@@ -27,7 +27,8 @@ Para não expor suas senhas no código, usamos "Secrets".
     | :--- | :--- |
     | `CPANEL_HOST` | O endereço do seu site (ex: `puretego.online` ou o IP do servidor). |
     | `CPANEL_USERNAME` | Seu usuário de login do cPanel. |
-    | `CPANEL_SSH_KEY` | O conteúdo da **Chave Privada** SSH que você copiou no passo anterior. |
+    | `CPANEL_SSH_KEY` | O conteúdo da **Chave Privada** SSH que eu gerei para você. |
+    | `CPANEL_SSH_PASSPHRASE` | A senha da chave SSH: `PureTego_Deploy_2026_@_Secure_SSH_Access!` |
 
 ## 3. Ajuste o Script de Deploy (`.github/workflows/deploy.yml`)
 
