@@ -1,0 +1,6 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home2/puretego/gbpcheck.puretego.online/
+    - /bin/cp -R * $DEPLOYPATH
+    - /bin/touch $DEPLOYPATH/passenger_wsgi.py

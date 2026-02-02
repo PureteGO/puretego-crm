@@ -1,0 +1,41 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USERNAME }}
+          key: ${{ secrets.CPANEL_SSH_KEY }}
+          port: 22
+          script: |
+            # 1. Navegar até o diretório do repositório no servidor
+            # AJUSTE ESTE CAMINHO PARA ONDE VOCÊ CLONOU O REPO NO CPANEL
+            cd /home2/${{ secrets.CPANEL_USERNAME }}/repositories/puretego-crm
+            
+            # 2. Puxar as últimas alterações
+            git pull origin main
+            
+            # 3. (Opcional) Se você usa o modo 'Deploy' do cPanel que copia arquivos para public_html
+            # /usr/local/cpanel/bin/uapi VersionControlDeployment create repository_root=/home/${{ secrets.CPANEL_USERNAME }}/repositories/puretego-crm
+            
+            # 4. Instalar dependências e Reiniciar App (Assumindo que o app roda direto do repo ou foi copiado)
+            # Vamos assumir que o App Python aponta para este diretório ou que copiamos os arquivos.
+            # Abaixo, um exemplo comum onde o app roda direto da pasta do repo ou de um venv local:
+            
+            source venv/bin/activate
+            pip install -r requirements.txt
+            
+            # Restart na aplicação (Touch no arquivo de entrada recarrega o Passenger)
+            touch passenger_wsgi.py
