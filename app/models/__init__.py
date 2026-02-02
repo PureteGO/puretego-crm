@@ -1,0 +1,22 @@
+"""
+PURETEGO CRM - Models Package
+"""
+
+from .user import User
+from .kanban_stage import KanbanStage
+from .client import Client
+from .visit import Visit
+from .health_check import HealthCheck
+from .service import Service
+from .proposal import Proposal, ProposalItem
+
+__all__ = [
+    'User',
+    'KanbanStage',
+    'Client',
+    'Visit',
+    'HealthCheck',
+    'Service',
+    'Proposal',
+    'ProposalItem'
+]

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Propuesta #{{ proposal.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Propuesta #{{ proposal.id }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('proposals.index') }}" class="btn btn-sm btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            <a href="{{ url_for('proposals.generate_pdf', proposal_id=proposal.id) }}"
+                class="btn btn-sm btn-outline-danger me-2">
+                <i class="bi bi-file-pdf"></i> PDF
+            </a>
+            <a href="{{ url_for('proposals.edit', proposal_id=proposal.id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Detalles de la Propuesta</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">Cliente:</div>
+                        <div class="col-sm-9">
+                            <a href="{{ url_for('clients.view', client_id=proposal.client.id) }}">{{
+                                proposal.client.name }}</a>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">Fecha:</div>
+                        <div class="col-sm-9">{{ proposal.created_at|format_date }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">Estado:</div>
+                        <div class="col-sm-9">
+                            <span class="badge bg-{{ 'success' if proposal.status == 'approved' else 'secondary' }}">{{
+                                proposal.status }}</span>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 border-bottom pb-2">Servicios</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-borderless">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>Servicio</th>
+                                    <th class="text-end">Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in proposal.items %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ item.service.name }}</div>
+                                        <small class="text-muted">{{ item.description or item.service.description
+                                            }}</small>
+                                    </td>
+                                    <td class="text-end">{{ item.price|format_currency }}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="border-top">
+                                    <td class="fw-bold text-end">TOTAL:</td>
+                                    <td class="fw-bold text-end">{{ proposal.total_amount|format_currency }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Condiciones</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">{{ proposal.payment_terms or 'No especificado.' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

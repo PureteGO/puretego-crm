@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Clientes</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('clients.create') }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-lg"></i> Novo Cliente
+            </a>
+            <a href="{{ url_for('clients.kanban') }}" class="btn btn-sm btn-outline-secondary ms-2">
+                <i class="bi bi-kanban"></i> Visualizar Kanban
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome / Negócio</th>
+                            <th>Contato</th>
+                            <th>Etapa</th>
+                            <th>Data Cadastro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold">{{ client.name }}</div>
+                                {% if client.gmb_profile_name %}
+                                <small class="text-muted"><i class="bi bi-google"></i> {{ client.gmb_profile_name
+                                    }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ client.contact_name or '-' }}</div>
+                                <small class="text-muted">{{ client.phone or '' }}</small>
+                            </td>
+                            <td>
+                                {% if client.kanban_stage %}
+                                <span class="badge bg-secondary">{{ client.kanban_stage.name }}</span>
+                                {% else %}
+                                <span class="badge bg-light text-dark">Sem etapa</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ client.created_at|format_date }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('clients.view', client_id=client.id) }}"
+                                        class="btn btn-outline-primary" title="Visualizar">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('clients.edit', client_id=client.id) }}"
+                                        class="btn btn-outline-secondary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <p class="text-muted mb-0">Nenhum cliente cadastrado ainda.</p>
+                                <a href="{{ url_for('clients.create') }}" class="btn btn-primary btn-sm mt-2">Cadastrar
+                                    Primeiro Cliente</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

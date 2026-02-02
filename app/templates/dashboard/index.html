@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h2">Dashboard</h1>
+    <p>Bem-vindo, {{ session["user_name"] }}!</p>
+
+    <!-- Estatísticas -->
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-people"></i> Total de Clientes</h5>
+                    <p class="card-text fs-2">{{ total_clients }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-geo-alt"></i> Total de Visitas</h5>
+                    <p class="card-text fs-2">{{ total_visits }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-file-earmark-text"></i> Total de Orçamentos</h5>
+                    <p class="card-text fs-2">{{ total_proposals }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-clipboard-data"></i> Total de Health Checks</h5>
+                    <p class="card-text fs-2">{{ total_health_checks }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Pipeline de Clientes -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    Pipeline de Clientes
+                </div>
+                <div class="card-body">
+                    <canvas id="clientsByStageChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orçamentos por Status -->
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    Orçamentos por Status
+                </div>
+                <div class="card-body">
+                    <canvas id="proposalsByStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Atividade Recente -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Atividade Recente
+                </div>
+                <div class="card-body">
+                    <h5>Últimas Visitas</h5>
+                    <ul class="list-group">
+                        {% for visit in recent_visits %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('clients.view', client_id=visit.client.id) }}">{{ visit.client.name
+                                }}</a> - {{ visit.visit_date|format_date }}
+                        </li>
+                        {% else %}
+                        <li class="list-group-item">Nenhuma visita recente.</li>
+                        {% endfor %}
+                    </ul>
+                    <h5 class="mt-4">Últimos Health Checks</h5>
+                    <ul class="list-group">
+                        {% for check in recent_health_checks %}
+                        <li class="list-group-item">
+                            <a href="{{ url_for('clients.view', client_id=check.client.id) }}">{{ check.client.name
+                                }}</a> - Pontuação: {{ check.score }}
+                        </li>
+                        {% else %}
+                        <li class="list-group-item">Nenhum health check recente.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Clientes por Etapa
+    const clientsByStageCtx = document.getElementById('clientsByStageChart').getContext('2d');
+    new Chart(clientsByStageCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for stage, count in clients_by_stage %}"{{ stage }}", {% endfor %}],
+        datasets: [{
+            label: '# de Clientes',
+            data: [{% for stage, count in clients_by_stage %}{{ count }}, {% endfor %}],
+        backgroundColor: [
+        'rgba(255, 99, 132, 0.2)',
+        'rgba(54, 162, 235, 0.2)',
+        'rgba(255, 206, 86, 0.2)',
+        'rgba(75, 192, 192, 0.2)',
+        'rgba(153, 102, 255, 0.2)',
+        'rgba(255, 159, 64, 0.2)'
+    ],
+        borderColor: [
+        'rgba(255, 99, 132, 1)',
+        'rgba(54, 162, 235, 1)',
+        'rgba(255, 206, 86, 1)',
+        'rgba(75, 192, 192, 1)',
+        'rgba(153, 102, 255, 1)',
+        'rgba(255, 159, 64, 1)'
+    ],
+        borderWidth: 1
+            }]
+        },
+        options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+    });
+
+    // Gráfico de Orçamentos por Status
+    const proposalsByStatusCtx = document.getElementById('proposalsByStatusChart').getContext('2d');
+    new Chart(proposalsByStatusCtx, {
+        type: 'pie',
+        data: {
+            labels: [{% for status, count in proposals_by_status.items() %}"{{ status|capitalize }}",{% endfor %}],
+        datasets: [{
+            label: '# de Orçamentos',
+            data: [{% for status, count in proposals_by_status.items() %}{{ count }}, {% endfor %}],
+        backgroundColor: [
+        'rgba(255, 206, 86, 0.7)', // Draft
+        'rgba(54, 162, 235, 0.7)',  // Sent
+        'rgba(75, 192, 192, 0.7)',  // Approved
+        'rgba(255, 99, 132, 0.7)'   // Rejected
+    ]
+            }]
+        }
+    });
+</script>
+{% endblock %}

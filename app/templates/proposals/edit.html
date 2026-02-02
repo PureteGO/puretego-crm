@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Propuesta #{{ proposal.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Editar Propuesta #{{ proposal.id }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('proposals.edit', proposal_id=proposal.id) }}">
+        <div class="row">
+            <!-- Dados da Proposta -->
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <h5 class="card-title mb-0">Datos Generales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Cliente</label>
+                            <input type="text" class="form-control" value="{{ proposal.client.name }}" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Estado</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="draft" {% if proposal.status=='draft' %}selected{% endif %}>Borrador
+                                </option>
+                                <option value="sent" {% if proposal.status=='sent' %}selected{% endif %}>Enviado
+                                </option>
+                                <option value="approved" {% if proposal.status=='approved' %}selected{% endif %}>
+                                    Aprovado</option>
+                                <option value="rejected" {% if proposal.status=='rejected' %}selected{% endif %}>
+                                    Rechazado</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="payment_terms" class="form-label">Términos de Pago</label>
+                            <textarea class="form-control" id="payment_terms" name="payment_terms"
+                                rows="3">{{ proposal.payment_terms }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Itens da Proposta -->
+            <div class="col-md-8 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Servicios / Itens</h5>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-item-btn">
+                            <i class="bi bi-plus-lg"></i> Agregar Servicio
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="items-container">
+                            {% for item in proposal.items %}
+                            <div class="row mb-3 item-row border-bottom pb-3">
+                                <div class="col-md-5">
+                                    <label class="form-label small">Servicio</label>
+                                    <select class="form-select service-select" name="service_ids[]" required
+                                        onchange="updatePrice(this)">
+                                        <option value="">Seleccione...</option>
+                                        {% for service in services %}
+                                        <option value="{{ service.id }}" data-price="{{ service.base_price }}"
+                                            data-desc="{{ service.description }}" {% if item.service_id==service.id
+                                            %}selected{% endif %}>{{ service.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small">Precio (GS)</label>
+                                    <input type="number" class="form-control price-input" name="service_prices[]"
+                                        value="{{ item.price }}" step="0.01" onchange="calculateTotal()" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small">Descripción Personalizada</label>
+                                    <input type="text" class="form-control desc-input" name="service_descriptions[]"
+                                        value="{{ item.description or '' }}" placeholder="Opcional">
+                                </div>
+                                <div class="col-md-1 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                        onclick="removeItem(this)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="row mt-4 border-top pt-3">
+                            <div class="col-md-6 offset-md-6 text-end">
+                                <h4>Total: <span id="total-display">GS {{ proposal.total_amount }}</span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="bi bi-save"></i> Actualizar Propuesta
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Template para novos itens (escondido) -->
+<template id="item-template">
+    <div class="row mb-3 item-row border-bottom pb-3">
+        <div class="col-md-5">
+            <label class="form-label small">Servicio</label>
+            <select class="form-select service-select" name="service_ids[]" required onchange="updatePrice(this)">
+                <option value="">Seleccione...</option>
+                {% for service in services %}
+                <option value="{{ service.id }}" data-price="{{ service.base_price }}"
+                    data-desc="{{ service.description }}">{{ service.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small">Precio (GS)</label>
+            <input type="number" class="form-control price-input" name="service_prices[]" step="0.01"
+                onchange="calculateTotal()" required>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small">Descripción Personalizada</label>
+            <input type="text" class="form-control desc-input" name="service_descriptions[]" placeholder="Opcional">
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function addItem() {
+        const template = document.getElementById('item-template');
+        const clone = template.content.cloneNode(true);
+        document.getElementById('items-container').appendChild(clone);
+    }
+
+    function removeItem(btn) {
+        btn.closest('.item-row').remove();
+        calculateTotal();
+    }
+
+    function updatePrice(select) {
+        const option = select.options[select.selectedIndex];
+        const row = select.closest('.item-row');
+        const priceInput = row.querySelector('.price-input');
+        const descInput = row.querySelector('.desc-input');
+
+        if (option.value) {
+            priceInput.value = option.dataset.price;
+            if (!descInput.value) {
+                descInput.value = option.dataset.desc.substring(0, 50) + '...';
+            }
+        } else {
+            priceInput.value = '';
+        }
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let total = 0;
+        document.querySelectorAll('.price-input').forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        document.getElementById('total-display').innerText = 'GS ' + total.toLocaleString('es-PY');
+    }
+
+    document.getElementById('add-item-btn').addEventListener('click', addItem);
+
+    // Calcular total inicial
+    calculateTotal();
+</script>
+{% endblock %}

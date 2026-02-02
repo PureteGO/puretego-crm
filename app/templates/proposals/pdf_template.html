@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Proposal</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+
+            @bottom-center {
+                content: "Page " counter(page) " of " counter(pages);
+                font-family: 'Helvetica', sans-serif;
+                font-size: 9pt;
+                color: #888;
+            }
+        }
+
+        body {
+            font-family: 'Helvetica', sans-serif;
+            color: #333;
+            line-height: 1.5;
+            font-size: 11pt;
+        }
+
+        .header {
+            width: 100%;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 20px;
+        }
+
+        .header-content {
+            display: flex;
+            /* xhtml2pdf support for flex is limited, using table fallback usually safer, but let's try clean css mostly */
+        }
+
+        /* Fallback layout using tables for PDF stability */
+        table.layout-table {
+            width: 100%;
+            border: none;
+        }
+
+        table.layout-table td {
+            vertical-align: top;
+            padding: 0;
+            border: none;
+        }
+
+        .company-name {
+            font-size: 24pt;
+            font-weight: bold;
+            color: #0056b3;
+            text-transform: uppercase;
+        }
+
+        .company-details {
+            text-align: right;
+            font-size: 9pt;
+            color: #555;
+        }
+
+        .document-title {
+            text-align: center;
+            font-size: 20pt;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #222;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .services-subtitle {
+            text-align: center;
+            font-size: 10pt;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .client-box {
+            background-color: #f8f9fa;
+            border-left: 5px solid #0056b3;
+            padding: 15px;
+            margin-bottom: 30px;
+        }
+
+        .client-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 14pt;
+            color: #0056b3;
+        }
+
+        .info-grid {
+            width: 100%;
+        }
+
+        .info-grid td {
+            padding-bottom: 5px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+            width: 30%;
+        }
+
+        table.items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        table.items-table th {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+
+        table.items-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-size: 10pt;
+        }
+
+        /* Stripe effect manually for PDF compatibility */
+        tr.even {
+            background-color: #f9f9f9;
+        }
+
+        .item-name {
+            font-weight: bold;
+            color: #333;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .item-desc {
+            font-size: 9pt;
+            color: #666;
+        }
+
+        .total-box {
+            width: 50%;
+            margin-left: auto;
+            background-color: #0056b3;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .total-box table {
+            width: 100%;
+            border: none;
+        }
+
+        .total-box td {
+            border: none;
+            padding: 5px 0;
+        }
+
+        .grand-total {
+            font-size: 16pt;
+            font-weight: bold;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            margin-top: 5px;
+            padding-top: 5px;
+        }
+
+        .terms-box {
+            margin-top: 40px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            background-color: #fdfdfd;
+        }
+
+        .terms-title {
+            font-weight: bold;
+            font-size: 12pt;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            color: #444;
+        }
+
+        .footer-note {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 9pt;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <table class="layout-table">
+            <tr>
+                <td width="50%">
+                    <div class="company-name">PURETEGO</div>
+
+                </td>
+                <td width="50%" class="company-details">
+                    <strong>{{ company_info.technical_responsible }}</strong><br>
+                    {{ company_info.website }}<br>
+                    {{ company_info.technical_email }}<br>
+                    {{ company_info.phone }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Title -->
+    <div class="document-title">{{ texts.proposal_title }}</div>
+    <div class="services-subtitle">{{ texts.services_subtitle|safe }}</div>
+
+    <!-- Client Info -->
+    <div class="client-box">
+        <h3>{{ texts.client_info }}</h3>
+        <table class="info-grid">
+            <tr>
+                <td class="label">{{ texts.client }}:</td>
+                <td>{{ proposal.client_name }}</td>
+            </tr>
+            <tr>
+                <td class="label">{{ texts.date }}:</td>
+                <td>{{ proposal.proposal_date|format_date }}</td>
+            </tr>
+            {% if proposal.valid_until %}
+            <tr>
+                <td class="label">{{ texts.valid_until }}:</td>
+                <td>{{ proposal.valid_until|format_date }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+
+    <!-- Items -->
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th width="10%">#</th>
+                <th width="60%">{{ texts.service }}</th>
+                <th width="30%" style="text-align: right;">{{ texts.investment }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in proposal.items %}
+            <tr class="{{ loop.cycle('', 'even') }}">
+                <td>{{ loop.index }}</td>
+                <td>
+                    <span class="item-name">{{ item.name }}</span>
+                    {% if item.description %}
+                    <br><span class="item-desc">{{ item.description }}</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">{{ item.price|format_currency(language) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="total-box">
+        <table>
+            <tr class="grand-total">
+                <td align="left">{{ texts.total_investment }}:</td>
+                <td align="right">{{ proposal.total_amount|format_currency(language) }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Terms -->
+    <div class="terms-box">
+        <div class="terms-title">{{ texts.payment_terms }}</div>
+        <p>{{ proposal.payment_terms or '-' }}</p>
+
+        <div class="terms-title" style="margin-top: 20px;">{{ texts.additional_info }}</div>
+        <p>{{ texts.additional_text }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-note">
+        Generated by Puretego CRM on {{ parse_date(now).strftime('%d/%m/%Y %H:%M') }}
+    </div>
+
+</body>
+
+</html>

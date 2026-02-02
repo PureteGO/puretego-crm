@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\ProAG\puretego-crm\debug_start.py", line 9, in <module>
+    import flask
+ModuleNotFoundError: No module named 'flask'
+Python executable: C:\Python314\python.exe
+CWD: C:\ProAG\puretego-crm
+Attempting to import Flask...
+ERROR CAUGHT:

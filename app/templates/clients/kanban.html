@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Kanban{% endblock %}
+
+{% block head %}
+<style>
+    .kanban-board {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+    }
+
+    .kanban-stage {
+        flex: 0 0 300px;
+        margin-right: 1rem;
+        background-color: #f4f5f7;
+        border-radius: 3px;
+        padding: 1rem;
+    }
+
+    .kanban-stage h5 {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .kanban-card {
+        background-color: #fff;
+        border-radius: 3px;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        cursor: grab;
+        box-shadow: 0 1px 0 rgba(9, 30, 66, .25);
+    }
+    .kanban-cards-container {
+        min-height: 200px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h2">Quadro Kanban</h1>
+
+    <div class="kanban-board">
+        {% for data in kanban_data %}
+        <div class="kanban-stage" data-stage-id="{{ data.stage.id }}">
+            <h5>{{ data.stage.name }} ({{ data.clients|length }})</h5>
+            <div class="kanban-cards-container" data-stage-id="{{ data.stage.id }}">
+                {% for client in data.clients %}
+                <div class="kanban-card" data-client-id="{{ client.id }}">
+                    <a href="{{ url_for('clients.view', client_id=client.id) }}" class="text-decoration-none text-dark">
+                        <h6>{{ client.name }}</h6>
+                        <small>{{ client.contact_name }}</small>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const containers = document.querySelectorAll(".kanban-cards-container");
+
+        if (typeof Sortable === 'undefined') {
+            console.error('SortableJS não foi carregado!');
+            return;
+        }
+
+        containers.forEach(container => {
+            new Sortable(container, {
+                group: 'kanban',
+                animation: 150,
+                onEnd: function (evt) {
+                    console.log('Drag ended', evt);
+                    const client_id = evt.item.dataset.clientId;
+                    const new_stage_id = evt.to.dataset.stageId;
+
+                    console.log(`Moving client ${client_id} to stage ${new_stage_id}`);
+
+                    fetch(`/clients/${client_id}/move`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ stage_id: new_stage_id })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                console.error('Error moving client:', data.message);
+                                alert('Erro ao mover cliente: ' + data.message);
+                                // Reverter o movimento visualmente
+                                evt.from.appendChild(evt.item);
+                            } else {
+                                console.log('Client moved successfully');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                            alert('Erro de conexão ao mover cliente.');
+                            evt.from.appendChild(evt.item);
+                        });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

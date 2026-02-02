@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Detalles del Cliente{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ client.name }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('clients.edit', client_id=client.id) }}" class="btn btn-sm btn-outline-primary me-2">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <form action="{{ url_for('clients.delete', client_id=client.id) }}" method="POST"
+                onsubmit="return confirm('¿Está seguro que desea eliminar este cliente?');">
+                <button type="submit" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-trash"></i> Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações do Cliente -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Información del Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong><i class="bi bi-tag"></i> Etapa:</strong> <span class="badge bg-info">{{
+                            client.kanban_stage.name if client.kanban_stage else 'Sem etapa' }}</span></p>
+                    <hr>
+                    <p><strong><i class="bi bi-person"></i> Contacto:</strong> {{ client.contact_name or '-' }}</p>
+                    <p><strong><i class="bi bi-telephone"></i> Teléfono:</strong> {{ client.phone or '-' }}</p>
+                    <p><strong><i class="bi bi-envelope"></i> Email:</strong> {{ client.email or '-' }}</p>
+                    <p><strong><i class="bi bi-geo-alt"></i> Dirección:</strong> {{
+                        client.address|urlize(target='_blank') if client.address else '-' }}</p>
+                    {% if client.gmb_profile_name %}
+                    <hr>
+                    <p><strong><i class="bi bi-google"></i> Google Maps:</strong> {{ client.gmb_profile_name }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Abas de Atividades -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="clientTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="proposals-tab" data-bs-toggle="tab" href="#proposals"
+                                role="tab">Propuestas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="visits-tab" data-bs-toggle="tab" href="#visits"
+                                role="tab">Visitas</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="health-tab" data-bs-toggle="tab" href="#health" role="tab">Health
+                                Check</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="clientTabsContent">
+                        <!-- Propuestas -->
+                        <div class="tab-pane fade show active" id="proposals" role="tabpanel">
+                            <div class="d-flex justify-content-end mb-3">
+                                <a href="{{ url_for('proposals.create', client_id=client.id) }}"
+                                    class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-lg"></i> Nueva Propuesta
+                                </a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Fecha</th>
+                                            <th>Total</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for proposal in proposals %}
+                                        <tr>
+                                            <td>#{{ proposal.id }}</td>
+                                            <td>{{ proposal.created_at|format_date }}</td>
+                                            <td>{{ proposal.total_amount|format_currency }}</td>
+                                            <td><span class="badge bg-secondary">{{ proposal.status }}</span></td>
+                                            <td>
+                                                <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}"
+                                                    class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center">No hay propuestas registradas.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Visitas -->
+                        <div class="tab-pane fade" id="visits" role="tabpanel">
+                            <p class="text-muted text-center py-4">Módulo de visitas em desenvolvimento.</p>
+                        </div>
+
+                        <!-- Health Check -->
+                        <div class="tab-pane fade" id="health" role="tabpanel">
+                            <p class="text-muted text-center py-4">Módulo de Health Check em desenvolvimento.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

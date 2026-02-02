@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Cliente{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Nuevo Cliente</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('clients.index') }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('clients.create') }}">
+                        <h4 class="mb-3 text-primary">Información del Negocio</h4>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Nombre del Negocio / Cliente <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="gmb_profile_name" class="form-label">Nombre en Google Maps (GMB)</label>
+                            <input type="text" class="form-control" id="gmb_profile_name" name="gmb_profile_name">
+                        </div>
+
+                        <h4 class="mb-3 text-primary mt-4">Contacto Principal</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="contact_name" class="form-label">Nombre de Contacto</label>
+                                <input type="text" class="form-control" id="contact_name" name="contact_name">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Teléfono / WhatsApp</label>
+                                <input type="text" class="form-control" id="phone" name="phone">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo Electrónico</label>
+                            <input type="email" class="form-control" id="email" name="email">
+                        </div>
+                        <div class="mb-3">
+                            <label for="address" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="address" name="address">
+                        </div>
+
+                        <h4 class="mb-3 text-primary mt-4">Pipeline</h4>
+                        <div class="mb-3">
+                            <label for="kanban_stage_id" class="form-label">Etapa Inicial</label>
+                            <select class="form-select" id="kanban_stage_id" name="kanban_stage_id">
+                                {% for stage in stages %}
+                                <option value="{{ stage.id }}">{{ stage.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Guardar Cliente
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

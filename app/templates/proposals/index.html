@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Orçamentos{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Orçamentos (Propuestas)</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('proposals.create') }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-lg"></i> Novo Orçamento
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th># ID</th>
+                            <th>Cliente</th>
+                            <th>Valor Total</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for proposal in proposals %}
+                        <tr>
+                            <td>#{{ proposal.id }}</td>
+                            <td>
+                                <a href="{{ url_for('clients.view', client_id=proposal.client_id) }}"
+                                    class="text-decoration-none">
+                                    {{ proposal.client_name }}
+                                </a>
+                            </td>
+                            <td class="fw-bold">{{ proposal.total_amount|format_currency }}</td>
+                            <td>
+                                {% if proposal.status == 'draft' %}
+                                <span class="badge bg-secondary">Rascunho (Borrador)</span>
+                                {% elif proposal.status == 'sent' %}
+                                <span class="badge bg-primary">Enviado</span>
+                                {% elif proposal.status == 'approved' %}
+                                <span class="badge bg-success">Aprovado</span>
+                                {% elif proposal.status == 'rejected' %}
+                                <span class="badge bg-danger">Rejeitado</span>
+                                {% else %}
+                                <span class="badge bg-light text-dark">{{ proposal.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ proposal.created_at|format_date }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}"
+                                        class="btn btn-outline-primary" title="Visualizar">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('proposals.edit', proposal_id=proposal.id) }}"
+                                        class="btn btn-outline-secondary" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    {% if proposal.pdf_file_path %}
+                                    <a href="{{ url_for('proposals.generate_pdf', proposal_id=proposal.id) }}"
+                                        class="btn btn-outline-danger" title="PDF">
+                                        <i class="bi bi-file-pdf"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <p class="text-muted mb-0">Nenhum orçamento cadastrado.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
