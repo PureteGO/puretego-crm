@@ -12,9 +12,9 @@ O sistema básico está funcional e rodando localmente com configurações de pr
 
 ### ✅ Concluído
 *   **CI/CD & Deploy**:
-    *   Pipeline GitHub Actions configurado e SUCCEEDING (Deploy via FTP).
-    *   Segredos de repositório configurados automaticamente.
-    *   Deploy em Staging (cPanel) realizado com sucesso.
+    *   Pipeline GitHub Actions configurado para **Deploy Automático via SSH** (Zero-Touch).
+    *   Segredos de repositório configurados (`CPANEL_SSH_KEY`).
+    *   Deploy em Produção (`crm.puretego.online`) verificado.
 *   **Infraestrutura Local**:
     *   Ambiente Python configurado (`venv`).
     *   Banco de dados MySQL (XAMPP) configurado e populado (`puretego_crm`).
