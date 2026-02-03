@@ -1,0 +1,2 @@
+This is a static file check.
+If you can see this, static files are working.

@@ -1,0 +1,15 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home2/puretego/gbpcheck.puretego.online"
+PassengerBaseURI "/"
+PassengerPython "/home2/puretego/virtualenv/gbpcheck.puretego.online/3.11/bin/python"
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+
+# Configurações de segurança
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+<Files "*.pyc">
+    Order allow,deny
+    Deny from all
+</Files>
