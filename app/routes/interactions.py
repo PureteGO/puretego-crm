@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from app.routes.auth import login_required
-from app.models import Interaction, InteractionType, CadenceRule, Client
+from app.models import Interaction, InteractionType, CadenceRule, Client, Visit
 from config.database import get_db
 from datetime import datetime, timedelta
 from sqlalchemy import or_
@@ -76,28 +76,75 @@ def create():
 @bp.route('/agenda')
 @login_required
 def agenda():
-    """Get tasks (scheduled interactions) formatted for dashboard"""
+    """Get tasks (scheduled interactions AND visits) formatted for dashboard"""
     now = datetime.now()
     end_of_today = now.replace(hour=23, minute=59, second=59)
     
     with get_db() as db:
-        # 1. Overdue & Today
+        # 1. Interactions: Overdue & Today
         urgent_tasks = db.query(Interaction).filter(
             Interaction.status == 'scheduled',
             Interaction.date <= end_of_today,
             Interaction.user_id == session['user_id']
         ).order_by(Interaction.date).all()
         
-        # 2. Upcoming (Future)
+        # 2. Interactions: Upcoming (Future)
         future_tasks = db.query(Interaction).filter(
             Interaction.status == 'scheduled',
             Interaction.date > end_of_today,
             Interaction.user_id == session['user_id']
         ).order_by(Interaction.date).limit(50).all()
+
+        # 3. Visits (Treat as Interactions)
+        # Fetch visits that are not "completed" (logic: future date = not completed usually, unless logic exists)
+        # For simplicity, we show ALL future visits as tasks
+        
+        visits_today = db.query(Visit).filter(
+            Visit.visit_date <= end_of_today,
+            Visit.visit_date >= now.replace(hour=0, minute=0, second=0),
+            Visit.user_id == session['user_id']
+        ).all()
+        
+        visits_future = db.query(Visit).filter(
+            Visit.visit_date > end_of_today,
+            Visit.user_id == session['user_id']
+        ).all()
+        
+        # Combine and formatting
+        today_list = [t.to_dict() for t in urgent_tasks]
+        upcoming_list = [t.to_dict() for t in future_tasks]
+        
+        # Add Visits to Today
+        for v in visits_today:
+            today_list.append({
+                'id': f"v_{v.id}",
+                'client_id': v.client_id,
+                'client_name': v.client.name,
+                'type_name': 'Visita Presencial',
+                'is_call': False,
+                'date': v.visit_date.isoformat(),
+                'status': 'scheduled'
+            })
+            
+        # Add Visits to Upcoming
+        for v in visits_future:
+            upcoming_list.append({
+                'id': f"v_{v.id}",
+                'client_id': v.client_id,
+                'client_name': v.client.name,
+                'type_name': 'Visita Presencial',
+                'is_call': False,
+                'date': v.visit_date.isoformat(),
+                'status': 'scheduled'
+            })
+            
+        # Sort lists by date
+        today_list.sort(key=lambda x: x['date'])
+        upcoming_list.sort(key=lambda x: x['date'])
         
         return jsonify({
-            'today': [t.to_dict() for t in urgent_tasks],
-            'upcoming': [t.to_dict() for t in future_tasks]
+            'today': today_list,
+            'upcoming': upcoming_list
         })
 
 

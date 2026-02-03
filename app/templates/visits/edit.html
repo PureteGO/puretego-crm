@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Visita - {{ visit.client.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Editar Visita</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('visits.edit', visit_id=visit.id) }}" method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">Cliente</label>
+                            <input type="text" class="form-control" value="{{ visit.client.name }}" readonly>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Data e Hora da Visita</label>
+                            <input type="datetime-local" name="visit_date" class="form-control"
+                                value="{{ visit.visit_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Observações / Notas</label>
+                            <textarea name="notes" class="form-control" rows="4">{{ visit.notes or '' }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Próximo Passo</label>
+                            <input type="text" name="next_step" class="form-control"
+                                value="{{ visit.next_step or '' }}">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Salvar Alterações</button>
+                            <a href="{{ url_for('visits.view', visit_id=visit.id) }}"
+                                class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
