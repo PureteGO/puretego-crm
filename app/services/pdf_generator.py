@@ -4,7 +4,7 @@ Serviço de geração de orçamentos em PDF usando HTML/CSS
 """
 
 from flask import render_template
-from xhtml2pdf import pisa
+# from xhtml2pdf import pisa # Moved to inside method
 from datetime import datetime
 import os
 import io
@@ -46,6 +46,11 @@ class PDFGenerator:
         # Renderizar HTML
         html_content = render_template('proposals/pdf_template.html', **context)
         
+        try:
+            from xhtml2pdf import pisa
+        except ImportError:
+            raise Exception("Biblioteca PDF (xhtml2pdf) não instalada no servidor. Contate o admin.")
+
         # Converter para PDF
         with open(filepath, "w+b") as result_file:
             pisa_status = pisa.CreatePDF(
