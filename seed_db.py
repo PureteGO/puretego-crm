@@ -1,5 +1,5 @@
 from app import create_app
-from app.models import User, KanbanStage, Service
+from app.models import User, KanbanStage, ServicePackage
 from config.database import db_session
 import bcrypt
 
@@ -24,8 +24,10 @@ def seed():
                 stage = KanbanStage(name=name, order=order)
                 db_session.add(stage)
         
-        # 2. Services
-        services = [
+        # 2. Service Packages (Start2GO, etc.)
+        # Note: These names must match what is expected in the UI logic if hardcoded anywhere,
+        # otherwise perfectly fine to use the descriptive names.
+        packages = [
             (
                 'Dominación en Google Maps - Pack 90 días', 
                 'Auditoría SEO Local avanzada, optimización técnica del Perfil de Empresa (GMB), gestión estratégica de reseñas y reputación, y posicionamiento en el Local Pack para máxima visibilidad.', 
@@ -48,19 +50,17 @@ def seed():
             )
         ]
         
-        for name, desc, price in services:
-            if not Service.query.filter_by(name=name).first():
-                service = Service(name=name, description=desc, base_price=price)
-                db_session.add(service)
+        for name, desc, price in packages:
+            if not ServicePackage.query.filter_by(name=name).first():
+                # ServicePackage uses 'name', 'description', 'price' (NOT 'base_price')
+                pkg = ServicePackage(name=name, description=desc, price=price)
+                db_session.add(pkg)
 
         # 3. Admin User
         admin_email = 'admin@puretego.online'
         if not User.query.filter_by(email=admin_email).first():
             print(f"Creating admin user: {admin_email}")
-            # The model handles hashing in set_password
             admin = User(name='Administrador', email=admin_email, password='nopasswordyet') 
-            # We need to manually set the password to match the known hash OR just set a new known password.
-            # Let's set the 'admin123' password using the model's method which generates a compatible bcrypt hash.
             admin.set_password('admin123')
             db_session.add(admin)
         else:
