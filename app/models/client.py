@@ -30,6 +30,12 @@ class Client(Base):
     visits = relationship('Visit', back_populates='client', cascade='all, delete-orphan')
     health_checks = relationship('HealthCheck', back_populates='client', cascade='all, delete-orphan')
     proposals = relationship('Proposal', back_populates='client', cascade='all, delete-orphan')
+    proposals = relationship('Proposal', back_populates='client', cascade='all, delete-orphan')
+    interactions = relationship('Interaction', back_populates='client', cascade='all, delete-orphan')
+    
+    # New Package Relationship
+    interested_package_id = Column(Integer, ForeignKey('service_packages.id', ondelete='SET NULL'), nullable=True)
+    interested_package = relationship("ServicePackage", back_populates="clients")
     
     def __init__(self, name, gmb_profile_name=None, contact_name=None, 
                  phone=None, email=None, address=None, kanban_stage_id=None):

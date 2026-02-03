@@ -60,6 +60,20 @@
                             </select>
                         </div>
 
+                        <h4 class="mb-3 text-primary mt-4">Interesse</h4>
+                        <div class="mb-3">
+                            <label for="interested_package_id" class="form-label">Pacote de Interesse</label>
+                            <select class="form-select" id="interested_package_id" name="interested_package_id">
+                                <option value="">Selecione um pacote...</option>
+                                {% for pkg in packages %}
+                                <option value="{{ pkg.id }}">{{ pkg.name }} - Gs. {{
+                                    "{:,.0f}".format(pkg.price).replace(',', '.') }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">O valor deste pacote será somado ao pipeline da fase selecionada.
+                            </div>
+                        </div>
+
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-save"></i> Guardar Cliente

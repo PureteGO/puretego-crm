@@ -4,6 +4,7 @@ Modelo de usuário do sistema
 """
 
 from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from config.database import Base
 import bcrypt
@@ -19,6 +20,9 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     password = Column(String(255), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
+
+    # Relationships
+    interactions = relationship('Interaction', back_populates='user')
     
     def __init__(self, name, email, password):
         self.name = name

@@ -5,7 +5,8 @@ Rotas de gestão de clientes e pipeline Kanban
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from app.routes.auth import login_required
-from app.models import Client, KanbanStage, Visit, HealthCheck, Proposal
+from app.routes.auth import login_required
+from app.models import Client, KanbanStage, Visit, HealthCheck, Proposal, Interaction, ServicePackage
 from config.database import get_db
 from datetime import datetime
 
@@ -29,7 +30,8 @@ def index():
             'phone': c.phone,
             'email': c.email,
             'created_at': c.created_at,
-            'kanban_stage': {'name': c.kanban_stage.name, 'color': 'primary'} if c.kanban_stage else None
+            'kanban_stage': {'name': c.kanban_stage.name, 'color': 'primary'} if c.kanban_stage else None,
+            'interested_package': c.interested_package.name if c.interested_package else None
         } for c in clients_query]
         
         stages = [{'id': s.id, 'name': s.name} for s in stages_query]
@@ -43,17 +45,26 @@ def kanban():
     """Visualização Kanban do pipeline de vendas"""
     with get_db() as db:
         stages = db.query(KanbanStage).order_by(KanbanStage.order).all()
+        first_stage_id = stages[0].id if stages else -1
         
         # Organizar clientes por etapa
         kanban_data = []
         for stage in stages:
             clients = db.query(Client).filter(Client.kanban_stage_id == stage.id).all()
             
+            # Calculate Total Value (Exclude first stage)
+            stage_value = 0
+            if stage.id != first_stage_id:
+                for client in clients:
+                    if client.interested_package:
+                        stage_value += client.interested_package.price
+
             # Serialize data to avoid DetachedInstanceError after session closes
             stage_dict = {
                 'id': stage.id,
                 'name': stage.name,
-                'order': stage.order
+                'order': stage.order,
+                'total_value': float(stage_value)
             }
             
             clients_list = []
@@ -62,7 +73,7 @@ def kanban():
                     'id': client.id,
                     'name': client.name,
                     'contact_name': client.contact_name,
-                    # Add other needed fields
+                    'package_name': client.interested_package.name if client.interested_package else None
                 })
 
             kanban_data.append({
@@ -85,6 +96,7 @@ def create():
         email = request.form.get('email')
         address = request.form.get('address')
         kanban_stage_id = request.form.get('kanban_stage_id')
+        package_id = request.form.get('interested_package_id')
         
         with get_db() as db:
             client = Client(
@@ -96,6 +108,9 @@ def create():
                 address=address,
                 kanban_stage_id=int(kanban_stage_id) if kanban_stage_id else None
             )
+            if package_id:
+                client.interested_package_id = int(package_id)
+                
             db.add(client)
             db.commit()
             
@@ -104,10 +119,12 @@ def create():
     
     with get_db() as db:
         stages_query = db.query(KanbanStage).order_by(KanbanStage.order).all()
-        # Serialize to avoid DetachedInstanceError
+        packages_query = db.query(ServicePackage).order_by(ServicePackage.price).all()
+        
         stages = [{'id': s.id, 'name': s.name} for s in stages_query]
+        packages = [{'id': p.id, 'name': p.name, 'price': float(p.price)} for p in packages_query]
     
-    return render_template('clients/create.html', stages=stages)
+    return render_template('clients/create.html', stages=stages, packages=packages)
 
 
 @bp.route('/<int:client_id>')
@@ -132,6 +149,9 @@ def view(client_id):
             .order_by(Proposal.created_at.desc()).all()
         
         stages = db.query(KanbanStage).order_by(KanbanStage.order).all()
+        
+        interactions = db.query(Interaction).filter(Interaction.client_id == client_id)\
+            .order_by(Interaction.date.desc()).all()
     
         return render_template(
             'clients/view.html',
@@ -139,7 +159,8 @@ def view(client_id):
             visits=visits,
             health_checks=health_checks,
             proposals=proposals,
-            stages=stages
+            stages=stages,
+            interactions=interactions
         )
 
 
@@ -165,16 +186,21 @@ def edit(client_id):
             kanban_stage_id = request.form.get('kanban_stage_id')
             client.kanban_stage_id = int(kanban_stage_id) if kanban_stage_id else None
             
+            package_id = request.form.get('interested_package_id')
+            client.interested_package_id = int(package_id) if package_id else None
+            
             db.commit()
             
             flash(f'Cliente {client.name} atualizado com sucesso!', 'success')
             return redirect(url_for('clients.view', client_id=client.id))
         
         stages_query = db.query(KanbanStage).order_by(KanbanStage.order).all()
-        # Serialize stages
+        packages_query = db.query(ServicePackage).order_by(ServicePackage.price).all()
+        
         stages = [{'id': s.id, 'name': s.name} for s in stages_query]
+        packages = [{'id': p.id, 'name': p.name, 'price': float(p.price)} for p in packages_query]
     
-        return render_template('clients/edit.html', client=client, stages=stages)
+        return render_template('clients/edit.html', client=client, stages=stages, packages=packages)
 
 
 @bp.route('/<int:client_id>/delete', methods=['POST'])

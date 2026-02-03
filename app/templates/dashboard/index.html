@@ -7,6 +7,39 @@
     <h1 class="h2">Dashboard</h1>
     <p>Bem-vindo, {{ session["user_name"] }}!</p>
 
+    <!-- Agenda / Tarefas -->
+    <div class="row mb-4">
+        <!-- Hoje -->
+        <div class="col-md-6 mb-3">
+            <div class="card border-primary h-100">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Agenda de Hoje</h5>
+                    <span class="badge bg-light text-primary" id="todayCount">0</span>
+                </div>
+                <div class="card-body p-0">
+                    <div id="todayList" class="list-group list-group-flush">
+                        <p class="text-muted text-center my-3">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos -->
+        <div class="col-md-6 mb-3">
+            <div class="card border-info h-100">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-calendar-next"></i> Próximos 7 Dias</h5>
+                    <span class="badge bg-light text-info" id="upcomingCount">0</span>
+                </div>
+                <div class="card-body p-0">
+                    <div id="upcomingList" class="list-group list-group-flush">
+                        <p class="text-muted text-center my-3">Carregando...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Estatísticas -->
     <div class="row">
         <div class="col-md-3 mb-3">
@@ -109,6 +142,48 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // Carregar Agenda
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/interactions/agenda')
+            .then(r => r.json())
+            .then(data => {
+                renderList('todayList', 'todayCount', data.today, 'Nenhuma tarefa para hoje.');
+                renderList('upcomingList', 'upcomingCount', data.upcoming, 'Nenhuma tarefa próxima.');
+            });
+    });
+
+    function renderList(listId, countId, tasks, emptyMsg) {
+        const list = document.getElementById(listId);
+        const countBadge = document.getElementById(countId);
+        list.innerHTML = '';
+        countBadge.textContent = tasks.length;
+
+        if (tasks.length === 0) {
+            list.innerHTML = `<p class="text-muted text-center my-3">${emptyMsg}</p>`;
+            return;
+        }
+
+        tasks.forEach(task => {
+            const item = document.createElement('a');
+            item.href = `/clients/${task.client_id}`;
+            item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+
+            const icon = task.is_call ? '<i class="bi bi-telephone"></i>' : '<i class="bi bi-geo-alt"></i>';
+            const d = new Date(task.date);
+            const dateStr = d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            item.innerHTML = `
+                <div>
+                    <span class="me-2 text-primary">${icon}</span>
+                    <strong>${task.type_name}</strong>
+                    <div class="small text-muted">${task.client_name}</div>
+                </div>
+                <span class="badge bg-light text-dark border">${dateStr}</span>
+            `;
+            list.appendChild(item);
+        });
+    }
+
     // Gráfico de Clientes por Etapa
     const clientsByStageCtx = document.getElementById('clientsByStageChart').getContext('2d');
     new Chart(clientsByStageCtx, {

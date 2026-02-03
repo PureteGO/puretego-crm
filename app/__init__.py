@@ -29,7 +29,7 @@ def create_app(config_object=None):
         init_db()
     
     # Registrar blueprints (rotas)
-    from app.routes import auth, clients, visits, proposals, health_checks, dashboard
+    from app.routes import auth, clients, visits, proposals, health_checks, dashboard, interactions
     
     app.register_blueprint(auth.bp)
     app.register_blueprint(clients.bp)
@@ -37,6 +37,7 @@ def create_app(config_object=None):
     app.register_blueprint(proposals.bp)
     app.register_blueprint(health_checks.bp)
     app.register_blueprint(dashboard.bp)
+    app.register_blueprint(interactions.bp)
     
     # Registrar função de limpeza
     @app.teardown_appcontext

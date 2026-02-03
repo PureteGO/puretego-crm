@@ -31,6 +31,7 @@
         cursor: grab;
         box-shadow: 0 1px 0 rgba(9, 30, 66, .25);
     }
+
     .kanban-cards-container {
         min-height: 200px;
     }
@@ -44,13 +45,33 @@
     <div class="kanban-board">
         {% for data in kanban_data %}
         <div class="kanban-stage" data-stage-id="{{ data.stage.id }}">
-            <h5>{{ data.stage.name }} ({{ data.clients|length }})</h5>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">
+                    {{ data.stage.name }}
+                    <button class="btn btn-sm btn-link text-muted p-0 ms-2"
+                        onclick="editStage({{ data.stage.id }}, '{{ data.stage.name }}', {{ data.stage.order }})">
+                        <i class="bi bi-pencil" style="font-size: 0.8rem;"></i>
+                    </button>
+                    <span class="badge bg-secondary rounded-pill ms-1">{{ data.clients|length }}</span>
+                </h5>
+            </div>
+            {% if data.stage.total_value > 0 %}
+            <div class="mb-2 text-end text-success fw-bold border-bottom pb-1">
+                Gs. {{ "{:,.0f}".format(data.stage.total_value).replace(',', '.') }}
+            </div>
+            {% endif %}
+
             <div class="kanban-cards-container" data-stage-id="{{ data.stage.id }}">
                 {% for client in data.clients %}
                 <div class="kanban-card" data-client-id="{{ client.id }}">
                     <a href="{{ url_for('clients.view', client_id=client.id) }}" class="text-decoration-none text-dark">
-                        <h6>{{ client.name }}</h6>
-                        <small>{{ client.contact_name }}</small>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">{{ client.name }}</h6>
+                        </div>
+                        <div class="small text-muted mb-1">{{ client.contact_name or '' }}</div>
+                        {% if client.package_name %}
+                        <div class="badge bg-info text-dark">{{ client.package_name }}</div>
+                        {% endif %}
                     </a>
                 </div>
                 {% endfor %}
@@ -59,10 +80,46 @@
         {% endfor %}
     </div>
 </div>
+</div>
+
+<!-- Edit Stage Modal -->
+<div class="modal fade" id="editStageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Etapa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStageForm" method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nome da Etapa</label>
+                        <input type="text" class="form-control" id="stageName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ordem</label>
+                        <input type="number" class="form-control" id="stageOrder" name="order" required>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+    function editStage(id, name, order) {
+        document.getElementById('editStageForm').action = `/clients/stages/${id}/edit`;
+        document.getElementById('stageName').value = name;
+        document.getElementById('stageOrder').value = order;
+        new bootstrap.Modal(document.getElementById('editStageModal')).show();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const containers = document.querySelectorAll(".kanban-cards-container");
 

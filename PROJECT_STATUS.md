@@ -11,18 +11,21 @@
 O sistema básico está funcional e rodando localmente com configurações de produção simuladas.
 
 ### ✅ Concluído
+*   **CI/CD & Deploy**:
+    *   Pipeline GitHub Actions configurado e SUCCEEDING (Deploy via FTP).
+    *   Segredos de repositório configurados automaticamente.
+    *   Deploy em Staging (cPanel) realizado com sucesso.
 *   **Infraestrutura Local**:
     *   Ambiente Python configurado (`venv`).
     *   Banco de dados MySQL (XAMPP) configurado e populado (`puretego_crm`).
-    *   Script de inicialização simplificado (`start_local.bat`).
 *   **Funcionalidades Principais**:
+    *   **Health Check**: Relatório visual 100% corrigido e populando dados corretamente.
     *   **Autenticação**: Login de admin implementado.
     *   **Propostas**: Geração de PDF via `xhtml2pdf` com layout profissional.
-    *   **Database**: Migração de SQLite para MySQL completa.
 
 ### 🚧 Em Andamento / Para Validar
-*   **Módulos de UI**: As telas de `Visitas` e `Health Checks` foram criadas (HTML), mas precisamos navegar nelas para validar se a integração com o back-end está 100%.
-*   **Fluxo de Proposta**: Verificar se o PDF gerado está salvando corretamente e não sendo regerado desnecessariamente (ponto levantado na análise de arquitetura).
+*   **Configuração Final Produção**: Criar arquivo `.env` manualmente no cPanel.
+*   **Validação Visual Remota**: Acessar a URL de staging para garantir que tudo carrega como no local.
 
 ---
 

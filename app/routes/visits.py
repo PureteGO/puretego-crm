@@ -18,8 +18,7 @@ def index():
     """Lista de visitas"""
     with get_db() as db:
         visits = db.query(Visit).order_by(Visit.visit_date.desc()).all()
-    
-    return render_template('visits/index.html', visits=visits)
+        return render_template('visits/index.html', visits=visits)
 
 
 @bp.route('/create', methods=['GET', 'POST'])

@@ -1,0 +1,191 @@
+<!-- Button to Trigger Modal -->
+<!-- Included in parent -->
+
+<!-- Main Logging Modal -->
+<div class="modal fade" id="logInteractionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="interactionModalLabel">Registrar Interação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="logInteractionForm">
+                    <input type="hidden" id="clientId" name="client_id" value="{{ client.id }}">
+                    <input type="hidden" id="interactionId" name="interaction_id"> <!-- HIDDEN ID -->
+
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <select class="form-select" id="interactionType" name="type_id" required>
+                            <!-- Populated via JS or server -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Data/Hora</label>
+                        <input type="datetime-local" class="form-control" id="interactionDate" name="date" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notas</label>
+                        <textarea class="form-control" id="interactionNotes" name="notes" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="interactionDone" name="status" value="done"
+                            checked>
+                        <label class="form-check-label" for="interactionDone">
+                            Já realizado (marcar como concluído)
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="submitInteraction()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Suggestion Modal (Hidden by default) -->
+<div class="modal fade" id="suggestionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-info">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title"><i class="bi bi-lightbulb"></i> Sugestão de Próximo Passo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="lead" id="suggestionMessage">...</p>
+                <input type="hidden" id="suggestedTypeId">
+                <input type="hidden" id="suggestedDate">
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary" onclick="acceptSuggestion()"><i
+                        class="bi bi-calendar-check"></i> Agendar</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Não agendar
+                    nada</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set default date to now
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('interactionDate').value = now.toISOString().slice(0, 16);
+
+        // Load Types
+        fetch('/interactions/types')
+            .then(r => r.json())
+            .then(types => {
+                const select = document.getElementById('interactionType');
+                types.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.id;
+                    opt.text = t.name;
+                    select.appendChild(opt);
+                });
+            });
+
+        // Reset modal on close
+        document.getElementById('logInteractionModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('logInteractionForm').reset();
+            document.getElementById('interactionId').value = '';
+            document.getElementById('interactionModalLabel').textContent = 'Registrar Interação';
+            document.getElementById('interactionDone').checked = true;
+            // Reset date
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('interactionDate').value = now.toISOString().slice(0, 16);
+        });
+    });
+
+    function openEditModal(id, typeId, dateStr, notes, status) {
+        document.getElementById('interactionId').value = id;
+        document.getElementById('interactionType').value = typeId;
+        document.getElementById('interactionNotes').value = notes;
+        document.getElementById('interactionDone').checked = (status === 'done');
+        document.getElementById('interactionModalLabel').textContent = 'Editar Interação';
+
+        // Format date for datetime-local (yyyy-MM-ddThh:mm)
+        const date = new Date(dateStr);
+        date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+        document.getElementById('interactionDate').value = date.toISOString().slice(0, 16);
+
+        const modal = new bootstrap.Modal(document.getElementById('logInteractionModal'));
+        modal.show();
+    }
+
+    function submitInteraction() {
+        const interactionId = document.getElementById('interactionId').value;
+        const isUpdate = !!interactionId;
+
+        const formData = {
+            client_id: document.getElementById('clientId').value,
+            type_id: document.getElementById('interactionType').value,
+            date: document.getElementById('interactionDate').value,
+            notes: document.getElementById('interactionNotes').value,
+            status: document.getElementById('interactionDone').checked ? 'done' : 'scheduled'
+        };
+
+        const url = isUpdate ? `/interactions/${interactionId}/update` : '/interactions/create';
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // Close log modal
+                    const logModal = bootstrap.Modal.getInstance(document.getElementById('logInteractionModal'));
+                    logModal.hide();
+
+                    // Check for suggestion (Only on Create)
+                    if (!isUpdate && data.suggestion) {
+                        document.getElementById('suggestionMessage').textContent = data.suggestion.message;
+                        document.getElementById('suggestedTypeId').value = data.suggestion.type_id;
+                        document.getElementById('suggestedDate').value = data.suggestion.date;
+
+                        const suggModal = new bootstrap.Modal(document.getElementById('suggestionModal'));
+                        suggModal.show();
+                    } else {
+                        location.reload(); // Refresh to show changes
+                    }
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+    }
+
+    function acceptSuggestion() {
+        const typeId = document.getElementById('suggestedTypeId').value;
+        const date = document.getElementById('suggestedDate').value;
+        const notes = "Agendado via sugestão automática.";
+
+        const formData = {
+            client_id: document.getElementById('clientId').value,
+            type_id: typeId,
+            date: date,
+            notes: notes,
+            status: 'scheduled'
+        };
+
+        fetch('/interactions/create', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+    }
+</script>

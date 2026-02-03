@@ -9,6 +9,8 @@ from .visit import Visit
 from .health_check import HealthCheck
 from .service import Service
 from .proposal import Proposal, ProposalItem
+from .interaction import Interaction, InteractionType, CadenceRule
+from .service_package import ServicePackage
 
 __all__ = [
     'User',
@@ -18,5 +20,9 @@ __all__ = [
     'HealthCheck',
     'Service',
     'Proposal',
-    'ProposalItem'
+    'ProposalItem',
+    'Interaction',
+    'InteractionType',
+    'CadenceRule',
+    'ServicePackage'
 ]

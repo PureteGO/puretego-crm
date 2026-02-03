@@ -18,8 +18,7 @@ def index():
     """Lista de health checks"""
     with get_db() as db:
         health_checks = db.query(HealthCheck).order_by(HealthCheck.created_at.desc()).all()
-    
-    return render_template('health_checks/index.html', health_checks=health_checks)
+        return render_template('health_checks/index.html', health_checks=health_checks)
 
 
 @bp.route('/create/<int:client_id>', methods=['GET', 'POST'])
