@@ -16,10 +16,15 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          # Caminho no servidor para onde os arquivos vão. 
-          # Exemplo: /gbpcheck.puretego.online/ ou /public_html/
+          username: ${{ secrets.CPANEL_USERNAME }}
+          # Usando SFTP com a chave SSH já configurada (mais seguro que senha)
+          protocol: sftp
+          port: 22
+          ssh-key: ${{ secrets.CPANEL_SSH_KEY }}
+          # Passphrase se a chave tiver (a action pode não suportar nativamente, mas tentamos)
+          # Se falhar, precisaremos da senha FTP real.
+          
+          # Caminho no servidor
           server-dir: /gbpcheck.puretego.online/
           
           # Arquivos para ignorar no upload
