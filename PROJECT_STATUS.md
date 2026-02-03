@@ -12,7 +12,7 @@ O sistema básico está funcional e rodando localmente com configurações de pr
 
 ### ✅ Concluído
 *   **CI/CD & Deploy**:
-    *   Pipeline GitHub Actions configurado para **Deploy Automático via SSH** (Zero-Touch).
+    *   Pipeline GitHub Actions configurado para **Deploy Automático via FTP** (Zero-Touch).
     *   Segredos de repositório configurados (`CPANEL_SSH_KEY`).
     *   Deploy em Produção (`crm.puretego.online`) verificado.
 *   **Infraestrutura Local**:
