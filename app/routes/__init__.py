@@ -10,5 +10,6 @@ __all__ = [
     'clients',
     'visits',
     'health_checks',
-    'proposals'
+    'proposals',
+    'calendar'
 ]

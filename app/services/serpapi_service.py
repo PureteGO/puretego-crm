@@ -14,13 +14,13 @@ class SerpApiService:
         self.api_key = api_key or config.SERPAPI_KEY
         self.base_url = "https://serpapi.com/search"
     
-    def search_business(self, business_name, location="Paraguay"):
+    def search_business(self, business_name, location=None):
         """
         Busca informações de um negócio no Google Maps
         
         Args:
             business_name: Nome do negócio para buscar
-            location: Localização para a busca (padrão: Paraguay)
+            location: Localização para a busca (opcional)
             
         Returns:
             dict: Dados do negócio encontrado ou None
@@ -29,10 +29,18 @@ class SerpApiService:
             params = {
                 "engine": "google_maps",
                 "q": business_name,
-                "ll": "@-25.2637,57.5759,14z",  # Coordenadas de Asunción, Paraguay
                 "type": "search",
                 "api_key": self.api_key
             }
+            
+            # Se tiver localização, adicionar à busca para contextualizar
+            if location:
+                params["q"] += f", {location}"
+            else:
+                # Se não tiver, focar em Assunção/Paraguay como fallback
+                params["ll"] = "@-25.2637,57.5759,14z"
+            
+            print(f"Buscando com params: {params['q']}") # Debug log
             
             response = requests.get(self.base_url, params=params, timeout=30)
             response.raise_for_status()
@@ -41,8 +49,22 @@ class SerpApiService:
             
             # Retornar o primeiro resultado local
             if "local_results" in data and len(data["local_results"]) > 0:
+                print(f"Encontrado (Local Results): {data['local_results'][0].get('title')}")
                 return data["local_results"][0]
             
+            # Verificar se é um resultado direto (Place Results) - Comum quando a busca é muito específica
+            if "place_results" in data:
+                print(f"Encontrado (Place Results): {data['place_results'].get('title')}")
+                return data["place_results"]
+            
+            # Verificar sugestão ortográfica se não encontrar nada
+            spelling_fix = data.get("search_information", {}).get("spelling_fix")
+            
+            print("Nenhum resultado local encontrado.")
+            if spelling_fix:
+                print(f"Sugestão encontrada: {spelling_fix}")
+                return {'error': 'not_found', 'suggestion': spelling_fix}
+                
             return None
             
         except requests.exceptions.RequestException as e:
@@ -76,12 +98,13 @@ class SerpApiService:
             print(f"Erro ao obter detalhes do negócio: {e}")
             return None
     
-    def analyze_gmb_profile(self, business_name):
+    def analyze_gmb_profile(self, business_name, location=None):
         """
         Analisa o perfil GMB de um negócio e retorna pontuação e relatório
         
         Args:
             business_name: Nome do negócio para analisar
+            location: Localização do negócio (opcional)
             
         Returns:
             dict: {
@@ -91,18 +114,36 @@ class SerpApiService:
             }
         """
         # Buscar o negócio
-        business = self.search_business(business_name)
+        business = self.search_business(business_name, location)
         
-        if not business:
+        if not business or 'error' in business:
+            suggestion = business.get('suggestion') if business else None
+            error_msg = 'Negócio não encontrado'
+            if suggestion:
+                error_msg += f'. Você quis dizer: "{suggestion}"?'
+            
+            # Tentar busca fallback (sem localização se falhou com ela, ou vice versa?)
+            # Por enquanto simples: se falhou, falhou.
             return {
                 'score': 0,
-                'report': {'error': 'Negócio não encontrado'},
+                'report': {'error': error_msg},
                 'raw_data': None
             }
         
-        # Obter detalhes completos se tiver place_id
+        # OTIMIZAÇÃO DE CRÉDITOS:
+        # Se o resultado da busca já for rico (ex: Place Results ou Local Result completo), 
+        # usamos ele mesmo como detalhes para economizar 1 chamada de API.
         details = None
-        if 'place_id' in business:
+        
+        # Heurística: Se tem horário E endereço, provavelmente é um resultado rico o suficiente
+        is_rich_result = 'hours' in business and 'address' in business
+        
+        if is_rich_result:
+            print("Otimização: Usando resultado da busca como detalhes (economizando 1 crédito)")
+            details = business
+        elif 'place_id' in business:
+            # Apenas faz a segunda chamada se o resultado for pobre (apenas resumo)
+            print("Resultado básico: Buscando detalhes adicionais (gasta +1 crédito)")
             details = self.get_business_details(business['place_id'])
         
         # Analisar os critérios

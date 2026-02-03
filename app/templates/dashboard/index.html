@@ -7,6 +7,38 @@
     <h1 class="h2">Dashboard</h1>
     <p>Bem-vindo, {{ session["user_name"] }}!</p>
 
+    <!-- Quick Health Check Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="bi bi-speedometer2"></i> Quick Health Check (GMB)</h5>
+                    <p class="text-muted small">Digite o nome da empresa para realizar uma análise instantânea do Google
+                        Meu Negócio.</p>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control form-control-lg" id="quickCheckInput"
+                            placeholder="Nome da empresa (ex: AGR Equipamientos)...">
+                        <button class="btn btn-primary" type="button" id="btnQuickCheck">Verificar Agora</button>
+                    </div>
+                    <div id="quickCheckResult" class="d-none animate__animated animate__fadeIn">
+                        <div class="alert alert-secondary d-flex align-items-center" role="alert">
+                            <div class="spinner-border text-primary me-3" role="status" id="quickCheckSpinner">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div id="quickCheckContent">
+                                <strong>Analisando...</strong> Por favor, aguarde enquanto consultamos o Google.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Result Modal Trigger (Hidden) -->
+                    <button id="showResultModal" type="button" class="d-none" data-bs-toggle="modal"
+                        data-bs-target="#healthCheckModal"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Agenda / Tarefas -->
     <div class="row mb-4">
         <!-- Hoje -->
@@ -239,5 +271,145 @@
             }]
         }
     });
+
+    // Quick Health Check Logic
+    const quickInput = document.getElementById('quickCheckInput');
+    const btnQuickCheck = document.getElementById('btnQuickCheck');
+    const resultDiv = document.getElementById('quickCheckResult');
+    const spinner = document.getElementById('quickCheckSpinner');
+    const contentDiv = document.getElementById('quickCheckContent');
+
+    // Enter key support
+    quickInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            btnQuickCheck.click();
+        }
+    });
+
+    btnQuickCheck.addEventListener('click', function () {
+        const businessName = quickInput.value.trim();
+        if (!businessName) return;
+
+        // Reset UI
+        resultDiv.classList.remove('d-none');
+        spinner.classList.remove('d-none');
+        contentDiv.innerHTML = '<strong>Analisando...</strong> Por favor, aguarde enquanto consultamos o Google.';
+        btnQuickCheck.disabled = true;
+
+        // API Call
+        fetch('/health-checks/quick-check', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ business_name: businessName })
+        })
+            .then(response => response.json())
+            .then(data => {
+                btnQuickCheck.disabled = false;
+                spinner.classList.add('d-none');
+
+                if (data.success) {
+                    const summary = data.report.summary;
+                    contentDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center w-100 mb-3">
+                        <div>
+                            <h4 class="alert-heading text-success mb-0"><i class="bi bi-check-circle-fill"></i> Análise Completa!</h4>
+                            <p class="mb-0">Empresa encontrada: <strong>${data.report.business_name}</strong></p>
+                        </div>
+                        <div class="text-center ms-3">
+                            <h2 class="display-4 fw-bold ${data.score > 70 ? 'text-success' : (data.score > 40 ? 'text-warning' : 'text-danger')} mb-0">${data.score}</h2>
+                            <small class="text-muted">Pontos</small>
+                        </div>
+                    </div>
+
+                    <!-- Summary Box matching user request -->
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-dark text-white py-2">
+                            <h6 class="mb-0 fw-bold">Resumo da Análise</h6>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                                <span class="fw-medium">Pontos Críticos:</span>
+                                <span class="badge rounded-pill bg-danger fs-6">${summary.critical_issues_count}</span>
+                            </div>
+                             <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                                <span class="fw-medium">Pontos Moderados:</span>
+                                <span class="badge rounded-pill bg-warning text-dark fs-6">${summary.moderate_issues_count}</span>
+                            </div>
+                             <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-medium">Pontos Positivos:</span>
+                                <span class="badge rounded-pill bg-success fs-6">${summary.positive_points_count}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        ${data.health_check_id
+                            ? `<a href="/health-checks/${data.health_check_id}" class="btn btn-primary">Ver Relatório Completo</a>`
+                            : `<button class="btn btn-success" onclick="createLeadFromQuickCheck()">Criar Lead Baseado Nisso</button>`
+                        }
+                    </div>
+                `;
+
+                    // Store data for potential lead creation
+                    window.lastQuickCheckResult = data;
+
+                    // Change alert class to transparent/cleaner style for the rich content
+                    resultDiv.querySelector('.alert').className = 'alert alert-light border shadow-sm';
+                } else {
+                    contentDiv.innerHTML = `
+                    <strong class="text-danger">Erro:</strong> ${data.message}
+                    <br><small>Tente ser mais específico (ex: "Empresa X, Cidade Y")</small>
+                `;
+                    resultDiv.querySelector('.alert').className = 'alert alert-danger d-flex align-items-center';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                btnQuickCheck.disabled = false;
+                spinner.classList.add('d-none');
+                contentDiv.innerHTML = `<strong class="text-danger">Erro de Conexão.</strong> Tente novamente.`;
+            });
+    });
+
+    function createLeadFromQuickCheck() {
+        if (!window.lastQuickCheckResult) return;
+
+        const data = window.lastQuickCheckResult;
+        const btn = document.querySelector('button[onclick="createLeadFromQuickCheck()"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Criando...';
+        }
+
+        fetch('/health-checks/convert-to-lead', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                business_name: data.report.business_name,
+                score: data.score,
+                report: data.report
+            })
+        })
+            .then(response => response.json())
+            .then(res => {
+                if (res.success) {
+                    window.location.href = `/clients/${res.client_id}`;
+                } else {
+                    alert('Erro ao criar lead: ' + res.message);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = 'Tentar Novamente';
+                    }
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Erro de conexão.');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Tentar Novamente';
+                }
+            });
+    }
 </script>
 {% endblock %}

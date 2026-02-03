@@ -183,6 +183,14 @@ def edit(client_id):
             client.email = request.form.get('email')
             client.address = request.form.get('address')
             
+            # New Fields
+            client.receptionist_name = request.form.get('receptionist_name')
+            client.decision_maker_name = request.form.get('decision_maker_name')
+            client.decision_factors = request.form.get('decision_factors')
+            client.best_contact_time = request.form.get('best_contact_time')
+            client.preferred_contact_method = request.form.get('preferred_contact_method')
+            client.observations = request.form.get('observations')
+            
             kanban_stage_id = request.form.get('kanban_stage_id')
             client.kanban_stage_id = int(kanban_stage_id) if kanban_stage_id else None
             

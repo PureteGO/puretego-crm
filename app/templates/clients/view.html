@@ -23,7 +23,7 @@
     <div class="row">
         <!-- Informações do Cliente -->
         <div class="col-md-4 mb-4">
-            <div class="card shadow-sm h-100">
+            <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light">
                     <h5 class="card-title mb-0">Información del Cliente</h5>
                 </div>
@@ -40,6 +40,27 @@
                     <hr>
                     <p><strong><i class="bi bi-google"></i> Google Maps:</strong> {{ client.gmb_profile_name }}</p>
                     {% endif %}
+                </div>
+            </div>
+
+            <!-- Dados Detalhados -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Detalles Adicionales</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Recepcionista:</strong> {{ client.receptionist_name or '-' }}</p>
+                    <p class="mb-2"><strong>Decisor:</strong> {{ client.decision_maker_name or '-' }}</p>
+                    <p class="mb-2"><strong>Fatores de Decisión:</strong></p>
+                    <div class="text-muted small mb-3">{{ client.decision_factors or '-' }}</div>
+
+                    <p class="mb-2"><strong>Horário Preferencial:</strong> {{ client.best_contact_time or '-' }}</p>
+                    <p class="mb-2"><strong>Método Preferencial:</strong> {{ client.preferred_contact_method or '-' }}
+                    </p>
+
+                    <hr>
+                    <p class="mb-1"><strong>Observaciones:</strong></p>
+                    <div class="text-muted small">{{ client.observations or '-' }}</div>
                 </div>
             </div>
         </div>

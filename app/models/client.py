@@ -33,12 +33,23 @@ class Client(Base):
     proposals = relationship('Proposal', back_populates='client', cascade='all, delete-orphan')
     interactions = relationship('Interaction', back_populates='client', cascade='all, delete-orphan')
     
+    # Detailed Info Fields
+    receptionist_name = Column(String(255))
+    decision_maker_name = Column(String(255))
+    decision_factors = Column(Text)
+    best_contact_time = Column(String(100))
+    preferred_contact_method = Column(String(100))
+    observations = Column(Text)
+    
     # New Package Relationship
     interested_package_id = Column(Integer, ForeignKey('service_packages.id', ondelete='SET NULL'), nullable=True)
     interested_package = relationship("ServicePackage", back_populates="clients")
     
     def __init__(self, name, gmb_profile_name=None, contact_name=None, 
-                 phone=None, email=None, address=None, kanban_stage_id=None):
+                 phone=None, email=None, address=None, kanban_stage_id=None,
+                 receptionist_name=None, decision_maker_name=None,
+                 decision_factors=None, best_contact_time=None,
+                 preferred_contact_method=None, observations=None):
         self.name = name
         self.gmb_profile_name = gmb_profile_name
         self.contact_name = contact_name
@@ -46,6 +57,14 @@ class Client(Base):
         self.email = email
         self.address = address
         self.kanban_stage_id = kanban_stage_id
+        
+        # New fields
+        self.receptionist_name = receptionist_name
+        self.decision_maker_name = decision_maker_name
+        self.decision_factors = decision_factors
+        self.best_contact_time = best_contact_time
+        self.preferred_contact_method = preferred_contact_method
+        self.observations = observations
     
     def to_dict(self, include_relations=False):
         """Converte o objeto para dicionário"""
@@ -59,7 +78,14 @@ class Client(Base):
             'address': self.address,
             'kanban_stage_id': self.kanban_stage_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            # New fields
+            'receptionist_name': self.receptionist_name,
+            'decision_maker_name': self.decision_maker_name,
+            'decision_factors': self.decision_factors,
+            'best_contact_time': self.best_contact_time,
+            'preferred_contact_method': self.preferred_contact_method,
+            'observations': self.observations
         }
         
         if include_relations:

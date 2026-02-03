@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ current_language }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,32 +10,43 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     {% block head %}{% endblock %}
 </head>
+
 <body>
     {% if 'user_id' in session %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('dashboard.index') }}">PURETEGO CRM</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('dashboard.index') }}"><i class="bi bi-house-door"></i> Dashboard</a>
+                        <a class="nav-link" href="{{ url_for('dashboard.index') }}"><i class="bi bi-house-door"></i>
+                            Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('clients.kanban') }}"><i class="bi bi-kanban"></i> Kanban</a>
+                        <a class="nav-link" href="{{ url_for('calendar.index') }}"><i class="bi bi-calendar3"></i>
+                            Agenda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('clients.index') }}"><i class="bi bi-people"></i> Clientes</a>
+                        <a class="nav-link" href="{{ url_for('clients.kanban') }}"><i class="bi bi-kanban"></i>
+                            Kanban</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('proposals.index') }}"><i class="bi bi-file-earmark-text"></i> Orçamentos</a>
+                        <a class="nav-link" href="{{ url_for('clients.index') }}"><i class="bi bi-people"></i>
+                            Clientes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('proposals.index') }}"><i
+                                class="bi bi-file-earmark-text"></i> Orçamentos</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle"></i> {{ session['user_name'] }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
@@ -49,16 +61,17 @@
 
     <main class="container-fluid mt-5 pt-3">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
-        
+
         {% block content %}{% endblock %}
     </main>
 
@@ -66,4 +79,5 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     {% block scripts %}{% endblock %}
 </body>
+
 </html>

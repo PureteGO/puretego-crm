@@ -17,10 +17,23 @@
         </div>
     </div>
 
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" id="clientSearch" class="form-control border-start-0 ps-0"
+                    placeholder="Localizar clientes (nome, contato, decisor...)" onkeyup="filterClients()">
+            </div>
+            <div class="form-text mt-1">
+                Filtre por Nome da Empresa, Contato, Recepcionista ou Decisor.
+            </div>
+        </div>
+    </div>
+
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
+                <table class="table table-hover align-middle" id="clientsTable">
                     <thead class="table-light">
                         <tr>
                             <th>Nome / Negócio</th>
@@ -32,7 +45,9 @@
                     </thead>
                     <tbody>
                         {% for client in clients %}
-                        <tr>
+                        <tr class="client-row" style="cursor: pointer;"
+                            onclick="window.location='{{ url_for('clients.view', client_id=client.id) }}';"
+                            data-search="{{ client.name }} {{ client.contact_name or '' }} {{ client.receptionist_name or '' }} {{ client.decision_maker_name or '' }}">
                             <td>
                                 <div class="fw-bold">{{ client.name }}</div>
                                 {% if client.gmb_profile_name %}
@@ -53,7 +68,7 @@
                             </td>
                             <td>{{ client.created_at|format_date }}</td>
                             <td>
-                                <div class="btn-group btn-group-sm">
+                                <div class="btn-group btn-group-sm" onclick="event.stopPropagation();">
                                     <a href="{{ url_for('clients.view', client_id=client.id) }}"
                                         class="btn btn-outline-primary" title="Visualizar">
                                         <i class="bi bi-eye"></i>
@@ -66,7 +81,7 @@
                             </td>
                         </tr>
                         {% else %}
-                        <tr>
+                        <tr id="noClientsRow">
                             <td colspan="5" class="text-center py-4">
                                 <p class="text-muted mb-0">Nenhum cliente cadastrado ainda.</p>
                                 <a href="{{ url_for('clients.create') }}" class="btn btn-primary btn-sm mt-2">Cadastrar
@@ -74,10 +89,42 @@
                             </td>
                         </tr>
                         {% endfor %}
+                        <tr id="noResultsRow" style="display: none;">
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                Nenhum cliente encontrado para esta busca.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function filterClients() {
+        const input = document.getElementById('clientSearch');
+        const filter = input.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.client-row');
+        const noResultsRow = document.getElementById('noResultsRow');
+        let hasResults = false;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search').toLowerCase();
+            if (searchText.includes(filter)) {
+                row.style.display = "";
+                hasResults = true;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        // Show/hide "No results" message
+        if (noResultsRow) {
+            noResultsRow.style.display = (hasResults || filter === "") ? "none" : "";
+        }
+    }
+</script>
 {% endblock %}

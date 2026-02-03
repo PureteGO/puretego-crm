@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}Agenda / Calendário{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Agenda</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                <i class="bi bi-plus-lg"></i> Novo Agendamento
+            </button>
+        </div>
+    </div>
+
+    <!-- Calendar Container -->
+    <div class="card shadow-sm">
+        <div class="card-body p-2">
+            <div id='calendar'></div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Add Event -->
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEventModalLabel">Novo Agendamento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addEventForm">
+                    <!-- Type Selection -->
+                    <div class="mb-3">
+                        <label class="form-label">Tipo</label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="eventType" id="typeVisit" value="visit" checked
+                                onchange="toggleType(this.value)">
+                            <label class="btn btn-outline-primary" for="typeVisit"><i class="bi bi-geo-alt-fill"></i>
+                                Visita Presencial</label>
+
+                            <input type="radio" class="btn-check" name="eventType" id="typeInteraction"
+                                value="interaction" onchange="toggleType(this.value)">
+                            <label class="btn btn-outline-success" for="typeInteraction"><i
+                                    class="bi bi-telephone-fill"></i> Ligação / Outro</label>
+                        </div>
+                    </div>
+
+                    <!-- Interaction Subtype (Hidden by default) -->
+                    <div class="mb-3 d-none" id="interactionTypeField">
+                        <label for="interactionTypeId" class="form-label">Tipo de Interação</label>
+                        <select class="form-select" id="interactionTypeId">
+                            {% for type in interaction_types %}
+                            <option value="{{ type.id }}">{{ type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Date & Time -->
+                    <div class="mb-3">
+                        <label for="eventDate" class="form-label">Data e Hora</label>
+                        <input type="datetime-local" class="form-control" id="eventDate" required>
+                    </div>
+
+                    <!-- Client Selection -->
+                    <div class="mb-3">
+                        <label for="clientId" class="form-label">Cliente</label>
+                        <select class="form-select" id="clientId" onchange="toggleNewClient(this.value)">
+                            <option value="">Selecione...</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}">{{ client.name }}</option>
+                            {% endfor %}
+                            <option value="new" class="fw-bold text-success">+ Novo Cliente Rápido</option>
+                        </select>
+                    </div>
+
+                    <!-- New Client Fields (Hidden) -->
+                    <div id="newClientFields"
+                        class="d-none border-start border-3 border-success ps-3 mb-3 bg-light py-2">
+                        <h6 class="text-success small mb-2">Cadastro Rápido de Cliente</h6>
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm" id="newClientName"
+                                placeholder="Nome do Cliente/Empresa">
+                        </div>
+                        <div class="mb-2">
+                            <input type="text" class="form-control form-control-sm" id="newClientPhone"
+                                placeholder="Telefone / WhatsApp">
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-3">
+                        <label for="eventNotes" class="form-label">Observações</label>
+                        <textarea class="form-control" id="eventNotes" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger d-none" id="btnDeleteEvent"
+                    onclick="deleteEvent()">Excluir</button>
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnSaveEvent" onclick="saveEvent()">Salvar
+                        Agendamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar CSS/JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
+<script>
+    let calendar;
+    let editEventId = null;
+    let editEventType = null;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'listWeek',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listWeek'
+            },
+            titleFormat: { // Adapt title per screen size
+                month: 'short',
+                year: 'numeric',
+                day: 'numeric',
+                weekday: 'short'
+            },
+            views: {
+                listWeek: {
+                    titleFormat: { month: 'short', year: 'numeric', day: 'numeric' }
+                }
+            },
+            locale: 'pt-br',
+            buttonText: {
+                today: 'Hoje',
+                month: 'Mês',
+                week: 'Semana',
+                day: 'Dia',
+                list: 'Lista'
+            },
+            height: 'auto',
+            navLinks: true,
+            editable: true,
+            selectable: true,
+            events: '/calendar/events',
+
+            dateClick: function (info) {
+                resetModal();
+                const date = new Date(info.dateStr);
+                const localISOTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                document.getElementById('eventDate').value = localISOTime;
+
+                document.getElementById('addEventModalLabel').innerText = 'Novo Agendamento';
+                const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
+                modal.show();
+            },
+
+            eventClick: function (info) {
+                resetModal();
+                const event = info.event;
+                const props = event.extendedProps;
+
+                editEventId = event.id.split('_')[1];
+                editEventType = props.type;
+
+                document.getElementById('addEventModalLabel').innerText = 'Editar Agendamento';
+                document.getElementById('btnSaveEvent').innerText = 'Atualizar Agendamento';
+                document.getElementById('btnDeleteEvent').classList.remove('d-none');
+
+                // Populate fields
+                if (props.type === 'visit') {
+                    document.getElementById('typeVisit').checked = true;
+                    toggleType('visit');
+                } else {
+                    document.getElementById('typeInteraction').checked = true;
+                    toggleType('interaction');
+                    document.getElementById('interactionTypeId').value = props.interaction_type_id;
+                }
+
+                const date = event.start;
+                const localISOTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                document.getElementById('eventDate').value = localISOTime;
+
+                document.getElementById('clientId').value = props.client_id;
+                document.getElementById('eventNotes').value = props.notes || '';
+
+                const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
+                modal.show();
+            }
+        });
+
+        calendar.render();
+    });
+
+    function resetModal() {
+        document.getElementById('addEventForm').reset();
+        editEventId = null;
+        editEventType = null;
+        document.getElementById('btnSaveEvent').innerText = 'Salvar Agendamento';
+        document.getElementById('btnDeleteEvent').classList.add('d-none');
+        document.getElementById('interactionTypeField').classList.add('d-none');
+        document.getElementById('newClientFields').classList.add('d-none');
+    }
+
+    function toggleType(type) {
+        const field = document.getElementById('interactionTypeField');
+        if (type === 'interaction') {
+            field.classList.remove('d-none');
+        } else {
+            field.classList.add('d-none');
+        }
+    }
+
+    function toggleNewClient(val) {
+        const fields = document.getElementById('newClientFields');
+        if (val === 'new') {
+            fields.classList.remove('d-none');
+            document.getElementById('newClientName').required = true;
+        } else {
+            fields.classList.add('d-none');
+            document.getElementById('newClientName').required = false;
+        }
+    }
+
+    function saveEvent() {
+        const type = document.querySelector('input[name="eventType"]:checked').value;
+        const interactionTypeId = document.getElementById('interactionTypeId').value;
+        const date = document.getElementById('eventDate').value;
+        const clientId = document.getElementById('clientId').value;
+        const notes = document.getElementById('eventNotes').value;
+
+        const newClientName = document.getElementById('newClientName').value;
+        const newClientPhone = document.getElementById('newClientPhone').value;
+
+        if (!date || !clientId) {
+            alert('Preencha Data e Cliente!');
+            return;
+        }
+
+        if (clientId === 'new' && !newClientName) {
+            alert('Preencha o Nome do Novo Cliente!');
+            return;
+        }
+
+        const payload = {
+            type: type,
+            client_id: clientId,
+            date: date,
+            notes: notes,
+            interaction_type_id: interactionTypeId,
+            new_client_name: newClientName,
+            new_client_phone: newClientPhone
+        };
+
+        const url = editEventId ? `/calendar/update/${editEventType}/${editEventId}` : '/calendar/save';
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const modalEl = document.getElementById('addEventModal');
+                    bootstrap.Modal.getInstance(modalEl).hide();
+                    calendar.refetchEvents();
+                    alert(data.message);
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Erro de conexão');
+            });
+    }
+
+    function deleteEvent() {
+        if (!confirm('Tem certeza que deseja excluir este agendamento?')) return;
+
+        fetch(`/calendar/delete/${editEventType}/${editEventId}`, {
+            method: 'POST'
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const modalEl = document.getElementById('addEventModal');
+                    bootstrap.Modal.getInstance(modalEl).hide();
+                    calendar.refetchEvents();
+                    alert(data.message);
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Erro de conexão');
+            });
+    }
+</script>
+
+<style>
+    /* FullCalendar overrides for Bootstrap 5 */
+    .fc-header-toolbar {
+        margin-bottom: 1rem !important;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .fc-button-primary {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+    }
+
+    .fc-toolbar-title {
+        font-size: 1.25rem !important;
+    }
+
+    /* Mobile Adjustments */
+    @media (max-width: 576px) {
+        .fc-toolbar {
+            flex-direction: column !important;
+            gap: 2px !important;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.1rem !important;
+            margin: 5px 0 !important;
+            text-align: center;
+            width: 100%;
+            white-space: normal;
+        }
+
+        .fc-toolbar-chunk {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 2px;
+        }
+
+        .fc-header-toolbar {
+            margin-bottom: 0.5rem !important;
+        }
+
+        .fc-button {
+            padding: 0.2rem 0.4rem !important;
+            font-size: 0.8rem !important;
+        }
+    }
+</style>
+{% endblock %}
