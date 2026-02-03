@@ -24,9 +24,7 @@ def seed():
                 stage = KanbanStage(name=name, order=order)
                 db_session.add(stage)
         
-        # 2. Service Packages (Start2GO, etc.)
-        # Note: These names must match what is expected in the UI logic if hardcoded anywhere,
-        # otherwise perfectly fine to use the descriptive names.
+        # 2a. Service Packages (Start2GO, etc.) - For Client Interest
         packages = [
             (
                 'Dominación en Google Maps - Pack 90 días', 
@@ -51,10 +49,17 @@ def seed():
         ]
         
         for name, desc, price in packages:
+            # Seed ServicePackage
             if not ServicePackage.query.filter_by(name=name).first():
-                # ServicePackage uses 'name', 'description', 'price' (NOT 'base_price')
                 pkg = ServicePackage(name=name, description=desc, price=price)
                 db_session.add(pkg)
+            
+            # Seed Service (For Proposals, often mirroring the packages or individual items)
+            # We will use the same list to populate the Service table for now to ensure consistency.
+            from app.models import Service
+            if not Service.query.filter_by(name=name).first():
+                srv = Service(name=name, description=desc, base_price=price)
+                db_session.add(srv)
 
         # 3. Admin User
         admin_email = 'admin@puretego.online'
