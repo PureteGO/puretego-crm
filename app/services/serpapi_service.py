@@ -4,16 +4,52 @@ Serviço de integração com SerpApi para análise do Google Meu Negócio
 """
 
 import requests
-from config.settings import config
+import logging
+from flask import current_app
+from config.settings import config as default_config
 
+# Configuração de log básica
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class SerpApiService:
     """Serviço para buscar informações do Google Meu Negócio via SerpApi"""
     
     def __init__(self, api_key=None):
-        self.api_key = api_key or config.SERPAPI_KEY
+        # Tenta pegar da config do Flask (current_app) se estiver em um context
+        try:
+            self.api_key = api_key or current_app.config.get('SERPAPI_KEY') or default_config.SERPAPI_KEY
+        except RuntimeError:
+            # Fora do context do Flask
+            self.api_key = api_key or default_config.SERPAPI_KEY
+            
         self.base_url = "https://serpapi.com/search"
     
+    def _execute_request(self, params):
+        """Executa a requisição com tratamento de erros robusto"""
+        try:
+            # Tentar primeira vez normalmente
+            response = requests.get(self.base_url, params=params, timeout=30)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.SSLError as e:
+            logger.warning(f"SSL Error detected: {e}. Attempting fallback without verification...")
+            # Fallback para servidores com CA bundles desatualizados (comum em cPanel compartilhado)
+            try:
+                # Disable warning for this specific fallback to not clutter logs
+                import urllib3
+                urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+                
+                response = requests.get(self.base_url, params=params, timeout=30, verify=False)
+                response.raise_for_status()
+                return response.json()
+            except Exception as e2:
+                logger.error(f"Fallback SSL request failed: {e2}")
+                return {'error': f"SSL Connection Error: {str(e2)}"}
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Request Error: {e}")
+            return {'error': str(e)}
+
     def search_business(self, business_name, location=None):
         """
         Busca informações de um negócio no Google Maps
@@ -23,53 +59,48 @@ class SerpApiService:
             location: Localização para a busca (opcional)
             
         Returns:
-            dict: Dados do negócio encontrado ou None
+            dict: Dados do negócio encontrado ou dicionário com erro
         """
-        try:
-            params = {
-                "engine": "google_maps",
-                "q": business_name,
-                "type": "search",
-                "api_key": self.api_key
-            }
+        params = {
+            "engine": "google_maps",
+            "q": business_name,
+            "type": "search",
+            "api_key": self.api_key
+        }
+        
+        # Se tiver localização, adicionar à busca para contextualizar
+        if location:
+            params["q"] += f", {location}"
+        else:
+            # Se não tiver, focar em Assunção/Paraguay como fallback
+            params["ll"] = "@-25.2637,57.5759,14z"
+        
+        logger.info(f"Buscando negócio: {params['q']}")
+        
+        data = self._execute_request(params)
+        
+        if not data or 'error' in data:
+            return data
             
-            # Se tiver localização, adicionar à busca para contextualizar
-            if location:
-                params["q"] += f", {location}"
-            else:
-                # Se não tiver, focar em Assunção/Paraguay como fallback
-                params["ll"] = "@-25.2637,57.5759,14z"
+        # Retornar o primeiro resultado local
+        if "local_results" in data and len(data["local_results"]) > 0:
+            logger.info(f"Encontrado (Local Results): {data['local_results'][0].get('title')}")
+            return data["local_results"][0]
+        
+        # Verificar se é um resultado direto (Place Results)
+        if "place_results" in data:
+            logger.info(f"Encontrado (Place Results): {data['place_results'].get('title')}")
+            return data["place_results"]
+        
+        # Verificar sugestão ortográfica se não encontrar nada
+        spelling_fix = data.get("search_information", {}).get("spelling_fix")
+        
+        logger.warning("Nenhum resultado local encontrado.")
+        if spelling_fix:
+            logger.info(f"Sugestão encontrada: {spelling_fix}")
+            return {'error': 'not_found', 'suggestion': spelling_fix}
             
-            print(f"Buscando com params: {params['q']}") # Debug log
-            
-            response = requests.get(self.base_url, params=params, timeout=30)
-            response.raise_for_status()
-            
-            data = response.json()
-            
-            # Retornar o primeiro resultado local
-            if "local_results" in data and len(data["local_results"]) > 0:
-                print(f"Encontrado (Local Results): {data['local_results'][0].get('title')}")
-                return data["local_results"][0]
-            
-            # Verificar se é um resultado direto (Place Results) - Comum quando a busca é muito específica
-            if "place_results" in data:
-                print(f"Encontrado (Place Results): {data['place_results'].get('title')}")
-                return data["place_results"]
-            
-            # Verificar sugestão ortográfica se não encontrar nada
-            spelling_fix = data.get("search_information", {}).get("spelling_fix")
-            
-            print("Nenhum resultado local encontrado.")
-            if spelling_fix:
-                print(f"Sugestão encontrada: {spelling_fix}")
-                return {'error': 'not_found', 'suggestion': spelling_fix}
-                
-            return None
-            
-        except requests.exceptions.RequestException as e:
-            print(f"Erro ao buscar negócio: {e}")
-            return None
+        return {'error': 'not_found'}
     
     def get_business_details(self, place_id):
         """
@@ -79,24 +110,17 @@ class SerpApiService:
             place_id: ID do lugar no Google Maps
             
         Returns:
-            dict: Detalhes completos do negócio
+            dict: Detalhes completos do negócio ou dicionário com erro
         """
-        try:
-            params = {
-                "engine": "google_maps",
-                "type": "place",
-                "place_id": place_id,
-                "api_key": self.api_key
-            }
-            
-            response = requests.get(self.base_url, params=params, timeout=30)
-            response.raise_for_status()
-            
-            return response.json()
-            
-        except requests.exceptions.RequestException as e:
-            print(f"Erro ao obter detalhes do negócio: {e}")
-            return None
+        params = {
+            "engine": "google_maps",
+            "type": "place",
+            "place_id": place_id,
+            "api_key": self.api_key
+        }
+        
+        logger.info(f"Buscando detalhes do place_id: {place_id}")
+        return self._execute_request(params)
     
     def analyze_gmb_profile(self, business_name, location=None):
         """
@@ -117,13 +141,19 @@ class SerpApiService:
         business = self.search_business(business_name, location)
         
         if not business or 'error' in business:
-            suggestion = business.get('suggestion') if business else None
-            error_msg = 'Negócio não encontrado'
+            api_error = business.get('error') if isinstance(business, dict) else None
+            suggestion = business.get('suggestion') if isinstance(business, dict) else None
+            
+            if api_error == 'not_found':
+                error_msg = 'Negócio não encontrado'
+            elif api_error:
+                error_msg = f'Erro: {api_error}'
+            else:
+                error_msg = 'Erro inesperado ao buscar negócio'
+                
             if suggestion:
                 error_msg += f'. Você quis dizer: "{suggestion}"?'
             
-            # Tentar busca fallback (sem localização se falhou com ela, ou vice versa?)
-            # Por enquanto simples: se falhou, falhou.
             return {
                 'score': 0,
                 'report': {'error': error_msg},
@@ -176,7 +206,10 @@ class SerpApiService:
         Returns:
             list: Lista de dicionários com resultado de cada critério
         """
-        criteria = config.HEALTH_CHECK_CRITERIA
+        try:
+            criteria = current_app.config.get('HEALTH_CHECK_CRITERIA') or default_config.HEALTH_CHECK_CRITERIA
+        except RuntimeError:
+            criteria = default_config.HEALTH_CHECK_CRITERIA
         results = []
         
         for criterion in criteria:

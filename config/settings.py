@@ -199,4 +199,8 @@ class ProductionConfig(Config):
 
 
 # Configuração ativa (alterar para ProductionConfig em produção)
-config = DevelopmentConfig()
+# Tenta detectar se estamos em produção pelo ambiente ou se a SECRET_KEY foi alterada
+if os.environ.get('FLASK_ENV') == 'production' or os.environ.get('SECRET_KEY'):
+    config = ProductionConfig()
+else:
+    config = DevelopmentConfig()
