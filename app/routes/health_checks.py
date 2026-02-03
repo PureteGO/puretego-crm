@@ -33,28 +33,36 @@ def create(client_id):
             return redirect(url_for('clients.index'))
         
         if request.method == 'POST':
-            # Usar o nome do perfil GMB ou o nome do cliente
-            business_name = client.gmb_profile_name or client.name
-            
-            # Executar análise via SerpApi
-            serpapi = SerpApiService()
-            result = serpapi.analyze_gmb_profile(business_name)
-            
-            if result['score'] == 0 and 'error' in result['report']:
-                flash(f'Erro ao analisar perfil: {result["report"]["error"]}', 'error')
+            try:
+                # Usar o nome do perfil GMB ou o nome do cliente
+                business_name = request.form.get('business_name') or client.gmb_profile_name or client.name
+                
+                # Executar análise via SerpApi
+                serpapi = SerpApiService()
+                result = serpapi.analyze_gmb_profile(business_name)
+                
+                if result['score'] == 0 and 'error' in result['report']:
+                    flash(f'Erro ao analisar perfil: {result["report"]["error"]}', 'error')
+                    return redirect(url_for('clients.view', client_id=client_id))
+                
+                # Salvar health check
+                health_check = HealthCheck(
+                    client_id=client_id,
+                    score=result['score'],
+                    report_data=result['report']
+                )
+                db.add(health_check)
+                db.commit()
+                
+                flash(f'Health Check realizado! Pontuação: {result["score"]}/100', 'success')
+                return redirect(url_for('health_checks.view', health_check_id=health_check.id))
+                
+            except Exception as e:
+                import traceback
+                traceback.print_exc() # Print to console/stderr
+                db.rollback()
+                flash(f'Erro interno ao realizar Health Check: {str(e)}', 'error')
                 return redirect(url_for('clients.view', client_id=client_id))
-            
-            # Salvar health check
-            health_check = HealthCheck(
-                client_id=client_id,
-                score=result['score'],
-                report_data=result['report']
-            )
-            db.add(health_check)
-            db.commit()
-            
-            flash(f'Health Check realizado! Pontuação: {result["score"]}/100', 'success')
-            return redirect(url_for('health_checks.view', health_check_id=health_check.id))
     
         return render_template('health_checks/create.html', client=client)
 
