@@ -34,7 +34,8 @@
                     <h6 class="mb-0">Resumen de Análisis</h6>
                 </div>
                 <div class="card-body">
-                    {% set report = health_check.get_report_data() %}
+                    {% set data = health_check.get_report_data() %}
+                    {% set report = data.summary if 'summary' in data else data %}
                     <div class="d-flex justify-content-between mb-2">
                         <span>Puntos Críticos:</span>
                         <span class="badge bg-danger rounded-pill">{{ report.critical_issues_count or 0 }}</span>
@@ -63,7 +64,8 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    {% set report = health_check.get_report_data() %}
+                    {% set data = health_check.get_report_data() %}
+                    {% set report = data.summary if 'summary' in data else data %}
 
                     {% if report.top_critical_issues %}
                     <h6 class="text-danger fw-bold mb-3"><i class="bi bi-exclamation-octagon"></i> Problemas Críticos

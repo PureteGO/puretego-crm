@@ -27,3 +27,5 @@ Desktop.ini
 *.sql
 *.pdf
 # Keep specific PDFs if needed, but ignoring general PDFs to save memory
+
+.agent/
