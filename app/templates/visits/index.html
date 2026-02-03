@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Histórico de Visitas{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-calendar-event"></i> Historial de Visitas</h1>
+        <a href="{{ url_for('visits.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Registrar Nueva Visita
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Notas</th>
+                        <th>Próximo Passo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visit in visits %}
+                    <tr>
+                        <td class="fw-bold">{{ visit.visit_date|format_date('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ visit.client.name }}</td>
+                        <td>
+                            <div class="text-truncate" style="max-width: 300px;">
+                                {{ visit.notes or '-' }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                {{ visit.next_step or '-' }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ url_for('visits.view', visit_id=visit.id) }}"
+                                class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">No hay visitas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,293 +3,458 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Proposal</title>
+    <title>Proposal - {{ proposal.client_name }}</title>
     <style>
         @page {
             size: A4;
-            margin: 2cm;
+            margin: 0;
+            padding: 0;
 
-            @bottom-center {
-                content: "Page " counter(page) " of " counter(pages);
-                font-family: 'Helvetica', sans-serif;
-                font-size: 9pt;
-                color: #888;
+            @frame footer {
+                -pdf-frame-content: footer-content;
+                bottom: 1cm;
+                margin-left: 2cm;
+                margin-right: 2cm;
+                height: 1cm;
             }
         }
 
         body {
-            font-family: 'Helvetica', sans-serif;
-            color: #333;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #2c3e50;
             line-height: 1.5;
             font-size: 11pt;
-        }
-
-        .header {
-            width: 100%;
-            margin-bottom: 40px;
-            border-bottom: 2px solid #0056b3;
-            padding-bottom: 20px;
-        }
-
-        .header-content {
-            display: flex;
-            /* xhtml2pdf support for flex is limited, using table fallback usually safer, but let's try clean css mostly */
-        }
-
-        /* Fallback layout using tables for PDF stability */
-        table.layout-table {
-            width: 100%;
-            border: none;
-        }
-
-        table.layout-table td {
-            vertical-align: top;
+            margin: 0;
             padding: 0;
-            border: none;
+            background-color: #ffffff;
         }
 
-        .company-name {
-            font-size: 24pt;
-            font-weight: bold;
-            color: #0056b3;
-            text-transform: uppercase;
+        /* Cores oficiais PureteGO */
+        .color-cyan { color: #00AEEF; }
+        .color-dark { color: #1a1a1a; }
+        .bg-cyan { background-color: #00AEEF; color: white; }
+        .bg-dark { background-color: #1a1a1a; color: white; }
+
+        /* Capa Premium */
+        .cover {
+            width: 100%;
+            height: 29.7cm;
+            background: linear-gradient(135deg, #1a1a1a 0%, #004a66 100%);
+            color: white;
+            text-align: left;
+            position: relative;
         }
 
-        .company-details {
-            text-align: right;
-            font-size: 9pt;
-            color: #555;
+        .cover-content {
+            padding: 4cm 2cm;
         }
 
-        .document-title {
-            text-align: center;
-            font-size: 20pt;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #222;
-            text-transform: uppercase;
+        .cover-accent {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40%;
+            height: 100%;
+            background-color: #00AEEF;
+            opacity: 0.1;
+        }
+
+        .cover-logo {
+            font-size: 42pt;
+            font-weight: 900;
+            color: #00AEEF;
+            margin-bottom: 0.5cm;
             letter-spacing: 2px;
         }
 
-        .services-subtitle {
-            text-align: center;
-            font-size: 10pt;
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        .client-box {
-            background-color: #f8f9fa;
-            border-left: 5px solid #0056b3;
-            padding: 15px;
-            margin-bottom: 30px;
-        }
-
-        .client-box h3 {
-            margin: 0 0 10px 0;
+        .cover-tagline {
             font-size: 14pt;
-            color: #0056b3;
+            color: #ddd;
+            margin-bottom: 6cm;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .info-grid {
-            width: 100%;
-        }
-
-        .info-grid td {
-            padding-bottom: 5px;
-        }
-
-        .label {
+        .cover-title {
+            font-size: 36pt;
             font-weight: bold;
-            color: #555;
-            width: 30%;
+            margin-bottom: 0.2cm;
+            color: white;
         }
 
-        table.items-table {
-            width: 100%;
-            border-collapse: collapse;
+        .cover-divider {
+            width: 100px;
+            height: 6px;
+            background-color: #00AEEF;
+            margin-bottom: 1cm;
+        }
+
+        .cover-client {
+            font-size: 28pt;
+            color: #00AEEF;
+            font-weight: 300;
+            margin-top: 2cm;
+        }
+
+        .cover-footer {
+            position: absolute;
+            bottom: 2cm;
+            left: 2cm;
+            font-size: 10pt;
+            color: #aaa;
+        }
+
+        /* Estrutura de Página */
+        .page-container {
+            padding: 2cm;
+            page-break-before: always;
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 1.5cm;
+        }
+
+        .section-title {
+            font-size: 22pt;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .section-subtitle {
+            font-size: 11pt;
+            color: #00AEEF;
+            font-weight: bold;
+            margin-top: -5px;
+        }
+
+        /* Auditoria / Health Check */
+        .audit-summary {
+            background-color: #f8fbfc;
+            border-radius: 15px;
+            padding: 30px;
             margin-bottom: 30px;
+            border: 1px solid #e1eef2;
         }
 
-        table.items-table th {
-            background-color: #0056b3;
-            color: white;
-            padding: 10px;
-            text-align: left;
+        /* Gauge Simplificado para xhtml2pdf */
+        .gauge-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .gauge-box {
+            display: inline-block;
+            width: 200px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 100px;
+            border: 8px solid #eee;
+        }
+
+        .score-display {
+            font-size: 48pt;
             font-weight: bold;
-            font-size: 10pt;
+            color: #00AEEF;
         }
 
-        table.items-table td {
-            padding: 10px;
-            border-bottom: 1px solid #ddd;
-            font-size: 10pt;
+        .score-label {
+            font-size: 12pt;
+            color: #7f8c8d;
+            text-transform: uppercase;
         }
 
-        /* Stripe effect manually for PDF compatibility */
-        tr.even {
-            background-color: #f9f9f9;
-        }
-
-        .item-name {
-            font-weight: bold;
-            color: #333;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .item-desc {
-            font-size: 9pt;
-            color: #666;
-        }
-
-        .total-box {
-            width: 50%;
-            margin-left: auto;
-            background-color: #0056b3;
-            color: white;
-            padding: 15px;
-            border-radius: 4px;
+        .issues-grid {
             margin-top: 20px;
         }
 
-        .total-box table {
-            width: 100%;
-            border: none;
-        }
-
-        .total-box td {
-            border: none;
-            padding: 5px 0;
-        }
-
-        .grand-total {
-            font-size: 16pt;
-            font-weight: bold;
-            border-top: 1px solid rgba(255, 255, 255, 0.3);
-            margin-top: 5px;
-            padding-top: 5px;
-        }
-
-        .terms-box {
-            margin-top: 40px;
-            border: 1px solid #ddd;
+        .issue-card {
             padding: 15px;
-            background-color: #fdfdfd;
-        }
-
-        .terms-title {
-            font-weight: bold;
-            font-size: 12pt;
             margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            color: #444;
+            border-radius: 8px;
+            font-size: 10pt;
         }
 
-        .footer-note {
-            margin-top: 50px;
-            text-align: center;
+        .issue-critical { background-color: #fff5f5; border-left: 5px solid #e74c3c; color: #c0392b; }
+        .issue-moderate { background-color: #fffaf0; border-left: 5px solid #f39c12; color: #d35400; }
+        .issue-positive { background-color: #f0fff4; border-left: 5px solid #2ecc71; color: #27ae60; }
+
+        /* Tabela de Serviços */
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1cm;
+        }
+
+        .services-table th {
+            text-align: left;
+            padding: 15px;
+            background-color: #1a1a1a;
+            color: white;
+            font-size: 10pt;
+            text-transform: uppercase;
+        }
+
+        .services-table td {
+            padding: 20px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .service-name {
+            font-weight: bold;
+            font-size: 13pt;
+            color: #1a1a1a;
+            display: block;
+        }
+
+        .service-desc {
             font-size: 9pt;
-            color: #999;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .service-price {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #00AEEF;
+            text-align: right;
+        }
+
+        /* Totais */
+        .totals-section {
+            margin-top: 1cm;
+            text-align: right;
+        }
+
+        .total-box {
+            display: inline-block;
+            background-color: #00AEEF;
+            color: white;
+            padding: 25px 40px;
+            border-radius: 10px;
+            min-width: 250px;
+        }
+
+        .total-label {
+            font-size: 10pt;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .total-amount {
+            font-size: 24pt;
+            font-weight: bold;
+        }
+
+        /* Rodapé */
+        #footer-content {
+            text-align: center;
+            color: #bdc3c7;
+            font-size: 8pt;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 10px;
+        }
+
+        /* Boxes de Autoridade */
+        .highlight-box {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 30px;
+            border-left: 8px solid #00AEEF;
+            margin: 1cm 0;
+        }
+
+        .highlight-text {
+            font-style: italic;
+            font-size: 12pt;
+            line-height: 1.6;
+        }
+
+        .benefit-list {
+            margin-top: 1cm;
+        }
+
+        .benefit-item {
+            margin-bottom: 20px;
+        }
+
+        .benefit-title {
+            font-weight: bold;
+            color: #00AEEF;
+            font-size: 12pt;
+            margin-bottom: 5px;
         }
     </style>
 </head>
 
 <body>
+    <!-- Capa -->
+    <div class="cover">
+        <div class="cover-accent"></div>
+        <div class="cover-content">
+            <div class="cover-logo">PURETEGO</div>
+            <div class="cover-tagline">Dominando el mercado local</div>
+            
+            <div class="spacer" style="height: 3cm;"></div>
+            
+            <div class="cover-title">{{ texts.proposal_title }}</div>
+            <div class="cover-divider"></div>
+            
+            <div class="cover-subtitle">
+                Presencia Web • Fotos y Videos 360 • GMB • SEO Local
+            </div>
+            
+            <div class="cover-client">
+                {{ proposal.client_name }}
+            </div>
+        </div>
+        
+        <div class="cover-footer">
+            {{ proposal.proposal_date|format_date }} • PureteGO Commercial Department
+        </div>
+    </div>
 
-    <!-- Header -->
-    <div class="header">
-        <table class="layout-table">
-            <tr>
-                <td width="50%">
-                    <div class="company-name">PURETEGO</div>
+    <!-- Página 1: Autoridade e Análise -->
+    <div class="page-container">
+        <div class="section-header">
+            <div class="section-subtitle">01. NUESTRO ENFOQUE</div>
+            <h1 class="section-title">SOBRE PURETEGO</h1>
+        </div>
 
-                </td>
-                <td width="50%" class="company-details">
-                    <strong>{{ company_info.technical_responsible }}</strong><br>
-                    {{ company_info.website }}<br>
-                    {{ company_info.technical_email }}<br>
-                    {{ company_info.phone }}
-                </td>
-            </tr>
+        <div class="highlight-box">
+            <div class="highlight-text">
+                "Acompañamos la evolución de Google desde sus inicios. Con raíces en Brasil desde 2001,
+                PureteGO nació de la necesidad de conectar negocios locales con clientes reales a través de datos y
+                resultados auditables."
+            </div>
+        </div>
+
+        <p>
+            Somos especialistas en <strong>Geomarketing de Élite</strong>. Mientras otros se enfocan en
+            métricas de vanidad, nosotros nos obsesionamos con el ROI y la intención de compra directa en Google Search y Google Maps.
+        </p>
+
+        <div class="benefit-list">
+            <div class="benefit-item">
+                <div class="benefit-title">Transparencia Radical</div>
+                <div class="benefit-desc">Resultados 100% auditables a través de ferramentas oficiais do Google.</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-title">Enfoque en Ventas</div>
+                <div class="benefit-desc">Optimizamos para o momento exato em que o cliente busca o que você oferece.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página 2: Auditoria GMB (Se existir) -->
+    {% if proposal.health_check %}
+    <div class="page-container">
+        <div class="section-header">
+            <div class="section-subtitle">02. DIAGNÓSTICO ESTRATÉGICO</div>
+            <h1 class="section-title">{{ texts.audit_title }}</h1>
+        </div>
+
+        <p>{{ texts.audit_subtitle }}</p>
+
+        <div class="audit-summary">
+            <div class="gauge-container">
+                <div class="gauge-box" style="border-color: 
+                    {% if proposal.health_check.score >= 70 %}#2ecc71
+                    {% elif proposal.health_check.score >= 40 %}#f39c12
+                    {% else %}#e74c3c{% endif %};">
+                    <div class="score-display" style="color: 
+                        {% if proposal.health_check.score >= 70 %}#2ecc71
+                        {% elif proposal.health_check.score >= 40 %}#f39c12
+                        {% else %}#e74c3c{% endif %};">
+                        {{ proposal.health_check.score }}
+                    </div>
+                    <div class="score-label">{{ texts.score_label }}</div>
+                </div>
+            </div>
+
+            <div class="issues-grid">
+                <h3 style="color: #1a1a1a; margin-bottom: 15px;">{{ texts.optimization_points }}</h3>
+                
+                {% if proposal.health_check.report_data.top_critical_issues %}
+                <div class="issue-card issue-critical">
+                    <strong>{{ texts.critical_issues }}:</strong>
+                    <ul style="margin: 5px 0 0 20px; padding: 0;">
+                        {% for issue in proposal.health_check.report_data.top_critical_issues %}
+                        <li>{{ issue.name }}: {{ issue.message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if proposal.health_check.report_data.recommendations %}
+                <div class="issue-card issue-moderate">
+                    <strong>Recomendaciones:</strong>
+                    <ul style="margin: 5px 0 0 20px; padding: 0;">
+                        {% for rec in proposal.health_check.report_data.recommendations %}
+                        <li>{{ rec }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Página 3: Proposta Técnica -->
+    <div class="page-container">
+        <div class="section-header">
+            <div class="section-subtitle">03. SOLUCIÓN PROPUESTA</div>
+            <h1 class="section-title">{{ texts.proposal_title }}</h1>
+        </div>
+
+        <p>Preparamos un plan de acción personalizado para fortalecer la presencia digital de <strong>{{ proposal.client_name }}</strong>:</p>
+
+        <table class="services-table">
+            <thead>
+                <tr>
+                    <th width="75%">{{ texts.service }}</th>
+                    <th width="25%" style="text-align: right;">{{ texts.investment }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in proposal.proposal_items %}
+                <tr>
+                    <td>
+                        <span class="service-name">{{ item.name }}</span>
+                        <div class="service-desc">{{ item.description }}</div>
+                    </td>
+                    <td class="service-price">
+                        {{ item.price|format_currency }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
+
+        <div class="totals-section">
+            <div class="total-box">
+                <div class="total-label">{{ texts.total_investment }}</div>
+                <div class="total-amount">{{ proposal.total_amount|format_currency }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 1.5cm;">
+            <h4 style="margin-bottom: 10px;">{{ texts.payment_terms }}</h4>
+            <p style="color: #2c3e50;">{{ proposal.payment_terms or 'A convenir' }}</p>
+            
+            <div style="background-color: #f8fbfc; padding: 15px; border-radius: 5px; font-size: 9pt; color: #7f8c8d; margin-top: 1cm;">
+                <strong>Nota:</strong> {{ texts.additional_text }}
+            </div>
+        </div>
     </div>
 
-    <!-- Title -->
-    <div class="document-title">{{ texts.proposal_title }}</div>
-    <div class="services-subtitle">{{ texts.services_subtitle|safe }}</div>
-
-    <!-- Client Info -->
-    <div class="client-box">
-        <h3>{{ texts.client_info }}</h3>
-        <table class="info-grid">
-            <tr>
-                <td class="label">{{ texts.client }}:</td>
-                <td>{{ proposal.client_name }}</td>
-            </tr>
-            <tr>
-                <td class="label">{{ texts.date }}:</td>
-                <td>{{ proposal.proposal_date|format_date }}</td>
-            </tr>
-            {% if proposal.valid_until %}
-            <tr>
-                <td class="label">{{ texts.valid_until }}:</td>
-                <td>{{ proposal.valid_until|format_date }}</td>
-            </tr>
-            {% endif %}
-        </table>
-    </div>
-
-    <!-- Items -->
-    <table class="items-table">
-        <thead>
-            <tr>
-                <th width="10%">#</th>
-                <th width="60%">{{ texts.service }}</th>
-                <th width="30%" style="text-align: right;">{{ texts.investment }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in proposal.items %}
-            <tr class="{{ loop.cycle('', 'even') }}">
-                <td>{{ loop.index }}</td>
-                <td>
-                    <span class="item-name">{{ item.name }}</span>
-                    {% if item.description %}
-                    <br><span class="item-desc">{{ item.description }}</span>
-                    {% endif %}
-                </td>
-                <td style="text-align: right;">{{ item.price|format_currency(language) }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- Totals -->
-    <div class="total-box">
-        <table>
-            <tr class="grand-total">
-                <td align="left">{{ texts.total_investment }}:</td>
-                <td align="right">{{ proposal.total_amount|format_currency(language) }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Terms -->
-    <div class="terms-box">
-        <div class="terms-title">{{ texts.payment_terms }}</div>
-        <p>{{ proposal.payment_terms or '-' }}</p>
-
-        <div class="terms-title" style="margin-top: 20px;">{{ texts.additional_info }}</div>
-        <p>{{ texts.additional_text }}</p>
-    </div>
-
-    <!-- Footer -->
-    <div class="footer-note">
-        Generated by Puretego CRM on {{ parse_date(now).strftime('%d/%m/%Y %H:%M') }}
+    <!-- Rodapé global -->
+    <div id="footer-content">
+        PURETEGO • {{ company_info.website }} • {{ company_info.phone }} • Página <pdf:pagenumber> de <pdf:pagecount>
     </div>
 
 </body>

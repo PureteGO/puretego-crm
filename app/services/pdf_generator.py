@@ -77,7 +77,14 @@ class PDFGenerator:
                 'total_investment': 'Investimento Total',
                 'payment_terms': 'Forma de Pagamento',
                 'additional_info': 'Informações Complementares',
-                'additional_text': 'Os preços incluem fatura legal, tempo de execução e seguimento do serviço mínimo de 90 dias, devido a pautas de inclusão e mudança de informação nas ferramentas comerciais do Google.'
+                'additional_text': 'Os preços incluem fatura legal, tempo de execução e seguimento do serviço mínimo de 90 dias, devido a pautas de inclusão e mudança de informação nas ferramentas comerciais do Google.',
+                'audit_title': 'Auditoria de Perfil Google',
+                'audit_subtitle': 'Análise técnica da sua presença local no Google Maps e Search',
+                'score_label': 'Pontuação de Saúde GMB',
+                'optimization_points': 'Pontos de Otimização',
+                'critical_issues': 'Problemas Críticos',
+                'moderate_issues': 'Problemas Moderados',
+                'positive_points': 'Pontos Positivos'
             }
         else:  # espanhol
             return {
@@ -95,5 +102,12 @@ class PDFGenerator:
                 'total_investment': 'Inversión Total',
                 'payment_terms': 'Forma de Pago',
                 'additional_info': 'Información Complementaria',
-                'additional_text': 'Los precios anteriores incluyen factura legal, tiempo de ejecución y seguimiento del servicio mínimo es de 90 días, debido a pautas de inclusión y cambio de información en las herramientas comerciales de Google.'
+                'additional_text': 'Los precios anteriores incluyen factura legal, tiempo de ejecución y seguimiento del servicio mínimo es de 90 dias, debido a pautas de inclusión y cambio de información en las herramientas comerciales de Google.',
+                'audit_title': 'Auditoría de Perfil Google',
+                'audit_subtitle': 'Análisis técnico de su presencia local en Google Maps y Search',
+                'score_label': 'Puntuación de Salud GMB',
+                'optimization_points': 'Puntos de Optimización',
+                'critical_issues': 'Problemas Críticos',
+                'moderate_issues': 'Problemas Moderados',
+                'positive_points': 'Puntos Positivos'
             }

@@ -26,9 +26,26 @@ def seed():
         
         # 2. Services
         services = [
-            ('Otimização PREMIUM GMB - 90 dias', 'Atualização de perfil completo...', 3500000.00),
-            ('Desenvolvimento Site Institucional', 'Registro e Gestão de Domínios...', 3500000.00),
-            ('Desenvolvimento Tienda Virtual', 'Funcionalidades para venda online...', 6500000.00)
+            (
+                'Dominación en Google Maps - Pack 90 días', 
+                'Auditoría SEO Local avanzada, optimización técnica del Perfil de Empresa (GMB), gestión estratégica de reseñas y reputación, y posicionamiento en el Local Pack para máxima visibilidad.', 
+                3500000.00
+            ),
+            (
+                'Desarrollo Web de Alto Nivel', 
+                'Sitios enfocados en la conversión (CRO) y optimizados para Google. Diseño personalizado, velocidad extrema, adaptado a móviles y con DNS gestionado profesionalmente.', 
+                3500000.00
+            ),
+            (
+                'Tienda Virtual de Gran Escala', 
+                'E-commerce profesional con gestión de inventario, pasarela de pagos integrada y optimización para ventas masivas online. Incluye seguimiento de conversiones.', 
+                7500000.00
+            ),
+            (
+                'Propulsor de Tráfico (Google Ads)',
+                'Gestión de campañas SEM focalizadas en intención de compra. Segmentación avanzada para atraer clientes calificados de forma inmediata y maximizar el ROI.',
+                2500000.00
+            )
         ]
         
         for name, desc, price in services:

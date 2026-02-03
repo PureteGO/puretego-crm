@@ -108,12 +108,94 @@
 
                         <!-- Visitas -->
                         <div class="tab-pane fade" id="visits" role="tabpanel">
-                            <p class="text-muted text-center py-4">Módulo de visitas em desenvolvimento.</p>
+                            <div class="d-flex justify-content-end mb-3">
+                                <a href="{{ url_for('visits.create', client_id=client.id) }}"
+                                    class="btn btn-sm btn-success">
+                                    <i class="bi bi-calendar-plus"></i> Registrar Visita
+                                </a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Notas</th>
+                                            <th>Próximo Passo</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for visit in visits %}
+                                        <tr>
+                                            <td>{{ visit.visit_date|format_date('%d/%m/%Y %H:%M') }}</td>
+                                            <td>{{ visit.notes|truncate(50) }}</td>
+                                            <td><span class="badge bg-light text-dark border">{{ visit.next_step
+                                                    }}</span></td>
+                                            <td>
+                                                <a href="{{ url_for('visits.view', visit_id=visit.id) }}"
+                                                    class="btn btn-sm btn-outline-info">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4">No hay visitas registradas.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         <!-- Health Check -->
                         <div class="tab-pane fade" id="health" role="tabpanel">
-                            <p class="text-muted text-center py-4">Módulo de Health Check em desenvolvimento.</p>
+                            <div class="d-flex justify-content-end mb-3">
+                                <a href="{{ url_for('health_checks.create', client_id=client.id) }}"
+                                    class="btn btn-sm btn-primary">
+                                    <i class="bi bi-google"></i> Nuevo Health Check
+                                </a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Puntuación</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for hc in health_checks %}
+                                        <tr>
+                                            <td>{{ hc.created_at|format_date }}</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-{{ hc.get_score_color() }} me-2">{{ hc.score
+                                                        }}</span>
+                                                    <div class="progress w-100" style="height: 5px;">
+                                                        <div class="progress-bar bg-{{ hc.get_score_color() }}"
+                                                            style="width: {{ hc.score }}%"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ hc.get_score_status() }}</td>
+                                            <td>
+                                                <a href="{{ url_for('health_checks.view', health_check_id=hc.id) }}"
+                                                    class="btn btn-sm btn-outline-info">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4">No hay auditorías realizadas.</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

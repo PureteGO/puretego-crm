@@ -60,11 +60,11 @@ def create(client_id=None):
         if client_id:
             selected_client = db.query(Client).filter(Client.id == client_id).first()
     
-    return render_template(
-        'visits/create.html',
-        clients=clients,
-        selected_client=selected_client
-    )
+        return render_template(
+            'visits/create.html',
+            clients=clients,
+            selected_client=selected_client
+        )
 
 
 @bp.route('/<int:visit_id>')
@@ -78,7 +78,7 @@ def view(visit_id):
             flash('Visita não encontrada.', 'error')
             return redirect(url_for('visits.index'))
     
-    return render_template('visits/view.html', visit=visit)
+        return render_template('visits/view.html', visit=visit)
 
 
 @bp.route('/<int:visit_id>/edit', methods=['GET', 'POST'])
@@ -108,7 +108,7 @@ def edit(visit_id):
             flash('Visita atualizada com sucesso!', 'success')
             return redirect(url_for('visits.view', visit_id=visit.id))
     
-    return render_template('visits/edit.html', visit=visit)
+        return render_template('visits/edit.html', visit=visit)
 
 
 @bp.route('/<int:visit_id>/delete', methods=['POST'])

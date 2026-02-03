@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Auditorías Health Check{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-google"></i> Auditorías Health Check</h1>
+    </div>
+
+    <div class="card shadow">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Puntuación</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hc in health_checks %}
+                    <tr>
+                        <td>{{ hc.created_at|format_date }}</td>
+                        <td class="fw-bold">{{ hc.client.name }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-{{ hc.get_score_color() }} me-2">{{ hc.score }}</span>
+                                <div class="progress w-100" style="height: 6px;">
+                                    <div class="progress-bar bg-{{ hc.get_score_color() }}"
+                                        style="width: {{ hc.score }}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ hc.get_score_status() }}</td>
+                        <td>
+                            <a href="{{ url_for('health_checks.view', health_check_id=hc.id) }}"
+                                class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">No hay auditorías realizadas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

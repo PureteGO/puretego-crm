@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Health Check - {{ client.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('clients.index') }}">Clientes</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('clients.view', client_id=client.id) }}">{{ client.name
+                    }}</a></li>
+            <li class="breadcrumb-item active">Nuevo Health Check</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-google"></i> Análisis de Perfil Google Business</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Esta herramienta utilizará la API de Google (vía SerpApi) para auditar el perfil público de este
+                        negocio.
+                        Analizaremos fotos, horarios, reseñas y optimización general.
+                    </p>
+
+                    <form action="{{ url_for('health_checks.create', client_id=client.id) }}" method="POST"
+                        id="healthCheckForm">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre del Negocio en Google Maps</label>
+                            <input type="text" name="business_name" class="form-control"
+                                value="{{ client.gmb_profile_name or client.name }}" required>
+                            <div class="form-text">Asegúrese de que el nombre coincida exactamente con lo que aparece en
+                                Google.</div>
+                        </div>
+
+                        <div id="loadingIndicator" class="text-center py-4 d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Analizando...</span>
+                            </div>
+                            <p class="mt-2 text-primary fw-bold">Auditando perfil... Esto puede demorar unos segundos.
+                            </p>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="bi bi-search"></i> Iniciar Análisis Real
+                            </button>
+                            <a href="{{ url_for('clients.view', client_id=client.id) }}"
+                                class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h6><i class="bi bi-info-circle"></i> ¿Qué estamos auditando?</h6>
+                <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check2-circle text-success me-2"></i> Presencia de Fotos y Videos
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check2-circle text-success me-2"></i> Horarios de Atención
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check2-circle text-success me-2"></i> Perfil Verificado
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check2-circle text-success me-2"></i> Reseñas y Respuestas
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('healthCheckForm').addEventListener('submit', function () {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('loadingIndicator').classList.remove('d-none');
+    });
+</script>
+{% endblock %}

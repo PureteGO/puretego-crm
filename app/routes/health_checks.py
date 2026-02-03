@@ -57,7 +57,7 @@ def create(client_id):
             flash(f'Health Check realizado! Pontuação: {result["score"]}/100', 'success')
             return redirect(url_for('health_checks.view', health_check_id=health_check.id))
     
-    return render_template('health_checks/create.html', client=client)
+        return render_template('health_checks/create.html', client=client)
 
 
 @bp.route('/<int:health_check_id>')
@@ -71,7 +71,7 @@ def view(health_check_id):
             flash('Health Check não encontrado.', 'error')
             return redirect(url_for('health_checks.index'))
     
-    return render_template('health_checks/view.html', health_check=health_check)
+        return render_template('health_checks/view.html', health_check=health_check)
 
 
 @bp.route('/<int:health_check_id>/delete', methods=['POST'])

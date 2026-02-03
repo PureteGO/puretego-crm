@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Visita - {{ selected_client.name if selected_client else 'Nuevo' }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Registrar Nueva Visita</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('visits.create') }}" method="POST">
+                        {% if not selected_client %}
+                        <div class="mb-3">
+                            <label class="form-label">Cliente</label>
+                            <select name="client_id" class="form-select" required>
+                                <option value="">Seleccione un cliente...</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% else %}
+                        <input type="hidden" name="client_id" value="{{ selected_client.id }}">
+                        <div class="mb-3">
+                            <label class="form-label">Cliente</label>
+                            <input type="text" class="form-control" value="{{ selected_client.name }}" readonly>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label class="form-label">Fecha y Hora de la Visita</label>
+                            <input type="datetime-local" name="visit_date" class="form-control"
+                                value="{{ now.strftime('%Y-%m-%dT%H:%M') if now else '' }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Observaciones / Notas</label>
+                            <textarea name="notes" class="form-control" rows="4"
+                                placeholder="¿Qué se habló con el cliente? ¿Qué problemas se detectaron?"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Próximo Paso / Compromiso</label>
+                            <input type="text" name="next_step" class="form-control"
+                                placeholder="Ej: Enviar propuesta, Volver a llamar el martes...">
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">Registrar Visita</button>
+                            <a href="{{ url_for('clients.view', client_id=selected_client.id) if selected_client else url_for('visits.index') }}"
+                                class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

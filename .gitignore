@@ -21,3 +21,9 @@ uploads/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Database and Binaries
+*.db
+*.sql
+*.pdf
+# Keep specific PDFs if needed, but ignoring general PDFs to save memory

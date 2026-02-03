@@ -172,7 +172,7 @@ def edit(proposal_id):
         # Serialize services
         services = [{'id': s.id, 'name': s.name, 'base_price': float(s.base_price), 'description': s.description} for s in services_query]
     
-    return render_template('proposals/edit.html', proposal=proposal, services=services)
+        return render_template('proposals/edit.html', proposal=proposal, services=services)
 
 
 @bp.route('/<int:proposal_id>/delete', methods=['POST'])
@@ -208,18 +208,23 @@ def generate_pdf(proposal_id):
             flash('Proposta não encontrada.', 'error')
             return redirect(url_for('proposals.index'))
         
+        # Buscar o último Health Check do cliente para incluir na proposta (Auditoria)
+        from app.models import HealthCheck
+        health_check = db.query(HealthCheck).filter(HealthCheck.client_id == proposal.client_id).order_by(HealthCheck.created_at.desc()).first()
+        
         # Preparar dados para o PDF
         proposal_data = {
             'client_name': proposal.client.name,
             'proposal_date': proposal.created_at,
             'valid_until': proposal.created_at + timedelta(days=30),
-            'items': [],
+            'proposal_items': [],
             'total_amount': float(proposal.total_amount),
-            'payment_terms': proposal.payment_terms or ''
+            'payment_terms': proposal.payment_terms or '',
+            'health_check': health_check.to_dict() if health_check else None
         }
         
         for item in proposal.items:
-            proposal_data['items'].append({
+            proposal_data['proposal_items'].append({
                 'name': item.service.name,
                 'description': item.description or item.service.description,
                 'price': float(item.price)
