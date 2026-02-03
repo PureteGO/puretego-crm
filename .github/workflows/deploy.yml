@@ -1,4 +1,4 @@
-name: Deploy to cPanel (SSH)
+name: Deploy to cPanel (FTP)
 
 on:
   push:
@@ -9,27 +9,27 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 🚀 Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.0
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
+
+      - name: 📂 Sync files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          host: ${{ secrets.CPANEL_HOST }}
+          server: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USERNAME }}
-          key: ${{ secrets.CPANEL_SSH_KEY }}
-          passphrase: ${{ secrets.CPANEL_SSH_PASSPHRASE }}
-          port: 22
-          script: |
-            # 1. Go to project folder
-            cd /home2/crmpuretego/repositories/puretego-crm
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftp
+          port: 21
+          # Deploying DIRECTLY to the app folder
+          server-dir: repositories/puretego-crm/
+          
+          # Optimization: Don't upload virtualenv or git files
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/venv/**
+            **/.env
+            **/generated_pdfs/**
+            **/__pycache__/**
             
-            # 2. Get latest code
-            git pull origin main
-            
-            # 3. Update dependencies (just in case)
-            source venv/bin/activate
-            pip install -r requirements.txt
-            
-            # 4. Restart Application
-            mkdir -p tmp
-            touch tmp/restart.txt
-            
-            echo "✅ Deployment Automatico Concluido!"
+      # Optional: Trigger a restart via HTTP request or leave it for manual check
