@@ -74,16 +74,36 @@ class SerpApiService:
         results = self._evaluate_criteria(business, details)
         total_score = sum(item['score'] for item in results)
         
+        # Gerar recomendações e problemas críticos
+        critical_items = [r for r in results if r['status'] == 'critical']
+        top_critical = [{'name': r['name_es'], 'message': r['message']} for r in critical_items[:3]]
+        
+        recommendations = []
+        for item in critical_items:
+            if item['id'] == 1: recommendations.append("Configurar los horarios de atención para no perder clientes potenciales.")
+            elif item['id'] == 2: recommendations.append("Subir al menos 10 fotos de alta calidad de sus productos o servicios.")
+            elif item['id'] == 4: recommendations.append("Completar el proceso de verificación de Google para ganar confianza y autoridad.")
+            elif item['id'] == 5: recommendations.append("Vincular un sitio web profesional para mejorar la conversión.")
+            elif item['id'] == 8: recommendations.append("Escribir una descripción detallada del negocio con palabras clave relevantes.")
+            elif item['id'] == 14: recommendations.append("Solicitar nuevas reseñas a sus clientes actuales para mejorar el ranking.")
+
+        # Recomendações genéricas se houver poucas específicas
+        if len(recommendations) < 3:
+            recommendations.append("Mantener el perfil actualizado con publicaciones semanais.")
+            recommendations.append("Responder a todas las reseñas, tanto positivas como negativas.")
+        
         return {
             'score': total_score,
             'report': {
                 'business_name': business.get('title', business_name),
                 'address': business.get('address'),
                 'summary': {
-                    'critical_issues_count': len([r for r in results if r['status'] == 'critical']),
+                    'critical_issues_count': len(critical_items),
                     'moderate_issues_count': len([r for r in results if r['status'] == 'moderate']),
                     'positive_points_count': len([r for r in results if r['status'] == 'positive'])
                 },
+                'top_critical_issues': top_critical,
+                'recommendations': recommendations[:5], # Máximo 5 recomendações
                 'criteria': results
             }
         }

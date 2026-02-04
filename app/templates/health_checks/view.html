@@ -34,20 +34,20 @@
                     <h6 class="mb-0">Resumen de Análisis</h6>
                 </div>
                 <div class="card-body">
-                    {% set data = health_check.get_report_data() %}
-                    {% set report = data.summary if 'summary' in data else data %}
+                    {% set report = health_check.get_report_data() %}
+                    {% set summary = report.summary if 'summary' in report else report %}
                     <div class="d-flex justify-content-between mb-2">
                         <span>Puntos Críticos:</span>
-                        <span class="badge bg-danger rounded-pill">{{ report.critical_issues_count or 0 }}</span>
+                        <span class="badge bg-danger rounded-pill">{{ summary.critical_issues_count or 0 }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span>Puntos Moderados:</span>
-                        <span class="badge bg-warning text-dark rounded-pill">{{ report.moderate_issues_count or 0
+                        <span class="badge bg-warning text-dark rounded-pill">{{ summary.moderate_issues_count or 0
                             }}</span>
                     </div>
                     <div class="d-flex justify-content-between">
                         <span>Puntos Positivos:</span>
-                        <span class="badge bg-success rounded-pill">{{ report.positive_points_count or 0 }}</span>
+                        <span class="badge bg-success rounded-pill">{{ summary.positive_points_count or 0 }}</span>
                     </div>
                 </div>
             </div>
@@ -64,8 +64,7 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    {% set data = health_check.get_report_data() %}
-                    {% set report = data.summary if 'summary' in data else data %}
+                    {% set report = health_check.get_report_data() %}
 
                     {% if report.top_critical_issues %}
                     <h6 class="text-danger fw-bold mb-3"><i class="bi bi-exclamation-octagon"></i> Problemas Críticos
@@ -86,9 +85,14 @@
                         Especialista</h6>
                     <div class="bg-light p-3 rounded border">
                         <ul class="mb-0">
+                            {% if report.recommendations %}
                             {% for rec in report.recommendations %}
                             <li class="mb-2">{{ rec }}</li>
                             {% endfor %}
+                            {% else %}
+                            <li class="text-muted">No hay recomendaciones específicas disponibles para esta auditoría.
+                            </li>
+                            {% endif %}
                         </ul>
                     </div>
                 </div>
