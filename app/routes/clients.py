@@ -137,43 +137,51 @@ def create():
 @login_required
 def view(client_id):
     """Visualizar detalhes do cliente"""
-    with get_db() as db:
-        from sqlalchemy.orm import joinedload
-        client = db.query(Client).options(
-            joinedload(Client.kanban_stage),
-            joinedload(Client.interested_package)
-        ).filter(Client.id == client_id).first()
-        
-        if not client:
-            flash('Cliente não encontrado.', 'error')
-            return redirect(url_for('clients.index'))
+    try:
+        with get_db() as db:
+            from sqlalchemy.orm import joinedload
+            client = db.query(Client).options(
+                joinedload(Client.kanban_stage),
+                joinedload(Client.interested_package)
+            ).filter(Client.id == client_id).first()
             
-        # Buscar visitas, health checks e propostas
-        visits = db.query(Visit).filter(Visit.client_id == client_id)\
-            .order_by(Visit.visit_date.desc()).all()
+            if not client:
+                flash('Cliente não encontrado.', 'error')
+                return redirect(url_for('clients.index'))
+                
+            # Buscar visitas, health checks e propostas com eager loading para evitar DetachedInstanceError no template
+            visits = db.query(Visit).options(joinedload(Visit.user))\
+                .filter(Visit.client_id == client_id)\
+                .order_by(Visit.visit_date.desc()).all()
+            
+            health_checks = db.query(HealthCheck).filter(HealthCheck.client_id == client_id)\
+                .order_by(HealthCheck.created_at.desc()).all()
+            
+            proposals = db.query(Proposal).options(joinedload(Proposal.user))\
+                .filter(Proposal.client_id == client_id)\
+                .order_by(Proposal.created_at.desc()).all()
+            
+            stages = db.query(KanbanStage).order_by(KanbanStage.order).all()
+            
+            interactions = db.query(Interaction).options(joinedload(Interaction.type), joinedload(Interaction.user))\
+                .filter(Interaction.client_id == client_id)\
+                .order_by(Interaction.date.desc()).all()
         
-        health_checks = db.query(HealthCheck).filter(HealthCheck.client_id == client_id)\
-            .order_by(HealthCheck.created_at.desc()).all()
-        
-        proposals = db.query(Proposal).filter(Proposal.client_id == client_id)\
-            .order_by(Proposal.created_at.desc()).all()
-        
-        stages = db.query(KanbanStage).order_by(KanbanStage.order).all()
-        
-        from sqlalchemy.orm import joinedload
-        interactions = db.query(Interaction).options(joinedload(Interaction.type), joinedload(Interaction.user))\
-            .filter(Interaction.client_id == client_id)\
-            .order_by(Interaction.date.desc()).all()
-    
-        return render_template(
-            'clients/view.html',
-            client=client,
-            visits=visits,
-            health_checks=health_checks,
-            proposals=proposals,
-            stages=stages,
-            interactions=interactions
-        )
+            return render_template(
+                'clients/view.html',
+                client=client,
+                visits=visits,
+                health_checks=health_checks,
+                proposals=proposals,
+                stages=stages,
+                interactions=interactions
+            )
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"DEBUG ERROR VIEW: {error_details}")
+        # Retorna o erro na tela para depuração imediata em produção (apenas para este problema)
+        return f"<h1>Erro de Depuração (Mostre isso ao suporte)</h1><pre>{error_details}</pre>", 500
 
 
 @bp.route('/<int:client_id>/edit', methods=['GET', 'POST'])
