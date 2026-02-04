@@ -30,7 +30,6 @@ class Client(Base):
     visits = relationship('Visit', back_populates='client', cascade='all, delete-orphan')
     health_checks = relationship('HealthCheck', back_populates='client', cascade='all, delete-orphan')
     proposals = relationship('Proposal', back_populates='client', cascade='all, delete-orphan')
-    proposals = relationship('Proposal', back_populates='client', cascade='all, delete-orphan')
     interactions = relationship('Interaction', back_populates='client', cascade='all, delete-orphan')
     
     # Detailed Info Fields

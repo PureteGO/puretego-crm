@@ -11,11 +11,18 @@ CREATE TABLE IF NOT EXISTS service_packages (
     UNIQUE (name)
 );
 
--- 2. Adicionar Coluna na Tabela de Clientes
--- Se esta linha der erro dizendo que a coluna já existe, pode ignorar
+-- 2. Adicionar Colunas na Tabela de Clientes
+-- Se estas linhas derem erro dizendo que a coluna já existe, pode ignorar
 ALTER TABLE clients ADD COLUMN interested_package_id INTEGER;
+ALTER TABLE clients ADD COLUMN receptionist_name VARCHAR(255);
+ALTER TABLE clients ADD COLUMN decision_maker_name VARCHAR(255);
+ALTER TABLE clients ADD COLUMN decision_factors TEXT;
+ALTER TABLE clients ADD COLUMN best_contact_time VARCHAR(100);
+ALTER TABLE clients ADD COLUMN preferred_contact_method VARCHAR(100);
+ALTER TABLE clients ADD COLUMN observations TEXT;
 
 -- 3. Criar Vínculo (Foreign Key)
+-- Se der erro de que a constraint já existe, pode ignorar
 ALTER TABLE clients ADD CONSTRAINT fk_clients_package 
 FOREIGN KEY (interested_package_id) REFERENCES service_packages(id) ON DELETE SET NULL;
 
