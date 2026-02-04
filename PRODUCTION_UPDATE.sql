@@ -68,15 +68,15 @@ CREATE TABLE IF NOT EXISTS interactions (
     FOREIGN KEY (type_id) REFERENCES interaction_types(id)
 );
 
--- 6. Inserir Tipos de Interação Iniciais
+-- 2. Popula os tipos de interação (Isso vai encher o seu dropdown!)
 INSERT IGNORE INTO interaction_types (name, icon, is_call) VALUES
-('Cold Visit', 'fas fa-walking', FALSE),
+('Visita Agendada', 'fas fa-calendar-check', FALSE),
+('Visita não agendada', 'fas fa-walking', FALSE),
+('Visita de Prospecção', 'fas fa-search', FALSE),
+('Visita de Seguimento', 'fas fa-redo', FALSE),
 ('Follow-up Call', 'fas fa-phone-volume', TRUE),
-('Presentation Visit', 'fas fa-laptop', FALSE),
 ('Negotiation Call', 'fas fa-hand-holding-usd', TRUE),
 ('Exploratory Call', 'fas fa-phone', TRUE),
-('Closing Visit', 'fas fa-signature', FALSE),
-('Technical Visit', 'fas fa-tools', FALSE),
 ('Closing Call', 'fas fa-check-circle', TRUE);
 
 -- 7. Inserir Regras de Cadência Iniciais

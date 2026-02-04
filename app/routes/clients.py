@@ -18,7 +18,11 @@ bp = Blueprint('clients', __name__, url_prefix='/clients')
 def index():
     """Lista de clientes"""
     with get_db() as db:
-        clients_query = db.query(Client).order_by(Client.created_at.desc()).all()
+        from sqlalchemy.orm import joinedload
+        clients_query = db.query(Client).options(
+            joinedload(Client.kanban_stage),
+            joinedload(Client.interested_package)
+        ).order_by(Client.created_at.desc()).all()
         stages_query = db.query(KanbanStage).order_by(KanbanStage.order).all()
         
         # Serialize to avoid DetachedInstanceError
@@ -50,7 +54,9 @@ def kanban():
         # Organizar clientes por etapa
         kanban_data = []
         for stage in stages:
-            clients = db.query(Client).filter(Client.kanban_stage_id == stage.id).all()
+            from sqlalchemy.orm import joinedload
+            clients = db.query(Client).options(joinedload(Client.interested_package))\
+                .filter(Client.kanban_stage_id == stage.id).all()
             
             # Calculate Total Value (Exclude first stage)
             stage_value = 0

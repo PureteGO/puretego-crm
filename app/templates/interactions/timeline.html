@@ -7,9 +7,9 @@
                     <i class="{{ interaction.type.icon }}"></i> {{ interaction.type.name }}
                 </h6>
                 <div class="d-flex align-items-center">
-                    <small class="text-muted me-2">{{ interaction.date.strftime('%d/%m/%Y %H:%M') }}</small>
+                    <small class="text-muted me-2">{{ interaction.date.strftime('%d/%m/%Y %H:%M') if interaction.date else '' }}</small>
                     <button class="btn btn-sm btn-link p-0 text-secondary"
-                        onclick="openEditModal({{ interaction.id }}, {{ interaction.type.id }}, '{{ interaction.date.isoformat() }}', `{{ interaction.notes }}`, '{{ interaction.status }}')"
+                        onclick="openEditModal({{ interaction.id }}, {{ interaction.type.id }}, '{{ interaction.date.isoformat() if interaction.date else '' }}', `{{ interaction.notes }}`, '{{ interaction.status }}')"
                         title="Editar">
                         <i class="bi bi-pencil"></i>
                     </button>

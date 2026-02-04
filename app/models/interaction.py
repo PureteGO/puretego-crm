@@ -67,7 +67,7 @@ class Interaction(Base):
             'type_name': self.type.name if self.type else None,
             'type_icon': self.type.icon if self.type else None,
             'is_call': self.type.is_call if self.type else False,
-            'date': self.date.isoformat(),
+            'date': self.date.isoformat() if self.date else None,
             'status': self.status,
             'notes': self.notes
         }
