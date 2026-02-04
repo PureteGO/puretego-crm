@@ -37,6 +37,40 @@ def index():
         health_checks = db.query(HealthCheck).order_by(HealthCheck.created_at.desc()).all()
         return render_template('health_checks/index.html', health_checks=health_checks)
 
+@bp.route('/create/<int:client_id>', methods=['GET', 'POST'])
+@login_required
+def create(client_id):
+    """Criar novo health check para um cliente"""
+    with get_db() as db:
+        client = db.query(Client).filter(Client.id == client_id).first()
+        if not client:
+            flash('Cliente não encontrado.', 'error')
+            return redirect(url_for('clients.index'))
+        
+        if request.method == 'POST':
+            business_name = request.form.get('business_name')
+            
+            try:
+                serpapi = SerpApiService()
+                result = serpapi.analyze_gmb_profile(business_name)
+                
+                health_check = HealthCheck(
+                    client_id=client.id,
+                    score=result['score'],
+                    report_data=result['report']
+                )
+                db.add(health_check)
+                db.commit()
+                
+                flash('Health Check realizado com sucesso!', 'success')
+                return redirect(url_for('clients.view', client_id=client.id))
+            except Exception as e:
+                db.rollback()
+                flash(f'Erro ao realizar Health Check: {str(e)}', 'error')
+                return render_template('health_checks/create.html', client=client)
+                
+        return render_template('health_checks/create.html', client=client)
+
 @bp.route('/<int:health_check_id>')
 @login_required
 def view(health_check_id):
