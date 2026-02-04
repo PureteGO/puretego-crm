@@ -102,13 +102,13 @@ def agenda():
         # Fetch visits that are not "completed" (logic: future date = not completed usually, unless logic exists)
         # For simplicity, we show ALL future visits as tasks
         
-        visits_today = db.query(Visit).filter(
+        visits_today = db.query(Visit).options(joinedload(Visit.client)).filter(
             Visit.visit_date <= end_of_today,
             Visit.visit_date >= now.replace(hour=0, minute=0, second=0),
             Visit.user_id == session['user_id']
         ).all()
         
-        visits_future = db.query(Visit).filter(
+        visits_future = db.query(Visit).options(joinedload(Visit.client)).filter(
             Visit.visit_date > end_of_today,
             Visit.user_id == session['user_id']
         ).all()
