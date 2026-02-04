@@ -81,19 +81,22 @@ def agenda():
     end_of_today = now.replace(hour=23, minute=59, second=59)
     
     with get_db() as db:
+        from sqlalchemy.orm import joinedload
         # 1. Interactions: Overdue & Today
-        urgent_tasks = db.query(Interaction).filter(
-            Interaction.status == 'scheduled',
-            Interaction.date <= end_of_today,
-            Interaction.user_id == session['user_id']
-        ).order_by(Interaction.date).all()
+        urgent_tasks = db.query(Interaction).options(joinedload(Interaction.client), joinedload(Interaction.type))\
+            .filter(
+                Interaction.status == 'scheduled',
+                Interaction.date <= end_of_today,
+                Interaction.user_id == session['user_id']
+            ).order_by(Interaction.date).all()
         
         # 2. Interactions: Upcoming (Future)
-        future_tasks = db.query(Interaction).filter(
-            Interaction.status == 'scheduled',
-            Interaction.date > end_of_today,
-            Interaction.user_id == session['user_id']
-        ).order_by(Interaction.date).limit(50).all()
+        future_tasks = db.query(Interaction).options(joinedload(Interaction.client), joinedload(Interaction.type))\
+            .filter(
+                Interaction.status == 'scheduled',
+                Interaction.date > end_of_today,
+                Interaction.user_id == session['user_id']
+            ).order_by(Interaction.date).limit(50).all()
 
         # 3. Visits (Treat as Interactions)
         # Fetch visits that are not "completed" (logic: future date = not completed usually, unless logic exists)
