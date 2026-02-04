@@ -150,7 +150,9 @@ def view(client_id):
         
         stages = db.query(KanbanStage).order_by(KanbanStage.order).all()
         
-        interactions = db.query(Interaction).filter(Interaction.client_id == client_id)\
+        from sqlalchemy.orm import joinedload
+        interactions = db.query(Interaction).options(joinedload(Interaction.type), joinedload(Interaction.user))\
+            .filter(Interaction.client_id == client_id)\
             .order_by(Interaction.date.desc()).all()
     
         return render_template(
