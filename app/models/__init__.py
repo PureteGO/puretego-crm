@@ -11,6 +11,7 @@ from .service import Service
 from .proposal import Proposal, ProposalItem
 from .interaction import Interaction, InteractionType, CadenceRule
 from .service_package import ServicePackage
+from .quick_check_log import QuickCheckLog
 
 __all__ = [
     'User',
@@ -24,5 +25,6 @@ __all__ = [
     'Interaction',
     'InteractionType',
     'CadenceRule',
-    'ServicePackage'
+    'ServicePackage',
+    'QuickCheckLog'
 ]
