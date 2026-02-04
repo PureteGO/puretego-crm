@@ -43,11 +43,11 @@ class HealthCheck(Base):
     def get_score_color(self):
         """Retorna a cor baseada na pontuação"""
         if self.score >= 70:
-            return 'green'
+            return 'success'
         elif self.score >= 40:
-            return 'yellow'
+            return 'warning'
         else:
-            return 'red'
+            return 'danger'
     
     def get_score_status(self):
         """Retorna o status baseado na pontuação"""
