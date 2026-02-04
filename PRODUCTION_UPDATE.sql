@@ -81,11 +81,11 @@ INSERT IGNORE INTO interaction_types (name, icon, is_call) VALUES
 
 -- 7. Inserir Regras de Cadência Iniciais
 INSERT IGNORE INTO cadence_rules (trigger_type_id, suggested_next_type_id, delay_days)
-SELECT t1.id, t2.id, 2 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Cold Visit' AND t2.name = 'Follow-up Call'
+SELECT t1.id, t2.id, 2 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Visita de Prospecção' AND t2.name = 'Follow-up Call'
 UNION ALL
-SELECT t1.id, t2.id, 3 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Presentation Visit' AND t2.name = 'Negotiation Call'
+SELECT t1.id, t2.id, 3 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Visita Agendada' AND t2.name = 'Negotiation Call'
 UNION ALL
-SELECT t1.id, t2.id, 5 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Exploratory Call' AND t2.name = 'Presentation Visit'
+SELECT t1.id, t2.id, 5 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Exploratory Call' AND t2.name = 'Visita Agendada'
 UNION ALL
 SELECT t1.id, t2.id, 2 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Negotiation Call' AND t2.name = 'Closing Call';
 
