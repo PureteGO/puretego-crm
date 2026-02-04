@@ -74,12 +74,38 @@ def create(client_id):
 @bp.route('/<int:health_check_id>')
 @login_required
 def view(health_check_id):
+    """Visualizar detalhes do relatório"""
+    try:
+        with get_db() as db:
+            from sqlalchemy.orm import joinedload
+            health_check = db.query(HealthCheck).options(joinedload(HealthCheck.client))\
+                .filter(HealthCheck.id == health_check_id).first()
+            if not health_check:
+                flash('Relatório não encontrado.', 'error')
+                return redirect(url_for('health_checks.index'))
+            return render_template('health_checks/view.html', health_check=health_check)
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"DEBUG ERROR HC VIEW: {error_details}")
+        return f"<h1>Erro ao carregar relatório</h1><pre>{error_details}</pre>", 500
+
+@bp.route('/<int:health_check_id>/delete', methods=['POST'])
+@login_required
+def delete(health_check_id):
+    """Deletar um relatório de health check"""
     with get_db() as db:
         health_check = db.query(HealthCheck).filter(HealthCheck.id == health_check_id).first()
         if not health_check:
             flash('Relatório não encontrado.', 'error')
             return redirect(url_for('health_checks.index'))
-        return render_template('health_checks/view.html', health_check=health_check)
+        
+        client_id = health_check.client_id
+        db.delete(health_check)
+        db.commit()
+        
+        flash('Relatório removido com sucesso.', 'success')
+        return redirect(url_for('clients.view', client_id=client_id))
 
 @bp.route('/convert-to-lead', methods=['POST'])
 @login_required
