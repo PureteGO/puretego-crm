@@ -132,7 +132,11 @@ def create():
 def view(client_id):
     """Visualizar detalhes do cliente"""
     with get_db() as db:
-        client = db.query(Client).filter(Client.id == client_id).first()
+        from sqlalchemy.orm import joinedload
+        client = db.query(Client).options(
+            joinedload(Client.kanban_stage),
+            joinedload(Client.interested_package)
+        ).filter(Client.id == client_id).first()
         
         if not client:
             flash('Cliente não encontrado.', 'error')
@@ -171,7 +175,11 @@ def view(client_id):
 def edit(client_id):
     """Editar cliente"""
     with get_db() as db:
-        client = db.query(Client).filter(Client.id == client_id).first()
+        from sqlalchemy.orm import joinedload
+        client = db.query(Client).options(
+            joinedload(Client.kanban_stage),
+            joinedload(Client.interested_package)
+        ).filter(Client.id == client_id).first()
         
         if not client:
             flash('Cliente não encontrado.', 'error')
@@ -199,10 +207,19 @@ def edit(client_id):
             package_id = request.form.get('interested_package_id')
             client.interested_package_id = int(package_id) if package_id else None
             
-            db.commit()
-            
-            flash(f'Cliente {client.name} atualizado com sucesso!', 'success')
-            return redirect(url_for('clients.view', client_id=client.id))
+            try:
+                db.commit()
+                flash(f'Cliente {client.name} atualizado com sucesso!', 'success')
+                return redirect(url_for('clients.view', client_id=client.id))
+            except Exception as e:
+                db.rollback()
+                flash(f'Erro ao salvar alterações: {str(e)}', 'error')
+                # Keep user on edit page to try again or see error
+                stages_query = db.query(KanbanStage).order_by(KanbanStage.order).all()
+                packages_query = db.query(ServicePackage).order_by(ServicePackage.price).all()
+                stages = [{'id': s.id, 'name': s.name} for s in stages_query]
+                packages = [{'id': p.id, 'name': p.name, 'price': float(p.price)} for p in packages_query]
+                return render_template('clients/edit.html', client=client, stages=stages, packages=packages)
         
         stages_query = db.query(KanbanStage).order_by(KanbanStage.order).all()
         packages_query = db.query(ServicePackage).order_by(ServicePackage.price).all()
