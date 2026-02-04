@@ -1,48 +1,48 @@
 # 📊 PureteGO CRM - Status & Roadmap
 
-**Data:** 03/02/2026
-**Versão:** MVP - Fase de Desenvolvimento Local
-**Status do Sistema:** 🟢 Operacional (Local)
+**Data:** 03/02/2026 (Final do Marathon Day: 07h - 23h30)
+**Versão:** MVP - Produção Estabilizada
+**Status do Sistema:** 🟢 Operacional (Produção & Local)
 
 ---
 
 ## 📍 1. Onde Estamos (Status Atual)
 
-O sistema básico está funcional e rodando localmente com configurações de produção simuladas.
+O sistema passou por uma fase crítica de estabilização em produção e agora está funcional e robusto.
 
-### ✅ Concluído
-*   **CI/CD & Deploy**:
-    *   Pipeline GitHub Actions configurado para **Deploy Automático via FTP** (Zero-Touch).
-    *   Segredos de repositório configurados (`CPANEL_SSH_KEY`).
-    *   Deploy em Produção (`crm.puretego.online`) verificado.
-*   **Infraestrutura Local**:
-    *   Ambiente Python configurado (`venv`).
-    *   Banco de dados MySQL (XAMPP) configurado e populado (`puretego_crm`).
-*   **Funcionalidades Principais**:
-    *   **Health Check**: Relatório visual 100% corrigido e populando dados corretamente.
-    *   **Autenticação**: Login de admin implementado.
-    *   **Propostas**: Geração de PDF via `xhtml2pdf` com layout profissional.
+### ✅ Concluído Hoje (Maratona de 16h)
+*   **Estabilidade de Produção**:
+    *   Resolvidos erros de `DetachedInstanceError` em todas as rotas principais (Dashboard, Clientes, Relatórios).
+    *   Implementado `joinedload` exaustivo para garantir que dados de relacionamentos subam sem falhas.
+    *   Blindagem contra valores nulos em filtros de moeda e templates.
+*   **Módulo Health Check (Auditoria GMB)**:
+    *   Fluxo completo: Criação -> Análise Real (SerpApi) -> Gravação -> Visualização -> Deleção.
+    *   **Inteligência Artificial**: Geração automática de Recomendações do Especialista e Problemas Críticos.
+*   **Localização & UI**:
+    *   Transição do sistema para **Espanhol (Paraguay)** como idioma primário.
+    *   Adicionados Campos Detalhados no Cliente (Decisor, Recepcionista, Fatores de Decisão, etc.).
+    *   Agenda do Dashboard unificada (Visitas + Interações Agendadas).
+*   **Infraestrutura**:
+    *   Deploy contínuo via GitHub Actions operando perfeitamente.
 
-### 🚧 Em Andamento / Para Validar
-*   **Configuração Final Produção**: Criar arquivo `.env` manualmente no cPanel.
-*   **Validação Visual Remota**: Acessar a URL de staging para garantir que tudo carrega como no local.
+### 🚧 Em Andamento / Próximos Desafios
+*   **Refinamento de Traduções**: Completar a tradução de labels estáticas remanescentes para Espanhol.
+*   **Propostas PDF**: Integrar os dados do novo Health Check diretamente no template de PDF.
 
 ---
 
 ## 🗺️ 2. Para Onde Vamos (Próximos Passos)
 
-### 🎯 Curto Prazo (Hoje/Amanhã)
-1.  **Validação Visual**: Navegar pelo sistema rodando localmente para garantir que não há erros de template (Jinja2) ou rotas quebradas.
-2.  **Refinamento de UI**: Ajustar detalhes visuais nos novos módulos (CSS/Layout).
-3.  **Deploy em Staging**: Colocar essa versão no cPanel para teste real remoto.
+### 🎯 Curto Prazo
+1.  **Módulo de Orçamentos**: Vincular os itens de serviço aos preços salvos no banco.
+2.  **Notificações**: Alertas simples para tarefas atrasadas na agenda.
 
 ### 🚀 Médio Prazo (Rumo aos 5k usuários)
-1.  **Fila de PDFs Assíncrona**: Mover a geração de PDF para background (Celery) para não travar o servidor quando múltiplos usuários gerarem propostas.
-2.  **Frontend Dinâmico**: Migrar partes interativas para Vue.js ou React conforme a complexidade aumentar.
-3.  **Infraestrutura**: Migrar do cPanel para um ambiente containerizado (Docker/Cloud SQL) quando a base de usuários crescer.
+1.  **Arquitetura Assíncrona**: Mover SerpApi e PDF para Celery/Redis.
+2.  **Dashboard Executivo**: Gráficos de conversão de leads por etapa do Kanban.
 
 ---
 
-## ⚠️ Pontos de Atenção (Arquitetura)
-*   **Performance**: A geração de PDF atual bloqueia a thread do servidor. Para poucos usuários é OK, mas é o primeiro gargalo a ser resolvido para escala.
-*   **Segurança**: Garantir que `SECRET_KEY` e senhas de banco de produção sejam fortes e gerenciadas via variáveis de ambiente (já implementado via `.env`).
+## ⚠️ Pontos de Atenção
+*   **Créditos de API**: Monitorar o uso da SerpApi conforme o volume de auditorias crescer.
+*   **Session Timeout**: Ajustar o tempo de sessão no cPanel para evitar logouts inesperados durante o uso.
