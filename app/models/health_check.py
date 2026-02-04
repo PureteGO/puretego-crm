@@ -42,6 +42,8 @@ class HealthCheck(Base):
     
     def get_score_color(self):
         """Retorna a cor baseada na pontuação"""
+        if self.score is None:
+            return 'secondary'
         if self.score >= 70:
             return 'success'
         elif self.score >= 40:
@@ -51,6 +53,8 @@ class HealthCheck(Base):
     
     def get_score_status(self):
         """Retorna o status baseado na pontuação"""
+        if self.score is None:
+            return 'N/A'
         if self.score >= 70:
             return 'Excelente'
         elif self.score >= 40:

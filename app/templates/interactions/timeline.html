@@ -1,15 +1,18 @@
 <div class="timeline p-3">
     {% for interaction in interactions %}
-    <div class="card mb-3 border-start border-4 border-{{ 'primary' if interaction.type.is_call else 'success' }}">
+    <div
+        class="card mb-3 border-start border-4 border-{{ 'primary' if interaction.type and interaction.type.is_call else 'success' }}">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <h6 class="card-subtitle text-muted">
-                    <i class="{{ interaction.type.icon }}"></i> {{ interaction.type.name }}
+                    <i class="{{ interaction.type.icon if interaction.type else 'fas fa-info-circle' }}"></i> {{
+                    interaction.type.name if interaction.type else 'Interação' }}
                 </h6>
                 <div class="d-flex align-items-center">
-                    <small class="text-muted me-2">{{ interaction.date.strftime('%d/%m/%Y %H:%M') if interaction.date else '' }}</small>
+                    <small class="text-muted me-2">{{ interaction.date.strftime('%d/%m/%Y %H:%M') if interaction.date
+                        else '' }}</small>
                     <button class="btn btn-sm btn-link p-0 text-secondary"
-                        onclick="openEditModal({{ interaction.id }}, {{ interaction.type.id }}, '{{ interaction.date.isoformat() if interaction.date else '' }}', `{{ interaction.notes }}`, '{{ interaction.status }}')"
+                        onclick="openEditModal({{ interaction.id }}, {{ interaction.type.id if interaction.type else 0 }}, '{{ interaction.date.isoformat() if interaction.date else '' }}', `{{ interaction.notes }}`, '{{ interaction.status }}')"
                         title="Editar">
                         <i class="bi bi-pencil"></i>
                     </button>
@@ -22,7 +25,7 @@
                 <span class="badge bg-{{ 'success' if interaction.status == 'done' else 'warning' }}">
                     {{ interaction.status }}
                 </span>
-                <small class="text-muted">por {{ interaction.user.name }}</small>
+                <small class="text-muted">por {{ interaction.user.name if interaction.user else 'Sistema' }}</small>
             </div>
         </div>
     </div>
