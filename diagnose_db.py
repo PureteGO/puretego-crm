@@ -62,6 +62,17 @@ try:
     else:
         print("\n[OK] Table 'service_packages' exists.")
 
+    if 'interaction_types' not in tables:
+        print("\n[FAIL] Table 'interaction_types' is MISSING.")
+    else:
+        print("\n[OK] Table 'interaction_types' exists.")
+        with engine.connect() as conn:
+            from sqlalchemy import text
+            count = conn.execute(text("SELECT COUNT(*) FROM interaction_types")).scalar()
+            print(f"   - Found {count} interaction types.")
+            if count == 0:
+                print("   [WARNING] Table 'interaction_types' is EMPTY.")
+
 except Exception as e:
     print(f"\n[ERROR] Database diagnostic failed: {e}")
 

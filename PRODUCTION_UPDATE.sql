@@ -37,3 +37,61 @@ ON DUPLICATE KEY UPDATE
 price=VALUES(price), 
 description=VALUES(description), 
 features=VALUES(features);
+
+-- 5. Tabelas de Interações (Agenda/Kanban)
+CREATE TABLE IF NOT EXISTS interaction_types (
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    icon VARCHAR(50) DEFAULT 'fas fa-circle',
+    is_call BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (id),
+    UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS cadence_rules (
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    trigger_type_id INTEGER NOT NULL,
+    suggested_next_type_id INTEGER NOT NULL,
+    delay_days INTEGER DEFAULT 2,
+    PRIMARY KEY (id),
+    FOREIGN KEY (trigger_type_id) REFERENCES interaction_types(id),
+    FOREIGN KEY (suggested_next_type_id) REFERENCES interaction_types(id)
+);
+
+CREATE TABLE IF NOT EXISTS interactions (
+    id INTEGER NOT NULL AUTO_INCREMENT,
+    client_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    type_id INTEGER NOT NULL,
+    date DATETIME,
+    status ENUM('done', 'scheduled', 'skipped', 'missed'),
+    notes TEXT,
+    created_at DATETIME,
+    updated_at DATETIME,
+    PRIMARY KEY (id),
+    FOREIGN KEY (client_id) REFERENCES clients(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (type_id) REFERENCES interaction_types(id)
+);
+
+-- 6. Inserir Tipos de Interação Iniciais
+INSERT IGNORE INTO interaction_types (name, icon, is_call) VALUES
+('Cold Visit', 'fas fa-walking', FALSE),
+('Follow-up Call', 'fas fa-phone-volume', TRUE),
+('Presentation Visit', 'fas fa-laptop', FALSE),
+('Negotiation Call', 'fas fa-hand-holding-usd', TRUE),
+('Exploratory Call', 'fas fa-phone', TRUE),
+('Closing Visit', 'fas fa-signature', FALSE),
+('Technical Visit', 'fas fa-tools', FALSE),
+('Closing Call', 'fas fa-check-circle', TRUE);
+
+-- 7. Inserir Regras de Cadência Iniciais
+INSERT IGNORE INTO cadence_rules (trigger_type_id, suggested_next_type_id, delay_days)
+SELECT t1.id, t2.id, 2 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Cold Visit' AND t2.name = 'Follow-up Call'
+UNION ALL
+SELECT t1.id, t2.id, 3 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Presentation Visit' AND t2.name = 'Negotiation Call'
+UNION ALL
+SELECT t1.id, t2.id, 5 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Exploratory Call' AND t2.name = 'Presentation Visit'
+UNION ALL
+SELECT t1.id, t2.id, 2 FROM interaction_types t1, interaction_types t2 WHERE t1.name = 'Negotiation Call' AND t2.name = 'Closing Call';
+
