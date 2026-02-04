@@ -52,6 +52,8 @@ def create_app(config_object=None):
     @app.template_filter('format_currency')
     def format_currency_filter(value, currency='GS'):
         """Formata valores monetários"""
+        if value is None:
+            return f"{currency} 0"
         if currency == 'GS':
             return f"GS {value:,.0f}".replace(',', '.')
         else:
