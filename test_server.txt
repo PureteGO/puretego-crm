@@ -1,0 +1,3 @@
+OK - Connection works.
+If you see this, Apache is serving static files correctly.
+If you see a 500 error, the .htaccess file or Passenger is broken.
