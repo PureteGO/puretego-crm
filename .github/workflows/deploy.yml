@@ -21,7 +21,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./
-        server-dir: /public_html/  # Ajuste conforme o caminho da sua app no cPanel
+        server-dir: /maps2go_crm/  # Ajuste conforme o caminho da sua app no cPanel
         exclude: |
           **/.git*
           **/.git*/**
