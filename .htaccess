@@ -4,14 +4,7 @@ PassengerBaseURI "/"
 PassengerPython "/home2/appmaps2go/virtualenv/maps2go_crm/3.11/bin/python"
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
 
-# Configurações de Redirecionamento
+# Simple Redirect - Avoid complex rules that trigger 500
 RewriteEngine On
-RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.*)$ passenger_wsgi.py/$1 [L]
-
-# Segurança
-<Files ".env">
-    Order allow,deny
-    Deny from all
-</Files>
