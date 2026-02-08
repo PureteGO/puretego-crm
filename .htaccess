@@ -4,13 +4,13 @@ PassengerBaseURI "/"
 PassengerPython "/home2/appmaps2go/virtualenv/maps2go_crm/3.10/bin/python"
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
 
-# Passenger will handle the routing to run.py or passenger_wsgi.py automatically.
-# We keep it minimal to avoid 500 errors on static files.
-
-Options -Indexes
 RewriteEngine On
 RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ run.py/$1 [L]
 
-# Allow static files to be served directly
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
+# Segurança
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
