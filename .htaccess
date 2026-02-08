@@ -1,16 +1,15 @@
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
-PassengerAppRoot "/home2/puretego/maps2go_crm"
-PassengerBaseURI "/"
-PassengerPython "/home2/puretego/virtualenv/maps2go_crm/3.11/bin/python"
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# Neutralized .htaccess to allow debugging
+# The original configuration was causing a 500 error even for static files.
 
-RewriteEngine On
-RewriteBase /
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ passenger_wsgi.py/$1 [L]
-
-# Configurações de segurança
+# Security only
 <Files ".env">
     Order allow,deny
     Deny from all
 </Files>
+
+<Files "*.pyc">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Do not add RewriteRules yet until we verify the server can serve test_server.txt
