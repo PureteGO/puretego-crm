@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="{{ current_language }}" data-theme="dark"
+    data-company-theme="{{ session.get('company_theme', 'tech-teal') }}">
+<script>
+    // Apply saved theme and company theme immediately to prevent flash
+    (function () {
+        const savedTheme = localStorage.getItem('maps2go-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    })();
+</script>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{% block title %}{% endblock %} - Maps2GO CRM</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    {% if 'user_id' in session %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard.index') }}">
+                {% if session.get('company_logo') %}
+                <img src="{{ session.get('company_logo') }}" alt="{{ session.get('company_name', 'Logo') }}"
+                    class="company-logo-navbar" style="height: 32px; max-width: 150px; object-fit: contain;">
+                {% else %}
+                <img src="{{ url_for('static', filename='branding/logo_navbar.png') }}"
+                    onerror="this.src='{{ url_for('static', filename='branding/logo.png') }}';" alt="Maps2GO CRM"
+                    class="company-logo-navbar me-2" style="height: 32px; max-width: 180px; object-fit: contain;">
+                <span class="navbar-brand-text d-none d-sm-inline"
+                    title="{{ _('Upload your logo in Company Settings') }}">
+                    {{ session.get('company_name', 'Maps2GO CRM') }}
+                </span>
+                {% endif %}
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% if session.get('is_superadmin') %}
+                    <li class="nav-item">
+                        <a class="nav-link text-warning fw-bold" href="{{ url_for('saas.dashboard') }}">
+                            <i class="bi bi-speedometer2"></i> SaaS Admin
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard.index') }}"><i class="bi bi-house-door"></i>
+                            {{ _('Dashboard') }}</a>
+                    </li>
+                    {% if session.get('workflow_mode') != 'solo' %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('calendar.index') }}">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            {{ _('Agenda') }}
+                            {% if overdue_count > 0 %}
+                            <span class="badge rounded-pill bg-danger ms-1" id="overdue-tasks-count"
+                                title="{{ _('Overdue tasks') }}">
+                                {{ overdue_count }}
+                            </span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('clients.kanban') }}"><i class="bi bi-kanban"></i>
+                            {{ _('Kanban') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('clients.index') }}"><i class="bi bi-people"></i>
+                            {{ _('Clients') }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('proposals.index') }}"><i
+                                class="bi bi-file-earmark-text"></i> {{ _("Proposals") }}</a>
+                    </li>
+                    {% if session.get('workflow_mode') == 'structured' %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('projects.index') }}"><i class="bi bi-briefcase"></i> {{
+                            _("Projects") }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if session.get('permissions', {}).get('can_manage_users', False) %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('users.index') }}"><i class="bi bi-people-fill"></i>
+                            {{ _('Users') }}</a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Theme Toggle -->
+                    <li class="nav-item me-2">
+                        <button class="theme-toggle" id="themeToggle" title="{{ _('Toggle theme') }}">
+                            <i class="bi bi-moon-fill"></i>
+                            <i class="bi bi-sun-fill"></i>
+                        </button>
+                    </li>
+
+                    <!-- Language Selector -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ language_info.flag }} {{ language_info.name }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                            {% for code, info in available_languages.items() %}
+                            <li>
+                                <a class="dropdown-item {% if current_language == code %}active{% endif %}"
+                                    href="{{ url_for('set_language', lang=code) }}">
+                                    {{ info.flag }} {{ info.name }}
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> {{ session['user_name'] }}
+                            {% if session.get('role_display') %}
+                            <small class="text-muted">({{ session['role_display'] }})</small>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            {% if session.get('company_name') %}
+                            <li><span class="dropdown-item-text text-muted"><i class="bi bi-building me-1"></i>{{
+                                    session['company_name'] }}</span></li>
+                            {% if session.get('permissions', {}).get('can_manage_company', False) %}
+                            <li><a class="dropdown-item" href="{{ url_for('company.profile') }}"><i
+                                        class="bi bi-gear me-1"></i>{{ _('Settings') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('google_oauth.dashboard') }}"><i
+                                        class="bi bi-google me-1"></i>{{ _('Integrations') }}</a></li>
+                            {% endif %}
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i
+                                        class="bi bi-box-arrow-right me-1"></i>{{ _('Logout') }}</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="container-fluid mt-5 pt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <!-- Theme Toggle Script -->
+    <script>
+        (function () {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', function () {
+                    const html = document.documentElement;
+                    const currentTheme = html.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                    html.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('maps2go-theme', newTheme);
+                });
+            }
+        })();
+    </script>
+
+    <!-- Quick Action Modal -->
+    <div class="modal fade" id="quickActionModal" tabindex="-1" aria-labelledby="quickActionTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="quickActionTitle">{{ _('New Action') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="quickActionForm" method="POST" action="/calendar/save">
+                    <div class="modal-body">
+                        <input type="hidden" name="type" id="quickActionType" value="visit">
+
+                        <!-- Client Selection -->
+                        <div class="mb-3">
+                            <label for="quickActionClient" class="form-label">{{ _('Client') }}</label>
+                            <select class="form-select" name="client_id" id="quickActionClient" required>
+                                <option value="">{{ _('Select client...') }}</option>
+                            </select>
+                            <div class="form-text">
+                                <a href="/clients/create" class="text-primary">
+                                    <i class="bi bi-plus-circle"></i> {{ _('Register new client') }}
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Date/Time -->
+                        <div class="mb-3">
+                            <label for="quickActionDate" class="form-label">{{ _('Date and Time') }}</label>
+                            <input type="datetime-local" class="form-control" name="date" id="quickActionDate" required>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="mb-3">
+                            <label for="quickActionNotes" class="form-label">{{ _('Notes (optional)') }}</label>
+                            <textarea class="form-control" name="notes" id="quickActionNotes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel')
+                            }}</button>
+                        <button type="submit" class="btn btn-primary" id="quickActionSubmit">
+                            <i class="bi bi-calendar-check"></i> {{ _('Schedule') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quick Action Modal Functions
+        function setQuickActionType(type) {
+            document.getElementById('quickActionType').value = type;
+            const title = document.getElementById('quickActionTitle');
+            const submitBtn = document.getElementById('quickActionSubmit');
+
+            if (type === 'visit') {
+                title.innerHTML = '<i class="bi bi-geo-alt-fill text-success"></i> {{ _("New Visit") }}';
+                submitBtn.className = 'btn btn-success';
+            } else {
+                title.innerHTML = '<i class="bi bi-telephone-fill text-info"></i> {{ _("New Call") }}';
+                submitBtn.className = 'btn btn-info text-white';
+            }
+
+            // Set default date to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('quickActionDate').value = now.toISOString().slice(0, 16);
+        }
+
+        // Load clients when modal opens
+        document.getElementById('quickActionModal').addEventListener('show.bs.modal', function () {
+            fetch('/api/clients/list')
+                .then(r => r.json())
+                .then(clients => {
+                    const select = document.getElementById('quickActionClient');
+                    select.innerHTML = '<option value="">{{ _("Select client...") }}</option>';
+                    clients.forEach(c => {
+                        select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                    });
+                })
+                .catch(err => console.error('Error loading clients', err));
+        });
+
+        // Handle form submission via AJAX
+        document.getElementById('quickActionForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            fetch('/calendar/save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(data)
+            })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        // Close modal and reload
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('quickActionModal'));
+                        modal.hide();
+                        window.location.reload();
+                    } else {
+                        alert(res.message || 'Error');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('{{ _("Connection Error") }}');
+                });
+        });
+    </script>
+
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

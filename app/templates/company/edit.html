@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Editar Empresa') }} - PURETEGO CRM{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-building-gear me-2"></i>{{ _('Editar Empresa') }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="row">
+                            <div class="col-md-4 text-center mb-4">
+                                <label class="form-label fw-bold">{{ _('Logo de la Empresa') }}</label>
+                                <div class="mb-3">
+                                    {% if company.logo_url %}
+                                    <img src="{{ company.logo_url }}" alt="{{ _('Logo actual') }}"
+                                        class="img-fluid rounded mb-2" style="max-height: 120px;">
+                                    {% else %}
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center mb-2"
+                                        style="height: 120px;">
+                                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <input type="file" class="form-control form-control-sm" id="logo" name="logo"
+                                    accept="image/*">
+                                <small class="text-muted">PNG, JPG, GIF, WebP (max 2MB)</small>
+                                {% if company.logo_url %}
+                                <div class="mt-2">
+                                    <a href="{{ url_for('company.remove_logo') }}"
+                                        onclick="return confirm('{{ _('¿Está seguro de eliminar el logo?') }}');"
+                                        class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-trash me-1"></i>{{ _('Eliminar Logo') }}
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">{{ _('Nombre de la Empresa') }} *</label>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                        value="{{ company.name }}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="slug" class="form-label">{{ _('Slug (Identificador)') }}</label>
+                                    <input type="text" class="form-control" id="slug" value="{{ company.slug }}"
+                                        disabled>
+                                    <small class="text-muted">{{ _('El slug no puede ser modificado') }}</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">{{ _('Email') }}</label>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        value="{{ company.email or '' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">{{ _('Teléfono') }}</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone"
+                                        value="{{ company.phone or '' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">{{ _('Dirección') }}</label>
+                                    <textarea class="form-control" id="address" name="address"
+                                        rows="2">{{ company.address or '' }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="currency_symbol" class="form-label">{{ _('Símbolo de Moneda (ej: Gs, $,
+                                        R$)') }}</label>
+                                    <input type="text" class="form-control" id="currency_symbol" name="currency_symbol"
+                                        value="{{ company.currency_symbol }}" maxlength="5" list="currency_options">
+                                    <datalist id="currency_options">
+                                        <option value="Gs">Guaraní (Paraguay)</option>
+                                        <option value="R$">Real (Brasil)</option>
+                                        <option value="USD">Dólar (EUA)</option>
+                                        <option value="€">Euro</option>
+                                    </datalist>
+                                    <small class="text-muted">{{ _('Este símbolo se usará en todos los valores
+                                        monetarios del sistema.') }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Theme Selector -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <label class="form-label fw-bold">
+                                    <i class="bi bi-palette me-1"></i>{{ _('Estilo Visual de la Empresa') }}
+                                </label>
+                                <p class="text-muted small mb-3">
+                                    {{ _('Selecciona el tema de color que deseas para tu empresa. Este tema se aplicará
+                                    a todos los usuarios.') }}
+                                </p>
+                                <div class="row g-3">
+                                    {% for value, name, description in theme_choices %}
+                                    <div class="col-md-4">
+                                        <div class="form-check theme-option">
+                                            <input class="form-check-input" type="radio" name="theme_style"
+                                                id="theme_{{ value }}" value="{{ value }}" {{ 'checked' if
+                                                company.theme_style==value else '' }}>
+                                            <label class="form-check-label d-flex align-items-center gap-2"
+                                                for="theme_{{ value }}">
+                                                <span class="theme-color-dot theme-dot-{{ value }}"></span>
+                                                <span>
+                                                    <strong>{{ name }}</strong>
+                                                    <small class="d-block text-muted">{{ description }}</small>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>{{ _('Guardar Cambios') }}
+                            </button>
+                            <a href="{{ url_for('company.profile') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-lg me-1"></i>{{ _('Cancelar') }}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

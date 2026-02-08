@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Editar Template') }} - PURETEGO CRM{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('company.settings') }}">{{ _('Configurações') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('company.email_templates') }}">{{ _('Templates de E-mail')
+                    }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ template.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold text-primary">{{ _('Editar Modelo:') }} {{ template.name }}</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form action="{{ url_for('company.edit_email_template', code=template.code) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">{{ _('Assunto do E-mail') }}</label>
+                            <input type="text" class="form-control" name="subject" value="{{ template.subject }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small">{{ _('Corpo do E-mail') }}</label>
+                            <div class="alert alert-light border small text-muted mb-2 py-2">
+                                <i class="bi bi-info-circle me-1"></i> {{ _('Use a sintaxe {{ placeholder }} para
+                                inserir dados dinâmicos.') }}
+                            </div>
+                            <textarea class="form-control" name="body" rows="12"
+                                style="font-family: monospace; font-size: 0.9rem;"
+                                required>{{ template.body }}</textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4 border-top pt-4">
+                            <div>
+                                <button type="submit" class="btn btn-primary px-4 bg-gradient">
+                                    <i class="bi bi-check-lg me-1"></i> {{ _('Salvar Template') }}
+                                </button>
+                                <a href="{{ url_for('company.email_templates') }}" class="btn btn-light px-4">
+                                    {{ _('Cancelar') }}
+                                </a>
+                            </div>
+
+                            {% if template.company_id %}
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="restoreDefault()">
+                                <i class="bi bi-arrow-counterclockwise"></i> {{ _('Restaurar Padrão Maps2GO') }}
+                            </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-light py-3">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-braces me-2"></i>{{ _('Placeholders Disponíveis') }}</h6>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small mb-4">{{ _('Clique no código para copiar um placeholder e cole no assunto
+                        ou corpo do e-mail.') }}</p>
+
+                    <h6 class="fw-bold small text-primary mb-2">{{ _('Dados do Cliente') }}</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{client_name}}')">{{ '{{client_name}}' }}</code>
+                            <span class="small text-muted">{{ _('Nome Completo') }}</span>
+                        </li>
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{client_company}}')">{{ '{{client_company}}' }}</code>
+                            <span class="small text-muted">{{ _('Empresa') }}</span>
+                        </li>
+                    </ul>
+
+                    {% if template.area == 'sales' %}
+                    <h6 class="fw-bold small text-success mb-2">{{ _('Dados da Proposta') }}</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{deal_title}}')">{{ '{{deal_title}}' }}</code>
+                            <span class="small text-muted">{{ _('Título do Negócio') }}</span>
+                        </li>
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{deal_value}}')">{{ '{{deal_value}}' }}</code>
+                            <span class="small text-muted">{{ _('Valor Total') }}</span>
+                        </li>
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{proposal_link}}')">{{ '{{proposal_link}}' }}</code>
+                            <span class="small text-muted">{{ _('Link Público') }}</span>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                    {% if template.area == 'finance' %}
+                    <h6 class="fw-bold small text-danger mb-2">{{ _('Dados Financeiros') }}</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{amount}}')">{{ '{{amount}}' }}</code>
+                            <span class="small text-muted">{{ _('Valor da Cobrança') }}</span>
+                        </li>
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{due_date}}')">{{ '{{due_date}}' }}</code>
+                            <span class="small text-muted">{{ _('Data de Vencimento') }}</span>
+                        </li>
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{invoice_description}}')">{{ '{{invoice_description}}' }}</code>
+                            <span class="small text-muted">{{ _('Descrição') }}</span>
+                        </li>
+                    </ul>
+                    {% endif %}
+
+                    <h6 class="fw-bold small text-secondary mb-2">{{ _('Dados da sua Agência') }}</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{tenant_name}}')">{{ '{{tenant_name}}' }}</code>
+                            <span class="small text-muted">{{ _('Nome da Agência') }}</span>
+                        </li>
+                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
+                            <code class="p-1 bg-light rounded cursor-pointer"
+                                onclick="copyToClipboard('{{sender_name}}')">{{ '{{sender_name}}' }}</code>
+                            <span class="small text-muted">{{ _('Seu Nome') }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            // Optional: Show a subtle toast or message
+            const toast = document.createElement('div');
+            toast.className = 'position-fixed bottom-0 start-50 translate-middle-x bg-dark text-white p-2 rounded small mb-4';
+            toast.style.zIndex = '9999';
+            toast.innerText = 'Copiado: ' + text;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 2000);
+        });
+    }
+
+    function restoreDefault() {
+        if (confirm("{{ _('Tem certeza que deseja apagar sua versão personalizada e voltar para o modelo padrão do sistema?') }}")) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('company.restore_email_template', code=template.code) }}";
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrf_token';
+            csrf.value = "{{ csrf_token() }}";
+            form.appendChild(csrf);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+{% endblock %}

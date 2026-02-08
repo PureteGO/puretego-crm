@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Login') }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card mt-5">
+                <div class="card-body text-center">
+                    <img src="{{ url_for('static', filename='branding/logo.png') }}" alt="Maps2GO"
+                        class="img-fluid mb-4" style="max-height: 80px;">
+                    <h3 class="card-title text-center mb-4 d-none">Maps2GO CRM</h3>
+                    <form method="POST" action="{{ url_for('auth.login') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">{{ _('Email') }}</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">{{ _('Password') }}</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">{{ _('Log In') }}</button>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none text-muted">
+                                <i class="bi bi-key me-1"></i>{{ _('Forgot your password?') }}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

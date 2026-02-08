@@ -1,0 +1,40 @@
+# PURETEGO CRM - Python Dependencies
+
+# Web Framework
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+WTForms==3.1.1
+
+# Database
+PyMySQL==1.1.0
+SQLAlchemy>=2.0.29
+
+# API Integration
+requests==2.31.0
+google-search-results==2.4.2
+
+# PDF Generation
+# xhtml2pdf==0.2.16
+Pillow>=10.2.0
+
+# Security
+bcrypt==4.1.2
+python-dotenv==1.0.0
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Development
+python-decouple==3.8
+
+# Internationalization
+Flask-Babel==4.0.0
+
+# Google Business Profile Integration
+google-auth>=2.25.0
+google-auth-oauthlib>=1.2.0
+google-auth-httplib2>=0.2.0
+cryptography>=41.0.0

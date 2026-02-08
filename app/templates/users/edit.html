@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Edit User') }} - PURETEGO CRM{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-person-gear me-2"></i>{{ _('Edit User') }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">{{ _('Name') }} *</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">{{ _('Email') }} *</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">{{ _('New Password') }}</label>
+                            <input type="password" class="form-control" id="password" name="password" minlength="6">
+                            <small class="text-muted">{{ _('Leave blank to keep current password')
+                                }}</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="role_id" class="form-label">{{ _('Role') }} *</label>
+                            <select class="form-select" id="role_id" name="role_id" required>
+                                <option value="">{{ _('Select role...') }}</option>
+                                {% for role in roles %}
+                                <option value="{{ role.id }}" {% if user.role_id==role.id %}selected{% endif %}>
+                                    {{ role.display_name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="base_salary" class="form-label">{{ _('Base Salary') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" step="0.01" class="form-control" id="base_salary"
+                                        name="base_salary" value="{{ user.base_salary }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3 d-flex align-items-end">
+                                <div class="form-check form-switch mb-2">
+                                    <input class="form-check-input" type="checkbox" id="receives_commission"
+                                        name="receives_commission" {% if user.receives_commission %}checked{% endif %}>
+                                    <label class="form-check-label" for="receives_commission">{{ _('Receives
+                                        Commission?') }}</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {% if
+                                    user.is_active %}checked{% endif %}>
+                                <label class="form-check-label" for="is_active">{{ _('Active User') }}</label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg me-1"></i>{{ _('Save') }}
+                            </button>
+                            <a href="{{ url_for('users.index') }}" class="btn btn-secondary">
+                                <i class="bi bi-x-lg me-1"></i>{{ _('Cancel') }}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

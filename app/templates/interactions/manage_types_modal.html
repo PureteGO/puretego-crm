@@ -1,0 +1,184 @@
+<!-- Manage Interaction Types Modal -->
+<div class="modal fade" id="manageTypesModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Manage Interaction Types') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Form to Add/Edit Type -->
+                <div class="card mb-4 bg-light border-0">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary"><i class="bi bi-plus-circle"></i> {{ _('New Type') }}</h6>
+                        <form id="typeForm" onsubmit="saveType(event)">
+                            <input type="hidden" id="typeId">
+                            <div class="row g-3">
+                                <div class="col-md-5">
+                                    <input type="text" class="form-control" id="typeName"
+                                        placeholder="{{ _('Name (ex: Technical Visit)') }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <select class="form-select" id="typeIcon">
+                                        <option value="fas fa-circle">Circle (Default)</option>
+                                        <option value="bi bi-telephone">Telephone</option>
+                                        <option value="bi bi-geo-alt">Location</option>
+                                        <option value="bi bi-chat">Chat</option>
+                                        <option value="bi bi-envelope">Email</option>
+                                        <option value="bi bi-people">Meeting</option>
+                                        <option value="bi bi-camera-video">Video Call</option>
+                                        <option value="bi bi-tools">Tools</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-check pt-2">
+                                        <input class="form-check-input" type="checkbox" id="typeIsCall">
+                                        <label class="form-check-label" for="typeIsCall">{{ _('Is call') }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                                        onclick="resetTypeForm()" style="display:none;" id="cancelEditType">{{
+                                        _('Cancel') }}</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">{{ _('Save') }}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- List of Types -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{{ _('Name') }}</th>
+                                <th>{{ _('Icon') }}</th>
+                                <th>{{ _('Type') }}</th>
+                                <th class="text-end">{{ _('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="typesListBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Load types when manage modal opens
+        const manageModal = document.getElementById('manageTypesModal');
+        manageModal.addEventListener('show.bs.modal', loadTypesTable);
+    });
+
+    function loadTypesTable() {
+        const tbody = document.getElementById('typesListBody');
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center">{{ _("Loading...") }}</td></tr>';
+
+        fetch('/interactions/types')
+            .then(r => r.json())
+            .then(types => {
+                tbody.innerHTML = '';
+                types.forEach(t => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${t.name}</td>
+                        <td><i class="${t.icon}"></i> ${t.icon}</td>
+                        <td>
+                            <span class="badge bg-${t.is_call ? 'info' : 'success'}">
+                                ${t.is_call ? '{{ _("Call") }}' : '{{ _("Visit/Other") }}'}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-link text-primary" onclick="editType(${t.id}, '${t.name}', '${t.icon}', ${t.is_call})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-link text-danger" onclick="deleteType(${t.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    function saveType(e) {
+        e.preventDefault();
+        const id = document.getElementById('typeId').value;
+        const name = document.getElementById('typeName').value;
+        const icon = document.getElementById('typeIcon').value;
+        const isCall = document.getElementById('typeIsCall').checked;
+
+        const url = id ? `/interactions/types/${id}/update` : '/interactions/types/create';
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, icon, is_call: isCall })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    resetTypeForm();
+                    loadTypesTable();
+                    refreshMainSelect(); // Function to update the main log modal dropdown
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+    }
+
+    function editType(id, name, icon, isCall) {
+        document.getElementById('typeId').value = id;
+        document.getElementById('typeName').value = name;
+        document.getElementById('typeIcon').value = icon;
+        document.getElementById('typeIsCall').checked = isCall;
+        document.getElementById('cancelEditType').style.display = 'inline-block';
+    }
+
+    function deleteType(id) {
+        if (!confirm('{{ _("Delete this type?") }}')) return;
+
+        fetch(`/interactions/types/${id}/delete`, { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    loadTypesTable();
+                    refreshMainSelect();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+    }
+
+    function resetTypeForm() {
+        document.getElementById('typeForm').reset();
+        document.getElementById('typeId').value = '';
+        document.getElementById('cancelEditType').style.display = 'none';
+    }
+
+    // Helper to refresh the dropdown in the main modal
+    function refreshMainSelect() {
+        fetch('/interactions/types')
+            .then(r => r.json())
+            .then(types => {
+                const select = document.getElementById('interactionType');
+                if (select) {
+                    const currentVal = select.value;
+                    select.innerHTML = '';
+                    types.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t.id;
+                        opt.text = t.name;
+                        select.appendChild(opt);
+                    });
+                    select.value = currentVal; // Try to keep selection
+                }
+            });
+    }
+</script>

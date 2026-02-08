@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Prospecção de Leads{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-search-location me-2"></i>Buscar Novos Leads</h4>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('prospecting.search') }}" method="GET" class="row g-3">
+                    <div class="col-md-5">
+                        <label for="q" class="form-label">Termo de Busca (ex: Dentistas, Restaurantes)</label>
+                        <input type="text" class="form-control" id="q" name="q" value="{{ query }}" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="location" class="form-label">Localização (Cidade, Bairro)</label>
+                        <input type="text" class="form-control" id="location" name="location" value="{{ location }}">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Buscar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if results %}
+<div class="row">
+    <div class="col-md-12">
+        <h5 class="mb-3">Resultados da Busca ({{ results|length }})</h5>
+        <div class="row">
+            {% for place in results %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-truncate" title="{{ place.title }}">{{ place.title }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ place.category }}</h6>
+
+                        <p class="card-text small mb-2">
+                            <i class="fas fa-map-marker-alt text-danger me-1"></i> {{ place.address }}
+                        </p>
+
+                        {% if place.phone %}
+                        <p class="card-text small mb-2">
+                            <i class="fas fa-phone text-success me-1"></i> {{ place.phone }}
+                        </p>
+                        {% endif %}
+
+                        {% if place.website %}
+                        <p class="card-text small mb-2">
+                            <i class="fas fa-globe text-info me-1"></i>
+                            <a href="{{ place.website }}" target="_blank" class="text-decoration-none">{{ place.website
+                                }}</a>
+                        </p>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge bg-warning text-dark">
+                                <i class="fas fa-star"></i> {{ place.rating }} ({{ place.reviews }})
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0 d-grid">
+                        <form action="{{ url_for('prospecting.add_lead') }}" method="POST">
+                            <input type="hidden" name="name" value="{{ place.title }}">
+                            <input type="hidden" name="address" value="{{ place.address }}">
+                            <input type="hidden" name="phone" value="{{ place.phone }}">
+                            <input type="hidden" name="website" value="{{ place.website }}">
+                            <input type="hidden" name="place_id" value="{{ place.place_id }}">
+                            <input type="hidden" name="q" value="{{ query }}">
+                            <input type="hidden" name="location" value="{{ location }}">
+
+                            <button type="submit" class="btn btn-success btn-sm w-100">
+                                <i class="fas fa-plus me-1"></i> Adicionar como Lead
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% elif query %}
+<div class="alert alert-info text-center">
+    Nenhum resultado encontrado para "{{ query }}" em "{{ location }}".
+</div>
+{% endif %}
+{% endblock %}

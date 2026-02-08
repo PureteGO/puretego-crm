@@ -1,0 +1,825 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Dashboard') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap align-items-center pt-3 pb-2 mb-3">
+        <div>
+            <h1 class="h2 mb-0">{{ _('Dashboard') }}</h1>
+            <p class="text-muted mb-0">{{ _('Welcome') }}, {{ session["user_name"] }}!</p>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quickActionModal"
+                onclick="setQuickActionType('visit')">
+                <i class="bi bi-geo-alt-fill me-1"></i> {{ _('New Visit') }}
+            </button>
+            <button type="button" class="btn btn-success text-white" data-bs-toggle="modal"
+                data-bs-target="#quickActionModal" onclick="setQuickActionType('call')">
+                <i class="bi bi-telephone-fill me-1"></i> {{ _('New Call') }}
+            </button>
+        </div>
+    </div>
+
+    {% if onboarding_guide and onboarding_percent < 100 %} <!-- Onboarding Guide for Owners -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm"
+                    style="background: linear-gradient(135deg, #14b8a6 0%, #0c2331 100%);">
+                    <div class="card-body p-4 text-white">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="fw-bold mb-1"><i class="bi bi-rocket-takeoff me-2"></i> {{ _('Primeiros
+                                    Passos para o Seu Sucesso') }}</h4>
+                                <p class="opacity-75 mb-4">{{ _('Complete estas etapas fundamentais para deixar sua
+                                    agência pronta para vender mais.') }}</p>
+
+                                <div class="row g-3">
+                                    <div class="col-sm-6 col-md-3 text-center">
+                                        <div class="mb-2">
+                                            {% if onboarding_guide.branding_ok %}
+                                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                                            {% else %}
+                                            <a href="{{ url_for('company.settings', tab='branding') }}"
+                                                class="text-white opacity-50 hover-opacity-100"><i
+                                                    class="bi bi-image fs-3"></i></a>
+                                            {% endif %}
+                                        </div>
+                                        <small class="d-block">{{ _('Logo & Branding') }}</small>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3 text-center">
+                                        <div class="mb-2">
+                                            {% if onboarding_guide.smtp_ok %}
+                                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                                            {% else %}
+                                            <a href="{{ url_for('company.settings', tab='email') }}"
+                                                class="text-white opacity-50 hover-opacity-100"><i
+                                                    class="bi bi-envelope fs-3"></i></a>
+                                            {% endif %}
+                                        </div>
+                                        <small class="d-block">{{ _('E-mail (SMTP)') }}</small>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3 text-center">
+                                        <div class="mb-2">
+                                            {% if onboarding_guide.users_added %}
+                                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                                            {% else %}
+                                            <a href="{{ url_for('users.index') }}"
+                                                class="text-white opacity-50 hover-opacity-100"><i
+                                                    class="bi bi-people fs-3"></i></a>
+                                            {% endif %}
+                                        </div>
+                                        <small class="d-block">{{ _('Time SDR/Sales') }}</small>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3 text-center">
+                                        <div class="mb-2">
+                                            {% if onboarding_guide.clients_added %}
+                                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                                            {% else %}
+                                            <a href="{{ url_for('clients.create') }}"
+                                                class="text-white opacity-50 hover-opacity-100"><i
+                                                    class="bi bi-person-plus fs-3"></i></a>
+                                            {% endif %}
+                                        </div>
+                                        <small class="d-block">{{ _('Primeiros Clientes') }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center mt-4 mt-md-0 border-start border-white border-opacity-25">
+                                <div class="display-3 fw-bold mb-0">{{ onboarding_percent }}%</div>
+                                <div class="text-uppercase small fw-bold opacity-75">{{ _('Configurado') }}</div>
+                                <div class="progress mt-3 mx-auto"
+                                    style="height: 10px; width: 80%; background: rgba(255, 255, 255, 0.1);">
+                                    <div class="progress-bar bg-white" role="progressbar"
+                                        style="width: var(--progress-percent);"
+                                        data-onboarding-percent="{{ onboarding_percent }}"></div>
+                                    <style>
+                                        [data-onboarding-percent] {
+                                            --progress-percent: {
+                                                    {
+                                                    onboarding_percent
+                                                }
+                                            }
+
+                                            %;
+                                        }
+                                    </style>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if overdue_count > 0 %}
+        <div class="alert alert-danger shadow-sm d-flex align-items-center mb-4 border-0 animate__animated animate__pulse animate__infinite"
+            style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" role="alert">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-1 fw-bold" style="color: #ef4444;">{{ _('You have overdue tasks') }}</h5>
+                <p class="mb-0">
+                    {{ _('There are %(count)s interactions that past their scheduled date.', count=overdue_count) }}
+                    <a href="{{ url_for('calendar.index') }}" class="alert-link ms-2 fw-bold" style="color: #ef4444;">
+                        <i class="bi bi-arrow-right"></i> {{ _('Resolve in Agenda') }}
+                    </a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quick Health Check Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary"><i class="bi bi-speedometer2"></i> Quick Health Check (GMB)
+                        </h5>
+                        <p class="text-muted small">{{ _('Enter the company name to perform an instant Google My
+                            Business
+                            analysis.') }}</p>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control form-control-lg" id="quickCheckInput"
+                                placeholder="{{ _('Company name (e.g., AGR Equipamientos)...') }}">
+                            <button class="btn btn-primary" type="button" id="btnQuickCheck">{{ _('Verify Now')
+                                }}</button>
+                        </div>
+                        <div id="quickCheckResult" class="d-none animate__animated animate__fadeIn">
+                            <div class="alert alert-secondary d-flex align-items-center" role="alert">
+                                <div class="spinner-border text-primary me-3" role="status" id="quickCheckSpinner">
+                                    <span class="visually-hidden">{{ _('Loading...') }}</span>
+                                </div>
+                                <div id="quickCheckContent">
+                                    <strong>{{ _('Analyzing...') }}</strong> {{ _('Please wait while we query Google.')
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Result Modal Trigger (Hidden) -->
+                        <button id="showResultModal" type="button" class="d-none" data-bs-toggle="modal"
+                            data-bs-target="#healthCheckModal"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Agenda / Tareas -->
+        <div class="row mb-4">
+            <!-- Hoy -->
+            <div class="col-md-6 mb-3">
+                <div class="card border-primary h-100">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar-check"></i> {{ _("Today's Agenda") }}</h5>
+                        <span class="badge bg-light text-primary" id="todayCount">0</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="todayList" class="list-group list-group-flush">
+                            <p class="text-muted text-center my-3">{{ _('Loading...') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Próximos -->
+            <div class="col-md-6 mb-3">
+                <div class="card border-info h-100">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar-next"></i> {{ _('Next 7 Days') }}</h5>
+                        <span class="badge bg-light text-info" id="upcomingCount">0</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="upcomingList" class="list-group list-group-flush">
+                            <p class="text-muted text-center my-3">{{ _('Loading...') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Dashboard Content by Role -->
+        {% if role == 'sdr' %}
+        {% include 'dashboard/_sdr.html' %}
+        {% elif role == 'sales' %}
+        {% include 'dashboard/_sales.html' %}
+        {% elif role == 'finance' %}
+        {% include 'dashboard/_finance.html' %}
+        {% elif role == 'gmb_manager' %}
+        {% include 'dashboard/_production.html' %}
+        {% else %}
+        <!-- Original Executive Metrics for Owner/Admin -->
+        {% if role in ['owner', 'admin', 'manager', 'superadmin'] %}
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-success border-start border-5 h-100">
+                    <div class="card-body">
+                        <h6 class="text-success fw-bold text-uppercase small mb-2"><i class="bi bi-graph-up-arrow"></i>
+                            {{
+                            _('Conversion') }}</h6>
+                        <div class="h3 mb-0 fw-bold">{{ "%.1f"|format(win_rate) }}%</div>
+                        <div class="progress mt-2" style="height: 6px; background: rgba(34, 197, 94, 0.1);">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                style="width: var(--win-rate-percent);" data-win-rate="{{ win_rate|round|int }}"></div>
+                            <style>
+                                [data-win-rate] {
+                                    --win-rate-percent: {
+                                            {
+                                            win_rate|round|int
+                                        }
+                                    }
+
+                                    %;
+                                }
+                            </style>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-primary border-start border-5 h-100">
+                    <div class="card-body">
+                        <h6 class="text-primary fw-bold text-uppercase small mb-2"><i class="bi bi-cash-stack"></i> {{
+                            _('Pipeline') }}</h6>
+                        <div class="h3 mb-0 fw-bold">{{ total_pipeline_value|format_currency }}</div>
+                        <p class="text-muted small mb-0">{{ _('Active Proposals') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-info border-start border-5 h-100">
+                    <div class="card-body">
+                        <h6 class="text-info fw-bold text-uppercase small mb-2"><i class="bi bi-trophy"></i> {{
+                            _('Closed')
+                            }}</h6>
+                        <div class="h3 mb-0 fw-bold">{{ won_amount|format_currency }}</div>
+                        <p class="text-muted small mb-0">{{ _('Closed Sales') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card shadow-sm border-warning border-start border-5 h-100">
+                    <div class="card-body">
+                        <h6 class="text-warning fw-bold text-uppercase small mb-2"><i class="bi bi-tag"></i> {{ _('Avg
+                            Ticket') }}</h6>
+                        <div class="h3 mb-0 fw-bold">{{ avg_ticket|format_currency }}</div>
+                        <p class="text-muted small mb-0">{{ _('Average Value Won') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-danger">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="bi bi-wallet2"></i> {{ _('Awaiting Payment') }}</h6>
+                        <p class="card-text fs-2" id="stat-awaiting-payment">{{ awaiting_payment }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="bi bi-file-earmark-lock"></i> {{ _('Pending Contracts') }}</h6>
+                        <p class="card-text fs-2" id="stat-pending-contracts">{{ pending_contracts }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="bi bi-people"></i> {{ _('Total Clients') }}</h6>
+                        <p class="card-text fs-2" id="stat-total-clients">{{ total_clients }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="bi bi-file-earmark-text"></i> {{ _('Total Proposals') }}</h6>
+                        <p class="card-text fs-2" id="stat-total-proposals">{{ total_proposals }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <!-- Specialized Lists -->
+        <div class="row mb-4">
+            {% if role in ['owner', 'admin', 'manager', 'superadmin'] and expiring_projects %}
+            <div class="col-12 mb-4">
+                <div class="card border-warning shadow-sm">
+                    <div class="card-header bg-warning text-dark fw-bold">
+                        <i class="bi bi-exclamation-triangle"></i> {{ _('Renewal Alerts (Next 30 Days)') }}
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 small">
+                                <thead>
+                                    <tr>
+                                        <th>{{ _('Project') }}</th>
+                                        <th>{{ _('Client') }}</th>
+                                        <th>{{ _('End Date') }}</th>
+                                        <th>{{ _('Value') }}</th>
+                                        <th>{{ _('Actions') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for project in expiring_projects %}
+                                    <tr>
+                                        <td><strong>{{ project.name }}</strong></td>
+                                        <td>{{ project.client.name }}</td>
+                                        <td class="text-danger fw-bold">{{ project.end_date|format_date }}</td>
+                                        <td>{{ project.monthly_value|format_currency }}</td>
+                                        <td><a href="{{ url_for('projects.view', project_id=project.id) }}"
+                                                class="btn btn-xs btn-outline-primary py-0">{{ _('View') }}</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if role == 'production' %}
+            <div class="col-12 mb-4">
+                <div class="card border-info shadow-sm">
+                    <div class="card-header bg-info text-white fw-bold">
+                        <i class="bi bi-list-task"></i> {{ _('Operational Task Queue (Pending)') }}
+                    </div>
+                    <div class="list-group list-group-flush small">
+                        {% for ticket in pending_tickets %}
+                        <a href="{{ url_for('projects.view', project_id=ticket.project_id) }}"
+                            class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 text-primary">{{ ticket.title }}</h6>
+                                <span class="badge bg-{{ 'danger' if ticket.priority == 'urgent' else 'warning' }}">{{
+                                    ticket.priority }}</span>
+                            </div>
+                            <p class="mb-1 text-muted">{{ ticket.project.name }} | {{ ticket.project.client.name }}</p>
+                        </a>
+                        {% else %}
+                        <div class="p-3 text-center text-muted">{{ _('No pending tasks.') }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Pipeline Charts -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-white fw-bold">{{ _('Client Pipeline') }}</div>
+                    <div class="card-body">
+                        <canvas id="clientsByStageChart"
+                            data-labels='{{ clients_by_stage|map(attribute=0)|list|tojson }}'
+                            data-values='{{ clients_by_stage|map(attribute=1)|list|tojson }}'></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-white fw-bold">{{ _('Pipeline Distribution') }}</div>
+                    <div class="card-body">
+                        <canvas id="proposalsByStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Atividade Recente -->
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white fw-bold">
+                        <i class="bi bi-clock-history"></i> {{ _('Recent Activity') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-telephone-inbound text-primary"></i> {{
+                                    _('Latest
+                                    Interactions') }}</h6>
+                                <div class="list-group list-group-flush">
+                                    {% for interaction in recent_interactions %}
+                                    <a href="{{ url_for('clients.view', client_id=interaction.client.id) }}"
+                                        class="list-group-item list-group-item-action px-0 border-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <small class="fw-bold text-truncate">{{ interaction.client.name }}</small>
+                                            <small class="text-muted">{{ interaction.date|format_date }}</small>
+                                        </div>
+                                        <p class="mb-1 small">{{ interaction.type.name }}</p>
+                                    </a>
+                                    {% else %}
+                                    <p class="text-muted small">{{ _('No recent interactions.') }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt text-success"></i> {{ _('Latest
+                                    Visits')
+                                    }}</h6>
+                                <div class="list-group list-group-flush">
+                                    {% for visit in recent_visits %}
+                                    <a href="{{ url_for('clients.view', client_id=visit.client.id) }}"
+                                        class="list-group-item list-group-item-action px-0 border-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <small class="fw-bold text-truncate">{{ visit.client.name }}</small>
+                                            <small class="text-muted">{{ visit.visit_date|format_date }}</small>
+                                        </div>
+                                        <p class="mb-1 small text-muted text-truncate">{{ visit.observations or _('No
+                                            observations') }}</p>
+                                    </a>
+                                    {% else %}
+                                    <p class="text-muted small">{{ _('No recent visits.') }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-shield-check text-info"></i> {{ _('Latest
+                                    Health
+                                    Checks') }}</h6>
+                                <div class="list-group list-group-flush">
+                                    {% for check in recent_health_checks %}
+                                    <a href="{{ url_for('clients.view', client_id=check.client.id) }}"
+                                        class="list-group-item list-group-item-action px-0 border-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <small class="fw-bold text-truncate">{{ check.client.name }}</small>
+                                            <small class="text-muted">{{ check.created_at|format_date }}</small>
+                                        </div>
+                                        <p class="mb-1 small">
+                                            <span
+                                                class="badge {% if check.score > 70 %}bg-success{% elif check.score > 40 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ check.score }}/100
+                                            </span>
+                                        </p>
+                                    </a>
+                                    {% else %}
+                                    <p class="text-muted small">{{ _('No recent health checks.') }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+<script src="{{ url_for('static', filename='js/reactive_dashboard.js') }}"></script>
+<script>
+    // Register the plugin to all charts:
+    Chart.register(ChartDataLabels);
+</script>
+<script>
+    // Translations for JS
+    const translations = {
+        noTasksToday: "{{ _('No tasks for today.') }}",
+        noUpcomingTasks: "{{ _('No upcoming tasks.') }}",
+        analyzing: "{{ _('Analyzing...') }}",
+        pleaseWait: "{{ _('Please wait while we query Google.') }}",
+        analysisComplete: "{{ _('Analysis Complete!') }}",
+        businessFound: "{{ _('Business found') }}",
+        points: "{{ _('Points') }}",
+        analysisResume: "{{ _('Analysis Summary') }}",
+        criticalPoints: "{{ _('Critical Points') }}",
+        moderatePoints: "{{ _('Moderate Points') }}",
+        positivePoints: "{{ _('Positive Points') }}",
+        viewFullReport: "{{ _('View Full Report') }}",
+        createLead: "{{ _('Create Lead Based on This') }}",
+        error: "{{ _('Error') }}",
+        trySpecific: "{{ _('Try to be more specific (e.g., Company X, City Y)') }}",
+        connectionError: "{{ _('Connection Error.') }}",
+        tryAgain: "{{ _('Try Again') }}",
+        creating: "{{ _('Creating...') }}",
+        errorCreatingLead: "{{ _('Error creating lead') }}"
+    };
+
+    // Carregar Agenda e Inicializar Dashboard Reativo
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/interactions/agenda')
+            .then(r => r.json())
+            .then(data => {
+                renderList('todayList', 'todayCount', data.today, translations.noTasksToday);
+                renderList('upcomingList', 'upcomingCount', data.upcoming, translations.noUpcomingTasks);
+            });
+
+        // Initialize reactive features
+        window.dashboardInstance = new ReactiveDashboard({
+            userId: parseInt('{{ session["user_id"] }}'),
+            role: '{{ role }}',
+            pollInterval: 20000 // Poll every 20 seconds
+        });
+    });
+
+    function renderList(listId, countId, tasks, emptyMsg) {
+        const list = document.getElementById(listId);
+        const countBadge = document.getElementById(countId);
+        list.innerHTML = '';
+        countBadge.textContent = tasks.length;
+
+        if (tasks.length === 0) {
+            list.innerHTML = `<p class="text-muted text-center my-3">${emptyMsg}</p>`;
+            return;
+        }
+
+        tasks.forEach(task => {
+            const item = document.createElement('a');
+            item.href = `/clients/${task.client_id}`;
+            item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center';
+
+            const icon = task.is_call ? '<i class="bi bi-telephone"></i>' : '<i class="bi bi-geo-alt"></i>';
+            const d = new Date(task.date);
+            const dateStr = d.toLocaleDateString('{{ current_language }}', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            item.innerHTML = `
+                <div>
+                    <span class="me-2 text-primary">${icon}</span>
+                    <strong>${task.type_name}</strong>
+                    <div class="small text-muted">${task.client_name}</div>
+                </div>
+                <span class="badge bg-light text-dark border">${dateStr}</span>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    // Gráfico de Clientes por Etapa
+    const clientsByStageCanvas = document.getElementById('clientsByStageChart');
+    if (clientsByStageCanvas) {
+        const labels = JSON.parse(clientsByStageCanvas.getAttribute('data-labels') || '[]');
+        const values = JSON.parse(clientsByStageCanvas.getAttribute('data-values') || '[]');
+
+        new Chart(clientsByStageCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "{{ _('N. of Clients') }}",
+                    data: values,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Gráfico de Clientes por Etapa (Doughnut)
+    const proposalsByStatusCanvas = document.getElementById('proposalsByStatusChart');
+    if (proposalsByStatusCanvas) {
+        // Reuse labels/values from the bar chart for consistency in this view
+        const labels = JSON.parse(clientsByStageCanvas.getAttribute('data-labels') || '[]');
+        const values = JSON.parse(clientsByStageCanvas.getAttribute('data-values') || '[]');
+
+        new Chart(proposalsByStatusCanvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "{{ _('N. of Clients') }}",
+                    data: values,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.7)', // Blue
+                        'rgba(255, 206, 86, 0.7)', // Yellow
+                        'rgba(75, 192, 192, 0.7)', // Teal
+                        'rgba(153, 102, 255, 0.7)', // Purple
+                        'rgba(255, 159, 64, 0.7)', // Orange
+                        'rgba(255, 99, 132, 0.7)', // Red
+                        'rgba(201, 203, 207, 0.7)'  // Grey
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    datalabels: {
+                        color: '#ffffff',
+                        font: { weight: 'bold', size: 12 },
+                        textAlign: 'center',
+                        formatter: (value, context) => {
+                            const label = context.chart.data.labels[context.dataIndex];
+                            return label + '\n' + value;
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfico de Desempenho de Vendas (Line)
+    const salesPerformanceCanvas = document.getElementById('salesPerformanceChart');
+    if (salesPerformanceCanvas) {
+        const dataRows = JSON.parse(salesPerformanceCanvas.getAttribute('data-values') || '[]');
+        const labels = dataRows.map(row => row.month);
+        const values = dataRows.map(row => row.total);
+
+        new Chart(salesPerformanceCanvas.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '{{ _("Sales Closed") }}',
+                    data: values,
+                    fill: true,
+                    backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgba(54, 162, 235, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return '{{ session.get("company_currency", "Gs") }} ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    datalabels: { display: false } // Hide labels on line chart for clarity
+                }
+            }
+        });
+    }
+
+    // Quick Health Check Logic
+    const quickInput = document.getElementById('quickCheckInput');
+    const btnQuickCheck = document.getElementById('btnQuickCheck');
+    const resultDiv = document.getElementById('quickCheckResult');
+    const spinner = document.getElementById('quickCheckSpinner');
+    const contentDiv = document.getElementById('quickCheckContent');
+
+    quickInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            btnQuickCheck.click();
+        }
+    });
+
+    btnQuickCheck.addEventListener('click', function () {
+        const businessName = quickInput.value.trim();
+        if (!businessName) return;
+
+        resultDiv.classList.remove('d-none');
+        spinner.classList.remove('d-none');
+        contentDiv.innerHTML = `<strong>${translations.analyzing}</strong> ${translations.pleaseWait}`;
+        btnQuickCheck.disabled = true;
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('/health-checks/quick-check', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ business_name: businessName })
+        })
+            .then(response => response.json())
+            .then(data => {
+                btnQuickCheck.disabled = false;
+                spinner.classList.add('d-none');
+
+                if (data.success) {
+                    const summary = data.report.summary;
+                    contentDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center w-100 mb-3">
+                        <div>
+                            <h4 class="alert-heading text-success mb-0"><i class="bi bi-check-circle-fill"></i> ${translations.analysisComplete}</h4>
+                            <p class="mb-0">${translations.businessFound}: <strong>${data.report.business_name}</strong></p>
+                        </div>
+                        <div class="text-center ms-3">
+                            <h2 class="display-4 fw-bold ${data.score > 70 ? 'text-success' : (data.score > 40 ? 'text-warning' : 'text-danger')} mb-0">${data.score}</h2>
+                            <small class="text-muted">${translations.points}</small>
+                        </div>
+                    </div>
+
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-header bg-dark text-white py-2">
+                            <h6 class="mb-0 fw-bold">${translations.analysisResume}</h6>
+                        </div>
+                        <div class="card-body py-2">
+                            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                                <span class="fw-medium">${translations.criticalPoints}:</span>
+                                <span class="badge rounded-pill bg-danger fs-6">${summary.critical_issues_count}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+                                <span class="fw-medium">${translations.moderatePoints}:</span>
+                                <span class="badge rounded-pill bg-warning text-dark fs-6">${summary.moderate_issues_count}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fw-medium">${translations.positivePoints}:</span>
+                                <span class="badge rounded-pill bg-success fs-6">${summary.positive_points_count}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        ${data.health_check_id
+                            ? `<a href="/health-checks/${data.health_check_id}" class="btn btn-primary">${translations.viewFullReport}</a>`
+                            : `<button class="btn btn-success" onclick="createLeadFromQuickCheck()">${translations.createLead}</button>`
+                        }
+                    </div>
+                `;
+
+                    window.lastQuickCheckResult = data;
+                    resultDiv.querySelector('.alert').className = 'alert alert-light border shadow-sm';
+                } else {
+                    contentDiv.innerHTML = `
+                    <strong class="text-danger">${translations.error}:</strong> ${data.message}
+                    <br><small>${translations.trySpecific}</small>
+                `;
+                    resultDiv.querySelector('.alert').className = 'alert alert-danger d-flex align-items-center';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                btnQuickCheck.disabled = false;
+                spinner.classList.add('d-none');
+                contentDiv.innerHTML = `<strong class="text-danger">${translations.connectionError}</strong> ${translations.tryAgain}`;
+            });
+    });
+
+    function createLeadFromQuickCheck() {
+        if (!window.lastQuickCheckResult) return;
+
+        const data = window.lastQuickCheckResult;
+        const btn = document.querySelector('button[onclick="createLeadFromQuickCheck()"]');
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ${translations.creating}`;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('/health-checks/convert-to-lead', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                business_name: data.report.business_name,
+                score: data.score,
+                report: data.report
+            })
+        })
+            .then(response => response.json())
+            .then(res => {
+                if (res.success) {
+                    window.location.href = `/clients/${res.client_id}`;
+                } else {
+                    alert(`${translations.errorCreatingLead}: ` + res.message);
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerText = translations.tryAgain;
+                    }
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert(translations.connectionError);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = translations.tryAgain;
+                }
+            });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Templates de E-mail') }} - PURETEGO CRM{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('company.settings') }}">{{ _('Configurações') }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ _('Templates de E-mail') }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0 text-gray-800"><i class="bi bi-file-earmark-code me-2"></i>{{ _('Modelos de E-mail')
+                    }}</h1>
+            </div>
+
+            <!-- COMERCIAL / SALES -->
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-cart3 me-2"></i>{{ _('Área Comercial (Vendas)') }}</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">{{ _('Nome') }}</th>
+                                    <th>{{ _('Assunto') }}</th>
+                                    <th>{{ _('Status') }}</th>
+                                    <th class="text-end pe-4">{{ _('Ações') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if templates.sales %}
+                                {% for t in templates.sales %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold">{{ t.name }}</div>
+                                        <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Code: {{
+                                            t.code }}</small>
+                                    </td>
+                                    <td>{{ t.subject }}</td>
+                                    <td>
+                                        {% if t.company_id %}
+                                        <span class="badge bg-info text-dark">{{ _('Personalizado') }}</span>
+                                        {% else %}
+                                        <span class="badge bg-light text-muted border">{{ _('Padrão Maps2GO') }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ url_for('company.edit_email_template', code=t.code) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i> {{ _('Editar') }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted small italic">{{ _('Nenhum
+                                        template comercial configurado.') }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINANCEIRO / FINANCE -->
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-cash-stack me-2"></i>{{ _('Área Financeira') }}</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">{{ _('Nome') }}</th>
+                                    <th>{{ _('Assunto') }}</th>
+                                    <th>{{ _('Status') }}</th>
+                                    <th class="text-end pe-4">{{ _('Ações') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if templates.finance %}
+                                {% for t in templates.finance %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold">{{ t.name }}</div>
+                                        <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Code: {{
+                                            t.code }}</small>
+                                    </td>
+                                    <td>{{ t.subject }}</td>
+                                    <td>
+                                        {% if t.company_id %}
+                                        <span class="badge bg-info text-dark">{{ _('Personalizado') }}</span>
+                                        {% else %}
+                                        <span class="badge bg-light text-muted border">{{ _('Padrão Maps2GO') }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{{ url_for('company.edit_email_template', code=t.code) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-pencil"></i> {{ _('Editar') }}
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4 text-muted small italic">{{ _('Nenhum
+                                        template financeiro configurado.') }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

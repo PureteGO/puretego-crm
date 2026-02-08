@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ _('User List') }} - PURETEGO CRM{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-people-fill me-2"></i>{{ _('Manage Users') }}</h1>
+        <a href="{{ url_for('users.create') }}" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>{{ _('New User') }}
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>{{ _('Name') }}</th>
+                            <th>{{ _('Email') }}</th>
+                            <th>{{ _('Role') }}</th>
+                            {% if session.get('is_superadmin') %}
+                            <th>{{ _('Company') }}</th>
+                            {% endif %}
+                            <th>{{ _('Status') }}</th>
+                            <th>{{ _('Fixo') }}</th>
+                            <th>{{ _('Comiss.') }}</th>
+                            <th>{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                {{ user.name }}
+                                {% if user.is_superadmin %}
+                                <span class="badge bg-danger ms-1">SuperAdmin</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge bg-secondary">{{ user.role_name }}</span>
+                            </td>
+                            {% if session.get('is_superadmin') %}
+                            <td>{{ user.company_name }}</td>
+                            {% endif %}
+                            <td>
+                                {% if user.is_active %}
+                                <span class="badge bg-success">{{ _('Active') }}</span>
+                                {% else %}
+                                <span class="badge bg-danger">{{ _('Inactive') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.base_salary | format_currency }}</td>
+                            <td>
+                                {% if user.receives_commission %}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                {% else %}
+                                <i class="bi bi-dash-circle text-muted"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('users.edit', user_id=user.id) }}"
+                                    class="btn btn-sm btn-outline-primary" title="{{ _('Edit') }}">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                {% if user.id != session.get('user_id') %}
+                                <form action="{{ url_for('users.toggle_active', user_id=user.id) }}" method="POST"
+                                    class="d-inline">
+                                    <button type="submit"
+                                        class="btn btn-sm btn-outline-{{ 'warning' if user.is_active else 'success' }}"
+                                        title="{{ _('Deactivate') if user.is_active else _('Activate') }}">
+                                        <i class="bi bi-{{ 'pause' if user.is_active else 'play' }}-fill"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">{{ _('No registered users') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,4491 @@
+# Spanish (Latin America) - Base language translations for PURETEGO CRM.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PURETEGO CRM 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-02-08 08:34-0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: es\n"
+"Language-Team: es <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/routes/auth.py:33
+msgid "Your account is inactive. Please contact the administrator."
+msgstr ""
+
+#: app/routes/auth.py:38
+msgid "Your company is inactive. Please contact support."
+msgstr ""
+
+#: app/routes/auth.py:73
+#, python-format
+msgid "Welcome, %(name)s!"
+msgstr ""
+
+#: app/routes/auth.py:79
+msgid "Invalid email or password."
+msgstr ""
+
+#: app/routes/auth.py:94
+msgid "You have logged out."
+msgstr ""
+
+#: app/routes/auth.py:118
+msgid "Recovery instructions were sent to your email."
+msgstr ""
+
+#: app/routes/auth.py:120
+msgid "Error sending email. Please try again later."
+msgstr ""
+
+#: app/routes/auth.py:138
+msgid "Invalid or expired recovery link."
+msgstr ""
+
+#: app/routes/auth.py:146
+msgid "Password must have at least 6 characters."
+msgstr ""
+
+#: app/routes/auth.py:150
+msgid "Passwords do not match."
+msgstr ""
+
+#: app/routes/auth.py:158
+msgid "Password updated successfully! You can now log in."
+msgstr ""
+
+#: app/routes/google_oauth.py:85
+msgid "Cuenta desconocida"
+msgstr ""
+
+#: app/routes/google_oauth.py:123
+#, fuzzy
+msgid "Cliente eliminado"
+msgstr "Cliente eliminado correctamente"
+
+#: app/routes/google_oauth.py:164
+msgid "Você não tem permissão para gerenciar integrações Google."
+msgstr ""
+
+#: app/routes/google_oauth.py:174
+#, fuzzy
+msgid "Conexão não encontrada."
+msgstr "Empresa no encontrada"
+
+#: app/routes/google_oauth.py:243
+msgid "La integración con Google Business Profile está deshabilitada."
+msgstr ""
+
+#: app/routes/google_oauth.py:248
+msgid "Error de configuración: Falta el Client Secret de Google."
+msgstr ""
+
+#: app/routes/google_oauth.py:291
+#, python-format
+msgid "Error de autorización de Google: %(error)s"
+msgstr ""
+
+#: app/routes/google_oauth.py:295
+msgid "Respuesta OAuth inválida."
+msgstr ""
+
+#: app/routes/google_oauth.py:306
+msgid "Token de seguridad inválido. Intente nuevamente."
+msgstr ""
+
+#: app/routes/google_oauth.py:347
+#, python-format
+msgid "Cuenta Google %(email)s reconectada exitosamente."
+msgstr ""
+
+#: app/routes/google_oauth.py:362
+#, python-format
+msgid "Cuenta Google %(email)s conectada exitosamente."
+msgstr ""
+
+#: app/routes/google_oauth.py:370
+#, fuzzy, python-format
+msgid "Error al procesar la autorización: %(error)s"
+msgstr "Error al procesar la solicitud"
+
+#: app/routes/google_oauth.py:390
+#, python-format
+msgid "Cuenta %(email)s desconectada."
+msgstr ""
+
+#: app/routes/google_oauth.py:392 app/routes/google_oauth.py:516
+#, fuzzy
+msgid "Conexión no encontrada."
+msgstr "Empresa no encontrada"
+
+#: app/routes/google_oauth.py:505
+msgid "Datos incompletos."
+msgstr ""
+
+#: app/routes/google_oauth.py:525
+msgid "Você não tem permissão para vincular este cliente."
+msgstr ""
+
+#: app/routes/google_oauth.py:539
+#, fuzzy
+msgid "Vínculo actualizado."
+msgstr "Actualizar"
+
+#: app/routes/google_oauth.py:552
+msgid "Perfil vinculado exitosamente."
+msgstr ""
+
+#: app/routes/google_oauth.py:578
+msgid "Você não tem permissão para remover este vínculo."
+msgstr ""
+
+#: app/routes/google_oauth.py:583
+msgid "Vínculo eliminado."
+msgstr ""
+
+#: app/routes/google_oauth.py:585
+#, fuzzy
+msgid "Vínculo no encontrado."
+msgstr "Empresa no encontrada"
+
+#: app/routes/google_oauth.py:605
+msgid "Conexión no encontrada o inactiva."
+msgstr ""
+
+#: app/routes/google_oauth.py:636
+msgid "Perfil habilitado para administración."
+msgstr ""
+
+#: app/routes/google_oauth.py:651
+#, python-format
+msgid "Error al obtener datos de Google: %(error)s"
+msgstr ""
+
+#: app/routes/google_oauth.py:672
+msgid "Conexão ou Perfil não encontrado."
+msgstr ""
+
+#: app/routes/google_oauth.py:679
+#, python-format
+msgid "Métricas sincronizadas com sucesso: %(count)s registros."
+msgstr ""
+
+#: app/routes/google_oauth.py:681
+#, python-format
+msgid "Erro ao sincronizar métricas: %(error)s"
+msgstr ""
+
+#: app/routes/health_checks.py:47
+msgid "Auditoria Oficial realizada com sucesso!"
+msgstr ""
+
+#: app/routes/health_checks.py:49
+#, python-format
+msgid "Erro: %(error)s"
+msgstr ""
+
+#: app/routes/health_checks.py:51
+#, fuzzy
+msgid "Erro interno ao processar auditoria oficial."
+msgstr "Error al procesar la solicitud"
+
+#: app/routes/projects.py:61
+#, python-format
+msgid "Projeto \"%(name)s\" iniciado com sucesso!"
+msgstr ""
+
+#: app/routes/projects.py:112
+msgid "Tarefa adicionada."
+msgstr ""
+
+#: app/routes/projects.py:208
+#, fuzzy
+msgid "Projeto não encontrado"
+msgstr "Empresa no encontrada"
+
+#: app/routes/projects.py:219
+msgid "Projeto renovado com sucesso!"
+msgstr ""
+
+#: app/routes/saas.py:18
+msgid "Acceso denegado. Área restringida para Super Administradores."
+msgstr "Acceso denegado. Área restringida para Super Administradores."
+
+#: app/routes/saas.py:50
+msgid "Nombre de la empresa es obligatorio."
+msgstr "Nombre de la empresa es obligatorio."
+
+#: app/routes/saas.py:71
+#, python-format
+msgid "Empresa %(name)s creada con éxito!"
+msgstr "Empresa %(name)s creada con éxito!"
+
+#: app/routes/saas.py:82
+msgid "Empresa no encontrada"
+msgstr "Empresa no encontrada"
+
+#: app/routes/saas.py:99
+msgid "Empresa actualizada con éxito!"
+msgstr "Empresa actualizada con éxito!"
+
+#: app/routes/saas.py:138
+#, python-format
+msgid "Ahora estás accediendo como %(name)s"
+msgstr "Ahora estás accediendo como %(name)s"
+
+#: app/routes/saas.py:141
+msgid "Esta empresa no tiene usuarios para impersonar."
+msgstr "Esta empresa no tiene usuarios para impersonar."
+
+#: app/routes/saas.py:169
+msgid "Paquete creado con éxito!"
+msgstr "Paquete creado con éxito!"
+
+#: app/routes/saas.py:192
+msgid "Paquete actualizado con éxito!"
+msgstr "Paquete actualizado con éxito!"
+
+#: app/templates/base.html:40
+msgid "Upload your logo in Company Settings"
+msgstr ""
+
+# Spanish is base language - msgstr same as msgid or empty
+# ===== NAVIGATION =====
+#: app/templates/base.html:60 app/templates/dashboard/index.html:3
+#: app/templates/dashboard/index.html:9
+msgid "Dashboard"
+msgstr "Dashboard"
+
+#: app/templates/base.html:65 app/templates/calendar/index.html:9
+#: app/templates/calendar/index.html:130
+msgid "Agenda"
+msgstr "Agenda"
+
+#: app/templates/base.html:67
+msgid "Overdue tasks"
+msgstr ""
+
+#: app/templates/base.html:75 app/templates/clients/kanban.html:3
+#: app/templates/clients/kanban.html:54
+msgid "Kanban"
+msgstr "Kanban"
+
+#: app/templates/base.html:79 app/templates/clients/index.html:3
+#: app/templates/clients/index.html:9 app/templates/health_checks/create.html:9
+#: app/templates/health_checks/view.html:9 app/templates/saas/dashboard.html:32
+#: app/templates/saas/packages/index.html:43 app/templates/visits/view.html:9
+#, fuzzy
+msgid "Clients"
+msgstr "Clientes"
+
+# ===== PROPOSALS =====
+#: app/templates/base.html:83 app/templates/clients/view.html:90
+#: app/templates/proposals/index.html:3 app/templates/proposals/index.html:9
+#, fuzzy
+msgid "Proposals"
+msgstr "Propuestas"
+
+#: app/templates/base.html:87
+#, fuzzy
+msgid "Projects"
+msgstr "Propietario"
+
+#: app/templates/base.html:94 app/templates/saas/dashboard.html:31
+#: app/templates/saas/packages/index.html:41
+#, fuzzy
+msgid "Users"
+msgstr "Usuarios"
+
+#: app/templates/base.html:100
+msgid "Toggle theme"
+msgstr ""
+
+#: app/templates/base.html:138
+msgid "Settings"
+msgstr ""
+
+# ===== INTERACTIONS =====
+#: app/templates/base.html:140
+#, fuzzy
+msgid "Integrations"
+msgstr "Interacciones"
+
+#: app/templates/base.html:147
+msgid "Logout"
+msgstr ""
+
+#: app/templates/base.html:197
+#, fuzzy
+msgid "New Action"
+msgstr "Inactivo"
+
+#: app/templates/base.html:206 app/templates/calendar/index.html:69
+#: app/templates/dashboard/index.html:260
+#: app/templates/health_checks/index.html:17
+#: app/templates/proposals/create.html:28 app/templates/proposals/edit.html:28
+#: app/templates/proposals/index.html:24 app/templates/proposals/view.html:32
+#: app/templates/visits/create.html:18 app/templates/visits/create.html:29
+#: app/templates/visits/edit.html:16 app/templates/visits/index.html:20
+#, fuzzy
+msgid "Client"
+msgstr "Clientes"
+
+#: app/templates/base.html:208 app/templates/base.html:268
+#, fuzzy
+msgid "Select client..."
+msgstr "Seleccionar cliente..."
+
+#: app/templates/base.html:212
+#, fuzzy
+msgid "Register new client"
+msgstr "Registrar nuevo cliente"
+
+#: app/templates/base.html:219 app/templates/calendar/index.html:63
+msgid "Date and Time"
+msgstr ""
+
+#: app/templates/base.html:225
+#, fuzzy
+msgid "Notes (optional)"
+msgstr "Notas (opcional)"
+
+#: app/templates/base.html:230 app/templates/calendar/index.html:104
+#: app/templates/clients/index.html:156 app/templates/clients/kanban.html:135
+#: app/templates/clients/kanban.html:220 app/templates/clients/view.html:524
+#: app/templates/clients/view.html:558 app/templates/clients/view.html:580
+#: app/templates/health_checks/create.html:53
+#: app/templates/interactions/log_modal.html:50
+#: app/templates/interactions/manage_types_modal.html:42
+#: app/templates/saas/dashboard.html:99
+#: app/templates/saas/packages/edit.html:75 app/templates/users/create.html:47
+#: app/templates/users/edit.html:59 app/templates/visits/create.html:55
+#: app/templates/visits/edit.html:40
+#, fuzzy
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: app/templates/base.html:233 app/templates/interactions/log_modal.html:72
+msgid "Schedule"
+msgstr ""
+
+#: app/templates/base.html:249 app/templates/clients/index.html:13
+#: app/templates/dashboard/index.html:15
+#, fuzzy
+msgid "New Visit"
+msgstr "Nueva Visita"
+
+#: app/templates/base.html:252 app/templates/clients/index.html:17
+#: app/templates/dashboard/index.html:19
+msgid "New Call"
+msgstr ""
+
+#: app/templates/base.html:305 app/templates/calendar/index.html:125
+#: app/templates/clients/index.html:226
+msgid "Connection Error"
+msgstr ""
+
+#: app/templates/auth/forgot_password.html:7
+#: app/templates/auth/forgot_password.html:44
+msgid "Recuperar Contraseña"
+msgstr "Recuperar Contraseña"
+
+#: app/templates/auth/forgot_password.html:45
+#, fuzzy
+msgid "Enter your email and we will send you instructions"
+msgstr "Ingresa tu email y te enviaremos instrucciones"
+
+# ===== AUTH =====
+#: app/templates/auth/forgot_password.html:63 app/templates/auth/login.html:15
+#: app/templates/clients/create.html:47 app/templates/clients/edit.html:72
+#: app/templates/clients/view.html:36 app/templates/company/edit.html:58
+#: app/templates/company/profile.html:41
+#: app/templates/saas/edit_company.html:25 app/templates/users/create.html:21
+#: app/templates/users/edit.html:22 app/templates/users/index.html:20
+msgid "Email"
+msgstr "Email"
+
+#: app/templates/auth/forgot_password.html:72
+#, fuzzy
+msgid "Send Instructions"
+msgstr "Enviar Instrucciones"
+
+#: app/templates/auth/forgot_password.html:77
+msgid "Back to Login"
+msgstr ""
+
+#: app/templates/auth/login.html:3
+#, fuzzy
+msgid "Login"
+msgstr "Opcional"
+
+#: app/templates/auth/login.html:19 app/templates/users/create.html:26
+msgid "Password"
+msgstr ""
+
+#: app/templates/auth/login.html:23
+#, fuzzy
+msgid "Log In"
+msgstr "Nueva Visita"
+
+#: app/templates/auth/login.html:27
+msgid "Forgot your password?"
+msgstr ""
+
+#: app/templates/auth/reset_password.html:7
+msgid "Nueva Contraseña"
+msgstr "Nueva Contraseña"
+
+#: app/templates/auth/reset_password.html:44
+#: app/templates/auth/reset_password.html:63 app/templates/users/edit.html:28
+msgid "New Password"
+msgstr ""
+
+#: app/templates/auth/reset_password.html:45
+msgid "Enter your new password"
+msgstr ""
+
+#: app/templates/auth/reset_password.html:67 app/templates/users/create.html:29
+#, fuzzy
+msgid "Minimum 6 characters"
+msgstr "Mínimo 6 caracteres"
+
+#: app/templates/auth/reset_password.html:72
+msgid "Confirm Password"
+msgstr ""
+
+#: app/templates/auth/reset_password.html:76
+msgid "Repeat password"
+msgstr ""
+
+#: app/templates/auth/reset_password.html:82
+msgid "Save Password"
+msgstr ""
+
+# ===== CALENDAR =====
+#: app/templates/calendar/index.html:3
+#, fuzzy
+msgid "Agenda / Calendar"
+msgstr "Calendario"
+
+#: app/templates/calendar/index.html:12 app/templates/calendar/index.html:30
+#: app/templates/calendar/index.html:118
+msgid "New Appointment"
+msgstr ""
+
+#: app/templates/calendar/index.html:37
+#: app/templates/interactions/log_modal.html:19
+#: app/templates/interactions/manage_types_modal.html:57
+msgid "Type"
+msgstr ""
+
+#: app/templates/calendar/index.html:42
+#, fuzzy
+msgid "On-site Visit"
+msgstr "Nueva Visita"
+
+#: app/templates/calendar/index.html:47
+msgid "Call / Other"
+msgstr ""
+
+# ===== INTERACTIONS =====
+#: app/templates/calendar/index.html:53
+#, fuzzy
+msgid "Interaction Type"
+msgstr "Interacciones"
+
+#: app/templates/calendar/index.html:71 app/templates/clients/edit.html:162
+#: app/templates/proposals/create.html:111 app/templates/proposals/edit.html:89
+#: app/templates/proposals/edit.html:142
+msgid "Select..."
+msgstr ""
+
+#: app/templates/calendar/index.html:75
+#, fuzzy
+msgid "Quick New Client"
+msgstr "Sin clientes"
+
+#: app/templates/calendar/index.html:82
+#, fuzzy
+msgid "Quick Client Registration"
+msgstr "Máximo de clientes registrados."
+
+#: app/templates/calendar/index.html:85
+msgid "Client/Company Name"
+msgstr ""
+
+#: app/templates/calendar/index.html:89 app/templates/clients/create.html:42
+#: app/templates/clients/edit.html:66 app/templates/clients/kanban.html:204
+#: app/templates/clients/view.html:34 app/templates/saas/edit_company.html:29
+msgid "Phone"
+msgstr ""
+
+#: app/templates/calendar/index.html:95 app/templates/clients/view.html:73
+#, fuzzy
+msgid "Observations"
+msgstr "Observaciones"
+
+#: app/templates/calendar/index.html:102 app/templates/clients/kanban.html:172
+#: app/templates/clients/view.html:16 app/templates/clients/view.html:344
+#: app/templates/visits/view.html:57
+#, fuzzy
+msgid "Delete"
+msgstr "# de Clientes"
+
+#: app/templates/calendar/index.html:105
+msgid ""
+"Save\n"
+"                        Appointment"
+msgstr ""
+
+#: app/templates/calendar/index.html:119
+#, fuzzy
+msgid "Edit Appointment"
+msgstr "Editar Cliente"
+
+#: app/templates/calendar/index.html:120
+msgid "Save Appointment"
+msgstr ""
+
+#: app/templates/calendar/index.html:121
+msgid "Update Appointment"
+msgstr ""
+
+#: app/templates/calendar/index.html:122
+msgid "Please fill Date and Client!"
+msgstr ""
+
+#: app/templates/calendar/index.html:123
+msgid "Please fill the New Client Name!"
+msgstr ""
+
+#: app/templates/calendar/index.html:124
+msgid "Are you sure you want to delete this appointment?"
+msgstr ""
+
+#: app/templates/calendar/index.html:126
+#, fuzzy
+msgid "Today"
+msgstr "Total"
+
+#: app/templates/calendar/index.html:127
+msgid "Month"
+msgstr ""
+
+#: app/templates/calendar/index.html:128
+msgid "Week"
+msgstr ""
+
+#: app/templates/calendar/index.html:129
+#, fuzzy
+msgid "Day"
+msgstr "Día"
+
+# ===== CLIENTS =====
+#: app/templates/clients/create.html:3 app/templates/clients/create.html:9
+#: app/templates/clients/index.html:20
+#, fuzzy
+msgid "New Client"
+msgstr "Nuevo Cliente"
+
+#: app/templates/clients/create.html:12 app/templates/clients/edit.html:12
+#: app/templates/proposals/create.html:12 app/templates/proposals/edit.html:12
+#: app/templates/proposals/view.html:12 app/templates/saas/edit_company.html:12
+#: app/templates/saas/packages/index.html:10
+msgid "Back"
+msgstr ""
+
+#: app/templates/clients/create.html:23 app/templates/clients/edit.html:43
+#, fuzzy
+msgid "Business Information"
+msgstr "Cliente eliminado correctamente"
+
+#: app/templates/clients/create.html:25 app/templates/clients/edit.html:45
+#, fuzzy
+msgid "Business Name / Client"
+msgstr "Sin clientes"
+
+#: app/templates/clients/create.html:30 app/templates/clients/edit.html:51
+msgid "Google Maps Name (GMB)"
+msgstr ""
+
+#: app/templates/clients/create.html:35 app/templates/clients/edit.html:57
+#, fuzzy
+msgid "Primary Contact"
+msgstr "Contacto"
+
+#: app/templates/clients/create.html:38 app/templates/clients/edit.html:60
+#: app/templates/clients/kanban.html:200
+#, fuzzy
+msgid "Contact Name"
+msgstr "Contacto"
+
+#: app/templates/clients/create.html:51 app/templates/clients/edit.html:77
+#: app/templates/clients/view.html:37
+#: app/templates/integrations/manage_location.html:65
+msgid "Website"
+msgstr ""
+
+#: app/templates/clients/create.html:53 app/templates/clients/edit.html:79
+msgid "Ex: www.client.com"
+msgstr ""
+
+#: app/templates/clients/create.html:56 app/templates/clients/edit.html:82
+#: app/templates/clients/view.html:45 app/templates/saas/edit_company.html:35
+msgid "Address"
+msgstr ""
+
+#: app/templates/clients/create.html:60 app/templates/dashboard/index.html:126
+msgid "Pipeline"
+msgstr ""
+
+#: app/templates/clients/create.html:62
+#, fuzzy
+msgid "Initial Stage"
+msgstr "Editar Visita"
+
+#: app/templates/clients/create.html:70 app/templates/clients/edit.html:100
+#, fuzzy
+msgid "Interest"
+msgstr "Clientes"
+
+#: app/templates/clients/create.html:72 app/templates/clients/edit.html:102
+#: app/templates/clients/kanban.html:210
+msgid "Interested Package"
+msgstr ""
+
+#: app/templates/clients/create.html:74 app/templates/clients/edit.html:105
+#: app/templates/clients/kanban.html:212 app/templates/proposals/create.html:51
+#: app/templates/proposals/edit.html:50
+#, fuzzy
+msgid "Select a package..."
+msgstr "Seleccionar cliente..."
+
+#: app/templates/clients/create.html:80
+msgid ""
+"The value of this package will be added to the pipeline of the\n"
+"                                selected stage."
+msgstr ""
+
+#: app/templates/clients/create.html:87 app/templates/clients/edit.html:187
+#: app/templates/clients/index.html:157 app/templates/clients/kanban.html:222
+#: app/templates/interactions/log_modal.html:51
+#: app/templates/interactions/manage_types_modal.html:43
+#: app/templates/users/create.html:44 app/templates/users/edit.html:56
+#, fuzzy
+msgid "Save"
+msgstr "Salir"
+
+#: app/templates/clients/edit.html:3 app/templates/clients/edit.html:9
+#, fuzzy
+msgid "Edit Client"
+msgstr "Editar Cliente"
+
+#: app/templates/clients/edit.html:29
+#, fuzzy
+msgid "Basic Information"
+msgstr "Cliente eliminado correctamente"
+
+#: app/templates/clients/edit.html:34
+#, fuzzy
+msgid "Detailed Information"
+msgstr "Cliente eliminado correctamente"
+
+#: app/templates/clients/edit.html:89
+#, fuzzy
+msgid "Current Stage"
+msgstr "Editar Visita"
+
+#: app/templates/clients/edit.html:113
+msgid ""
+"The value of this package will be added to the pipeline\n"
+"                                        of the selected stage."
+msgstr ""
+
+#: app/templates/clients/edit.html:121
+msgid "Contact and Decision Details"
+msgstr ""
+
+#: app/templates/clients/edit.html:125
+#, fuzzy
+msgid "Receptionist Name"
+msgstr "Recepcionista"
+
+#: app/templates/clients/edit.html:129
+msgid "Who receives/answers first"
+msgstr ""
+
+#: app/templates/clients/edit.html:132
+#, fuzzy
+msgid "Decision Maker Name"
+msgstr "Precio"
+
+#: app/templates/clients/edit.html:136
+msgid "Who signs the check"
+msgstr ""
+
+#: app/templates/clients/edit.html:141 app/templates/clients/view.html:63
+#, fuzzy
+msgid "Decision Factors"
+msgstr "Precio"
+
+#: app/templates/clients/edit.html:145
+msgid "What is important to them? (Price, Quality, Speed, Trust...)"
+msgstr ""
+
+#: app/templates/clients/edit.html:150
+#, fuzzy
+msgid "Best Contact Time"
+msgstr "Contacto"
+
+#: app/templates/clients/edit.html:154
+msgid "Ex: Tuesday afternoon"
+msgstr ""
+
+#: app/templates/clients/edit.html:157
+#, fuzzy
+msgid ""
+"Preferred Contact\n"
+"                                            Method"
+msgstr "Paquete Activo (Disponible para venta)"
+
+#: app/templates/clients/edit.html:166
+#: app/templates/interactions/manage_types_modal.html:93
+#, fuzzy
+msgid "Call"
+msgstr "Cancelar"
+
+#: app/templates/clients/edit.html:171
+#, fuzzy
+msgid "In-person Visit"
+msgstr "Nueva Visita"
+
+#: app/templates/clients/edit.html:177
+#, fuzzy
+msgid ""
+"Additional Information /\n"
+"                                        Observations"
+msgstr "Paquete Activo (Disponible para venta)"
+
+#: app/templates/clients/edit.html:180
+msgid "Any other relevant detail..."
+msgstr ""
+
+#: app/templates/clients/index.html:23
+#, fuzzy
+msgid "View Kanban"
+msgstr "Ver Kanban"
+
+#: app/templates/clients/index.html:33
+#, fuzzy
+msgid "Search clients (name, contact, decision maker...)"
+msgstr "Buscar clientes (nombre, contacto, decisor...)"
+
+#: app/templates/clients/index.html:37
+msgid "All Stages"
+msgstr ""
+
+#: app/templates/clients/index.html:39 app/templates/clients/index.html:148
+#, fuzzy
+msgid "No Stage"
+msgstr "Notas"
+
+#: app/templates/clients/index.html:48
+#, fuzzy
+msgid "Filter by Company Name, Contact, Receptionist or Decision Maker."
+msgstr "Filtrar por Nombre de Empresa, Contacto, Recepcionista o Decisor."
+
+#: app/templates/clients/index.html:59
+msgid "Name / Business"
+msgstr ""
+
+#: app/templates/clients/index.html:60 app/templates/clients/view.html:32
+#, fuzzy
+msgid "Contact"
+msgstr "Contacto"
+
+#: app/templates/clients/index.html:61 app/templates/clients/view.html:29
+msgid "Stage"
+msgstr ""
+
+#: app/templates/clients/index.html:62
+#, fuzzy
+msgid "Registration Date"
+msgstr "registros"
+
+#: app/templates/clients/index.html:63 app/templates/clients/view.html:145
+#: app/templates/clients/view.html:186 app/templates/clients/view.html:246
+#: app/templates/clients/view.html:302 app/templates/dashboard/index.html:263
+#: app/templates/health_checks/index.html:20
+#: app/templates/interactions/manage_types_modal.html:58
+#: app/templates/proposals/index.html:28 app/templates/saas/dashboard.html:34
+#: app/templates/users/index.html:26 app/templates/visits/index.html:23
+#, fuzzy
+msgid "Actions"
+msgstr "Acciones"
+
+#: app/templates/clients/index.html:86 app/templates/clients/index.html:90
+msgid "Change Stage"
+msgstr ""
+
+#: app/templates/clients/index.html:91 app/templates/clients/view.html:30
+#, fuzzy
+msgid "No stage"
+msgstr "Notas"
+
+#: app/templates/clients/index.html:100 app/templates/dashboard/index.html:274
+#: app/templates/proposals/index.html:59
+msgid "View"
+msgstr ""
+
+#: app/templates/clients/index.html:104 app/templates/clients/view.html:12
+#: app/templates/proposals/index.html:63 app/templates/proposals/view.html:19
+#: app/templates/users/index.html:54 app/templates/visits/view.html:51
+#, fuzzy
+msgid "Edit"
+msgstr "EDITAR"
+
+#: app/templates/clients/index.html:113
+#, fuzzy
+msgid "No clients registered yet."
+msgstr "No hay clientes registrados aún."
+
+#: app/templates/clients/index.html:115
+#, fuzzy
+msgid "Register First Client"
+msgstr "Registrar Primer Cliente"
+
+#: app/templates/clients/index.html:121
+msgid "No clients found for this search."
+msgstr ""
+
+#: app/templates/clients/index.html:138
+#, fuzzy
+msgid "Move Client"
+msgstr "Ver Clientes"
+
+#: app/templates/clients/index.html:146
+#, fuzzy
+msgid "New Stage"
+msgstr "Nueva Visita"
+
+#: app/templates/clients/index.html:195
+#, fuzzy
+msgid "Move"
+msgstr "Ver"
+
+#: app/templates/clients/index.html:221 app/templates/clients/kanban.html:234
+#, fuzzy
+msgid "Error moving client"
+msgstr "Error al crear lead"
+
+#: app/templates/clients/kanban.html:57
+msgid ""
+"WARNING: This will remove all custom columns and move ALL clients to No "
+"Stage. Are you sure?"
+msgstr ""
+
+#: app/templates/clients/kanban.html:60
+msgid "Restore Default"
+msgstr ""
+
+#: app/templates/clients/kanban.html:64 app/templates/clients/kanban.html:119
+#, fuzzy
+msgid "New Column"
+msgstr "Nueva Contraseña"
+
+#: app/templates/clients/kanban.html:78
+#, fuzzy
+msgid "Add Client"
+msgstr "Clientes"
+
+#: app/templates/clients/kanban.html:126 app/templates/clients/kanban.html:155
+#, fuzzy
+msgid "Stage Name"
+msgstr "Agenda"
+
+#: app/templates/clients/kanban.html:130 app/templates/clients/kanban.html:159
+#, fuzzy
+msgid "Order"
+msgstr "Ver"
+
+#: app/templates/clients/kanban.html:136
+#, fuzzy
+msgid "Create"
+msgstr "Crear"
+
+#: app/templates/clients/kanban.html:148
+#, fuzzy
+msgid "Edit Stage"
+msgstr "Editar Visita"
+
+#: app/templates/clients/kanban.html:163
+#: app/templates/saas/edit_company.html:71 app/templates/visits/edit.html:38
+msgid "Save Changes"
+msgstr ""
+
+#: app/templates/clients/kanban.html:168 app/templates/clients/kanban.html:170
+msgid "Are you sure you want to delete this stage?"
+msgstr ""
+
+#: app/templates/clients/kanban.html:184
+#, fuzzy
+msgid "Add Client to Column"
+msgstr "Editar Cliente"
+
+#: app/templates/clients/kanban.html:193
+msgid "Business / Client Name"
+msgstr ""
+
+#: app/templates/clients/kanban.html:235
+#, fuzzy
+msgid "Connection error moving client."
+msgstr "Error al crear lead"
+
+#: app/templates/clients/kanban.html:316
+#, fuzzy
+msgid "Error reordering columns"
+msgstr "Error al crear lead"
+
+#: app/templates/clients/view.html:3
+#, fuzzy
+msgid "Client Details"
+msgstr "Clientes Totales"
+
+#: app/templates/clients/view.html:26
+#, fuzzy
+msgid "Client Information"
+msgstr "Cliente eliminado correctamente"
+
+#: app/templates/clients/view.html:57
+msgid "Additional Details"
+msgstr ""
+
+#: app/templates/clients/view.html:60
+#, fuzzy
+msgid "Receptionist"
+msgstr "Recepcionista"
+
+#: app/templates/clients/view.html:61
+#, fuzzy
+msgid "Decision Maker"
+msgstr "Precio"
+
+#: app/templates/clients/view.html:66
+msgid "Preferred Time"
+msgstr ""
+
+#: app/templates/clients/view.html:68
+msgid "Preferred Method"
+msgstr ""
+
+# ===== INTERACTIONS =====
+#: app/templates/clients/view.html:86
+#, fuzzy
+msgid "Interactions"
+msgstr "Interacciones"
+
+# ===== VISITS =====
+#: app/templates/clients/view.html:94
+#, fuzzy
+msgid "Visits"
+msgstr "Visitas"
+
+#: app/templates/clients/view.html:99
+#, fuzzy
+msgid "Health Check"
+msgstr "Health Check"
+
+#: app/templates/clients/view.html:102
+msgid ""
+"SEO\n"
+"                                Ranking"
+msgstr ""
+
+# ===== VISITS =====
+#: app/templates/clients/view.html:107
+#, fuzzy
+msgid "GMB Insights"
+msgstr "Visitas"
+
+#: app/templates/clients/view.html:112
+msgid "Projects / Post-Sales"
+msgstr ""
+
+#: app/templates/clients/view.html:123
+msgid "Log Visit / Call"
+msgstr ""
+
+#: app/templates/clients/view.html:134 app/templates/proposals/create.html:3
+#: app/templates/proposals/create.html:9 app/templates/proposals/index.html:12
+#, fuzzy
+msgid "New Proposal"
+msgstr "Ver Propuesta"
+
+#: app/templates/clients/view.html:142 app/templates/clients/view.html:183
+#: app/templates/clients/view.html:243
+#: app/templates/health_checks/index.html:16
+#: app/templates/proposals/index.html:27 app/templates/proposals/view.html:39
+#: app/templates/visits/index.html:19
+#, fuzzy
+msgid "Date"
+msgstr "# de Clientes"
+
+#: app/templates/clients/view.html:143 app/templates/proposals/create.html:89
+#: app/templates/proposals/edit.html:119
+msgid "Total"
+msgstr "Total"
+
+# ===== VISITS =====
+#: app/templates/clients/view.html:144 app/templates/clients/view.html:245
+#: app/templates/health_checks/index.html:19
+#: app/templates/proposals/create.html:39 app/templates/proposals/edit.html:32
+#: app/templates/proposals/index.html:26 app/templates/proposals/view.html:43
+#: app/templates/saas/dashboard.html:30 app/templates/users/index.html:25
+#, fuzzy
+msgid "Status"
+msgstr "Visitas"
+
+#: app/templates/clients/view.html:162 app/templates/proposals/index.html:78
+#, fuzzy
+msgid "No proposals registered."
+msgstr "No hay presupuestos registrados."
+
+#: app/templates/clients/view.html:176 app/templates/visits/create.html:3
+#: app/templates/visits/create.html:53
+#, fuzzy
+msgid "Log Visit"
+msgstr "Nueva Visita"
+
+#: app/templates/clients/view.html:184
+#: app/templates/interactions/log_modal.html:36
+#: app/templates/visits/index.html:21
+#, fuzzy
+msgid "Notes"
+msgstr "Notas"
+
+#: app/templates/clients/view.html:185 app/templates/visits/edit.html:32
+#: app/templates/visits/index.html:22 app/templates/visits/view.html:36
+msgid "Next Step"
+msgstr ""
+
+#: app/templates/clients/view.html:205 app/templates/visits/index.html:50
+#, fuzzy
+msgid "No visits registered."
+msgstr "No hay visitas recientes."
+
+#: app/templates/clients/view.html:223
+msgid "Advanced Audit (API)"
+msgstr ""
+
+#: app/templates/clients/view.html:229
+msgid "Link Google Profile"
+msgstr ""
+
+#: app/templates/clients/view.html:235
+#, fuzzy
+msgid "New Health Check (Public)"
+msgstr "Health Check"
+
+#: app/templates/clients/view.html:244
+#: app/templates/health_checks/index.html:18
+#, fuzzy
+msgid "Score"
+msgstr "Crear"
+
+#: app/templates/clients/view.html:273
+#: app/templates/health_checks/index.html:47
+msgid "No audits performed."
+msgstr ""
+
+#: app/templates/clients/view.html:290
+msgid "Track Keyword"
+msgstr ""
+
+#: app/templates/clients/view.html:298 app/templates/clients/view.html:545
+msgid "Keyword"
+msgstr ""
+
+#: app/templates/clients/view.html:299
+#, fuzzy
+msgid "Local Position"
+msgstr "Puntos Positivos"
+
+#: app/templates/clients/view.html:300
+msgid "Organic Position"
+msgstr ""
+
+#: app/templates/clients/view.html:301
+msgid "Last Check"
+msgstr ""
+
+#: app/templates/clients/view.html:333
+msgid "Update"
+msgstr ""
+
+#: app/templates/clients/view.html:341
+msgid "Delete this keyword?"
+msgstr ""
+
+#: app/templates/clients/view.html:355
+msgid "No keywords tracked."
+msgstr ""
+
+#: app/templates/clients/view.html:367
+msgid "Google Business Profile Performance (Last 30 days)"
+msgstr ""
+
+#: app/templates/clients/view.html:374
+msgid "Update Data"
+msgstr ""
+
+#: app/templates/clients/view.html:393
+msgid "Total Impressions"
+msgstr ""
+
+#: app/templates/clients/view.html:403 app/templates/clients/view.html:682
+msgid "Calls"
+msgstr ""
+
+#: app/templates/clients/view.html:413 app/templates/clients/view.html:690
+msgid "Website Clicks"
+msgstr ""
+
+#: app/templates/clients/view.html:426
+msgid "No data collected for this account yet. Click \"Update Data\" to import."
+msgstr ""
+
+#: app/templates/clients/view.html:428
+msgid "Link a Google Business account to see performance metrics."
+msgstr ""
+
+#: app/templates/clients/view.html:438
+#, fuzzy
+msgid "Active Projects and Deliveries"
+msgstr "Ver Propuesta"
+
+#: app/templates/clients/view.html:440
+#, fuzzy
+msgid "Start New Project"
+msgstr "Editar Propuesta"
+
+#: app/templates/clients/view.html:454
+#, fuzzy
+msgid "No description."
+msgstr "Descripción"
+
+#: app/templates/clients/view.html:461
+msgid "Manage"
+msgstr ""
+
+#: app/templates/clients/view.html:473
+msgid "This client does not have an active project yet."
+msgstr ""
+
+#: app/templates/clients/view.html:474
+msgid "Projects allow managing contracts and post-sales tasks."
+msgstr ""
+
+#: app/templates/clients/view.html:491
+msgid "Link Google Business Profile"
+msgstr ""
+
+#: app/templates/clients/view.html:500
+msgid "Google Account"
+msgstr ""
+
+#: app/templates/clients/view.html:502
+#, fuzzy
+msgid "Select an account..."
+msgstr "Seleccionar cliente..."
+
+#: app/templates/clients/view.html:510
+msgid "Business Profile"
+msgstr ""
+
+#: app/templates/clients/view.html:512
+#, fuzzy
+msgid "Loading profiles..."
+msgstr "Seleccione una opción"
+
+#: app/templates/clients/view.html:520
+#, fuzzy
+msgid "Searching profiles..."
+msgstr "Seleccione una opción"
+
+#: app/templates/clients/view.html:525
+msgid "Link"
+msgstr ""
+
+#: app/templates/clients/view.html:537
+msgid "Track New Keyword"
+msgstr ""
+
+#: app/templates/clients/view.html:547
+#, fuzzy
+msgid "Ex: Pizzeria in Asuncion"
+msgstr "Ej: Pizzería en Asunción"
+
+#: app/templates/clients/view.html:551
+#, fuzzy
+msgid "Location"
+msgstr "Opcional"
+
+#: app/templates/clients/view.html:553
+#, fuzzy
+msgid "Ex: Asuncion, Paraguay"
+msgstr "Ej: Asunción, Paraguay"
+
+#: app/templates/clients/view.html:554
+msgid "Leave empty for global search or enter City, Country"
+msgstr ""
+
+#: app/templates/clients/view.html:559
+msgid "Track"
+msgstr ""
+
+#: app/templates/clients/view.html:571
+#, fuzzy
+msgid "Confirm Deletion"
+msgstr "Confirmar"
+
+#: app/templates/clients/view.html:576
+msgid "Are you sure you want to delete the client"
+msgstr ""
+
+#: app/templates/clients/view.html:577
+msgid "This action will move the client to the trash (Soft Delete)."
+msgstr ""
+
+#: app/templates/clients/view.html:582
+#, fuzzy
+msgid "Delete Client"
+msgstr "# de Clientes"
+
+#: app/templates/clients/view.html:623
+#, fuzzy
+msgid "Select profile..."
+msgstr "Seleccione una opción"
+
+#: app/templates/clients/view.html:634
+msgid "No profiles found in this account."
+msgstr ""
+
+#: app/templates/clients/view.html:639
+#, fuzzy
+msgid "Error loading profiles."
+msgstr "Error al crear lead"
+
+#: app/templates/clients/view.html:674
+#, fuzzy
+msgid "Impressions"
+msgstr "Impuestos"
+
+#: app/templates/company/edit.html:2 app/templates/company/edit.html:10
+msgid "Editar Empresa"
+msgstr "Editar Empresa"
+
+# ===== COMPANY =====
+#: app/templates/company/edit.html:17
+#, fuzzy
+msgid "Logo de la Empresa"
+msgstr "Perfil de la Empresa"
+
+#: app/templates/company/edit.html:20
+msgid "Logo actual"
+msgstr ""
+
+#: app/templates/company/edit.html:35
+msgid "¿Está seguro de eliminar el logo?"
+msgstr ""
+
+#: app/templates/company/edit.html:37
+#, fuzzy
+msgid "Eliminar Logo"
+msgstr "Eliminar"
+
+#: app/templates/company/edit.html:45
+msgid "Nombre de la Empresa"
+msgstr "Nombre de la Empresa"
+
+#: app/templates/company/edit.html:51
+#, fuzzy
+msgid "Slug (Identificador)"
+msgstr "Slug (ID interno)"
+
+#: app/templates/company/edit.html:54
+msgid "El slug no puede ser modificado"
+msgstr ""
+
+#: app/templates/company/edit.html:64 app/templates/company/profile.html:45
+#: app/templates/integrations/manage_location.html:57
+msgid "Teléfono"
+msgstr "Teléfono"
+
+#: app/templates/company/edit.html:70 app/templates/company/profile.html:49
+#: app/templates/integrations/google_dashboard.html:144
+#: app/templates/integrations/location_mapping.html:48
+msgid "Dirección"
+msgstr "Dirección"
+
+#: app/templates/company/edit.html:76
+#, fuzzy
+msgid ""
+"Símbolo de Moneda (ej: Gs, $,\n"
+"                                        R$)"
+msgstr "Paquete Activo (Disponible para venta)"
+
+#: app/templates/company/edit.html:86
+#, fuzzy
+msgid ""
+"Este símbolo se usará en todos los valores\n"
+"                                        monetarios del sistema."
+msgstr "Paquete Activo (Disponible para venta)"
+
+# ===== COMPANY =====
+#: app/templates/company/edit.html:96
+#, fuzzy
+msgid "Estilo Visual de la Empresa"
+msgstr "Perfil de la Empresa"
+
+#: app/templates/company/edit.html:99
+msgid ""
+"Selecciona el tema de color que deseas para tu empresa. Este tema se "
+"aplicará\n"
+"                                    a todos los usuarios."
+msgstr ""
+
+#: app/templates/company/edit.html:128
+msgid "Guardar Cambios"
+msgstr "Guardar Cambios"
+
+#: app/templates/company/edit.html:131 app/templates/projects/create.html:55
+msgid "Cancelar"
+msgstr "Cancelar"
+
+#: app/templates/company/email_settings.html:2
+#: app/templates/company/email_settings.html:10
+#: app/templates/company/profile.html:97
+msgid "Configuración de Email"
+msgstr "Configuración de Email"
+
+#: app/templates/company/email_settings.html:15
+msgid ""
+"Configure su servidor SMTP para enviar emails (propuestas, "
+"notificaciones) desde el email\n"
+"                        de su empresa."
+msgstr ""
+
+# ===== EMAIL SETTINGS =====
+#: app/templates/company/email_settings.html:24
+msgid "Servidor SMTP"
+msgstr "Servidor SMTP"
+
+#: app/templates/company/email_settings.html:27
+msgid "Ej: smtp.gmail.com, smtp.office365.com"
+msgstr ""
+
+#: app/templates/company/email_settings.html:32
+#: app/templates/company/email_settings.html:139
+#: app/templates/company/email_settings.html:146
+msgid "Puerto"
+msgstr "Puerto"
+
+#: app/templates/company/email_settings.html:43
+msgid "Usar TLS"
+msgstr "Usar TLS"
+
+#: app/templates/company/email_settings.html:44
+#, fuzzy
+msgid "Recomendado"
+msgstr "Recomendaciones"
+
+#: app/templates/company/email_settings.html:53
+msgid "Usuario SMTP"
+msgstr "Usuario SMTP"
+
+#: app/templates/company/email_settings.html:60
+msgid "Contraseña SMTP"
+msgstr "Contraseña SMTP"
+
+#: app/templates/company/email_settings.html:62
+#, fuzzy
+msgid "Ingrese la contraseña"
+msgstr "Repite la contraseña"
+
+#: app/templates/company/email_settings.html:64
+msgid "Dejar en blanco para mantener la contraseña actual"
+msgstr "Dejar en blanco para mantener la contraseña actual"
+
+#: app/templates/company/email_settings.html:72
+#, fuzzy
+msgid "Remitente"
+msgstr "Pendiente"
+
+#: app/templates/company/email_settings.html:77
+msgid "Email del Remitente"
+msgstr "Email del Remitente"
+
+#: app/templates/company/email_settings.html:81
+msgid "Si está vacío, se usará el usuario SMTP"
+msgstr ""
+
+#: app/templates/company/email_settings.html:86
+msgid "Nombre del Remitente"
+msgstr "Nombre del Remitente"
+
+#: app/templates/company/email_settings.html:90
+msgid "Si está vacío, se usará el nombre de la empresa"
+msgstr ""
+
+# ===== COMMON ACTIONS =====
+#: app/templates/company/email_settings.html:98
+msgid "Guardar"
+msgstr "Guardar"
+
+#: app/templates/company/email_settings.html:101
+#: app/templates/integrations/google_dashboard.html:17
+#: app/templates/integrations/location_mapping.html:22
+msgid "Volver"
+msgstr "Volver"
+
+#: app/templates/company/email_settings.html:112
+msgid "Probar Configuración"
+msgstr "Probar Configuración"
+
+#: app/templates/company/email_settings.html:115
+msgid "Envíe un email de prueba para verificar que la configuración funciona."
+msgstr ""
+
+#: app/templates/company/email_settings.html:119
+msgid "Email de Destino"
+msgstr "Email de Destino"
+
+#: app/templates/company/email_settings.html:125
+msgid "Enviar Prueba"
+msgstr "Enviar Prueba"
+
+#: app/templates/company/email_settings.html:133
+msgid "Ayuda"
+msgstr "Ayuda"
+
+# ===== EMAIL SETTINGS =====
+#: app/templates/company/email_settings.html:138
+#: app/templates/company/email_settings.html:145
+#, fuzzy
+msgid "Servidor"
+msgstr "Servidor SMTP"
+
+#: app/templates/company/email_settings.html:140
+#, fuzzy
+msgid "Use una"
+msgstr "Semana"
+
+#: app/templates/company/email_settings.html:141
+#, fuzzy
+msgid "Contraseña de Aplicación"
+msgstr "Contraseña SMTP"
+
+# ===== COMPANY =====
+#: app/templates/company/profile.html:2
+msgid "Perfil de la Empresa"
+msgstr "Perfil de la Empresa"
+
+#: app/templates/company/profile.html:12
+msgid "Editar"
+msgstr "Editar"
+
+#: app/templates/company/profile.html:26
+msgid "Sin logo configurado"
+msgstr ""
+
+#: app/templates/company/profile.html:30
+#, fuzzy
+msgid "Cambiar Logo"
+msgstr "Subir Logo"
+
+#: app/templates/company/profile.html:37 app/templates/saas/dashboard.html:29
+msgid "Slug"
+msgstr "Slug"
+
+#: app/templates/company/profile.html:53
+msgid "Creada"
+msgstr "Creada"
+
+#: app/templates/company/profile.html:66
+msgid "Estadísticas"
+msgstr "Estadísticas"
+
+#: app/templates/company/profile.html:70
+msgid "Usuarios"
+msgstr "Usuarios"
+
+#: app/templates/company/profile.html:74
+msgid "Clientes"
+msgstr "Clientes"
+
+#: app/templates/company/profile.html:78
+#: app/templates/integrations/google_dashboard.html:47
+#: app/templates/integrations/google_dashboard.html:146
+#: app/templates/integrations/location_mapping.html:49
+#: app/templates/integrations/manage_location.html:34
+msgid "Estado"
+msgstr "Estado"
+
+#: app/templates/company/profile.html:80
+msgid "Activa"
+msgstr "Activa"
+
+#: app/templates/company/profile.html:82
+msgid "Inactiva"
+msgstr "Inactiva"
+
+#: app/templates/company/profile.html:90
+msgid "Accesos Rápidos"
+msgstr "Accesos Rápidos"
+
+#: app/templates/company/profile.html:94
+#, fuzzy
+msgid "Integración Google"
+msgstr "Interacción"
+
+#: app/templates/company/profile.html:100
+msgid "Gestionar Usuarios"
+msgstr "Gestionar Usuarios"
+
+#: app/templates/company/profile.html:103 app/templates/projects/index.html:70
+msgid "Ver Clientes"
+msgstr "Ver Clientes"
+
+#: app/templates/dashboard/index.html:10
+msgid "Welcome"
+msgstr ""
+
+#: app/templates/dashboard/index.html:29
+msgid "You have overdue tasks"
+msgstr ""
+
+#: app/templates/dashboard/index.html:31
+#, python-format
+msgid "There are %(count)s interactions that past their scheduled date."
+msgstr ""
+
+#: app/templates/dashboard/index.html:33
+msgid "Resolve in Agenda"
+msgstr ""
+
+#: app/templates/dashboard/index.html:46
+msgid ""
+"Enter the company name to perform an instant Google My Business\n"
+"                        analysis."
+msgstr ""
+
+#: app/templates/dashboard/index.html:51
+#, fuzzy
+msgid "Company name (e.g., AGR Equipamientos)..."
+msgstr "Nombre de la empresa es obligatorio."
+
+#: app/templates/dashboard/index.html:52
+msgid "Verify Now"
+msgstr ""
+
+#: app/templates/dashboard/index.html:58 app/templates/dashboard/index.html:84
+#: app/templates/dashboard/index.html:99
+#: app/templates/interactions/manage_types_modal.html:80
+#, fuzzy
+msgid "Loading..."
+msgstr "Seleccione una opción"
+
+#: app/templates/dashboard/index.html:61 app/templates/dashboard/index.html:421
+#: app/templates/health_checks/create.html:41
+#, fuzzy
+msgid "Analyzing..."
+msgstr "Analizando..."
+
+#: app/templates/dashboard/index.html:61 app/templates/dashboard/index.html:422
+msgid "Please wait while we query Google."
+msgstr ""
+
+#: app/templates/dashboard/index.html:79
+#, fuzzy
+msgid "Today's Agenda"
+msgstr "Agenda"
+
+#: app/templates/dashboard/index.html:94
+msgid "Next 7 Days"
+msgstr ""
+
+#: app/templates/dashboard/index.html:113
+msgid "Conversion"
+msgstr ""
+
+#: app/templates/dashboard/index.html:128
+#, fuzzy
+msgid "Active Proposals"
+msgstr "Ver Propuesta"
+
+#: app/templates/dashboard/index.html:135
+msgid "Closed"
+msgstr ""
+
+#: app/templates/dashboard/index.html:138
+msgid "Closed Sales"
+msgstr ""
+
+#: app/templates/dashboard/index.html:145
+msgid ""
+"Avg\n"
+"                        Ticket"
+msgstr ""
+
+#: app/templates/dashboard/index.html:148
+msgid "Average Value Won"
+msgstr ""
+
+#: app/templates/dashboard/index.html:162
+msgid "Awaiting Payment"
+msgstr ""
+
+#: app/templates/dashboard/index.html:170
+msgid "Pending Contracts"
+msgstr ""
+
+#: app/templates/dashboard/index.html:178
+#, fuzzy
+msgid "Total Clients"
+msgstr "Clientes"
+
+# ===== PROPOSALS =====
+#: app/templates/dashboard/index.html:186
+#, fuzzy
+msgid "Total Proposals"
+msgstr "Propuestas"
+
+#: app/templates/dashboard/index.html:196
+msgid "Onboarding Phase"
+msgstr ""
+
+# ===== INTERACTIONS =====
+#: app/templates/dashboard/index.html:204
+#, fuzzy
+msgid "In Execution"
+msgstr "Interacciones"
+
+#: app/templates/dashboard/index.html:212
+#, fuzzy
+msgid "Active Projects"
+msgstr "Ver Propuesta"
+
+#: app/templates/dashboard/index.html:222
+#, fuzzy
+msgid "My Clients"
+msgstr "Clientes"
+
+# ===== VISITS =====
+#: app/templates/dashboard/index.html:230
+#, fuzzy
+msgid "My Visits"
+msgstr "Visitas"
+
+#: app/templates/dashboard/index.html:238
+#, fuzzy
+msgid "General Total"
+msgstr "Valor Total"
+
+#: app/templates/dashboard/index.html:252
+msgid "Renewal Alerts (Next 30 Days)"
+msgstr ""
+
+#: app/templates/dashboard/index.html:259
+#, fuzzy
+msgid "Project"
+msgstr "Propietario"
+
+#: app/templates/dashboard/index.html:261
+#, fuzzy
+msgid "End Date"
+msgstr "# de Clientes"
+
+#: app/templates/dashboard/index.html:262
+#, fuzzy
+msgid "Value"
+msgstr "Valor"
+
+#: app/templates/dashboard/index.html:289
+msgid "Operational Task Queue (Pending)"
+msgstr ""
+
+#: app/templates/dashboard/index.html:303
+msgid "No pending tasks."
+msgstr ""
+
+#: app/templates/dashboard/index.html:315
+#, fuzzy
+msgid "Client Pipeline"
+msgstr "Cliente eliminado correctamente"
+
+#: app/templates/dashboard/index.html:324
+msgid "Pipeline Distribution"
+msgstr ""
+
+#: app/templates/dashboard/index.html:337
+msgid "Recent Activity"
+msgstr ""
+
+#: app/templates/dashboard/index.html:342
+#, fuzzy
+msgid ""
+"Latest\n"
+"                                Interactions"
+msgstr "Paquete Activo (Disponible para venta)"
+
+# ===== INTERACTIONS =====
+#: app/templates/dashboard/index.html:355
+#, fuzzy
+msgid "No recent interactions."
+msgstr "Interacciones"
+
+#: app/templates/dashboard/index.html:360
+#, fuzzy
+msgid "Latest Visits"
+msgstr "Últimas Visitas"
+
+#: app/templates/dashboard/index.html:370
+#, fuzzy
+msgid ""
+"No\n"
+"                                        observations"
+msgstr "Paquete Activo (Disponible para venta)"
+
+#: app/templates/dashboard/index.html:374
+#, fuzzy
+msgid "No recent visits."
+msgstr "Nueva Visita"
+
+#: app/templates/dashboard/index.html:379
+#, fuzzy
+msgid ""
+"Latest Health\n"
+"                                Checks"
+msgstr "Por favor espere mientras consultamos Google."
+
+#: app/templates/dashboard/index.html:397
+#, fuzzy
+msgid "No recent health checks."
+msgstr "Health Check"
+
+#: app/templates/dashboard/index.html:419
+msgid "No tasks for today."
+msgstr ""
+
+#: app/templates/dashboard/index.html:420
+msgid "No upcoming tasks."
+msgstr ""
+
+#: app/templates/dashboard/index.html:423
+#, fuzzy
+msgid "Analysis Complete!"
+msgstr "¡Análisis Completo!"
+
+#: app/templates/dashboard/index.html:424
+msgid "Business found"
+msgstr ""
+
+#: app/templates/dashboard/index.html:425
+#, fuzzy
+msgid "Points"
+msgstr "Puntos"
+
+#: app/templates/dashboard/index.html:426
+#: app/templates/health_checks/view.html:35
+msgid "Analysis Summary"
+msgstr ""
+
+#: app/templates/dashboard/index.html:427
+msgid "Critical Points"
+msgstr ""
+
+#: app/templates/dashboard/index.html:428
+msgid "Moderate Points"
+msgstr ""
+
+#: app/templates/dashboard/index.html:429
+#: app/templates/health_checks/view.html:50
+msgid "Positive Points"
+msgstr ""
+
+#: app/templates/dashboard/index.html:430
+msgid "View Full Report"
+msgstr ""
+
+#: app/templates/dashboard/index.html:431
+#, fuzzy
+msgid "Create Lead Based on This"
+msgstr "Crear Lead Basado en Esto"
+
+#: app/templates/dashboard/index.html:432
+msgid "Error"
+msgstr "Error"
+
+#: app/templates/dashboard/index.html:433
+msgid "Try to be more specific (e.g., Company X, City Y)"
+msgstr ""
+
+#: app/templates/dashboard/index.html:434
+#, fuzzy
+msgid "Connection Error."
+msgstr "Error al crear lead"
+
+#: app/templates/dashboard/index.html:435
+msgid "Try Again"
+msgstr ""
+
+#: app/templates/dashboard/index.html:436
+#, fuzzy
+msgid "Creating..."
+msgstr "Creando..."
+
+#: app/templates/dashboard/index.html:437
+#, fuzzy
+msgid "Error creating lead"
+msgstr "Error al crear lead"
+
+#: app/templates/dashboard/index.html:493
+#: app/templates/dashboard/index.html:534
+#, fuzzy
+msgid "# of Clients"
+msgstr "# de Clientes"
+
+#: app/templates/dashboard/index.html:577
+msgid "Sales Closed"
+msgstr ""
+
+#: app/templates/health_checks/create.html:3
+#: app/templates/health_checks/create.html:12
+#, fuzzy
+msgid "New Health Check"
+msgstr "Health Check"
+
+#: app/templates/health_checks/create.html:20
+msgid "Google Business Profile Analysis"
+msgstr ""
+
+#: app/templates/health_checks/create.html:24
+msgid ""
+"This tool will use the Google API (via SerpApi) to audit the public "
+"profile of this\n"
+"                        business."
+msgstr ""
+
+#: app/templates/health_checks/create.html:26
+msgid "We will analyze photos, hours, reviews, and general optimization."
+msgstr ""
+
+#: app/templates/health_checks/create.html:32
+msgid "Business Name on Google Maps"
+msgstr ""
+
+#: app/templates/health_checks/create.html:35
+msgid "Ensure the name matches exactly with what appears on Google."
+msgstr ""
+
+#: app/templates/health_checks/create.html:43
+msgid ""
+"Auditing profile... This may take a few\n"
+"                                seconds."
+msgstr ""
+
+#: app/templates/health_checks/create.html:50
+msgid "Start Real Analysis"
+msgstr ""
+
+#: app/templates/health_checks/create.html:60
+msgid "What are we auditing?"
+msgstr ""
+
+#: app/templates/health_checks/create.html:64
+msgid "Presence of Photos and Videos"
+msgstr ""
+
+#: app/templates/health_checks/create.html:70
+msgid "Business Hours"
+msgstr ""
+
+#: app/templates/health_checks/create.html:75
+#, fuzzy
+msgid "Verified Profile"
+msgstr "Ver Propuesta"
+
+#: app/templates/health_checks/create.html:80
+msgid "Reviews and Replies"
+msgstr ""
+
+#: app/templates/health_checks/index.html:3
+#: app/templates/health_checks/index.html:8
+#, fuzzy
+msgid "Health Check Audits"
+msgstr "Health Check"
+
+#: app/templates/health_checks/view.html:3
+#, fuzzy
+msgid "Health Check Report"
+msgstr "Health Check"
+
+#: app/templates/health_checks/view.html:12
+#, fuzzy
+msgid "Health Check Details"
+msgstr "Health Check"
+
+#: app/templates/health_checks/view.html:21
+#, fuzzy
+msgid "GMB Score"
+msgstr "Crear"
+
+#: app/templates/health_checks/view.html:28
+msgid "Audit performed on"
+msgstr ""
+
+#: app/templates/health_checks/view.html:41
+msgid "Critical Issues"
+msgstr ""
+
+#: app/templates/health_checks/view.html:45
+msgid "Moderate Issues"
+msgstr ""
+
+#: app/templates/health_checks/view.html:61
+#, fuzzy
+msgid "Audit Details"
+msgstr "Clientes Totales"
+
+#: app/templates/health_checks/view.html:64
+#, fuzzy
+msgid "Create Proposal Based on this"
+msgstr "Crear Lead Basado en Esto"
+
+#: app/templates/health_checks/view.html:71
+msgid ""
+"Critical Issues\n"
+"                        Identified"
+msgstr ""
+
+#: app/templates/health_checks/view.html:85
+msgid ""
+"Specialist\n"
+"                        Recommendations"
+msgstr ""
+
+#: app/templates/health_checks/view.html:94
+msgid "No specific recommendations available for this audit."
+msgstr ""
+
+#: app/templates/health_checks/view.html:104
+msgid "Are you sure you want to delete this audit?"
+msgstr ""
+
+#: app/templates/health_checks/view.html:105
+#, fuzzy
+msgid "Delete this Report"
+msgstr "# de Clientes"
+
+# ===== INTERACTIONS =====
+#: app/templates/integrations/google_dashboard.html:3
+#, fuzzy
+msgid "Integraciones Google"
+msgstr "Interacciones"
+
+#: app/templates/integrations/google_dashboard.html:11
+msgid "Google Business Profile"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:13
+msgid "Conecta tus cuentas de Google para sincronizar perfiles y reseñas"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:21
+msgid "Conectar Cuenta Google"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:30
+msgid "La integración con Google Business Profile está actualmente deshabilitada."
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:37
+msgid "Cuentas Conectadas"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:45
+msgid "Cuenta Google"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:46
+msgid "Perfiles Vinculados"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:48
+#, fuzzy
+msgid "Conectado"
+msgstr "Contacto"
+
+#: app/templates/integrations/google_dashboard.html:49
+#: app/templates/integrations/google_dashboard.html:147
+#: app/templates/integrations/location_mapping.html:51
+msgid "Acciones"
+msgstr "Acciones"
+
+#: app/templates/integrations/google_dashboard.html:76
+msgid "Token Expirado"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:80
+msgid "Activo"
+msgstr "Activo"
+
+#: app/templates/integrations/google_dashboard.html:90
+#, fuzzy
+msgid "Ver Perfiles"
+msgstr "Ver Propuesta"
+
+#: app/templates/integrations/google_dashboard.html:95
+#, fuzzy
+msgid "Reconectar"
+msgstr "Entrar"
+
+#: app/templates/integrations/google_dashboard.html:101
+msgid "¿Desconectar esta cuenta?"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:104
+#, fuzzy
+msgid "Desconectar"
+msgstr "Desactivar"
+
+#: app/templates/integrations/google_dashboard.html:118
+msgid "Sin cuentas conectadas"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:119
+msgid ""
+"Conecta tu primera cuenta de Google para comenzar a sincronizar perfiles "
+"de\n"
+"                    negocio."
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:123
+msgid "Conectar con Google"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:135
+msgid "Perfiles Administrados"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:143
+msgid "Nombre del Negocio"
+msgstr "Nombre del Negocio"
+
+# ===== SAAS =====
+#: app/templates/integrations/google_dashboard.html:145
+#, fuzzy
+msgid "Administrado por"
+msgstr "Administración SaaS"
+
+#: app/templates/integrations/google_dashboard.html:170
+#: app/templates/integrations/location_mapping.html:77
+#, fuzzy
+msgid "Vinculado"
+msgstr "Enviado"
+
+#: app/templates/integrations/google_dashboard.html:174
+#: app/templates/integrations/location_mapping.html:81
+msgid "Sin vincular"
+msgstr ""
+
+# ===== SAAS =====
+#: app/templates/integrations/google_dashboard.html:180
+#, fuzzy
+msgid "Administrar"
+msgstr "Administración SaaS"
+
+#: app/templates/integrations/google_dashboard.html:184
+#, fuzzy
+msgid "Vincular a Cliente CRM"
+msgstr "Editar Cliente"
+
+#: app/templates/integrations/google_dashboard.html:201
+msgid "Cómo funciona"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:211
+#, fuzzy
+msgid "Conectar Cuenta"
+msgstr "Editar Cliente"
+
+#: app/templates/integrations/google_dashboard.html:212
+msgid ""
+"Inicia sesión con tu cuenta Google que administra\n"
+"                                perfiles de negocio."
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:223
+msgid "Vincular Perfiles"
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:224
+msgid ""
+"Asocia cada perfil de Google Business a un cliente en\n"
+"                                el CRM."
+msgstr ""
+
+#: app/templates/integrations/google_dashboard.html:235
+#, fuzzy
+msgid "Sincronizar Reseñas"
+msgstr "Confirmar Contraseña"
+
+#: app/templates/integrations/google_dashboard.html:236
+msgid ""
+"Las reseñas se sincronizarán automáticamente para\n"
+"                                seguimiento."
+msgstr ""
+
+# ===== COMPANY =====
+#: app/templates/integrations/location_mapping.html:3
+#, fuzzy
+msgid "Perfiles de Google"
+msgstr "Perfil de la Empresa"
+
+#: app/templates/integrations/location_mapping.html:12
+msgid ""
+"Integraciones\n"
+"                            Google"
+msgstr ""
+
+#: app/templates/integrations/location_mapping.html:18
+#, fuzzy
+msgid "Perfiles de Negocio"
+msgstr "Nombre del Negocio"
+
+#: app/templates/integrations/location_mapping.html:29
+#, fuzzy
+msgid "Error al cargar perfiles:"
+msgstr "Error al crear lead"
+
+#: app/templates/integrations/location_mapping.html:37
+msgid "Perfiles disponibles"
+msgstr ""
+
+#: app/templates/integrations/location_mapping.html:47
+#, fuzzy
+msgid "Perfil de Negocio"
+msgstr "Nombre del Negocio"
+
+#: app/templates/integrations/location_mapping.html:50
+msgid "Cliente Vinculado"
+msgstr ""
+
+#: app/templates/integrations/location_mapping.html:101
+msgid "Seleccionar cliente..."
+msgstr "Seleccionar cliente..."
+
+#: app/templates/integrations/location_mapping.html:107
+#, fuzzy
+msgid "Vincular"
+msgstr "Cancelar"
+
+#: app/templates/integrations/location_mapping.html:116
+#, fuzzy
+msgid "Ver Cliente"
+msgstr "Ver Clientes"
+
+#: app/templates/integrations/location_mapping.html:122
+msgid "Remover este vínculo?"
+msgstr ""
+
+#: app/templates/integrations/location_mapping.html:125
+#, fuzzy
+msgid "Desvincular"
+msgstr "Descargar"
+
+#: app/templates/integrations/location_mapping.html:140
+#, fuzzy
+msgid "No se encontraron perfiles de negocio en esta cuenta."
+msgstr "No se encontraron clientes para esta búsqueda."
+
+#: app/templates/integrations/location_mapping.html:152
+msgid "Cómo vincular perfiles"
+msgstr ""
+
+#: app/templates/integrations/location_mapping.html:154
+msgid ""
+"Selecciona un cliente del dropdown y haz clic en \"Vincular\" para "
+"asociar el perfil de\n"
+"                        Google Business con ese cliente.\n"
+"                        Una vez vinculado, podrás ver las reseñas y "
+"métricas del perfil directamente en la ficha del\n"
+"                        cliente."
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:11
+msgid ""
+"Google\n"
+"                            Dashboard"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:24
+#, fuzzy
+msgid "Ver en Maps"
+msgstr "Ver Clientes"
+
+#: app/templates/integrations/manage_location.html:37
+msgid "Publicado"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:39
+msgid "No Publicado"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:48
+msgid "Categoría"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:83
+msgid "Reseñas"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:115
+#, fuzzy
+msgid "Tu respuesta:"
+msgstr "Nuevo Presupuesto"
+
+#: app/templates/integrations/manage_location.html:122
+msgid "Responder"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:131
+#, fuzzy
+msgid "No hay reseñas disponibles."
+msgstr "No hay tareas próximas."
+
+# ===== INTERACTIONS =====
+#: app/templates/interactions/log_modal.html:9
+#: app/templates/interactions/log_modal.html:82
+#, fuzzy
+msgid "Log Interaction"
+msgstr "Interacciones"
+
+#: app/templates/interactions/log_modal.html:22
+msgid "Manage Types"
+msgstr ""
+
+#: app/templates/interactions/log_modal.html:31
+#, fuzzy
+msgid "Date/Time"
+msgstr "# de Clientes"
+
+#: app/templates/interactions/log_modal.html:44
+msgid "Already done (mark as completed)"
+msgstr ""
+
+#: app/templates/interactions/log_modal.html:62
+msgid "Next Step Suggestion"
+msgstr ""
+
+#: app/templates/interactions/log_modal.html:73
+msgid "No scheduling"
+msgstr ""
+
+#: app/templates/interactions/log_modal.html:83
+#, fuzzy
+msgid "Edit Interaction"
+msgstr "Registrar Interacción"
+
+#: app/templates/interactions/log_modal.html:84
+msgid "Scheduled via automatic suggestion."
+msgstr ""
+
+# ===== INTERACTIONS =====
+#: app/templates/interactions/manage_types_modal.html:6
+#, fuzzy
+msgid "Manage Interaction Types"
+msgstr "Interacciones"
+
+#: app/templates/interactions/manage_types_modal.html:13
+#, fuzzy
+msgid "New Type"
+msgstr "Nueva Visita"
+
+#: app/templates/interactions/manage_types_modal.html:19
+msgid "Name (ex: Technical Visit)"
+msgstr ""
+
+#: app/templates/interactions/manage_types_modal.html:36
+msgid "Is call"
+msgstr ""
+
+#: app/templates/interactions/manage_types_modal.html:55
+#: app/templates/users/create.html:16 app/templates/users/edit.html:16
+#: app/templates/users/index.html:19
+#, fuzzy
+msgid "Name"
+msgstr "Nombre"
+
+#: app/templates/interactions/manage_types_modal.html:56
+#, fuzzy
+msgid "Icon"
+msgstr "Contacto"
+
+# ===== VISITS =====
+#: app/templates/interactions/manage_types_modal.html:93
+#, fuzzy
+msgid "Visit/Other"
+msgstr "Visitas"
+
+#: app/templates/interactions/manage_types_modal.html:145
+#, fuzzy
+msgid "Delete this type?"
+msgstr "# de Clientes"
+
+# ===== INTERACTIONS =====
+#: app/templates/interactions/timeline.html:12
+#, fuzzy
+msgid "Interaction"
+msgstr "Interacciones"
+
+#: app/templates/interactions/timeline.html:24
+msgid "Done"
+msgstr ""
+
+#: app/templates/interactions/timeline.html:24
+#, fuzzy
+msgid "Pending"
+msgstr "Pendiente"
+
+#: app/templates/interactions/timeline.html:26
+msgid "by"
+msgstr ""
+
+#: app/templates/interactions/timeline.html:26
+#, fuzzy
+msgid "System"
+msgstr "Sin email"
+
+#: app/templates/interactions/timeline.html:32
+#, fuzzy
+msgid "No interactions recorded."
+msgstr "No hay interacciones registradas."
+
+#: app/templates/projects/create.html:3 app/templates/projects/create.html:13
+#, fuzzy
+msgid "Novo Projeto"
+msgstr "Nuevo Presupuesto"
+
+#: app/templates/projects/create.html:19
+msgid "Iniciar Novo Projeto"
+msgstr ""
+
+#: app/templates/projects/create.html:26
+#, fuzzy
+msgid "Nome do Projeto"
+msgstr "Nombre del Paquete"
+
+#: app/templates/projects/create.html:28
+msgid "Ex: Gestão GMB + SEO Local"
+msgstr ""
+
+#: app/templates/projects/create.html:32
+#, fuzzy
+msgid "Descrição"
+msgstr "Descripción"
+
+#: app/templates/projects/create.html:34
+msgid "O que está incluso neste contrato?"
+msgstr ""
+
+#: app/templates/projects/create.html:39
+msgid "Data de Início"
+msgstr ""
+
+#: app/templates/projects/create.html:44
+#, fuzzy
+msgid "Valor Mensal"
+msgstr "Valor Total"
+
+#: app/templates/projects/create.html:57
+#, fuzzy
+msgid "Criar Projeto"
+msgstr "Editar Propuesta"
+
+#: app/templates/projects/index.html:3
+#, fuzzy
+msgid "Projetos"
+msgstr "Propietario"
+
+#: app/templates/projects/index.html:9
+msgid "Projetos / Contratos Ativos"
+msgstr ""
+
+#: app/templates/projects/index.html:14
+#, fuzzy
+msgid "Ativos"
+msgstr "Activo"
+
+#: app/templates/projects/index.html:17
+msgid "Concluídos"
+msgstr ""
+
+#: app/templates/projects/index.html:20
+msgid "Todos"
+msgstr "Todos"
+
+#: app/templates/projects/index.html:41
+msgid "Sem descrição."
+msgstr ""
+
+#: app/templates/projects/index.html:56
+#, fuzzy
+msgid "Gerenciar Projeto"
+msgstr "Editar Propuesta"
+
+#: app/templates/projects/index.html:67
+#, fuzzy
+msgid "Nenhum projeto encontrado."
+msgstr "Empresa encontrada"
+
+#: app/templates/projects/index.html:68
+msgid "Projetos são criados a partir da visualização de um Cliente."
+msgstr ""
+
+#: app/templates/proposals/create.html:24 app/templates/proposals/edit.html:24
+#, fuzzy
+msgid "General Data"
+msgstr "Valor Total"
+
+#: app/templates/proposals/create.html:31 app/templates/visits/create.html:20
+#, fuzzy
+msgid "Select a client..."
+msgstr "Seleccionar cliente..."
+
+#: app/templates/proposals/create.html:41 app/templates/proposals/edit.html:35
+#: app/templates/proposals/index.html:44
+#, fuzzy
+msgid "Draft"
+msgstr "# de Clientes"
+
+#: app/templates/proposals/create.html:42 app/templates/proposals/edit.html:37
+#: app/templates/proposals/index.html:46
+#, fuzzy
+msgid "Sent"
+msgstr "Entrar"
+
+#: app/templates/proposals/create.html:43 app/templates/proposals/edit.html:41
+#: app/templates/proposals/index.html:48
+#, fuzzy
+msgid "Approved"
+msgstr "Aprobado"
+
+#: app/templates/proposals/create.html:44 app/templates/proposals/edit.html:43
+#: app/templates/proposals/index.html:50
+#, fuzzy
+msgid "Rejected"
+msgstr "Propietario"
+
+#: app/templates/proposals/create.html:48
+#, fuzzy
+msgid "Suggested Package"
+msgstr "Seleccionar cliente..."
+
+#: app/templates/proposals/create.html:61
+msgid "This will replace the price and description of the first item."
+msgstr ""
+
+#: app/templates/proposals/create.html:65 app/templates/proposals/edit.html:64
+msgid "Payment Terms"
+msgstr ""
+
+#: app/templates/proposals/create.html:67
+#, python-format
+msgid "50% on signature, 50% on delivery."
+msgstr ""
+
+#: app/templates/proposals/create.html:77 app/templates/proposals/edit.html:76
+#, fuzzy
+msgid "Services / Items"
+msgstr "Observaciones"
+
+#: app/templates/proposals/create.html:79 app/templates/proposals/edit.html:78
+#, fuzzy
+msgid "Add Service"
+msgstr "Observaciones"
+
+#: app/templates/proposals/create.html:99
+#, fuzzy
+msgid "Generate Proposal"
+msgstr "Nueva Propuesta"
+
+#: app/templates/proposals/create.html:109 app/templates/proposals/edit.html:86
+#: app/templates/proposals/edit.html:140 app/templates/proposals/view.html:55
+#, fuzzy
+msgid "Service"
+msgstr "Observaciones"
+
+#: app/templates/proposals/create.html:119 app/templates/proposals/edit.html:98
+#: app/templates/proposals/edit.html:150 app/templates/proposals/view.html:56
+msgid "Price"
+msgstr ""
+
+#: app/templates/proposals/create.html:124
+#: app/templates/proposals/edit.html:103 app/templates/proposals/edit.html:155
+#, fuzzy
+msgid "Custom Description"
+msgstr "Descripción"
+
+#: app/templates/proposals/create.html:126
+#: app/templates/proposals/edit.html:105 app/templates/proposals/edit.html:157
+#, fuzzy
+msgid "Optional"
+msgstr "Opcional"
+
+#: app/templates/proposals/edit.html:3 app/templates/proposals/edit.html:9
+#, fuzzy
+msgid "Edit Proposal"
+msgstr "Ver Propuesta"
+
+#: app/templates/proposals/edit.html:47
+#, fuzzy
+msgid ""
+"Load Suggested\n"
+"                                Package"
+msgstr "Por favor espere mientras consultamos Google."
+
+#: app/templates/proposals/edit.html:60
+msgid "This will replace or add the price and description of the first item."
+msgstr ""
+
+#: app/templates/proposals/edit.html:130
+#, fuzzy
+msgid "Update Proposal"
+msgstr "Ver Propuesta"
+
+#: app/templates/proposals/index.html:25
+#, fuzzy
+msgid "Total Value"
+msgstr "Total"
+
+# ===== PROPOSALS =====
+#: app/templates/proposals/view.html:3 app/templates/proposals/view.html:9
+#, fuzzy
+msgid "Proposal"
+msgstr "Propuestas"
+
+#: app/templates/proposals/view.html:28
+#, fuzzy
+msgid "Proposal Details"
+msgstr "Propuestas Totales"
+
+#: app/templates/proposals/view.html:50
+#, fuzzy
+msgid "Services"
+msgstr "Observaciones"
+
+#: app/templates/proposals/view.html:71
+#, fuzzy
+msgid "TOTAL"
+msgstr "Total"
+
+#: app/templates/proposals/view.html:84
+#, fuzzy
+msgid "Conditions"
+msgstr "Condiciones"
+
+#: app/templates/proposals/view.html:87
+msgid "Not specified."
+msgstr ""
+
+# ===== SAAS =====
+#: app/templates/saas/dashboard.html:3 app/templates/saas/dashboard.html:8
+#, fuzzy
+msgid "SaaS Administration"
+msgstr "Administración SaaS"
+
+#: app/templates/saas/dashboard.html:11
+msgid "Manage Packages"
+msgstr ""
+
+#: app/templates/saas/dashboard.html:14
+#, fuzzy
+msgid "New Company"
+msgstr "Nueva Contraseña"
+
+#: app/templates/saas/dashboard.html:21
+#, fuzzy
+msgid "Registered Companies (Tenants)"
+msgstr "Empresas Registradas (Tenants)"
+
+#: app/templates/saas/dashboard.html:28 app/templates/users/index.html:23
+msgid "Company"
+msgstr ""
+
+#: app/templates/saas/dashboard.html:33
+#, fuzzy
+msgid "Created at"
+msgstr "Crear"
+
+#: app/templates/saas/dashboard.html:43
+#, fuzzy
+msgid "No email"
+msgstr "Sin email"
+
+#: app/templates/saas/dashboard.html:48
+#: app/templates/saas/packages/index.html:24 app/templates/users/index.html:47
+#, fuzzy
+msgid "Active"
+msgstr "Activo"
+
+#: app/templates/saas/dashboard.html:50
+#: app/templates/saas/packages/index.html:26 app/templates/users/index.html:49
+#, fuzzy
+msgid "Inactive"
+msgstr "Inactivo"
+
+#: app/templates/saas/dashboard.html:58
+msgid "Access as this company"
+msgstr ""
+
+#: app/templates/saas/dashboard.html:62
+#, fuzzy
+msgid "Edit Settings"
+msgstr "Editar Visita"
+
+#: app/templates/saas/dashboard.html:69
+msgid "No companies found."
+msgstr ""
+
+#: app/templates/saas/dashboard.html:83
+#, fuzzy
+msgid "New Company (Tenant)"
+msgstr "Nueva Empresa (Tenant)"
+
+#: app/templates/saas/dashboard.html:90 app/templates/saas/edit_company.html:19
+#, fuzzy
+msgid "Company Name"
+msgstr "Contacto"
+
+#: app/templates/saas/dashboard.html:94
+#, fuzzy
+msgid "Contact Email"
+msgstr "Contacto"
+
+#: app/templates/saas/dashboard.html:100
+#, fuzzy
+msgid "Create Company"
+msgstr "Crear"
+
+#: app/templates/saas/edit_company.html:3
+#, fuzzy
+msgid "Edit Company"
+msgstr "Editar Empresa"
+
+#: app/templates/saas/edit_company.html:11
+#, fuzzy
+msgid "Edit Company (SuperAdmin)"
+msgstr "Editar Empresa (SuperAdmin)"
+
+#: app/templates/saas/edit_company.html:42
+msgid "Currency (Symbol)"
+msgstr ""
+
+#: app/templates/saas/edit_company.html:47
+#, fuzzy
+msgid "Slug (Internal ID)"
+msgstr "Slug (ID interno)"
+
+#: app/templates/saas/edit_company.html:53
+msgid "Visual Theme"
+msgstr ""
+
+#: app/templates/saas/edit_company.html:66
+#, fuzzy
+msgid ""
+"Active Company (Block access if\n"
+"                                unchecked)"
+msgstr "Empresa Activa (Bloquear acceso si desmarcado)"
+
+#: app/templates/saas/packages/edit.html:3
+#: app/templates/saas/packages/edit.html:13
+#, fuzzy
+msgid "Edit Package"
+msgstr "Editar Visita"
+
+#: app/templates/saas/packages/edit.html:15
+#, fuzzy
+msgid "New SaaS Package"
+msgstr "Nueva Visita"
+
+#: app/templates/saas/packages/edit.html:23
+#, fuzzy
+msgid "Package Name"
+msgstr "Agenda"
+
+#: app/templates/saas/packages/edit.html:29
+#, fuzzy
+msgid "Description"
+msgstr "Descripción"
+
+#: app/templates/saas/packages/edit.html:36
+msgid "Monthly Price"
+msgstr ""
+
+#: app/templates/saas/packages/edit.html:44
+#, fuzzy
+msgid ""
+"Active Package (Available for\n"
+"                                        sale)"
+msgstr "Paquete Activo (Disponible para venta)"
+
+#: app/templates/saas/packages/edit.html:51
+#, fuzzy
+msgid "Limits & Quotas"
+msgstr "Límites & Cuotas"
+
+#: app/templates/saas/packages/edit.html:55
+msgid "User Limit"
+msgstr ""
+
+#: app/templates/saas/packages/edit.html:58
+msgid "Maximum users on the account."
+msgstr ""
+
+#: app/templates/saas/packages/edit.html:61
+#, fuzzy
+msgid "Client Limit"
+msgstr "Cliente eliminado correctamente"
+
+#: app/templates/saas/packages/edit.html:64
+#, fuzzy
+msgid "Maximum clients registered."
+msgstr "Máximo de clientes registrados."
+
+#: app/templates/saas/packages/edit.html:67
+#: app/templates/saas/packages/index.html:46
+#, fuzzy
+msgid "Health Check Credits"
+msgstr "Health Check"
+
+#: app/templates/saas/packages/edit.html:70
+msgid "Usage credits for audits."
+msgstr ""
+
+#: app/templates/saas/packages/edit.html:77
+#, fuzzy
+msgid "Save Package"
+msgstr "Seleccionar cliente..."
+
+#: app/templates/saas/packages/index.html:3
+#, fuzzy
+msgid "SaaS Packages"
+msgstr "Seleccionar cliente..."
+
+#: app/templates/saas/packages/index.html:8
+msgid "SaaS Service Packages"
+msgstr ""
+
+#: app/templates/saas/packages/index.html:12
+#, fuzzy
+msgid "New Package"
+msgstr "Nueva Visita"
+
+#: app/templates/saas/packages/index.html:32
+#, fuzzy
+msgid "FREE"
+msgstr "Crear"
+
+#: app/templates/saas/packages/index.html:35
+msgid "month"
+msgstr ""
+
+#: app/templates/saas/packages/index.html:51
+#, fuzzy
+msgid "EDIT"
+msgstr "EDITAR"
+
+#: app/templates/saas/packages/index.html:57
+#, fuzzy
+msgid "No packages registered."
+msgstr "No hay presupuestos registrados."
+
+#: app/templates/users/create.html:2 app/templates/users/create.html:10
+#: app/templates/users/index.html:9
+#, fuzzy
+msgid "New User"
+msgstr "Nueva Visita"
+
+#: app/templates/users/create.html:33 app/templates/users/edit.html:35
+#: app/templates/users/index.html:21
+#, fuzzy
+msgid "Role"
+msgstr "Rol"
+
+#: app/templates/users/create.html:35 app/templates/users/edit.html:37
+#, fuzzy
+msgid "Select role..."
+msgstr "Seleccione una opción"
+
+#: app/templates/users/edit.html:2 app/templates/users/edit.html:10
+#, fuzzy
+msgid "Edit User"
+msgstr "Editar Visita"
+
+#: app/templates/users/edit.html:30
+msgid "Leave blank to keep current password"
+msgstr ""
+
+#: app/templates/users/edit.html:50
+#, fuzzy
+msgid "Active User"
+msgstr "Activar"
+
+#: app/templates/users/index.html:2
+#, fuzzy
+msgid "User List"
+msgstr "Usuarios"
+
+#: app/templates/users/index.html:7
+msgid "Manage Users"
+msgstr ""
+
+#: app/templates/users/index.html:62
+#, fuzzy
+msgid "Deactivate"
+msgstr "Desactivar"
+
+#: app/templates/users/index.html:62
+#, fuzzy
+msgid "Activate"
+msgstr "Activa"
+
+#: app/templates/users/index.html:71
+#, fuzzy
+msgid "No registered users"
+msgstr "No hay clientes registrados aún."
+
+#: app/templates/visits/create.html:3
+msgid "New"
+msgstr ""
+
+#: app/templates/visits/create.html:12 app/templates/visits/index.html:10
+#, fuzzy
+msgid "Log New Visit"
+msgstr "Nueva Visita"
+
+#: app/templates/visits/create.html:35 app/templates/visits/edit.html:21
+msgid "Visit Date and Time"
+msgstr ""
+
+#: app/templates/visits/create.html:41 app/templates/visits/edit.html:27
+#, fuzzy
+msgid "Observations / Notes"
+msgstr "Observaciones"
+
+#: app/templates/visits/create.html:43
+msgid "What was discussed with the client? What problems were detected?"
+msgstr ""
+
+#: app/templates/visits/create.html:47
+msgid "Next Step / Commitment"
+msgstr ""
+
+#: app/templates/visits/create.html:49
+msgid "e.g., Send proposal, Call back on Tuesday..."
+msgstr ""
+
+#: app/templates/visits/edit.html:3 app/templates/visits/edit.html:11
+#, fuzzy
+msgid "Edit Visit"
+msgstr "Editar Visita"
+
+# ===== VISITS =====
+#: app/templates/visits/index.html:3 app/templates/visits/index.html:8
+#, fuzzy
+msgid "Visit History"
+msgstr "Visitas"
+
+#: app/templates/visits/view.html:3 app/templates/visits/view.html:12
+#, fuzzy
+msgid "Visit Details"
+msgstr "Clientes Totales"
+
+#: app/templates/visits/view.html:20
+#, fuzzy
+msgid "Visit Record"
+msgstr "Visita Presencial"
+
+# ===== VISITS =====
+#: app/templates/visits/view.html:24
+#, fuzzy
+msgid "Visit Date"
+msgstr "Visitas"
+
+#: app/templates/visits/view.html:29
+msgid "Notes / Report"
+msgstr ""
+
+#: app/templates/visits/view.html:31
+#, fuzzy
+msgid "No notes recorded."
+msgstr "No hay visitas recientes."
+
+#: app/templates/visits/view.html:39
+msgid "No specific step defined."
+msgstr ""
+
+#: app/templates/visits/view.html:46
+#, fuzzy
+msgid "Back to Client"
+msgstr "Sin clientes"
+
+#: app/templates/visits/view.html:55
+msgid "Are you sure you want to delete this visit record?"
+msgstr ""
+
+#~ msgid "Buscar"
+#~ msgstr "Buscar"
+
+#~ msgid "Nueva"
+#~ msgstr "Nueva"
+
+#~ msgid "Cerrar"
+#~ msgstr "Cerrar"
+
+#~ msgid "Quitar"
+#~ msgstr "Quitar"
+
+#~ msgid "Imprimir"
+#~ msgstr "Imprimir"
+
+#~ msgid "Copiar"
+#~ msgstr "Copiar"
+
+#~ msgid "Filtrar"
+#~ msgstr "Filtrar"
+
+#~ msgid "Limpiar"
+#~ msgstr "Limpiar"
+
+#~ msgid "Ninguno"
+#~ msgstr "Ninguno"
+
+#~ msgid "Sí"
+#~ msgstr "Sí"
+
+#~ msgid "No"
+#~ msgstr "No"
+
+#~ msgid "Restablecer Contraseña"
+#~ msgstr "Restablecer Contraseña"
+
+# ===== DASHBOARD =====
+#~ msgid "Bienvenido"
+#~ msgstr "Bienvenido"
+
+#~ msgid "Visitas Programadas"
+#~ msgstr "Visitas Programadas"
+
+#~ msgid "Actividades Recientes"
+#~ msgstr "Actividades Recientes"
+
+#~ msgid "Próximas Actividades"
+#~ msgstr "Próximas Actividades"
+
+#~ msgid "Este Mes"
+#~ msgstr "Este Mes"
+
+#~ msgid "Hoy"
+#~ msgstr "Hoy"
+
+#~ msgid "Ayer"
+#~ msgstr "Ayer"
+
+#~ msgid "Esta Semana"
+#~ msgstr "Esta Semana"
+
+#~ msgid "Lista de Clientes"
+#~ msgstr "Lista de Clientes"
+
+#~ msgid "Ciudad"
+#~ msgstr "Ciudad"
+
+#~ msgid "Fecha de Creación"
+#~ msgstr "Fecha de Creación"
+
+#~ msgid "Última Actualización"
+#~ msgstr "Última Actualización"
+
+#~ msgid "Crear primer cliente"
+#~ msgstr "Crear primer cliente"
+
+#~ msgid "Cliente guardado correctamente"
+#~ msgstr "Cliente guardado correctamente"
+
+#~ msgid "Lead Rápido"
+#~ msgstr "Lead Rápido"
+
+#~ msgid "Persona de Contacto"
+#~ msgstr "Persona de Contacto"
+
+#~ msgid "Mejor Horario de Contacto"
+#~ msgstr "Mejor Horario de Contacto"
+
+#~ msgid "Programar Visita"
+#~ msgstr "Programar Visita"
+
+#~ msgid "Hora"
+#~ msgstr "Hora"
+
+#~ msgid "Duración"
+#~ msgstr "Duración"
+
+#~ msgid "Objetivo"
+#~ msgstr "Objetivo"
+
+#~ msgid "Resultado"
+#~ msgstr "Resultado"
+
+#~ msgid "Comentarios"
+#~ msgstr "Comentarios"
+
+#~ msgid "Videollamada"
+#~ msgstr "Videollamada"
+
+#~ msgid "Realizada"
+#~ msgstr "Realizada"
+
+#~ msgid "Cancelada"
+#~ msgstr "Cancelada"
+
+#~ msgid "Reprogramada"
+#~ msgstr "Reprogramada"
+
+#~ msgid "Visitas Totales"
+#~ msgstr "Visitas Totales"
+
+#~ msgid "Health Checks Totales"
+#~ msgstr "Health Checks Totales"
+
+#~ msgid "Clientes por Etapa (Kanban)"
+#~ msgstr "Clientes por Etapa (Kanban)"
+
+#~ msgid "Acessar como esta empresa"
+#~ msgstr "Acceder como esta empresa"
+
+# ===== THEMES =====
+#~ msgid "Tech Teal"
+#~ msgstr "Tech Teal"
+
+#~ msgid "Corporate Blue"
+#~ msgstr "Corporate Blue"
+
+#~ msgid "Energetic Orange"
+#~ msgstr "Energetic Orange"
+
+#~ msgid "Premium Red"
+#~ msgstr "Premium Red"
+
+#~ msgid "Nature Green"
+#~ msgstr "Nature Green"
+
+#~ msgid "Moderno e tecnológico com verde-azulado"
+#~ msgstr "Moderno y tecnológico con verde-azul"
+
+#~ msgid "Profissional e corporativo"
+#~ msgstr "Profesional y corporativo"
+
+#~ msgid "Inovador e criativo"
+#~ msgstr "Innovador y creativo"
+
+#~ msgid "Dinâmico e energético"
+#~ msgstr "Dinámico y energético"
+
+#~ msgid "Elegante e premium"
+#~ msgstr "Elegante y premium"
+
+#~ msgid "Natural e sustentável"
+#~ msgstr "Natural y sustentable"
+
+#~ msgid "Generar PDF"
+#~ msgstr "Generar PDF"
+
+#~ msgid "Enviar por Email"
+#~ msgstr "Enviar por Email"
+
+#~ msgid "Título"
+#~ msgstr "Título"
+
+#~ msgid "Cantidad"
+#~ msgstr "Cantidad"
+
+#~ msgid "Subtotal"
+#~ msgstr "Subtotal"
+
+#~ msgid "Descuento"
+#~ msgstr "Descuento"
+
+#~ msgid "Válido hasta"
+#~ msgstr "Válido hasta"
+
+#~ msgid "Términos y Condiciones"
+#~ msgstr "Términos y Condiciones"
+
+#~ msgid "Aprobada"
+#~ msgstr "Aprobada"
+
+#~ msgid "En Revisión"
+#~ msgstr "En Revisión"
+
+#~ msgid "Enviada"
+#~ msgstr "Enviada"
+
+# ===== HEALTH CHECKS =====
+#~ msgid "Diagnósticos"
+#~ msgstr "Diagnósticos"
+
+#~ msgid "Nuevo Diagnóstico"
+#~ msgstr "Nuevo Diagnóstico"
+
+#~ msgid "Análisis de Presencia Digital"
+#~ msgstr "Análisis de Presencia Digital"
+
+#~ msgid "Fortalezas"
+#~ msgstr "Fortalezas"
+
+#~ msgid "Debilidades"
+#~ msgstr "Debilidades"
+
+#~ msgid "Oportunidades"
+#~ msgstr "Oportunidades"
+
+#~ msgid "Logo"
+#~ msgstr "Logo"
+
+#~ msgid "Quitar Logo"
+#~ msgstr "Quitar Logo"
+
+#~ msgid "Información de la empresa actualizada con éxito"
+#~ msgstr "Información de la empresa actualizada con éxito"
+
+#~ msgid "Configuración guardada"
+#~ msgstr "Configuración guardada"
+
+#~ msgid "Usuario creado correctamente"
+#~ msgstr "Usuario creado correctamente"
+
+#~ msgid "Usuario actualizado correctamente"
+#~ msgstr "Usuario actualizado correctamente"
+
+#~ msgid "Mes"
+#~ msgstr "Mes"
+
+#~ msgid "Anterior"
+#~ msgstr "Anterior"
+
+#~ msgid "Siguiente"
+#~ msgstr "Siguiente"
+
+#~ msgid "Nueva Interacción"
+#~ msgstr "Nueva Interacción"
+
+#~ msgid "Línea de Tiempo"
+#~ msgstr "Línea de Tiempo"
+
+#~ msgid "Nota"
+#~ msgstr "Nota"
+
+#~ msgid "Tarea"
+#~ msgstr "Tarea"
+
+#~ msgid "Seguimiento"
+#~ msgstr "Seguimiento"
+
+# ===== MESSAGES =====
+#~ msgid "Operación exitosa"
+#~ msgstr "Operación exitosa"
+
+#~ msgid "Datos guardados correctamente"
+#~ msgstr "Datos guardados correctamente"
+
+#~ msgid "¿Está seguro?"
+#~ msgstr "¿Está seguro?"
+
+#~ msgid "Esta acción no se puede deshacer"
+#~ msgstr "Esta acción no se puede deshacer"
+
+#~ msgid "Sin resultados"
+#~ msgstr "Sin resultados"
+
+#~ msgid "Mostrando"
+#~ msgstr "Mostrando"
+
+#~ msgid "de"
+#~ msgstr "de"
+
+#~ msgid "Escriba aquí..."
+#~ msgstr "Escriba aquí..."
+
+#~ msgid "Sin datos"
+#~ msgstr "Sin datos"
+
+# ===== TIME =====
+#~ msgid "minutos"
+#~ msgstr "minutos"
+
+#~ msgid "horas"
+#~ msgstr "horas"
+
+#~ msgid "días"
+#~ msgstr "días"
+
+#~ msgid "hace"
+#~ msgstr "hace"
+
+# ===== SEO RANKING =====
+#~ msgid "SEO Ranking"
+#~ msgstr "SEO Ranking"
+
+#~ msgid "Sube tu logo en Configuraciones de Empresa"
+#~ msgstr "Sube tu logo en Configuraciones de Empresa"
+
+#~ msgid "Tareas atrasadas"
+#~ msgstr ""
+
+#~ msgid "Orçamentos"
+#~ msgstr "Presupuestos"
+
+#~ msgid "Alternar tema"
+#~ msgstr ""
+
+#~ msgid "Configuraciones"
+#~ msgstr "Configuraciones"
+
+#~ msgid "Salir"
+#~ msgstr "Salir"
+
+#~ msgid "Nueva Acción"
+#~ msgstr "Nueva Acción"
+
+#~ msgid "Fecha y Hora"
+#~ msgstr "Fecha y Hora"
+
+#~ msgid "Nueva Visita"
+#~ msgstr "Nueva Visita"
+
+#~ msgid "Nueva Llamada"
+#~ msgstr "Nueva Llamada"
+
+#~ msgid "Tipo de Interacción"
+#~ msgstr "Interacción"
+
+#~ msgid "Todas las Etapas"
+#~ msgstr ""
+
+#~ msgid "Sin Etapa"
+#~ msgstr "Sin etapa"
+
+#~ msgid "Nombre / Negocio"
+#~ msgstr "Nombre / Negocio"
+
+#~ msgid "Etapa"
+#~ msgstr "Etapa"
+
+#~ msgid "Fecha de Registro"
+#~ msgstr "Fecha de Registro"
+
+#~ msgid "Cambiar Etapa"
+#~ msgstr "Cambiar Contraseña"
+
+#~ msgid "Sin etapa"
+#~ msgstr "Sin etapa"
+
+#~ msgid "No se encontraron clientes para esta búsqueda."
+#~ msgstr "No se encontraron clientes para esta búsqueda."
+
+#~ msgid "Nueva Etapa"
+#~ msgstr "Sin etapa"
+
+#~ msgid "Error de conexión"
+#~ msgstr "Error de Conexión."
+
+#~ msgid ""
+#~ "ATENÇÃO: Isso removerá todas as colunas"
+#~ " personalizadas e moverá TODOS os "
+#~ "clientes para Sem Etapa. Tem certeza?"
+#~ msgstr ""
+
+#~ msgid "Restaurar Padrão"
+#~ msgstr ""
+
+#~ msgid "Nova Coluna"
+#~ msgstr ""
+
+#~ msgid "Nombre de la Etapa"
+#~ msgstr "Nombre de la Empresa"
+
+#~ msgid "Orden"
+#~ msgstr ""
+
+#~ msgid "Editar Etapa"
+#~ msgstr "Editar Empresa"
+
+#~ msgid "¿Seguro quieres eliminar esta etapa?"
+#~ msgstr ""
+
+#~ msgid "Nome do Negócio / Cliente"
+#~ msgstr "Nombre del Negocio"
+
+#~ msgid "Nome de Contato"
+#~ msgstr "Email de Contacto"
+
+#~ msgid "Telefone"
+#~ msgstr "Teléfono"
+
+#~ msgid "Error de conexión al mover cliente."
+#~ msgstr "Error de Conexión."
+
+#~ msgid "Detalles del Cliente"
+#~ msgstr "Detalles del Cliente"
+
+#~ msgid "Información del Cliente"
+#~ msgstr "Información del Negocio"
+
+#~ msgid "Detalles Adicionales"
+#~ msgstr ""
+
+#~ msgid "Horario Preferido"
+#~ msgstr ""
+
+#~ msgid "Método Preferido"
+#~ msgstr "Método de Contacto Preferido"
+
+#~ msgid "Insights GMB"
+#~ msgstr ""
+
+#~ msgid "Projetos/Pós-Venda"
+#~ msgstr ""
+
+#~ msgid "Registrar Visita/Llamada"
+#~ msgstr "Registrar Visita/Llamada"
+
+#~ msgid "Auditoria Avançada (API)"
+#~ msgstr ""
+
+#~ msgid "Vincular Perfil Google"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "No hay auditorías\n"
+#~ "                                                realizadas."
+#~ msgstr ""
+
+#~ msgid "Rastrear Palabra Clave"
+#~ msgstr "Rastrear Palabra Clave"
+
+#~ msgid "Palabra Clave"
+#~ msgstr "Palabra Clave"
+
+#~ msgid "Posición Local"
+#~ msgstr "Posición Local"
+
+#~ msgid "Posición Orgánica"
+#~ msgstr "Posición Orgánica"
+
+#~ msgid "Última Verificación"
+#~ msgstr "Última Verificación"
+
+#~ msgid "Actualizar"
+#~ msgstr "Actualizar"
+
+#~ msgid "¿Eliminar esta palabra clave?"
+#~ msgstr "Rastrear Palabra Clave"
+
+#~ msgid "No hay palabras clave rastreadas."
+#~ msgstr "No hay palabras clave rastreadas."
+
+#~ msgid "Performance do Google Business Profile (Últimos 30 dias)"
+#~ msgstr ""
+
+#~ msgid "Atualizar Dados"
+#~ msgstr "Actualizar"
+
+#~ msgid "Impressões Totais"
+#~ msgstr "Propuestas Totales"
+
+#~ msgid "Chamadas"
+#~ msgstr "Rechazada"
+
+#~ msgid "Cliques no Site"
+#~ msgstr "Clientes"
+
+#~ msgid ""
+#~ "Ainda não há dados coletados para "
+#~ "esta conta. Clique em \"Atualizar "
+#~ "Dados\" para\n"
+#~ "                            importar."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Vincule uma conta do Google Business "
+#~ "para ver as métricas de desempenho."
+#~ msgstr ""
+
+#~ msgid "Projetos e Entregas Ativas"
+#~ msgstr ""
+
+#~ msgid "Gerenciar"
+#~ msgstr "Enviar"
+
+#~ msgid "Este cliente ainda não possui um projeto ativo."
+#~ msgstr ""
+
+#~ msgid "Projetos permitem gerenciar contratos e tarefas de pós-venda."
+#~ msgstr ""
+
+#~ msgid "Vincular Perfil do Google Business"
+#~ msgstr ""
+
+#~ msgid "Conta Google"
+#~ msgstr "Contacto"
+
+# ===== COMPANY =====
+#~ msgid "Perfil da Empresa"
+#~ msgstr "Perfil de la Empresa"
+
+#~ msgid "Carregando perfis..."
+#~ msgstr "Cargando..."
+
+#~ msgid "Buscando perfis..."
+#~ msgstr "Buscar..."
+
+#~ msgid "Rastrear Nueva Palabra Clave"
+#~ msgstr "Rastrear Nueva Palabra Clave"
+
+#~ msgid "Ubicación"
+#~ msgstr "Ubicación"
+
+#~ msgid "Dejar vacío para búsqueda global o ingrese Ciudad, Pais"
+#~ msgstr "Dejar vacío para búsqueda general en Paraguay"
+
+#~ msgid "Rastrear"
+#~ msgstr "Rastrear"
+
+#~ msgid "¿Está seguro que deseja eliminar al cliente"
+#~ msgstr ""
+
+#~ msgid "Esta acción moverá al cliente a la papelera (Soft Delete)."
+#~ msgstr ""
+
+#~ msgid "Eliminar Cliente"
+#~ msgstr "Editar Cliente"
+
+#~ msgid "{editor}: Editing failed"
+#~ msgstr ""
+
+#~ msgid "{editor}: Editing failed: {e}"
+#~ msgstr ""
+
+#~ msgid "{text} {deprecated_message}"
+#~ msgstr ""
+
+#~ msgid "Got unexpected extra argument ({args})"
+#~ msgid_plural "Got unexpected extra arguments ({args})"
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+#~ msgstr ""
+
+#~ msgid "Aborted!"
+#~ msgstr ""
+
+#~ msgid "Commands"
+#~ msgstr ""
+
+#~ msgid "Missing command."
+#~ msgstr ""
+
+#~ msgid "No such command {name!r}."
+#~ msgstr ""
+
+#~ msgid "Value must be an iterable."
+#~ msgstr ""
+
+#~ msgid "Takes {nargs} values but 1 was given."
+#~ msgid_plural "Takes {nargs} values but {len} were given."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid ""
+#~ "DeprecationWarning: The {param_type} {name!r} "
+#~ "is deprecated.{extra_message}"
+#~ msgstr ""
+
+#~ msgid "env var: {var}"
+#~ msgstr ""
+
+#~ msgid "default: {default}"
+#~ msgstr ""
+
+# ===== FORM LABELS =====
+#~ msgid "required"
+#~ msgstr "Requerido"
+
+#~ msgid "(dynamic)"
+#~ msgstr ""
+
+#~ msgid "%(prog)s, version %(version)s"
+#~ msgstr ""
+
+#~ msgid "Show the version and exit."
+#~ msgstr ""
+
+#~ msgid "Show this message and exit."
+#~ msgstr ""
+
+#~ msgid "Error: {message}"
+#~ msgstr ""
+
+#~ msgid "Try '{command} {option}' for help."
+#~ msgstr ""
+
+#~ msgid "Invalid value: {message}"
+#~ msgstr ""
+
+#~ msgid "Invalid value for {param_hint}: {message}"
+#~ msgstr ""
+
+#~ msgid "Missing argument"
+#~ msgstr ""
+
+#~ msgid "Missing option"
+#~ msgstr ""
+
+#~ msgid "Missing parameter"
+#~ msgstr ""
+
+#~ msgid "Missing {param_type}"
+#~ msgstr ""
+
+#~ msgid "Missing parameter: {param_name}"
+#~ msgstr ""
+
+#~ msgid "No such option: {name}"
+#~ msgstr ""
+
+#~ msgid "Did you mean {possibility}?"
+#~ msgid_plural "(Possible options: {possibilities})"
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "unknown error"
+#~ msgstr ""
+
+#~ msgid "Could not open file {filename!r}: {message}"
+#~ msgstr ""
+
+#~ msgid "Usage:"
+#~ msgstr ""
+
+#~ msgid "Argument {name!r} takes {nargs} values."
+#~ msgstr ""
+
+#~ msgid "Option {name!r} does not take a value."
+#~ msgstr ""
+
+#~ msgid "Option {name!r} requires an argument."
+#~ msgid_plural "Option {name!r} requires {nargs} arguments."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Shell completion is not supported for Bash versions older than 4.4."
+#~ msgstr ""
+
+#~ msgid "Couldn't detect Bash version, shell completion is not supported."
+#~ msgstr ""
+
+#~ msgid "Repeat for confirmation"
+#~ msgstr "Editar Configuraciones"
+
+#~ msgid "Error: The value you entered was invalid."
+#~ msgstr ""
+
+#~ msgid "Error: {e.message}"
+#~ msgstr ""
+
+#~ msgid "Error: The two entered values do not match."
+#~ msgstr ""
+
+#~ msgid "Error: invalid input"
+#~ msgstr ""
+
+#~ msgid "Press any key to continue..."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Choose from:\n"
+#~ "\t{choices}"
+#~ msgstr ""
+
+#~ msgid "{value!r} is not {choice}."
+#~ msgid_plural "{value!r} is not one of {choices}."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "{value!r} does not match the format {format}."
+#~ msgid_plural "{value!r} does not match the formats {formats}."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "{value!r} is not a valid {number_type}."
+#~ msgstr ""
+
+#~ msgid "{value} is not in the range {range}."
+#~ msgstr ""
+
+#~ msgid "{value!r} is not a valid boolean. Recognized values: {states}"
+#~ msgstr ""
+
+#~ msgid "{value!r} is not a valid UUID."
+#~ msgstr ""
+
+#~ msgid "file"
+#~ msgstr ""
+
+#~ msgid "directory"
+#~ msgstr ""
+
+#~ msgid "path"
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} does not exist."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is a file."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is a directory."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not readable."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not writable."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not executable."
+#~ msgstr ""
+
+#~ msgid "{len_type} values are required, but {len_value} was given."
+#~ msgid_plural "{len_type} values are required, but {len_value} were given."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "This field is required."
+#~ msgstr ""
+
+#~ msgid "File does not have an approved extension: {extensions}"
+#~ msgstr ""
+
+#~ msgid "File does not have an approved extension."
+#~ msgstr ""
+
+#~ msgid "File must be between {min_size} and {max_size} bytes."
+#~ msgstr ""
+
+#~ msgid "Content purported to be compressed with %s but failed to decompress."
+#~ msgstr ""
+
+#~ msgid "Unsupported value for qop: %s."
+#~ msgstr ""
+
+#~ msgid "Unsupported value for algorithm: %s.algorithm"
+#~ msgstr ""
+
+#~ msgid "The challenge doesn't contain a server nonce, or this one is empty."
+#~ msgstr ""
+
+#~ msgid "Unsupported value for pw-algorithm: %s.pw-algorithm"
+#~ msgstr ""
+
+#~ msgid "Redirected but the response is missing a Location: header."
+#~ msgstr ""
+
+#~ msgid "Invalid field name '%s'."
+#~ msgstr ""
+
+#~ msgid "Field must be equal to %(other_name)s."
+#~ msgstr ""
+
+#~ msgid "Field must be at least %(min)d character long."
+#~ msgid_plural "Field must be at least %(min)d characters long."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Field cannot be longer than %(max)d character."
+#~ msgid_plural "Field cannot be longer than %(max)d characters."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Field must be exactly %(max)d character long."
+#~ msgid_plural "Field must be exactly %(max)d characters long."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Field must be between %(min)d and %(max)d characters long."
+#~ msgstr ""
+
+#~ msgid "Number must be at least %(min)s."
+#~ msgstr ""
+
+#~ msgid "Number must be at most %(max)s."
+#~ msgstr ""
+
+#~ msgid "Number must be between %(min)s and %(max)s."
+#~ msgstr ""
+
+#~ msgid "Invalid input."
+#~ msgstr ""
+
+#~ msgid "Invalid email address."
+#~ msgstr ""
+
+#~ msgid "Invalid IP address."
+#~ msgstr ""
+
+#~ msgid "Invalid Mac address."
+#~ msgstr ""
+
+#~ msgid "Invalid URL."
+#~ msgstr "Innovation Purple"
+
+#~ msgid "Invalid UUID."
+#~ msgstr ""
+
+#~ msgid "Invalid value, must be one of: %(values)s."
+#~ msgstr ""
+
+#~ msgid "Invalid value, can't be any of: %(values)s."
+#~ msgstr ""
+
+#~ msgid "This field cannot be edited"
+#~ msgstr ""
+
+#~ msgid "This field is disabled and cannot have a value"
+#~ msgstr ""
+
+#~ msgid "Invalid CSRF Token."
+#~ msgstr ""
+
+#~ msgid "CSRF token missing."
+#~ msgstr ""
+
+#~ msgid "CSRF failed."
+#~ msgstr ""
+
+#~ msgid "CSRF token expired."
+#~ msgstr ""
+
+#~ msgid "Invalid Choice: could not coerce."
+#~ msgstr ""
+
+#~ msgid "Choices cannot be None."
+#~ msgstr ""
+
+#~ msgid "Not a valid choice."
+#~ msgstr ""
+
+#~ msgid "Invalid choice(s): one or more data inputs could not be coerced."
+#~ msgstr ""
+
+#~ msgid "'%(value)s' is not a valid choice for this field."
+#~ msgid_plural "'%(value)s' are not valid choices for this field."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Not a valid datetime value."
+#~ msgstr ""
+
+#~ msgid "Not a valid date value."
+#~ msgstr ""
+
+#~ msgid "Not a valid time value."
+#~ msgstr ""
+
+#~ msgid "Not a valid week value."
+#~ msgstr ""
+
+#~ msgid "Not a valid integer value."
+#~ msgstr ""
+
+#~ msgid "Not a valid decimal value."
+#~ msgstr ""
+
+#~ msgid "Not a valid float value."
+#~ msgstr ""
+
+#~ msgid "Volver al Login"
+#~ msgstr "Volver al Login"
+
+#~ msgid "Iniciar Sesión"
+#~ msgstr "Iniciar Sesión"
+
+#~ msgid "Contraseña"
+#~ msgstr "Contraseña"
+
+#~ msgid "¿Olvidaste tu contraseña?"
+#~ msgstr "¿Olvidaste tu contraseña?"
+
+#~ msgid "Ingresa tu nueva contraseña"
+#~ msgstr "Ingresa tu nueva contraseña"
+
+#~ msgid "Confirmar Contraseña"
+#~ msgstr "Confirmar Contraseña"
+
+#~ msgid "Repite la contraseña"
+#~ msgstr "Repite la contraseña"
+
+#~ msgid "Guardar Contraseña"
+#~ msgstr "Guardar Contraseña"
+
+# ===== CLIENTS =====
+#~ msgid "Nuevo Cliente"
+#~ msgstr "Nuevo Cliente"
+
+#~ msgid "Información del Negocio"
+#~ msgstr "Información del Negocio"
+
+#~ msgid "Nombre del Negocio / Cliente"
+#~ msgstr "Nombre del Negocio"
+
+#~ msgid "Nombre en Google Maps (GMB)"
+#~ msgstr ""
+
+#~ msgid "Contacto Principal"
+#~ msgstr "Contacto"
+
+#~ msgid "Nombre de Contacto"
+#~ msgstr "Email de Contacto"
+
+#~ msgid "Ej: www.cliente.com"
+#~ msgstr ""
+
+#~ msgid "Etapa Inicial"
+#~ msgstr ""
+
+#~ msgid "Paquete de Interés"
+#~ msgstr "Paquetes de Servicio SaaS"
+
+#~ msgid "Seleccione un paquete..."
+#~ msgstr "Seleccionar cliente..."
+
+#~ msgid ""
+#~ "El valor de este paquete se sumará al pipeline de la etapa\n"
+#~ "                                seleccionada."
+#~ msgstr ""
+
+#~ msgid "Información Básica"
+#~ msgstr "Información Básica"
+
+#~ msgid "Información Detallada"
+#~ msgstr "Información de Contacto"
+
+#~ msgid "Etapa Actual"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "El valor de este paquete se sumará al pipeline de la\n"
+#~ "                                        etapa seleccionada."
+#~ msgstr ""
+
+#~ msgid "Detalles de Contacto y Decisión"
+#~ msgstr "Detalles del Cliente"
+
+#~ msgid ""
+#~ "Nombre del\n"
+#~ "                                            Recepcionista"
+#~ msgstr ""
+
+#~ msgid "Quien recibe/atiende primero"
+#~ msgstr ""
+
+#~ msgid "Nombre del Decisor"
+#~ msgstr "Nombre del Negocio"
+
+#~ msgid "Quien firma el cheque"
+#~ msgstr ""
+
+#~ msgid "Factores de Decisión"
+#~ msgstr "Tomador de Decisión"
+
+#~ msgid "¿Qué es importante para ellos? (Precio, Calidad, Rapidez, Confianza...)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Mejor Horario de\n"
+#~ "                                            Contacto"
+#~ msgstr ""
+
+#~ msgid "Ej: Martes por la tarde"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Forma Preferida\n"
+#~ "                                            de Contacto"
+#~ msgstr ""
+
+#~ msgid "Seleccione..."
+#~ msgstr "Seleccionar"
+
+#~ msgid "Llamada"
+#~ msgstr "Llamada"
+
+#~ msgid ""
+#~ "Información Adicional /\n"
+#~ "                                        Observaciones"
+#~ msgstr ""
+
+#~ msgid "Cualquier otro detalle relevante..."
+#~ msgstr ""
+
+#~ msgid "Adicionar Cliente"
+#~ msgstr "Editar Cliente"
+
+#~ msgid ""
+#~ "Símbolo de Moneda (ej: Gs, $,\n"
+#~ "                                        €)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Ingresa el nombre de la empresa para realizar un análisis\n"
+#~ "                        instantáneo de Google My Business."
+#~ msgstr ""
+
+#~ msgid "Verificar Ahora"
+#~ msgstr ""
+
+#~ msgid "Cargando..."
+#~ msgstr "Cargando..."
+
+#~ msgid "Agenda de Hoy"
+#~ msgstr "Agenda de Hoy"
+
+#~ msgid "Próximos 7 Días"
+#~ msgstr "Próximos 7 Días"
+
+#~ msgid "Aguardando Pagto"
+#~ msgstr "Guardar Paquete"
+
+#~ msgid "Contratos Pendentes"
+#~ msgstr "Propuestas Pendientes"
+
+#~ msgid "Clientes Totais"
+#~ msgstr "Clientes Totales"
+
+#~ msgid "Fase Onboarding"
+#~ msgstr ""
+
+#~ msgid "Em Execução"
+#~ msgstr ""
+
+#~ msgid "Projetos Ativos"
+#~ msgstr "Puntos Positivos"
+
+#~ msgid "Alertas de Renovação (Próximos 30 dias)"
+#~ msgstr ""
+
+#~ msgid "Projeto"
+#~ msgstr "Propietario"
+
+#~ msgid "Cliente"
+#~ msgstr "Clientes"
+
+#~ msgid "Data Término"
+#~ msgstr ""
+
+#~ msgid "Ações"
+#~ msgstr ""
+
+#~ msgid "Ver"
+#~ msgstr "Ver"
+
+#~ msgid "Fila de Tarefas Operacionais (Pendentes)"
+#~ msgstr ""
+
+#~ msgid "Nenhuma tarefa pendente."
+#~ msgstr ""
+
+#~ msgid "Pipeline de Clientes"
+#~ msgstr "Pipeline de Clientes"
+
+#~ msgid "Distribución del Pipeline"
+#~ msgstr ""
+
+#~ msgid "Actividad Reciente"
+#~ msgstr "Actividad Reciente"
+
+#~ msgid ""
+#~ "Últimas\n"
+#~ "                                Interacciones"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Sin\n"
+#~ "                                        observaciones"
+#~ msgstr ""
+
+#~ msgid "No hay visitas recentes."
+#~ msgstr "No hay visitas recientes."
+
+#~ msgid ""
+#~ "Últimos Health\n"
+#~ "                                Checks"
+#~ msgstr ""
+
+#~ msgid "No hay health checks recientes."
+#~ msgstr "No hay health checks recientes."
+
+#~ msgid "No hay tareas para hoy."
+#~ msgstr "No hay tareas para hoy."
+
+#~ msgid "No hay tareas próximas."
+#~ msgstr "No hay tareas próximas."
+
+#~ msgid "Por favor espere mientras consultamos Google."
+#~ msgstr "Por favor espere mientras consultamos Google."
+
+#~ msgid "Empresa encontrada"
+#~ msgstr "Empresa encontrada"
+
+#~ msgid "Resumen del Análisis"
+#~ msgstr "Resumen del Análisis"
+
+#~ msgid "Puntos Críticos"
+#~ msgstr "Puntos Críticos"
+
+#~ msgid "Puntos Moderados"
+#~ msgstr "Puntos Moderados"
+
+#~ msgid "Puntos Positivos"
+#~ msgstr "Puntos Positivos"
+
+#~ msgid "Ver Informe Completo"
+#~ msgstr "Ver Informe Completo"
+
+#~ msgid "Intente ser más específico (ej: Empresa X, Ciudad Y)"
+#~ msgstr "Intente ser más específico (ej: Empresa X, Ciudad Y)"
+
+#~ msgid "Error de Conexión."
+#~ msgstr "Error de Conexión."
+
+#~ msgid "Intentar de Nuevo"
+#~ msgstr "Intentar de Nuevo"
+
+#~ msgid "Vendas Fechadas"
+#~ msgstr ""
+
+#~ msgid "Análisis de Perfil Google Business"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Esta herramienta utilizará la API de "
+#~ "Google (vía SerpApi) para auditar el "
+#~ "perfil público\n"
+#~ "                        de este negocio."
+#~ msgstr ""
+
+#~ msgid "Analizaremos fotos, horarios, reseñas y optimización general."
+#~ msgstr ""
+
+#~ msgid "Nombre del Negocio en Google Maps"
+#~ msgstr "Nombre del Negocio"
+
+#~ msgid ""
+#~ "Asegúrese de que el nombre coincida exactamente con lo que\n"
+#~ "                                aparece en Google."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Auditando perfil... Esto puede demorar unos\n"
+#~ "                                segundos."
+#~ msgstr ""
+
+#~ msgid "Iniciar Análisis Real"
+#~ msgstr ""
+
+#~ msgid "¿Qué estamos auditando?"
+#~ msgstr ""
+
+#~ msgid "Presencia de Fotos y Videos"
+#~ msgstr ""
+
+#~ msgid "Horarios de Atención"
+#~ msgstr ""
+
+#~ msgid "Perfil Verificado"
+#~ msgstr ""
+
+#~ msgid "Reseñas y Respuestas"
+#~ msgstr ""
+
+#~ msgid "Auditorías Health Check"
+#~ msgstr "Últimos Health Checks"
+
+#~ msgid "Fecha"
+#~ msgstr "Fecha"
+
+#~ msgid "Puntuación"
+#~ msgstr "Puntuación"
+
+#~ msgid "No hay auditorías realizadas."
+#~ msgstr "No hay interacciones registradas."
+
+#~ msgid "Detalles del Health Check"
+#~ msgstr "Detalles del Cliente"
+
+#~ msgid "Puntuación GMB"
+#~ msgstr "Puntuación"
+
+#~ msgid "Auditoría realizada el"
+#~ msgstr ""
+
+#~ msgid "Resumen de Análisis"
+#~ msgstr "Resumen del Análisis"
+
+#~ msgid "Detalles de la Auditoría"
+#~ msgstr "Detalles del Cliente"
+
+#~ msgid ""
+#~ "Problemas\n"
+#~ "                        Críticos Identificados"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Recomendaciones del\n"
+#~ "                        Especialista"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "No hay recomendaciones específicas disponibles para esta\n"
+#~ "                                auditoría."
+#~ msgstr ""
+
+#~ msgid "¿Seguro que desea eliminar esta auditoría?"
+#~ msgstr ""
+
+#~ msgid "Eliminar este Reporte"
+#~ msgstr ""
+
+#~ msgid "Registrar Interacción"
+#~ msgstr "Registrar Interacción"
+
+#~ msgid "Tipo"
+#~ msgstr "Tipo"
+
+#~ msgid "Gestionar Tipos"
+#~ msgstr "Gestionar Usuarios"
+
+#~ msgid "Fecha/Hora"
+#~ msgstr "Fecha y Hora"
+
+#~ msgid "Notas"
+#~ msgstr "Notas"
+
+#~ msgid "Ya realizado (marcar como completado)"
+#~ msgstr ""
+
+#~ msgid "Sugerencia de Próximo Paso"
+#~ msgstr ""
+
+#~ msgid "Agendar"
+#~ msgstr "Agendar"
+
+#~ msgid "No agendar nada"
+#~ msgstr "Agendar"
+
+#~ msgid "Agendado via sugerencia automática."
+#~ msgstr ""
+
+#~ msgid "Gestionar Tipos de Interacción"
+#~ msgstr "Registrar Interacción"
+
+# ===== USERS =====
+#~ msgid "Nuevo Tipo"
+#~ msgstr "Nuevo Usuario"
+
+#~ msgid "Nombre (ej: Visita Técnica)"
+#~ msgstr ""
+
+#~ msgid "Es llamada"
+#~ msgstr "Llamada"
+
+#~ msgid "¿Eliminar este tipo?"
+#~ msgstr ""
+
+#~ msgid "Interacción"
+#~ msgstr "Interacción"
+
+#~ msgid "Realizado"
+#~ msgstr "Realizado"
+
+#~ msgid "por"
+#~ msgstr "por"
+
+#~ msgid "No hay interacciones registradas."
+#~ msgstr "No hay interacciones registradas."
+
+#~ msgid "Nueva Propuesta"
+#~ msgstr "Nueva Propuesta"
+
+#~ msgid "Datos Generales"
+#~ msgstr ""
+
+#~ msgid "Seleccione un cliente..."
+#~ msgstr "Seleccionar cliente..."
+
+#~ msgid "Borrador"
+#~ msgstr "Borrador"
+
+#~ msgid "Enviado"
+#~ msgstr "Enviado"
+
+#~ msgid "Rechazado"
+#~ msgstr "Rechazado"
+
+#~ msgid ""
+#~ "Cargar Paquete\n"
+#~ "                                Sugerido"
+#~ msgstr ""
+
+#~ msgid "Esto reemplazará el precio y descripción del primer item."
+#~ msgstr ""
+
+#~ msgid "Términos de Pago"
+#~ msgstr ""
+
+#~ msgid "50% a la firma, 50% contra entrega."
+#~ msgstr ""
+
+#~ msgid "Agregar Servicio"
+#~ msgstr "Agregar"
+
+#~ msgid "Precio"
+#~ msgstr "Precio"
+
+#~ msgid "Descripción Personalizada"
+#~ msgstr "Descripción"
+
+#~ msgid "Editar Propuesta"
+#~ msgstr "Editar Propuesta"
+
+#~ msgid "Seleccione um paquete..."
+#~ msgstr "Seleccionar cliente..."
+
+#~ msgid "Esto reemplazará o agregará el precio y descripción del primer item."
+#~ msgstr ""
+
+#~ msgid "Actualizar Propuesta"
+#~ msgstr "Editar Propuesta"
+
+#~ msgid "Presupuestos"
+#~ msgstr "Nuevo Presupuesto"
+
+#~ msgid "Presupuestos (Propuestas)"
+#~ msgstr "Presupuestos (Propuestas)"
+
+#~ msgid "Nuevo Presupuesto"
+#~ msgstr "Nuevo Presupuesto"
+
+#~ msgid "Valor Total"
+#~ msgstr "Valor Total"
+
+#~ msgid "No hay presupuestos registrados."
+#~ msgstr "No hay presupuestos registrados."
+
+# ===== PROPOSALS =====
+#~ msgid "Propuesta"
+#~ msgstr "Propuestas"
+
+#~ msgid "Detalles de la Propuesta"
+#~ msgstr "Detalles del Cliente"
+
+#~ msgid "No especificado."
+#~ msgstr ""
+
+# ===== SAAS =====
+#~ msgid "Administración SaaS"
+#~ msgstr "Administración SaaS"
+
+#~ msgid "Gestionar Paquetes"
+#~ msgstr "Gestionar Paquetes"
+
+#~ msgid "Nueva Empresa"
+#~ msgstr "Nueva Propuesta"
+
+#~ msgid "Empresa"
+#~ msgstr "Editar Empresa"
+
+#~ msgid "Creado en"
+#~ msgstr "Creado en"
+
+#~ msgid "Acceder como esta empresa"
+#~ msgstr "Acceder como esta empresa"
+
+#~ msgid "Editar Configuraciones"
+#~ msgstr "Editar Configuraciones"
+
+#~ msgid "Ninguna empresa encontrada."
+#~ msgstr "Ninguna empresa encontrada."
+
+#~ msgid "Email de Contacto"
+#~ msgstr "Email de Contacto"
+
+#~ msgid "Crear Empresa"
+#~ msgstr "Editar Empresa"
+
+#~ msgid "Moneda (Símbolo)"
+#~ msgstr "Moneda (Símbolo)"
+
+# ===== AUTH =====
+#~ msgid "Tema Visual"
+#~ msgstr "Email"
+
+#~ msgid "Editar Paquete"
+#~ msgstr "Guardar Paquete"
+
+#~ msgid "Nuevo Paquete SaaS"
+#~ msgstr "Nuevo Paquete SaaS"
+
+#~ msgid "Nombre del Paquete"
+#~ msgstr "Nombre del Paquete"
+
+#~ msgid "Descripción"
+#~ msgstr "Descripción"
+
+#~ msgid "Precio Mensual"
+#~ msgstr "Opcional"
+
+#~ msgid "Límite de Usuarios"
+#~ msgstr "Límite de Usuarios"
+
+#~ msgid "Máximo de usuarios en la cuenta."
+#~ msgstr "Máximo de usuarios en la cuenta."
+
+#~ msgid "Límite de Clientes"
+#~ msgstr "Límite de Clientes"
+
+#~ msgid "Créditos Health Check"
+#~ msgstr "Últimos Health Checks"
+
+#~ msgid "Créditos de uso para auditorías."
+#~ msgstr "Créditos de uso para auditorias."
+
+#~ msgid "Guardar Paquete"
+#~ msgstr "Guardar Paquete"
+
+#~ msgid "Paquetes SaaS"
+#~ msgstr "Paquetes SaaS"
+
+#~ msgid "Paquetes de Servicio SaaS"
+#~ msgstr "Paquetes de Servicio SaaS"
+
+#~ msgid "Nuevo Paquete"
+#~ msgstr "Nuevo Paquete SaaS"
+
+#~ msgid "GRATIS"
+#~ msgstr "GRATIS"
+
+#~ msgid "mes"
+#~ msgstr "mes"
+
+#~ msgid "EDITAR"
+#~ msgstr "EDITAR"
+
+#~ msgid "Ningún paquete registrado."
+#~ msgstr "Ningún paquete registrado."
+
+# ===== USERS =====
+#~ msgid "Nuevo Usuario"
+#~ msgstr "Nuevo Usuario"
+
+#~ msgid "Seleccionar rol..."
+#~ msgstr "Seleccionar cliente..."
+
+#~ msgid "Editar Usuario"
+#~ msgstr "Editar Usuario"
+
+#~ msgid "Usuario Activo"
+#~ msgstr "Usuario SMTP"
+
+#~ msgid "Lista de Usuarios"
+#~ msgstr "Lista de Usuarios"
+
+#~ msgid "No hay usuarios registrados"
+#~ msgstr "No hay presupuestos registrados."
+
+#~ msgid "Registrar Visita"
+#~ msgstr "Editar Visita"
+
+#~ msgid "Nuevo"
+#~ msgstr "Nuevo"
+
+#~ msgid "Registrar Nueva Visita"
+#~ msgstr "Nueva Visita"
+
+#~ msgid "Fecha y Hora de la Visita"
+#~ msgstr "Fecha y Hora"
+
+#~ msgid "¿Qué se habló con el cliente? ¿Qué problemas se detectaron?"
+#~ msgstr ""
+
+#~ msgid "Próximo Paso / Compromiso"
+#~ msgstr ""
+
+#~ msgid "Ej: Enviar propuesta, Volver a llamar el martes..."
+#~ msgstr ""
+
+#~ msgid "Próximo Paso"
+#~ msgstr "Próximos 7 Días"
+
+#~ msgid "Historial de Visitas"
+#~ msgstr "Historial"
+
+#~ msgid "No hay visitas registradas."
+#~ msgstr "No hay visitas recientes."
+
+#~ msgid "Detalles de la Visita"
+#~ msgstr "Detalles del Cliente"
+
+#~ msgid "Registro de Visita"
+#~ msgstr "registros"
+
+#~ msgid "Fecha de la Visita"
+#~ msgstr "Fecha de Registro"
+
+#~ msgid "Notas / Relato"
+#~ msgstr ""
+
+#~ msgid "No se registraron notas."
+#~ msgstr ""
+
+#~ msgid "Ningún paso específico definido."
+#~ msgstr ""
+
+#~ msgid "Volver al Cliente"
+#~ msgstr "Volver al Login"
+
+#~ msgid "¿Seguro que desea eliminar este registro de visita?"
+#~ msgstr ""
+
+#~ msgid "Eliminar"
+#~ msgstr "Eliminar"
+

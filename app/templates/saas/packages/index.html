@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('SaaS Packages') }} - SaaS Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-box-seam me-2"></i>{{ _('SaaS Service Packages') }}</h1>
+        <div>
+            <a href="{{ url_for('saas.dashboard') }}" class="btn btn-outline-secondary me-2">{{ _('Back') }}</a>
+            <a href="{{ url_for('saas.create_package') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> {{ _('New Package') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for pkg in packages %}
+        <div class="col">
+            <div class="card h-100 shadow-sm border-{{ 'success' if pkg.is_active else 'secondary' }}">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">{{ pkg.name }}</h5>
+                    {% if pkg.is_active %}
+                    <span class="badge bg-success">{{ _('Active') }}</span>
+                    {% else %}
+                    <span class="badge bg-secondary">{{ _('Inactive') }}</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <h3 class="card-text text-center text-primary mb-3">
+                        {% if pkg.price == 0 %}
+                        {{ _('FREE') }}
+                        {% else %}
+                        {{ pkg.currency_symbol or '$' }} {{ "%.2f"|format(pkg.price) }}<small
+                            class="text-muted fs-6">/{{ _('month') }}</small>
+                        {% endif %}
+                    </h3>
+                    <p class="card-text">{{ pkg.description }}</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><i class="bi bi-people me-2"></i>{{ pkg.max_users }} {{
+                            _('Users') }}</li>
+                        <li class="list-group-item"><i class="bi bi-building me-2"></i>{{ pkg.max_clients }} {{
+                            _('Clients') }}
+                        </li>
+                        <li class="list-group-item"><i class="bi bi-heart-pulse me-2"></i>{{ pkg.health_check_credits }}
+                            {{ _('Health Check Credits') }}</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent text-end">
+                    <a href="{{ url_for('saas.edit_package', package_id=pkg.id) }}"
+                        class="btn btn-sm btn-outline-primary">{{ _('EDIT') }}</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">{{ _('No packages registered.') }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

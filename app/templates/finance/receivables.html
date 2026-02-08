@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Contas a Receber') }} - Maps2GO{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ _('Financeiro') }}</h1>
+        <div class="btn-group">
+            <a href="{{ url_for('finance.list_receivables', status='open') }}"
+                class="btn btn-outline-primary btn-sm {% if request.args.get('status') == 'open' %}active{% endif %}">{{
+                _('Abertos') }}</a>
+            <a href="{{ url_for('finance.list_receivables', status='paid') }}"
+                class="btn btn-outline-success btn-sm {% if request.args.get('status') == 'paid' %}active{% endif %}">{{
+                _('Pagos') }}</a>
+            <a href="{{ url_for('finance.list_receivables') }}"
+                class="btn btn-outline-secondary btn-sm {% if not request.args.get('status') %}active{% endif %}">{{
+                _('Todos') }}</a>
+        </div>
+    </div>
+
+    <!-- Global Profit Summary -->
+    <div class="card shadow-sm mb-4 border-left-info bg-dark text-white">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-3 border-end border-secondary">
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ _('Lucro Líquido Estimado')
+                        }}</div>
+                    <div class="h4 mb-0 font-weight-bold text-white" id="stat-net-profit">...</div>
+                    <small class="text-muted">{{ _('(Recebíveis - Comissões - Custos - Folha)') }}</small>
+                </div>
+                <div class="col-md-3 border-end border-secondary">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ _('Folha de Pagamento
+                        (Fixo)') }}</div>
+                    <div class="h5 mb-0 font-weight-bold" id="stat-payroll">...</div>
+                </div>
+                <div class="col-md-3 border-end border-secondary">
+                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">{{ _('Comissões Pendentes') }}
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold" id="stat-commissions">...</div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ _('Contas a Pagar') }}
+                    </div>
+                    <div class="h5 mb-0 font-weight-bold" id="stat-payables">...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('finance.list_receivables') }}">{{ _('Recebíveis') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('finance.list_payables') }}">{{ _('Contas a Pagar') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('finance.list_commissions') }}">{{ _('Comissões') }}</a>
+        </li>
+    </ul>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-left-primary h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ _('Total em
+                                Aberto') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_open | format_currency }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-wallet2 fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-left-success h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ _('Total
+                                Recebido') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_paid | format_currency }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-cash-stack fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-left-danger h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">{{ _('Faturas
+                                Vencidas') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.overdue_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receivables Table -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3 d-flex justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">{{ _('Lista de Recebíveis') }}</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="receivablesTable">
+                    <thead>
+                        <tr>
+                            <th>{{ _('Cliente') }}</th>
+                            <th>{{ _('Descrição') }}</th>
+                            <th>{{ _('Vencimento') }}</th>
+                            <th>{{ _('Valor') }}</th>
+                            <th>{{ _('Status') }}</th>
+                            <th>{{ _('Ações') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if receivables %}
+                        {% for rec in receivables %}
+                        <tr>
+                            <td><strong>{{ rec.client.name }}</strong></td>
+                            <td>{{ rec.description }}</td>
+                            <td>
+                                <span
+                                    class="{% if rec.status == 'open' and rec.due_date < datetime.utcnow().date() %}text-danger fw-bold{% endif %}">
+                                    {{ rec.due_date | format_date }}
+                                </span>
+                            </td>
+                            <td>{{ rec.amount | format_currency }}</td>
+                            <td>
+                                {% if rec.status == 'paid' %}
+                                <span class="badge bg-success">{{ _('Pago') }}</span>
+                                {% elif rec.due_date < datetime.utcnow().date() %} <span class="badge bg-danger">{{
+                                    _('Vencido') }}</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark">{{ _('Pendente') }}</span>
+                                    {% endif %}
+                            </td>
+                            <td>
+                                {% if rec.status == 'open' %}
+                                <form action="{{ url_for('finance.mark_as_paid', id=rec.id) }}" method="POST"
+                                    class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-success"
+                                        title="{{ _('Marcar como pago') }}">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('finance.send_invoice', receivable_id=rec.id) }}" method="POST"
+                                    class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary"
+                                        title="{{ _('Enviar Fatura por E-mail') }}">
+                                        <i class="bi bi-envelope-at"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-muted small"><i class="bi bi-calendar-check"></i> {{ rec.paid_at |
+                                    format_date }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4">{{ _('Nenhum recebível encontrado.') }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

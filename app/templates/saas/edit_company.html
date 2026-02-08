@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Edit Company') }} - SaaS Admin{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-building-gear me-2"></i>{{ _('Edit Company (SuperAdmin)') }}</h4>
+                    <a href="{{ url_for('saas.dashboard') }}" class="btn btn-sm btn-light text-primary">{{ _('Back')
+                        }}</a>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Company Name') }}</label>
+                            <input type="text" class="form-control" name="name" value="{{ company.name }}" required>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ _('Email') }}</label>
+                                <input type="email" class="form-control" name="email" value="{{ company.email or '' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ _('Phone') }}</label>
+                                <input type="text" class="form-control" name="phone" value="{{ company.phone or '' }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Address') }}</label>
+                            <textarea class="form-control" name="address"
+                                rows="2">{{ company.address or '' }}</textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ _('Currency (Symbol)') }}</label>
+                                <input type="text" class="form-control" name="currency_symbol"
+                                    value="{{ company.currency_symbol or 'Gs' }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ _('Slug (Internal ID)') }}</label>
+                                <input type="text" class="form-control" value="{{ company.slug }}" disabled>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">{{ _('Visual Theme') }}</label>
+                            <select class="form-select" name="theme_style">
+                                {% for value, name, desc in theme_choices %}
+                                <option value="{{ value }}" {% if company.theme_style==value %}selected{% endif %}>
+                                    {{ _(name) }} - {{ _(desc) }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" type="checkbox" id="isActive" name="is_active" {% if
+                                company.is_active %}checked{% endif %}>
+                            <label class="form-check-label" for="isActive">{{ _('Active Company (Block access if
+                                unchecked)') }}</label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

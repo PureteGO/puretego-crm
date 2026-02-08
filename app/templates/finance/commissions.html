@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Comissões') }} - Maps2GO{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ _('Financeiro') }}</h1>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('finance.list_receivables') }}">{{ _('Recebíveis') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('finance.list_payables') }}">{{ _('Contas a Pagar') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('finance.list_commissions') }}">{{ _('Comissões') }}</a>
+        </li>
+    </ul>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-left-info h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ _('Comissões
+                                Pendentes') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_pending | format_currency
+                                }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-person-badge fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm border-left-success h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ _('Comissões
+                                Pagas') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_paid | format_currency }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-wallet-fill fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commissions Table -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">{{ _('Lista de Comissões') }}</h6>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>{{ _('Colaborador') }}</th>
+                            <th>{{ _('Negócio') }}</th>
+                            <th>{{ _('Tipo') }}</th>
+                            <th>{{ _('Valor') }}</th>
+                            <th>{{ _('Status') }}</th>
+                            <th>{{ _('Data Gerada') }}</th>
+                            <th>{{ _('Ações') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if commissions %}
+                        {% for c in commissions %}
+                        <tr>
+                            <td><strong>{{ c.user.name }}</strong></td>
+                            <td>{{ c.deal.title }}</td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    {{ _('Closer') if c.commission_type == 'closer' else _('SDR/Opener') }}
+                                </span>
+                            </td>
+                            <td>{{ c.amount | format_currency }}</td>
+                            <td>
+                                {% if c.status == 'paid' %}
+                                <span class="badge bg-success">{{ _('Pago') }}</span>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">{{ _('Pendente') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ c.created_at | format_date }}</td>
+                            <td>
+                                {% if c.status == 'pending' %}
+                                <button onclick="payCommission({{ c.id }})" class="btn btn-sm btn-success">
+                                    <i class="bi bi-cash"></i> {{ _('Pagar') }}
+                                </button>
+                                {% else %}
+                                <small class="text-muted"><i class="bi bi-calendar-check text-success"></i> {{ c.paid_at
+                                    | format_date }}</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">{{ _('Nenhuma comissão encontrada.') }}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function payCommission(id) {
+        if (!confirm('{{ _("Confirmar pagamento desta comissão?") }}')) return;
+
+        fetch(`/finance/commissions/${id}/pay`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+</script>
+{% endblock %}

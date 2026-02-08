@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('SaaS Administration') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-clouds-fill me-2"></i>{{ _('SaaS Administration') }}</h1>
+        <div>
+            <a href="{{ url_for('saas.packages_list') }}" class="btn btn-outline-info me-2">
+                <i class="bi bi-box-seam"></i> {{ _('Manage Packages') }}
+            </a>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newCompanyModal">
+                <i class="bi bi-plus-lg"></i> {{ _('New Company') }}
+            </button>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">{{ _('Registered Companies (Tenants)') }}</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>{{ _('Company') }}</th>
+                        <th>{{ _('Slug') }}</th>
+                        <th>{{ _('Status') }}</th>
+                        <th>{{ _('Users') }}</th>
+                        <th>{{ _('Clients') }}</th>
+                        <th>{{ _('Created at') }}</th>
+                        <th class="text-end">{{ _('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in companies %}
+                    <tr>
+                        <td>{{ company.id }}</td>
+                        <td>
+                            <div class="fw-bold">{{ company.name }}</div>
+                            <small class="text-muted">{{ company.email or _('No email') }}</small>
+                        </td>
+                        <td><code>{{ company.slug }}</code></td>
+                        <td>
+                            {% if company.is_active %}
+                            <span class="badge bg-success">{{ _('Active') }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ _('Inactive') }}</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-secondary">{{ company.users_count }}</span></td>
+                        <td><span class="badge bg-info">{{ company.clients_count }}</span></td>
+                        <td>{{ company.created_at|format_date }}</td>
+                        <td class="text-end">
+                            <a href="{{ url_for('saas.impersonate', company_id=company.id) }}"
+                                class="btn btn-sm btn-outline-warning" title="{{ _('Access as this company') }}">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                            </a>
+                            <a href="{{ url_for('saas.edit_company', company_id=company.id) }}"
+                                class="btn btn-sm btn-outline-primary" title="{{ _('Edit Settings') }}">
+                                <i class="bi bi-gear"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5">{{ _('No companies found.') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Empresa -->
+<div class="modal fade" id="newCompanyModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('New Company (Tenant)') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('saas.create_company') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Company Name') }}</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Contact Email') }}</label>
+                        <input type="email" class="form-control" name="email">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Create Company') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

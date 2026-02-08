@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Proposal') }} #{{ proposal.id }}{% endblock %}
+
+{% block scripts %}
+<script>
+    function acceptProposal(proposalId) {
+        if (!confirm("{{ _('Deseja aceitar esta proposta? Isso gerará as faturas e projetos automaticamente.') }}")) return;
+
+        // Show loading state
+        const btn = event.currentTarget;
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>...';
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch(`/proposals/${proposalId}/accept`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirect || window.location.href;
+                } else {
+                    alert(data.message || 'Erro ao aceitar proposta');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro de conexão');
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            });
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ _('Proposal') }} #{{ proposal.id }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            {% if proposal.status != 'accepted' %}
+            <button class="btn btn-sm btn-success me-2" onclick="acceptProposal({{ proposal.id }})">
+                <i class="bi bi-check-circle"></i> {{ _('Accept Proposal') }}
+            </button>
+            {% endif %}
+            <a href="{{ url_for('proposals.index') }}" class="btn btn-sm btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left"></i> {{ _('Back') }}
+            </a>
+            <a href="{{ url_for('proposals.generate_pdf', proposal_id=proposal.id) }}"
+                class="btn btn-sm btn-outline-danger me-2">
+                <i class="bi bi-file-pdf"></i> PDF
+            </a>
+            <a href="{{ url_for('proposals.edit', proposal_id=proposal.id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-pencil"></i> {{ _('Edit') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">{{ _('Proposal Details') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">{{ _('Client') }}:</div>
+                        <div class="col-sm-9">
+                            <a href="{{ url_for('clients.view', client_id=proposal.client.id) }}">{{
+                                proposal.client.name }}</a>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">{{ _('Date') }}:</div>
+                        <div class="col-sm-9">{{ proposal.created_at|format_date }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold">{{ _('Status') }}:</div>
+                        <div class="col-sm-9">
+                            <span
+                                class="badge bg-{{ 'success' if proposal.status in ['approved', 'accepted'] else 'secondary' }}">{{
+                                proposal.status }}</span>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 border-bottom pb-2">{{ _('Services') }}</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-borderless">
+                            <thead>
+                                <tr class="table-light">
+                                    <th>{{ _('Service') }}</th>
+                                    <th class="text-end">{{ _('Price') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in proposal.items %}
+                                <tr>
+                                    <td>
+                                        <div class="fw-bold">{{ item.service.name }}</div>
+                                        <small class="text-muted">{{ item.description or item.service.description
+                                            }}</small>
+                                    </td>
+                                    <td class="text-end">{{ item.price|format_currency }}</td>
+                                </tr>
+                                {% endfor %}
+                                <tr class="border-top">
+                                    <td class="fw-bold text-end">{{ _('TOTAL') }}:</td>
+                                    <td class="fw-bold text-end">{{ proposal.total_amount|format_currency }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">{{ _('Conditions') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">{{ proposal.payment_terms or _('Not specified.') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

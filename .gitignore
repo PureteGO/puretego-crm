@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+*.zip
+*.sql
+client_secret*.json
+debug_output*.txt
+verification_log.txt
+.idea/
+.vscode/
+tmp/
+instance/
+seed_log.txt

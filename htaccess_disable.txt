@@ -1,0 +1,2 @@
+# Passenger Disabled for Testing
+# If this file works, static_check.txt should be visible.

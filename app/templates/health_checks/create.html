@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('New Health Check') }} - {{ client.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('clients.index') }}">{{ _('Clients') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('clients.view', client_id=client.id) }}">{{ client.name
+                    }}</a></li>
+            <li class="breadcrumb-item active">{{ _('New Health Check') }}</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-google"></i> {{ _('Google Business Profile Analysis') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        {{ _('This tool will use the Google API (via SerpApi) to audit the public profile of this
+                        business.') }}
+                        {{ _('We will analyze photos, hours, reviews, and general optimization.') }}
+                    </p>
+
+                    <form action="{{ url_for('health_checks.create', client_id=client.id) }}" method="POST"
+                        id="healthCheckForm">
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Business Name on Google Maps') }}</label>
+                            <input type="text" name="business_name" class="form-control"
+                                value="{{ client.gmb_profile_name or client.name }}" required>
+                            <div class="form-text">{{ _('Ensure the name matches exactly with what appears on Google.')
+                                }}</div>
+                        </div>
+
+                        <div id="loadingIndicator" class="text-center py-4 d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">{{ _('Analyzing...') }}</span>
+                            </div>
+                            <p class="mt-2 text-primary fw-bold">{{ _('Auditing profile... This may take a few
+                                seconds.') }}
+                            </p>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="bi bi-search"></i> {{ _('Start Real Analysis') }}
+                            </button>
+                            <a href="{{ url_for('clients.view', client_id=client.id) }}"
+                                class="btn btn-outline-secondary">{{ _('Cancel') }}</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h6><i class="bi bi-info-circle"></i> {{ _('What are we auditing?') }}</h6>
+                <div class="row row-cols-1 row-cols-md-2 g-3 mt-1">
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check2-circle text-success me-2"></i> {{ _('Presence of Photos and Videos')
+                            }}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check2-circle text-success me-2"></i> {{ _('Business Hours') }}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check2-circle text-success me-2"></i> {{ _('Verified Profile') }}
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check2-circle text-success me-2"></i> {{ _('Reviews and Replies') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('healthCheckForm').addEventListener('submit', function () {
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('loadingIndicator').classList.remove('d-none');
+    });
+</script>
+{% endblock %}

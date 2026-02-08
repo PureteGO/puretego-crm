@@ -1,0 +1,38 @@
+<div class="timeline p-3">
+    {% for interaction in interactions %}
+    <div class="card mb-3 border-start border-4 border-{{ 'primary' if interaction.type and interaction.type.is_call else 'success' }} clickable-card"
+        data-id="{{ interaction.id }}" data-type-id="{{ interaction.type.id if interaction.type else 0 }}"
+        data-date="{{ interaction.date.isoformat() if interaction.date else '' }}"
+        data-notes="{{ interaction.notes|e if interaction.notes else '' }}" data-status="{{ interaction.status }}"
+        onclick="openEditModalFromData(this)" style="cursor: pointer;">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="card-subtitle text-muted">
+                    <i class="{{ interaction.type.icon if interaction.type else 'fas fa-info-circle' }}"></i> {{
+                    _(interaction.type.name) if interaction.type else _('Interaction') }}
+                </h6>
+                <div class="d-flex align-items-center">
+                    <small class="text-muted me-2">{{ interaction.date.strftime('%d/%m/%Y %H:%M') if interaction.date
+                        else '' }}</small>
+                </div>
+            </div>
+
+            <p class="card-text">{{ interaction.notes }}</p>
+
+            <div class="d-flex justify-content-between">
+                <span class="badge bg-{{ 'success' if interaction.status == 'done' else 'warning' }}">
+                    {{ _('Done') if interaction.status == 'done' else _('Pending') }}
+                </span>
+                <small class="text-muted">{{ _('by') }} {{ interaction.user.name if interaction.user else _('System')
+                    }}</small>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-center text-muted my-5">{{ _('No interactions recorded.') }}</p>
+    {% endfor %}
+</div>
+
+<style>
+    /* Simple CSS for Timeline feeling if needed, otherwise Bootstrap cards work */
+</style>

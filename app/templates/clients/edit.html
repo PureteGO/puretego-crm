@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Edit Client') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ _('Edit Client') }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('clients.view', client_id=client.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> {{ _('Back') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('clients.edit', client_id=client.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <!-- Nav Tabs -->
+                        <ul class="nav nav-tabs mb-4" id="clientTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="basic-tab" data-bs-toggle="tab"
+                                    data-bs-target="#basic" type="button" role="tab" aria-controls="basic"
+                                    aria-selected="true">{{ _('Basic Information') }}</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
+                                    type="button" role="tab" aria-controls="details" aria-selected="false">{{
+                                    _('Detailed Information') }}</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="clientTabsContent">
+                            <!-- Tab 1: Basic Information -->
+                            <div class="tab-pane fade show active" id="basic" role="tabpanel"
+                                aria-labelledby="basic-tab">
+
+                                <h4 class="mb-3 text-primary">{{ _('Business Information') }}</h4>
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">{{ _('Business Name / Client') }} <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" name="name"
+                                        value="{{ client.name }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="gmb_profile_name" class="form-label">{{ _('Google Maps Name (GMB)')
+                                        }}</label>
+                                    <input type="text" class="form-control" id="gmb_profile_name"
+                                        name="gmb_profile_name" value="{{ client.gmb_profile_name or '' }}">
+                                </div>
+
+                                <h4 class="mb-3 text-primary mt-4">{{ _('Primary Contact') }}</h4>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="contact_name" class="form-label">{{ _('Contact Name')
+                                            }}</label>
+                                        <input type="text" class="form-control" id="contact_name" name="contact_name"
+                                            value="{{ client.contact_name or '' }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="phone" class="form-label">{{ _('Phone') }} / WhatsApp</label>
+                                        <input type="text" class="form-control" id="phone" name="phone"
+                                            value="{{ client.phone or '' }}">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">{{ _('Email') }}</label>
+                                    <input type="email" class="form-control" id="email" name="email"
+                                        value="{{ client.email or '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="website" class="form-label">{{ _('Website') }}</label>
+                                    <input type="text" class="form-control" id="website" name="website"
+                                        value="{{ client.website or '' }}" placeholder="{{ _('Ex: www.client.com') }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">{{ _('Address') }}</label>
+                                    <input type="text" class="form-control" id="address" name="address"
+                                        value="{{ client.address or '' }}">
+                                </div>
+
+                                <h4 class="mb-3 text-primary mt-4">Pipeline</h4>
+                                <div class="mb-3">
+                                    <label for="kanban_stage_id" class="form-label">{{ _('Current Stage') }}</label>
+                                    <select class="form-select" id="kanban_stage_id" name="kanban_stage_id">
+                                        {% for stage in stages %}
+                                        <option value="{{ stage.id }}" {% if client.kanban_stage_id==stage.id
+                                            %}selected{% endif %}>
+                                            {{ stage.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <h4 class="mb-3 text-primary mt-4">{{ _('Interest') }}</h4>
+                                <div class="mb-3">
+                                    <label for="interested_package_id" class="form-label">{{ _('Interested Package')
+                                        }}</label>
+                                    <select class="form-select" id="interested_package_id" name="interested_package_id">
+                                        <option value="">{{ _('Select a package...') }}</option>
+                                        {% for pkg in packages %}
+                                        <option value="{{ pkg.id }}" {% if client.interested_package_id==pkg.id
+                                            %}selected{% endif %}>
+                                            {{ pkg.name }} - Gs. {{ "{:,.0f}".format(pkg.price).replace(',', '.') }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">{{ _('The value of this package will be added to the pipeline
+                                        of the selected stage.') }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab 2: Detailed Information -->
+                            <div class="tab-pane fade" id="details" role="tabpanel" aria-labelledby="details-tab">
+                                <h4 class="mb-3 text-info">{{ _('Contact and Decision Details') }}</h4>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="receptionist_name" class="form-label">{{ _('Receptionist Name')
+                                            }}</label>
+                                        <input type="text" class="form-control" id="receptionist_name"
+                                            name="receptionist_name" value="{{ client.receptionist_name or '' }}"
+                                            placeholder="{{ _('Who receives/answers first') }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="decision_maker_name" class="form-label">{{ _('Decision Maker Name')
+                                            }}</label>
+                                        <input type="text" class="form-control" id="decision_maker_name"
+                                            name="decision_maker_name" value="{{ client.decision_maker_name or '' }}"
+                                            placeholder="{{ _('Who signs the check') }}">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="decision_factors" class="form-label">{{ _('Decision Factors')
+                                        }}</label>
+                                    <textarea class="form-control" id="decision_factors" name="decision_factors"
+                                        rows="3"
+                                        placeholder="{{ _('What is important to them? (Price, Quality, Speed, Trust...)') }}">{{ client.decision_factors or '' }}</textarea>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="best_contact_time" class="form-label">{{ _('Best Contact Time')
+                                            }}</label>
+                                        <input type="text" class="form-control" id="best_contact_time"
+                                            name="best_contact_time" value="{{ client.best_contact_time or '' }}"
+                                            placeholder="{{ _('Ex: Tuesday afternoon') }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="preferred_contact_method" class="form-label">{{ _('Preferred Contact
+                                            Method')
+                                            }}</label>
+                                        <select class="form-select" id="preferred_contact_method"
+                                            name="preferred_contact_method">
+                                            <option value="">{{ _('Select...') }}</option>
+                                            <option value="WhatsApp" {% if client.preferred_contact_method=='WhatsApp'
+                                                %}selected{% endif %}>WhatsApp</option>
+                                            <option value="Call" {% if client.preferred_contact_method=='Call'
+                                                %}selected{% endif %}>{{ _('Call') }}</option>
+                                            <option value="Email" {% if client.preferred_contact_method=='Email'
+                                                %}selected{% endif %}>Email</option>
+                                            <option value="In-person" {% if client.preferred_contact_method=='In-person'
+                                                %}selected{% endif %}>
+                                                {{ _('In-person Visit') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="observations" class="form-label">{{ _('Additional Information /
+                                        Observations') }}</label>
+                                    <textarea class="form-control" id="observations" name="observations" rows="5"
+                                        placeholder="{{ _('Any other relevant detail...') }}">{{ client.observations or '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> {{ _('Save') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

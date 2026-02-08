@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Novo Projeto') }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('clients.view', client_id=client.id) }}">{{
+                            client.name }}</a></li>
+                    <li class="breadcrumb-item active">{{ _('Novo Projeto') }}</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-plus-lg"></i> {{ _('Iniciar Novo Projeto') }}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ _('Nome do Projeto') }}</label>
+                            <input type="text" name="name" class="form-control"
+                                placeholder="{{ _('Ex: Gestão GMB + SEO Local') }}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">{{ _('Descrição') }}</label>
+                            <textarea name="description" class="form-control" rows="3"
+                                placeholder="{{ _('O que está incluso neste contrato?') }}"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ _('Data de Início') }}</label>
+                                <input type="date" name="start_date" class="form-control" value="{{ now_date }}"
+                                    required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">{{ _('Valor Mensal') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ session.get('company_currency', 'Gs') }}</span>
+                                    <input type="number" name="monthly_value" class="form-control" step="0.01"
+                                        value="{{ client.interested_package.price if client.interested_package else 0 }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{{ url_for('clients.view', client_id=client.id) }}"
+                                class="btn btn-outline-secondary me-md-2">{{ _('Cancelar') }}</a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-lg"></i> {{ _('Criar Projeto') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

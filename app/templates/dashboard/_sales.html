@@ -1,0 +1,84 @@
+<!-- Sales (Closer) Specialized Dashboard Partial -->
+<div class="row mb-4">
+    <!-- SALES SPECIFIC METRICS -->
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-success text-white h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-calendar-check"></i> {{ _('Próximas
+                    Reuniões') }}</h6>
+                <div class="h2 mb-0 fw-bold" id="sales-upcoming-meetings">0</div>
+                <p class="mb-0 small opacity-75">{{ _('Reuniões agendadas para os próximos dias') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-primary text-white h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-file-earmark-text"></i> {{ _('Propostas
+                    Enviadas') }}</h6>
+                <div class="h2 mb-0 fw-bold">{{ total_proposals }}</div>
+                <p class="mb-0 small opacity-75">{{ _('Total de propostas aguardando retorno') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-dark text-white h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-cash-coin"></i> {{ _('Valor em
+                    Negociação') }}</h6>
+                <div class="h2 mb-0 fw-bold">{{ total_pipeline_value|format_currency }}</div>
+                <p class="mb-0 small opacity-75">{{ _('Volume total das oportunidades abertas') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- TASK LIST / HANDOFFS -->
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-success"><i class="bi bi-hand-thumbs-up"></i> {{ _('Oportunidades do SDR
+                    (Handoffs)') }}</h5>
+                <span class="badge bg-success" id="sales-handoff-count">0</span>
+            </div>
+            <div class="card-body p-0" id="workflow-tasks-container">
+                <!-- Reactive Tasks will be rendered here by JS -->
+                <div class="p-4 text-center">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Buscando oportunidades do SDR...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SALES TOOLS -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-briefcase"></i> {{ _('Ferramentas de Venda') }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('clients.kanban') }}" class="btn btn-outline-success text-start">
+                        <i class="bi bi-layout-three-columns"></i> Gerenciar Pipeline
+                    </a>
+                    <a href="{{ url_for('proposals.index') }}" class="btn btn-outline-success text-start">
+                        <i class="bi bi-file-earmark-pdf"></i> Meus Orçamentos
+                    </a>
+                    <a href="{{ url_for('calendar.index') }}" class="btn btn-outline-success text-start">
+                        <i class="bi bi-calendar3"></i> Minha Agenda
+                    </a>
+                </div>
+                <hr>
+                <div class="alert alert-success small mb-0">
+                    <i class="bi bi-check-circle"></i> {{ _('Ao fechar um negócio (Ganho), as tarefas de faturamento e
+                    produção são criadas automaticamente.') }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

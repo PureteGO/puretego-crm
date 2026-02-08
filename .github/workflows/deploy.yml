@@ -1,0 +1,36 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches:
+      - main  # Ou sua branch principal
+
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v3
+
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: app.maps2go.online
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./
+        server-dir: /public_html/  # Ajuste conforme o caminho da sua app no cPanel
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/__pycache__/**
+          venv/**
+          .env
+          tests/**
+          scripts/**
+          TASK_SAAS_ROADMAP.md
+          implementation_plan.md
+          walkthrough.md
+          task.md

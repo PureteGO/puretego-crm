@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Contas a Pagar') }} - Maps2GO{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">{{ _('Financeiro') }}</h1>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('finance.list_receivables') }}">{{ _('Recebíveis') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{{ url_for('finance.list_payables') }}">{{ _('Contas a Pagar') }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('finance.list_commissions') }}">{{ _('Comissões') }}</a>
+        </li>
+    </ul>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-left-warning h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ _('A Pagar
+                                (Aberto)') }}</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_open | format_currency }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-receipt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card shadow-sm border-left-success h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ _('Total Pago') }}
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_paid | format_currency }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-check-all fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- New Payable Form -->
+        <div class="col-xl-4 col-lg-5 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">{{ _('Nova Conta a Pagar') }}</h6>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('finance.list_payables') }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Descrição') }}</label>
+                            <input type="text" name="description" class="form-control" required
+                                placeholder="Ex: Assinatura CRM, Google Ads...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Valor') }}</label>
+                            <input type="number" step="0.01" name="amount" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Vencimento') }}</label>
+                            <input type="date" name="due_date" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ _('Categoria') }}</label>
+                            <select name="category" class="form-select">
+                                <option value="tools">{{ _('Ferramentas') }}</option>
+                                <option value="ads">{{ _('Anúncios (Ads)') }}</option>
+                                <option value="office">{{ _('Escritório') }}</option>
+                                <option value="payroll">{{ _('Pessoal/Folha') }}</option>
+                                <option value="other" selected>{{ _('Outros') }}</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">{{ _('Registrar Conta') }}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payables Table -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">{{ _('Lançamentos') }}</h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('Descrição') }}</th>
+                                    <th>{{ _('Vencimento') }}</th>
+                                    <th>{{ _('Valor') }}</th>
+                                    <th>{{ _('Categoria') }}</th>
+                                    <th>{{ _('Status') }}</th>
+                                    <th>{{ _('Ações') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if payables %}
+                                {% for p in payables %}
+                                <tr>
+                                    <td><strong>{{ p.description }}</strong></td>
+                                    <td>{{ p.due_date | format_date }}</td>
+                                    <td>{{ p.amount | format_currency }}</td>
+                                    <td><span class="badge bg-light text-dark border">{{ p.category }}</span></td>
+                                    <td>
+                                        {% if p.status == 'paid' %}
+                                        <span class="badge bg-success">{{ _('Pago') }}</span>
+                                        {% elif p.due_date < datetime.utcnow().date() %} <span class="badge bg-danger">
+                                            {{ _('Vencido') }}</span>
+                                            {% else %}
+                                            <span class="badge bg-warning text-dark">{{ _('Aberto') }}</span>
+                                            {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if p.status == 'open' %}
+                                        <button onclick="markPayablePaid({{ p.id }})" class="btn btn-sm btn-success">
+                                            <i class="bi bi-check-circle"></i> {{ _('Pagar') }}
+                                        </button>
+                                        {% else %}
+                                        <small class="text-muted"><i class="bi bi-calendar-check text-success"></i> {{
+                                            p.paid_at | format_date }}</small>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">{{ _('Nenhuma conta
+                                        registrada.') }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function markPayablePaid(id) {
+        if (!confirm('{{ _("Marcar esta conta como paga?") }}')) return;
+
+        fetch(`/finance/payables/${id}/pay`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+</script>
+{% endblock %}

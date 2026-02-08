@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Integraciones Google') }} - Maps2GO{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="mb-1">
+                <i class="bi bi-google text-danger me-2"></i>{{ _('Google Business Profile') }}
+            </h1>
+            <p class="text-muted mb-0">{{ _('Conecta tus cuentas de Google para sincronizar perfiles y reseñas') }}</p>
+        </div>
+        <div>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left"></i> {{ _('Volver') }}
+            </a>
+            {% if gbp_enabled %}
+            <a href="{{ url_for('google_oauth.connect') }}" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> {{ _('Conectar Cuenta Google') }}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if not gbp_enabled %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ _('La integración con Google Business Profile está actualmente deshabilitada.') }}
+    </div>
+    {% endif %}
+
+    <!-- Connected Accounts -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-transparent">
+            <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>{{ _('Cuentas Conectadas') }}</h5>
+        </div>
+        <div class="card-body">
+            {% if connections %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>{{ _('Cuenta Google') }}</th>
+                            <th class="text-center">{{ _('Perfiles Vinculados') }}</th>
+                            <th class="text-center">{{ _('Estado') }}</th>
+                            <th>{{ _('Conectado') }}</th>
+                            <th class="text-end">{{ _('Acciones') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for conn in connections %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-danger bg-opacity-10 rounded-circle p-2 me-3">
+                                        <i class="bi bi-google text-danger"></i>
+                                    </div>
+                                    <div>
+                                        <strong>{{ conn.email }}</strong>
+                                        {% if conn.last_error %}
+                                        <br><small class="text-danger" title="{{ conn.last_error }}"><i
+                                                class="bi bi-exclamation-circle-fill me-1"></i>{{ conn.last_error[:60]
+                                            }}{% if conn.last_error|length > 60 %}...{% endif %}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-primary fs-6">{{ conn.locations_count }}</span>
+                            </td>
+                            <td class="text-center">
+                                {% if conn.is_expired %}
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ _('Token Expirado') }}
+                                </span>
+                                {% else %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i>{{ _('Activo') }}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ conn.created_at|format_date }}</small>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('google_oauth.locations', connection_id=conn.id) }}"
+                                        class="btn btn-outline-primary" title="{{ _('Ver Perfiles') }}">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </a>
+                                    {% if conn.is_expired %}
+                                    <a href="{{ url_for('google_oauth.connect') }}" class="btn btn-outline-warning"
+                                        title="{{ _('Reconectar') }}">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </a>
+                                    {% endif %}
+                                    <form action="{{ url_for('google_oauth.disconnect', connection_id=conn.id) }}"
+                                        method="POST" class="d-inline"
+                                        onsubmit="return confirm('{{ _('¿Desconectar esta cuenta?') }}');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-danger"
+                                            title="{{ _('Desconectar') }}">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-cloud-slash text-muted" style="font-size: 4rem;"></i>
+                <h5 class="mt-3 text-muted">{{ _('Sin cuentas conectadas') }}</h5>
+                <p class="text-muted">{{ _('Conecta tu primera cuenta de Google para comenzar a sincronizar perfiles de
+                    negocio.') }}</p>
+                {% if gbp_enabled %}
+                <a href="{{ url_for('google_oauth.connect') }}" class="btn btn-primary btn-lg mt-2">
+                    <i class="bi bi-google me-2"></i>{{ _('Conectar con Google') }}
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Managed Profiles Section -->
+    {% if all_locations %}
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-shop me-2"></i>{{ _('Perfiles Administrados') }}</h5>
+            <span class="badge bg-secondary">{{ all_locations|length }}</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>{{ _('Nombre del Negocio') }}</th>
+                            <th>{{ _('Dirección') }}</th>
+                            <th>{{ _('Administrado por') }}</th>
+                            <th class="text-center">{{ _('Estado') }}</th>
+                            <th class="text-end">{{ _('Acciones') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loc in all_locations %}
+                        <tr>
+                            <td>
+                                <strong>{{ loc.title }}</strong>
+                                <br><small class="text-muted">{{ loc.account_name }}</small>
+                            </td>
+                            <td>
+                                <small>{{ loc.address }}</small>
+                                <br><small class="text-muted">{{ loc.city }}</small>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-google text-muted me-2"></i>
+                                    <span>{{ loc.connection_email }}</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                {% if loc.is_linked %}
+                                <span class="badge bg-success" title="{{ loc.linked_client_name }}">
+                                    <i class="bi bi-link-45deg me-1"></i>{{ _('Vinculado') }}
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">
+                                    <i class="bi bi-dash-lg me-1"></i>{{ _('Sin vincular') }}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ loc.manage_url }}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-gear-fill"></i> {{ _('Administrar') }}
+                                </a>
+                                {% if not loc.is_linked %}
+                                <a href="{{ loc.link_url }}" class="btn btn-sm btn-outline-secondary ms-1"
+                                    title="{{ _('Vincular a Cliente CRM') }}">
+                                    <i class="bi bi-link"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Instructions Card -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-transparent">
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>{{ _('Cómo funciona') }}</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="d-flex">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <span class="fs-4 text-primary">1</span>
+                        </div>
+                        <div>
+                            <h6>{{ _('Conectar Cuenta') }}</h6>
+                            <p class="text-muted small mb-0">{{ _('Inicia sesión con tu cuenta Google que administra
+                                perfiles de negocio.') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <span class="fs-4 text-primary">2</span>
+                        </div>
+                        <div>
+                            <h6>{{ _('Vincular Perfiles') }}</h6>
+                            <p class="text-muted small mb-0">{{ _('Asocia cada perfil de Google Business a un cliente en
+                                el CRM.') }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex">
+                        <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                            <span class="fs-4 text-primary">3</span>
+                        </div>
+                        <div>
+                            <h6>{{ _('Sincronizar Reseñas') }}</h6>
+                            <p class="text-muted small mb-0">{{ _('Las reseñas se sincronizarán automáticamente para
+                                seguimiento.') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

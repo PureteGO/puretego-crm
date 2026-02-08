@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}{{ location.title }} - Google Business Profile{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('google_oauth.dashboard') }}">{{ _('Google
+                            Dashboard') }}</a></li>
+                    <li class="breadcrumb-item active">{{ location.title }}</li>
+                </ol>
+            </nav>
+            <h1 class="h3">{{ location.title }}</h1>
+            <p class="text-muted mb-0">
+                <i class="bi bi-geo-alt"></i> {{ location.address }}
+            </p>
+        </div>
+        <div>
+            <a href="{{ location.metadata.mapsUri if location.metadata and location.metadata.mapsUri else '#' }}"
+                target="_blank" class="btn btn-outline-primary">
+                <i class="bi bi-box-arrow-up-right"></i> {{ _('Ver en Maps') }}
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats / Info Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">{{ _('Estado') }}</h6>
+                    <div class="d-flex align-items-center">
+                        {% if location.locationState and location.locationState.isPublished %}
+                        <span class="badge bg-success me-2">{{ _('Publicado') }}</span>
+                        {% else %}
+                        <span class="badge bg-warning me-2">{{ _('No Publicado') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">{{ _('Categoría') }}</h6>
+                    <p class="mb-0 fw-bold">{{ location.primaryCategory.displayName if location.primaryCategory else '-'
+                        }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">{{ _('Teléfono') }}</h6>
+                    <p class="mb-0">{{ location.phoneNumbers.primaryPhone if location.phoneNumbers else '-' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h6 class="text-muted text-uppercase small">{{ _('Website') }}</h6>
+                    {% if location.websiteUri %}
+                    <a href="{{ location.websiteUri }}" target="_blank" class="text-truncate d-block">{{
+                        location.websiteUri }}</a>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Tabs -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-transparent">
+            <ul class="nav nav-tabs card-header-tabs" id="manageTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="reviews-tab" data-bs-toggle="tab" href="#reviews" role="tab">{{
+                        _('Reseñas') }} ({{ reviews|length }})</a>
+                </li>
+                <!-- Future tabs: Posts, Photos, Insights -->
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="manageTabsContent">
+                <!-- Reviews Tab -->
+                <div class="tab-pane fade show active" id="reviews" role="tabpanel">
+                    {% if reviews %}
+                    <div class="list-group list-group-flush">
+                        {% for review in reviews %}
+                        <div class="list-group-item px-0 py-3">
+                            <div class="d-flex w-100 justify-content-between mb-1">
+                                <div>
+                                    <h6 class="mb-1">{{ review.reviewer.displayName }}</h6>
+                                    <div class="text-warning small mb-2">
+                                        {% for i in range(5) %}
+                                        {% if i < ["ONE", "TWO" , "THREE" , "FOUR" , "FIVE" ].index(review.starRating) +
+                                            1 %} <i class="bi bi-star-fill"></i>
+                                            {% else %}
+                                            <i class="bi bi-star"></i>
+                                            {% endif %}
+                                            {% endfor %}
+                                    </div>
+                                </div>
+                                <small class="text-muted">{{ review.createTime[:10] }}</small>
+                            </div>
+                            <p class="mb-1">{{ review.comment }}</p>
+
+                            {% if review.reviewReply %}
+                            <div class="bg-light p-3 rounded mt-2 ms-4">
+                                <small class="fw-bold d-block mb-1">{{ _('Tu respuesta:') }}</small>
+                                <p class="mb-0 fs-7 italic">{{ review.reviewReply.comment }}</p>
+                                <small class="text-muted">{{ review.reviewReply.updateTime[:10] }}</small>
+                            </div>
+                            {% else %}
+                            <div class="mt-2">
+                                <button class="btn btn-sm btn-outline-primary" disabled title="Coming soon">{{
+                                    _('Responder') }}</button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-chat-square-text fs-1 text-muted"></i>
+                        <p class="mt-2 text-muted">{{ _('No hay reseñas disponibles.') }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

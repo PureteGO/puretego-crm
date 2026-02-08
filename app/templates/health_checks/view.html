@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Health Check Report') }} - {{ health_check.client.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('clients.index') }}">{{ _('Clients') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('clients.view', client_id=health_check.client_id) }}">{{
+                    health_check.client.name }}</a></li>
+            <li class="breadcrumb-item active">{{ _('Health Check Details') }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Dashboard de Score -->
+        <div class="col-md-4">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center py-5">
+                    <h5 class="text-muted text-uppercase mb-4">{{ _('GMB Score') }}</h5>
+                    <div class="display-1 fw-bold text-{{ health_check.get_score_color() }}">
+                        {{ health_check.score }}
+                    </div>
+                    <div class="badge bg-{{ health_check.get_score_color() }} fs-5 px-3 py-2 mt-3">
+                        {{ health_check.get_score_status() }}
+                    </div>
+                    <p class="text-muted mt-4 mb-0">{{ _('Audit performed on') }} {{
+                        health_check.created_at|format_date }}</p>
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h6 class="mb-0">{{ _('Analysis Summary') }}</h6>
+                </div>
+                <div class="card-body">
+                    {% set report = health_check.get_report_data() %}
+                    {% set summary = report.summary if 'summary' in report else report %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ _('Critical Issues') }}:</span>
+                        <span class="badge bg-danger rounded-pill">{{ summary.critical_issues_count or 0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ _('Moderate Issues') }}:</span>
+                        <span class="badge bg-warning text-dark rounded-pill">{{ summary.moderate_issues_count or 0
+                            }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>{{ _('Positive Points') }}:</span>
+                        <span class="badge bg-success rounded-pill">{{ summary.positive_points_count or 0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles de los Criterios -->
+        <div class="col-md-8">
+            <div class="card shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ _('Audit Details') }}</h5>
+                    <a href="{{ url_for('proposals.create', client_id=health_check.client_id) }}"
+                        class="btn btn-sm btn-primary">
+                        <i class="bi bi-file-earmark-plus"></i> {{ _('Create Proposal Based on this') }}
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% set report = health_check.get_report_data() %}
+
+                    {% if report.top_critical_issues %}
+                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-exclamation-octagon"></i> {{ _('Critical Issues
+                        Identified') }}</h6>
+                    <div class="list-group mb-4">
+                        {% for issue in report.top_critical_issues %}
+                        <div class="list-group-item list-group-item-danger border-start-5">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ issue.name }}</h6>
+                            </div>
+                            <p class="mb-1 small text-muted">{{ issue.message }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <h6 class="text-primary fw-bold mb-3"><i class="bi bi-lightbulb"></i> {{ _('Specialist
+                        Recommendations') }}</h6>
+                    <div class="bg-light p-3 rounded border">
+                        <ul class="mb-0">
+                            {% if report.recommendations %}
+                            {% for rec in report.recommendations %}
+                            <li class="mb-2">{{ rec }}</li>
+                            {% endfor %}
+                            {% else %}
+                            <li class="text-muted">{{ _('No specific recommendations available for this audit.') }}
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <form action="{{ url_for('health_checks.delete', health_check_id=health_check.id) }}" method="POST"
+                    onsubmit="return confirm('{{ _('Are you sure you want to delete this audit?') }}');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">{{ _('Delete this Report')
+                        }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

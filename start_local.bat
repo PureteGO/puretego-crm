@@ -1,0 +1,19 @@
+@echo off
+echo Starting PureteGO CRM...
+
+if not exist venv (
+    echo Creating virtual environment...
+    python -m venv venv
+)
+
+echo Activating virtual environment...
+call venv\Scripts\activate
+
+echo Installing/Updating dependencies...
+pip install -r requirements.txt
+
+echo running database migrations (creating tables if not exist)...
+echo Database tables are created automatically on app startup.
+
+echo Starting server...
+python run.py

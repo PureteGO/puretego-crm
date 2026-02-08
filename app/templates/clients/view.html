@@ -1,0 +1,719 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Client Details') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ client.name }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('clients.edit', client_id=client.id) }}" class="btn btn-sm btn-outline-primary me-2">
+                <i class="bi bi-pencil"></i> {{ _('Edit') }}
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal"
+                data-bs-target="#deleteClientModal">
+                <i class="bi bi-trash"></i> {{ _('Delete') }}
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Información del Cliente -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">{{ _('Client Information') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong><i class="bi bi-tag"></i> {{ _('Stage') }}:</strong> <span class="badge bg-info">{{
+                            client.kanban_stage.name if client.kanban_stage else _('No stage') }}</span></p>
+                    <hr>
+                    <p><strong><i class="bi bi-person"></i> {{ _('Contact') }}:</strong> {{ client.contact_name or '-'
+                        }}</p>
+                    <p><strong><i class="bi bi-telephone"></i> {{ _('Phone') }}:</strong> {{ client.phone or '-' }}
+                    </p>
+                    <p><strong><i class="bi bi-envelope"></i> {{ _('Email') }}:</strong> {{ client.email or '-' }}</p>
+                    <p><strong><i class="bi bi-globe"></i> {{ _('Website') }}:</strong>
+                        {% if client.website %}
+                        <a href="{{ client.website if client.website.startswith('http') else 'http://' + client.website }}"
+                            target="_blank">{{ client.website }}</a>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </p>
+                    <p><strong><i class="bi bi-geo-alt"></i> {{ _('Address') }}:</strong> {{
+                        client.address|urlize(target='_blank') if client.address else '-' }}</p>
+                    {% if client.gmb_profile_name %}
+                    <hr>
+                    <p><strong><i class="bi bi-google"></i> Google Maps:</strong> {{ client.gmb_profile_name }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Detalles Adicionales -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">{{ _('Additional Details') }}</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>{{ _('Receptionist') }}:</strong> {{ client.receptionist_name or '-' }}</p>
+                    <p class="mb-2"><strong>{{ _('Decision Maker') }}:</strong> {{ client.decision_maker_name or '-' }}
+                    </p>
+                    <p class="mb-2"><strong>{{ _('Decision Factors') }}:</strong></p>
+                    <div class="text-muted small mb-3">{{ client.decision_factors or '-' }}</div>
+
+                    <p class="mb-2"><strong>{{ _('Preferred Time') }}:</strong> {{ client.best_contact_time or '-' }}
+                    </p>
+                    <p class="mb-2"><strong>{{ _('Preferred Method') }}:</strong> {{ client.preferred_contact_method or
+                        '-' }}
+                    </p>
+
+                    <hr>
+                    <p class="mb-1"><strong>{{ _('Observations') }}:</strong></p>
+                    <div class="text-muted small">{{ client.observations or '-' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestañas de Actividades -->
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="clientTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="timeline-tab" data-bs-toggle="tab" href="#timeline"
+                                role="tab">{{ _('Interactions') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="proposals-tab" data-bs-toggle="tab" href="#proposals" role="tab">{{
+                                _('Proposals') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="visits-tab" data-bs-toggle="tab" href="#visits" role="tab">{{
+                                _('Visits') }}
+                                (Legacy)</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="health-tab" data-bs-toggle="tab" href="#health" role="tab">{{
+                                _('Health Check') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="seo-tab" data-bs-toggle="tab" href="#seo" role="tab">{{ _('SEO
+                                Ranking') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="insights-tab" data-bs-toggle="tab" href="#insights" role="tab">{{
+                                _('GMB Insights') }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="projects-tab" data-bs-toggle="tab" href="#projects-tab-pane"
+                                role="tab">{{
+                                _('Projects / Post-Sales') }}</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="clientTabsContent">
+                        <!-- Timeline (Interacciones) -->
+                        <div class="tab-pane fade show active" id="timeline" role="tabpanel">
+                            <div class="d-flex justify-content-end mb-3">
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#logInteractionModal">
+                                    <i class="bi bi-clock-history"></i> {{ _('Log Visit / Call') }}
+                                </button>
+                            </div>
+                            {% include "interactions/timeline.html" %}
+                        </div>
+
+                        <!-- Propuestas -->
+                        <div class="tab-pane fade" id="proposals" role="tabpanel">
+                            <div class="d-flex justify-content-end mb-3">
+                                <a href="{{ url_for('proposals.create', client_id=client.id) }}"
+                                    class="btn btn-sm btn-primary">
+                                    <i class="bi bi-plus-lg"></i> {{ _('New Proposal') }}
+                                </a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>{{ _('Date') }}</th>
+                                            <th>{{ _('Total') }}</th>
+                                            <th>{{ _('Status') }}</th>
+                                            <th>{{ _('Actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for proposal in proposals %}
+                                        <tr>
+                                            <td>#{{ proposal.id }}</td>
+                                            <td>{{ proposal.created_at|format_date }}</td>
+                                            <td>{{ proposal.total_amount|format_currency }}</td>
+                                            <td><span class="badge bg-secondary">{{ proposal.status }}</span></td>
+                                            <td>
+                                                <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}"
+                                                    class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center">{{ _('No proposals registered.')
+                                                }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Visitas -->
+                        <div class="tab-pane fade" id="visits" role="tabpanel">
+                            <div class="d-flex justify-content-end mb-3">
+                                <a href="{{ url_for('visits.create', client_id=client.id) }}"
+                                    class="btn btn-sm btn-success">
+                                    <i class="bi bi-calendar-plus"></i> {{ _('Log Visit') }}
+                                </a>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Date') }}</th>
+                                            <th>{{ _('Notes') }}</th>
+                                            <th>{{ _('Next Step') }}</th>
+                                            <th>{{ _('Actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for visit in visits %}
+                                        <tr>
+                                            <td>{{ visit.visit_date|format_date('%d/%m/%Y %H:%M') }}</td>
+                                            <td>{{ visit.notes|truncate(50) }}</td>
+                                            <td><span class="badge bg-light text-dark border">{{ visit.next_step
+                                                    }}</span></td>
+                                            <td>
+                                                <a href="{{ url_for('visits.view', visit_id=visit.id) }}"
+                                                    class="btn btn-sm btn-outline-info">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4">{{ _('No visits registered.')
+                                                }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Health Check -->
+                        <div class="tab-pane fade" id="health" role="tabpanel">
+                            <div class="d-flex justify-content-end mb-3 gap-2">
+                                {% if current_user.can_manage_healthcheck_for(client) %}
+                                {% if client.gmb_location_links %}
+                                <form action="{{ url_for('health_checks.official_check', client_id=client.id) }}"
+                                    method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        <i class="bi bi-shield-check"></i> {{ _('Advanced Audit (API)') }}
+                                    </button>
+                                </form>
+                                {% elif connections %}
+                                <button type="button" class="btn btn-sm btn-outline-google" data-bs-toggle="modal"
+                                    data-bs-target="#linkGmbModal">
+                                    <i class="bi bi-link-45deg"></i> {{ _('Link Google Profile') }}
+                                </button>
+                                {% endif %}
+
+                                <a href="{{ url_for('health_checks.create', client_id=client.id) }}"
+                                    class="btn btn-sm btn-primary">
+                                    <i class="bi bi-google"></i> {{ _('New Health Check (Public)') }}
+                                </a>
+                                {% endif %}
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>{{ _('Date') }}</th>
+                                            <th>{{ _('Score') }}</th>
+                                            <th>{{ _('Status') }}</th>
+                                            <th>{{ _('Actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for hc in health_checks %}
+                                        <tr>
+                                            <td>{{ hc.created_at|format_date }}</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge bg-{{ hc.get_score_color() }} me-2">{{ hc.score
+                                                        }}</span>
+                                                    <div class="progress w-100" style="height: 5px;">
+                                                        <div class="progress-bar bg-{{ hc.get_score_color() }}"
+                                                            style="width: {{ hc.score }}%;"></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ hc.get_score_status() }}</td>
+                                            <td>
+                                                <a href="{{ url_for('health_checks.view', health_check_id=hc.id) }}"
+                                                    class="btn btn-sm btn-outline-info">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4">{{ _('No audits performed.') }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO Ranking -->
+                <div class="tab-pane fade" id="seo" role="tabpanel">
+                    <div class="d-flex justify-content-end mb-3">
+                        {% if current_user.can_manage_gmb_for(client) %}
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                            data-bs-target="#addKeywordModal">
+                            <i class="bi bi-plus-lg"></i> {{ _('Track Keyword') }}
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>{{ _('Keyword') }}</th>
+                                    <th>{{ _('Local Position') }}</th>
+                                    <th>{{ _('Organic Position') }}</th>
+                                    <th>{{ _('Last Check') }}</th>
+                                    <th>{{ _('Actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if client.rankings %}
+                                {% for ranking in client.rankings %}
+                                <tr>
+                                    <td>{{ ranking.keyword }}</td>
+                                    <td>
+                                        {% if ranking.current_position_local %}
+                                        <span class="badge bg-success">#{{ ranking.current_position_local }}</span>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if ranking.current_position_organic %}
+                                        <span class="badge bg-info">#{{ ranking.current_position_organic }}</span>
+                                        {% else %}
+                                        <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ ranking.last_check_at|format_date }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            {% if current_user.can_manage_gmb_for(client) %}
+                                            <form
+                                                action="{{ url_for('clients.refresh_keyword', client_id=client.id, ranking_id=ranking.id) }}"
+                                                method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-primary"
+                                                    title="{{ _('Update') }}">
+                                                    <i class="bi bi-arrow-clockwise"></i>
+                                                </button>
+                                            </form>
+                                            <form
+                                                action="{{ url_for('clients.delete_keyword', client_id=client.id, ranking_id=ranking.id) }}"
+                                                method="POST" class="d-inline ms-1"
+                                                onsubmit="return confirm(this.getAttribute('data-confirm'));"
+                                                data-confirm="{{ _('Delete this keyword?') }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    title="{{ _('Delete') }}">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">{{ _('No keywords tracked.')
+                                        }}</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- GMB Insights -->
+                <div class="tab-pane fade" id="insights" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">{{ _('Google Business Profile Performance (Last 30 days)') }}</h5>
+                        {% if client.gmb_location_links and current_user.can_manage_gmb_for(client) %}
+                        <form
+                            action="{{ url_for('integrations.sync_insights', connection_id=client.gmb_location_links[0].google_connection_id, link_id=client.gmb_location_links[0].id) }}"
+                            method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-arrow-repeat"></i> {{ _('Update Data') }}
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+
+                    {% if insights %}
+                    <div class="row">
+                        <div class="col-12 mb-4">
+                            <div class="card bg-white border">
+                                <div class="card-body">
+                                    <canvas id="insightsChart" style="max-height: 350px;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm text-center">
+                                <div class="card-body">
+                                    <h6 class="text-muted">{{ _('Total Impressions') }}</h6>
+                                    {% set total_imp = insights|map(attribute='impressions')|sum %}
+                                    <h3 class="fw-bold">{{ total_imp }}</h3>
+                                    <i class="bi bi-eye text-primary fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm text-center">
+                                <div class="card-body">
+                                    <h6 class="text-muted">{{ _('Calls') }}</h6>
+                                    {% set total_calls = insights|map(attribute='calls')|sum %}
+                                    <h3 class="fw-bold">{{ total_calls }}</h3>
+                                    <i class="bi bi-telephone text-success fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card shadow-sm text-center">
+                                <div class="card-body">
+                                    <h6 class="text-muted">{{ _('Website Clicks') }}</h6>
+                                    {% set total_web = insights|map(attribute='website')|sum %}
+                                    <h3 class="fw-bold">{{ total_web }}</h3>
+                                    <i class="bi bi-globe text-info fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-graph-up text-muted display-1"></i>
+                        <p class="mt-3 text-muted">
+                            {% if is_linked %}
+                            {{ _('No data collected for this account yet. Click "Update Data" to import.') }}
+                            {% else %}
+                            {{ _('Link a Google Business account to see performance metrics.') }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Projects & Post-Sales -->
+                <div class="tab-pane fade" id="projects-tab-pane" role="tabpanel">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">{{ _('Active Projects and Deliveries') }}</h5>
+                        <a href="{{ url_for('projects.create', client_id=client.id) }}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle"></i> {{ _('Start New Project') }}
+                        </a>
+                    </div>
+
+                    {% if client.projects %}
+                    <div class="row">
+                        {% for project in client.projects %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card shadow-sm border-0 bg-light">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="fw-bold mb-0">{{ project.name }}</h6>
+                                        <span class="badge bg-success">{{ project.status|capitalize }}</span>
+                                    </div>
+                                    <p class="small text-muted mb-3">{{ project.description or _('No description.') }}
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="text-primary fw-bold">{{ project.monthly_value|format_currency
+                                            }}</span>
+                                        <a href="{{ url_for('projects.view', project_id=project.id) }}"
+                                            class="btn btn-sm btn-outline-primary">
+                                            {{ _('Manage') }}
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5 bg-light rounded shadow-sm">
+                        <i class="bi bi-briefcase text-muted display-4"></i>
+                        <p class="mt-3 text-muted">
+                            {{ _('This client does not have an active project yet.') }}<br>
+                            {{ _('Projects allow managing contracts and post-sales tasks.') }}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Link GMB Modal -->
+<div class="modal fade" id="linkGmbModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Link Google Business Profile') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('google_oauth.link_location', connection_id=0) }}" method="POST" id="linkGmbForm">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="client_id" value="{{ client.id }}">
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Google Account') }}</label>
+                        <select class="form-select" id="gmbConnectionSelect" required>
+                            <option value="">{{ _('Select an account...') }}</option>
+                            {% for conn in connections %}
+                            <option value="{{ conn.id }}">{{ conn.google_account_email }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3" id="gmbLocationContainer" style="display: none;">
+                        <label class="form-label">{{ _('Business Profile') }}</label>
+                        <select class="form-select" name="location_name" id="gmbLocationSelect" required>
+                            <option value="">{{ _('Loading profiles...') }}</option>
+                        </select>
+                        <input type="hidden" name="location_title" id="gmbLocationTitle">
+                        <input type="hidden" name="location_address" id="gmbLocationAddress">
+                    </div>
+
+                    <div id="gmbLoading" class="text-center py-3" style="display: none;">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                        <span class="ms-2">{{ _('Searching profiles...') }}</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary" id="btnLinkGmb" disabled>{{ _('Link') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Keyword Modal -->
+<div class="modal fade" id="addKeywordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Track New Keyword') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('clients.add_keyword', client_id=client.id) }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label for="keyword" class="form-label">{{ _('Keyword') }} *</label>
+                        <input type="text" class="form-control" id="keyword" name="keyword" required
+                            placeholder="{{ _('Ex: Pizzeria in Asuncion') }}">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="location_seo" class="form-label">{{ _('Location') }}</label>
+                        <input type="text" class="form-control" id="location_seo" name="location"
+                            value="{{ client.address or '' }}" placeholder="{{ _('Ex: Asuncion, Paraguay') }}">
+                        <div class="form-text">{{ _('Leave empty for global search or enter City, Country') }}</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Track') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteClientModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> {{ _('Confirm Deletion') }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ _('Are you sure you want to delete the client') }} <strong>{{ client.name }}</strong>?</p>
+                <p class="text-muted small">{{ _('This action will move the client to the trash (Soft Delete).') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <form action="{{ url_for('clients.delete', client_id=client.id) }}" method="POST">
+                    <button type="submit" class="btn btn-danger">{{ _('Delete Client') }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "interactions/log_modal.html" %}
+{% include "interactions/manage_types_modal.html" %}
+
+{% block scripts %}
+<script>
+    // Link GMB Modal logic
+    (function () {
+        const connectionSelect = document.getElementById('gmbConnectionSelect');
+        const locationSelect = document.getElementById('gmbLocationSelect');
+        const locationContainer = document.getElementById('gmbLocationContainer');
+        const loading = document.getElementById('gmbLoading');
+        const btnLink = document.getElementById('btnLinkGmb');
+        const form = document.getElementById('linkGmbForm');
+        const baseAction = form.action;
+
+        if (connectionSelect) {
+            connectionSelect.addEventListener('change', function () {
+                const connId = this.value;
+                if (!connId) {
+                    locationContainer.style.display = 'none';
+                    return;
+                }
+
+                form.action = baseAction.replace(/\/0\/link$/, '/' + connId + '/link');
+
+                loading.style.display = 'block';
+                locationContainer.style.display = 'none';
+                btnLink.disabled = true;
+
+                fetch('/integrations/google/api/locations/' + connId)
+                    .then(r => r.json())
+                    .then(data => {
+                        loading.style.display = 'none';
+                        if (data.success && data.locations.length > 0) {
+                            locationSelect.innerHTML = '<option value="">{{ _("Select profile...") }}</option>';
+                            data.locations.forEach(loc => {
+                                const opt = document.createElement('option');
+                                opt.value = loc.name;
+                                opt.textContent = loc.title;
+                                opt.dataset.title = loc.title;
+                                opt.dataset.address = loc.address;
+                                locationSelect.appendChild(opt);
+                            });
+                            locationContainer.style.display = 'block';
+                        } else {
+                            alert('{{ _("No profiles found in this account.") }}');
+                        }
+                    })
+                    .catch(err => {
+                        loading.style.display = 'none';
+                        alert('{{ _("Error loading profiles.") }}');
+                    });
+            });
+
+            locationSelect.addEventListener('change', function () {
+                const opt = this.options[this.selectedIndex];
+                if (opt.value) {
+                    document.getElementById('gmbLocationTitle').value = opt.dataset.title;
+                    document.getElementById('gmbLocationAddress').value = opt.dataset.address;
+                    btnLink.disabled = false;
+                } else {
+                    btnLink.disabled = true;
+                }
+            });
+        }
+    })();
+
+    // Insights Chart logic
+    {% if insights %}
+    (function () {
+        const ctx = document.getElementById('insightsChart').getContext('2d');
+        const data = {{ insights | tojson | safe
+    }};
+
+    const labels = data.map(i => i.date);
+    const impressions = data.map(i => i.impressions);
+    const calls = data.map(i => i.calls);
+    const website = data.map(i => i.website);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '{{ _("Impressions") }}',
+                    data: impressions,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: '{{ _("Calls") }}',
+                    data: calls,
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: '{{ _("Website Clicks") }}',
+                    data: website,
+                    borderColor: '#0dcaf0',
+                    backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    }) ();
+    {% endif %}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Perfil de la Empresa') }} - PURETEGO CRM{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-building me-2"></i>{{ company.name }}</h4>
+                    <a href="{{ url_for('company.edit') }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil me-1"></i>{{ _('Editar') }}
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4">
+                            {% if company.logo_url %}
+                            <img src="{{ company.logo_url }}" alt="Logo" class="img-fluid rounded mb-2"
+                                style="max-height: 150px;">
+                            {% else %}
+                            <div class="rounded d-flex align-items-center justify-content-center mb-2"
+                                style="height: 150px; background: var(--bg-hover);">
+                                <i class="bi bi-building text-muted" style="font-size: 4rem;"></i>
+                            </div>
+                            <small class="text-muted">{{ _('Sin logo configurado') }}</small>
+                            {% endif %}
+                            <div class="mt-2">
+                                <a href="{{ url_for('company.edit') }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-camera me-1"></i>{{ _('Cambiar Logo') }}
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th style="width: 150px;"><i class="bi bi-globe me-2"></i>{{ _('Slug') }}:</th>
+                                    <td><code>{{ company.slug }}</code></td>
+                                </tr>
+                                <tr>
+                                    <th><i class="bi bi-envelope me-2"></i>{{ _('Email') }}:</th>
+                                    <td>{{ company.email or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th><i class="bi bi-phone me-2"></i>{{ _('Teléfono') }}:</th>
+                                    <td>{{ company.phone or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th><i class="bi bi-geo-alt me-2"></i>{{ _('Dirección') }}:</th>
+                                    <td>{{ company.address or '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th><i class="bi bi-calendar me-2"></i>{{ _('Creada') }}:</th>
+                                    <td>{{ company.created_at|format_date if company.created_at else '-' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>{{ _('Estadísticas') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="bi bi-people me-2"></i>{{ _('Usuarios') }}</span>
+                        <span class="badge bg-primary fs-6">{{ company.users_count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span><i class="bi bi-person-lines-fill me-2"></i>{{ _('Clientes') }}</span>
+                        <span class="badge bg-success fs-6">{{ company.clients_count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-patch-check me-2"></i>{{ _('Estado') }}</span>
+                        {% if company.is_active %}
+                        <span class="badge bg-success">{{ _('Activa') }}</span>
+                        {% else %}
+                        <span class="badge bg-danger">{{ _('Inactiva') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>{{ _('Accesos Rápidos') }}</h5>
+                </div>
+                <div class="card-body">
+                    <a href="{{ url_for('google_oauth.dashboard') }}" class="btn btn-outline-danger w-100 mb-2">
+                        <i class="bi bi-google me-1"></i>{{ _('Integración Google') }}
+                    </a>
+                    <a href="{{ url_for('company.email_settings') }}" class="btn btn-outline-warning w-100 mb-2">
+                        <i class="bi bi-envelope-at me-1"></i>{{ _('Configuración de Email') }}
+                    </a>
+                    <a href="{{ url_for('users.index') }}" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="bi bi-people-fill me-1"></i>{{ _('Gestionar Usuarios') }}
+                    </a>
+                    <a href="{{ url_for('clients.index') }}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-person-lines-fill me-1"></i>{{ _('Ver Clientes') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

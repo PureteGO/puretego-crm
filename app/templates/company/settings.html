@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Configurações da Empresa') }} - PURETEGO CRM{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4 text-gray-800"><i class="bi bi-building-gear me-2"></i>{{ _('Configurações da Empresa')
+                }}</h1>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white p-0">
+                    <ul class="nav nav-tabs border-bottom-0" id="companySettingsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-4 py-3 active fw-bold" id="branding-tab" data-bs-toggle="tab"
+                                data-bs-target="#branding" type="button" role="tab" aria-controls="branding"
+                                aria-selected="true">
+                                <i class="bi bi-palette me-1"></i> {{ _('Branding') }}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-4 py-3 fw-bold" id="email-tab" data-bs-toggle="tab"
+                                data-bs-target="#email" type="button" role="tab" aria-controls="email"
+                                aria-selected="false">
+                                <i class="bi bi-envelope me-1"></i> {{ _('E-mail (SMTP)') }}
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link px-4 py-3 fw-bold" id="workflow-tab" data-bs-toggle="tab"
+                                data-bs-target="#workflow" type="button" role="tab" aria-controls="workflow"
+                                aria-selected="false">
+                                <i class="bi bi-diagram-3 me-1"></i> {{ _('Modo de Trabalho') }}
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body p-4">
+                    <div class="tab-content" id="companySettingsTabsContent">
+                        <!-- Branding Tab -->
+                        <div class="tab-pane fade show active" id="branding" role="tabpanel"
+                            aria-labelledby="branding-tab">
+                            <form action="{{ url_for('company.update_branding') }}" method="POST"
+                                enctype="multipart/form-data">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="row">
+                                    <div class="col-md-4 text-center border-end">
+                                        <label class="form-label fw-bold d-block mb-3">{{ _('Logo da Agência')
+                                            }}</label>
+                                        <div class="mb-3 position-relative d-inline-block">
+                                            {% if company.logo_url %}
+                                            <img src="{{ company.logo_url }}" alt="Logo"
+                                                class="img-fluid rounded shadow-sm"
+                                                style="max-height: 150px; background: #f8f9fa; padding: 10px;">
+                                            <div class="mt-2">
+                                                <button type="button" class="btn btn-sm btn-outline-danger border-0"
+                                                    onclick="confirmDeleteLogo()">
+                                                    <i class="bi bi-trash"></i> {{ _('Remover') }}
+                                                </button>
+                                            </div>
+                                            {% else %}
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                style="height: 150px; width: 150px; border: 2px dashed #dee2e6;">
+                                                <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="mt-3">
+                                            <input type="file" class="form-control form-control-sm" name="logo"
+                                                accept="image/*">
+                                            <small class="text-muted d-block mt-1">{{ _('Recomendado: 400x400px (PNG ou
+                                                SVG)') }}</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 px-md-5">
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold"><i class="bi bi-palette me-1"></i> {{
+                                                _('Paleta de Cores (Tema)') }}</label>
+                                            <p class="text-muted small">{{ _('Selecione a identidade visual que será
+                                                aplicada nos dashboards e relatórios para seus clientes.') }}</p>
+                                            <div class="row g-3 mt-2">
+                                                {% for value, name, description in theme_choices %}
+                                                <div class="col-md-6 col-lg-4">
+                                                    <div class="theme-card {% if company.theme_style == value %}active{% endif %}"
+                                                        onclick="selectTheme('{{ value }}')"
+                                                        id="theme-card-{{ value }}">
+                                                        <div class="theme-color-preview bg-{{ value }}"></div>
+                                                        <div class="p-2">
+                                                            <div class="fw-bold small">{{ name }}</div>
+                                                            <div class="text-muted" style="font-size: 0.75rem;">{{
+                                                                description }}</div>
+                                                        </div>
+                                                        <input type="radio" name="theme_style" id="radio_{{ value }}"
+                                                            value="{{ value }}" {% if company.theme_style==value
+                                                            %}checked{% endif %} class="d-none">
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">{{ _('Informações Básicas') }}</label>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small">{{ _('Nome da Agência') }}</label>
+                                                    <input type="text" class="form-control" name="name"
+                                                        value="{{ company.name }}" required>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small">{{ _('Símbolo de Moeda') }}</label>
+                                                    <input type="text" class="form-control" name="currency_symbol"
+                                                        value="{{ company.currency_symbol or 'Gs' }}" maxlength="5">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <button type="submit" class="btn btn-primary px-4">
+                                            <i class="bi bi-save me-1"></i> {{ _('Salvar Alterações de Branding') }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Email Tab -->
+                        <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+                            <div class="row">
+                                <div class="col-md-7">
+                                    <form action="{{ url_for('company.update_smtp') }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <h5 class="fw-bold mb-3">{{ _('Servidor SMTP Próprio') }}</h5>
+                                        <p class="text-muted small mb-4">
+                                            {{ _('Configure o SMTP da sua agência para que os e-mails de propostas e
+                                            faturas sejam enviados em seu próprio nome. Se deixar em branco, usaremos o
+                                            servidor padrão Maps2GO.') }}
+                                        </p>
+
+                                        <div class="row">
+                                            <div class="col-md-8 mb-3">
+                                                <label class="form-label small">{{ _('Servidor SMTP (Host)') }}</label>
+                                                <input type="text" class="form-control" name="smtp_server"
+                                                    value="{{ smtp.smtp_server }}" placeholder="smtp.exemplo.com">
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <label class="form-label small">{{ _('Porta') }}</label>
+                                                <input type="number" class="form-control" name="smtp_port"
+                                                    value="{{ smtp.smtp_port }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label small">{{ _('Usuário / E-mail') }}</label>
+                                                <input type="text" class="form-control" name="smtp_username"
+                                                    value="{{ smtp.smtp_username }}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label small">{{ _('Senha') }}</label>
+                                                <input type="password" class="form-control" name="smtp_password"
+                                                    placeholder="{% if smtp.has_password %}********{% else %}Sua senha SMTP{% endif %}">
+                                                {% if smtp.has_password %}<small class="text-muted">{{ _('Deixe em
+                                                    branco para manter a senha atual.') }}</small>{% endif %}
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="smtp_use_tls"
+                                                    id="useTls" {% if smtp.smtp_use_tls %}checked{% endif %}>
+                                                <label class="form-check-label" for="useTls">{{ _('Usar TLS / SSL')
+                                                    }}</label>
+                                            </div>
+                                        </div>
+
+                                        <hr class="my-4">
+
+                                        <h5 class="fw-bold mb-3">{{ _('Identidade do Remetente') }}</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label small">{{ _('Nome de Exibição') }}</label>
+                                                <input type="text" class="form-control" name="smtp_from_name"
+                                                    value="{{ smtp.smtp_from_name }}" placeholder="{{ company.name }}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label small">{{ _('E-mail do Remetente') }}</label>
+                                                <input type="email" class="form-control" name="smtp_from_email"
+                                                    value="{{ smtp.smtp_from_email }}"
+                                                    placeholder="{{ smtp.smtp_username }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                                <i class="bi bi-save me-1"></i> {{ _('Salvar Configurações SMTP') }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body p-4">
+                                            <h6 class="fw-bold mb-3"><i class="bi bi-send-check me-1"></i> {{ _('Testar
+                                                Configuração') }}</h6>
+                                            <p class="small text-muted mb-3">{{ _('Envie um e-mail de teste para
+                                                verificar se suas credenciais SMTP estão corretas.') }}</p>
+                                            <form action="{{ url_for('company.test_email') }}" method="POST">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <div class="input-group">
+                                                    <input type="email" class="form-control form-control-sm"
+                                                        name="test_email" placeholder="email@exemplo.com" required>
+                                                    <button class="btn btn-secondary btn-sm" type="submit">{{ _('Enviar
+                                                        Teste') }}</button>
+                                                </div>
+                                            </form>
+
+                                            <div class="mt-5">
+                                                <h6 class="fw-bold mb-3"><i class="bi bi-file-earmark-code me-1"></i> {{
+                                                    _('Templates de E-mail') }}</h6>
+                                                <p class="small text-muted mb-3">{{ _('Personalize as mensagens enviadas
+                                                    automaticamente pelo sistema (propostas, cobranças, etc).') }}</p>
+                                                <a href="{{ url_for('company.email_templates') }}"
+                                                    class="btn btn-outline-primary btn-sm w-100">
+                                                    <i class="bi bi-pencil-square"></i> {{ _('Editar Templates de
+                                                    E-mail') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Workflow Mode Tab -->
+                        <div class="tab-pane fade" id="workflow" role="tabpanel" aria-labelledby="workflow-tab">
+                            <form action="{{ url_for('company.update_workflow_mode') }}" method="POST">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <h5 class="fw-bold mb-3">{{ _('Modo de Trabalho (SOP)') }}</h5>
+                                <p class="text-muted small mb-4">
+                                    {{ _('Adapte a interface e as funcionalidades do Maps2GO conforme o tamanho e a
+                                    maturidade da sua agência.') }}
+                                </p>
+
+                                <div class="row g-4">
+                                    <!-- Solo Mode -->
+                                    <div class="col-md-4">
+                                        <div class="workflow-option-card {% if company.workflow_mode == 'solo' %}active{% endif %}"
+                                            onclick="selectWorkflow('solo')">
+                                            <div class="p-4 text-center">
+                                                <div class="workflow-icon mb-3 bg-light text-primary"><i
+                                                        class="bi bi-person"></i></div>
+                                                <h5 class="fw-bold">{{ _('Solo') }}</h5>
+                                                <p class="text-muted small mb-0">{{ _('Para consultores independentes.
+                                                    Foco total em prospecção e fechamento sem módulos extras.') }}</p>
+                                                <input type="radio" name="workflow_mode" id="wf_solo" value="solo" {% if
+                                                    company.workflow_mode=='solo' %}checked{% endif %} class="d-none">
+                                            </div>
+                                            <div class="card-footer bg-white border-0 text-center pb-4">
+                                                <span class="badge bg-light text-muted">{{ _('Owner/SDR/Sales')
+                                                    }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Lean Mode -->
+                                    <div class="col-md-4">
+                                        <div class="workflow-option-card {% if company.workflow_mode == 'lean' %}active{% endif %}"
+                                            onclick="selectWorkflow('lean')">
+                                            <div class="p-4 text-center">
+                                                <div class="workflow-icon mb-3 bg-light text-success"><i
+                                                        class="bi bi-people"></i></div>
+                                                <h5 class="fw-bold">{{ _('Lean') }}</h5>
+                                                <p class="text-muted small mb-0">{{ _('Agência pequena. Fluxo entre SDR,
+                                                    Vendedor e Gestor GMB. Módulos financeiros básicos inclusos.') }}
+                                                </p>
+                                                <input type="radio" name="workflow_mode" id="wf_lean" value="lean" {% if
+                                                    company.workflow_mode=='lean' %}checked{% endif %} class="d-none">
+                                            </div>
+                                            <div class="card-footer bg-white border-0 text-center pb-4">
+                                                <span class="badge bg-light text-muted">{{ _('Roles Essenciais')
+                                                    }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Structured Mode -->
+                                    <div class="col-md-4">
+                                        <div class="workflow-option-card {% if company.workflow_mode == 'structured' %}active{% endif %}"
+                                            onclick="selectWorkflow('structured')">
+                                            <div class="p-4 text-center">
+                                                <div class="workflow-icon mb-3 bg-light text-danger"><i
+                                                        class="bi bi-building"></i></div>
+                                                <h5 class="fw-bold">{{ _('Structured') }}</h5>
+                                                <p class="text-muted small mb-0">{{ _('Agência completa. Todos os
+                                                    módulos: Tráfego, Design, GMB Avançado, Comissões e Hierarquia.') }}
+                                                </p>
+                                                <input type="radio" name="workflow_mode" id="wf_structured"
+                                                    value="structured" {% if company.workflow_mode=='structured'
+                                                    %}checked{% endif %} class="d-none">
+                                            </div>
+                                            <div class="card-footer bg-white border-0 text-center pb-4">
+                                                <span class="badge bg-light text-muted">{{ _('Toda a Plataforma')
+                                                    }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-5 border-top pt-4">
+                                    <h6 class="fw-bold mb-3"><i class="bi bi-percent me-1"></i> {{ _('Taxas de
+                                        Comissionamento') }}</h6>
+                                    <div class="row">
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label small">{{ _('Comissão Closer (%)') }}</label>
+                                            <div class="input-group">
+                                                <input type="number" step="0.1" name="commission_closer_rate"
+                                                    class="form-control"
+                                                    value="{{ company.commission_closer_rate or 10.0 }}">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label small">{{ _('Comissão SDR (%)') }}</label>
+                                            <div class="input-group">
+                                                <input type="number" step="0.1" name="commission_sdr_rate"
+                                                    class="form-control"
+                                                    value="{{ company.commission_sdr_rate or 2.0 }}">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary px-5 btn-lg shadow-sm mt-3">
+                                        <i class="bi bi-check-circle me-1"></i> {{ _('Aplicar Configurações') }}
+                                    </button>
+                                    <p class="text-warning small mt-3">
+                                        <i class="bi bi-info-circle"></i> {{ _('Alterar o modo de trabalho pode ocultar
+                                        ou exibir menus e desativar/ativar roles para novos usuários.') }}
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .theme-card {
+        border: 2px solid #f1f3f5;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        overflow: hidden;
+    }
+
+    .theme-card:hover {
+        border-color: #dee2e6;
+        transform: translateY(-2px);
+    }
+
+    .theme-card.active {
+        border-color: var(--bs-primary);
+        background-color: #f8f9fa;
+    }
+
+    .theme-color-preview {
+        height: 60px;
+        width: 100%;
+    }
+
+    .workflow-option-card {
+        border: 2px solid #f1f3f5;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+        height: 100%;
+    }
+
+    .workflow-option-card:hover {
+        border-color: #dee2e6;
+        transform: scale(1.02);
+    }
+
+    .workflow-option-card.active {
+        border-color: var(--bs-primary);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .workflow-icon {
+        width: 60px;
+        height: 60px;
+        line-height: 60px;
+        font-size: 1.5rem;
+        border-radius: 50%;
+        margin: 0 auto;
+    }
+
+    /* Theme color dots helper if needed */
+    .bg-tech-teal {
+        background: #008080 !important;
+    }
+
+    .bg-corporate-blue {
+        background: #0047AB !important;
+    }
+
+    .bg-innovation-purple {
+        background: #6A0DAD !important;
+    }
+
+    .bg-energetic-orange {
+        background: #FF8C00 !important;
+    }
+
+    .bg-premium-red {
+        background: #B22222 !important;
+    }
+
+    .bg-nature-green {
+        background: #2E8B57 !important;
+    }
+</style>
+
+<script>
+    function selectTheme(value) {
+        // Deselect all
+        document.querySelectorAll('.theme-card').forEach(el => el.classList.remove('active'));
+        // Select one
+        document.getElementById('theme-card-' + value).classList.add('active');
+        document.getElementById('radio_' + value).checked = true;
+    }
+
+    function selectWorkflow(mode) {
+        // Deselect all
+        document.querySelectorAll('.workflow-option-card').forEach(el => el.classList.remove('active'));
+        // Select one
+        const el = document.querySelector(`.workflow-option-card[onclick="selectWorkflow('${mode}')"]`);
+        if (el) el.classList.add('active');
+        document.getElementById('wf_' + mode).checked = true;
+    }
+
+    function confirmDeleteLogo() {
+        if (confirm("{{ _('Deseja realmente remover o logo da empresa?') }}")) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('company.remove_logo') }}";
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrf_token';
+            csrf.value = "{{ csrf_token() }}";
+            form.appendChild(csrf);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+</script>
+{% endblock %}

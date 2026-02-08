@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Proposal - {{ proposal.client_name }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+            padding: 0;
+
+            @frame footer {
+                -pdf-frame-content: footer-content;
+                bottom: 1cm;
+                margin-left: 2cm;
+                margin-right: 2cm;
+                height: 1cm;
+            }
+        }
+
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #2c3e50;
+            line-height: 1.5;
+            font-size: 11pt;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+        }
+
+        /* Cores oficiais PureteGO */
+        .color-cyan { color: #00AEEF; }
+        .color-dark { color: #1a1a1a; }
+        .bg-cyan { background-color: #00AEEF; color: white; }
+        .bg-dark { background-color: #1a1a1a; color: white; }
+
+        /* Capa Premium */
+        .cover {
+            width: 100%;
+            height: 29.7cm;
+            background: linear-gradient(135deg, #1a1a1a 0%, #004a66 100%);
+            color: white;
+            text-align: left;
+            position: relative;
+        }
+
+        .cover-content {
+            padding: 4cm 2cm;
+        }
+
+        .cover-accent {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40%;
+            height: 100%;
+            background-color: #00AEEF;
+            opacity: 0.1;
+        }
+
+        .cover-logo {
+            font-size: 42pt;
+            font-weight: 900;
+            color: #00AEEF;
+            margin-bottom: 0.5cm;
+            letter-spacing: 2px;
+        }
+
+        .cover-tagline {
+            font-size: 14pt;
+            color: #ddd;
+            margin-bottom: 6cm;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cover-title {
+            font-size: 36pt;
+            font-weight: bold;
+            margin-bottom: 0.2cm;
+            color: white;
+        }
+
+        .cover-divider {
+            width: 100px;
+            height: 6px;
+            background-color: #00AEEF;
+            margin-bottom: 1cm;
+        }
+
+        .cover-client {
+            font-size: 28pt;
+            color: #00AEEF;
+            font-weight: 300;
+            margin-top: 2cm;
+        }
+
+        .cover-footer {
+            position: absolute;
+            bottom: 2cm;
+            left: 2cm;
+            font-size: 10pt;
+            color: #aaa;
+        }
+
+        /* Estrutura de Página */
+        .page-container {
+            padding: 2cm;
+            page-break-before: always;
+            position: relative;
+        }
+
+        .section-header {
+            margin-bottom: 1.5cm;
+        }
+
+        .section-title {
+            font-size: 22pt;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .section-subtitle {
+            font-size: 11pt;
+            color: #00AEEF;
+            font-weight: bold;
+            margin-top: -5px;
+        }
+
+        /* Auditoria / Health Check */
+        .audit-summary {
+            background-color: #f8fbfc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #e1eef2;
+        }
+
+        /* Gauge Simplificado para xhtml2pdf */
+        .gauge-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .gauge-box {
+            display: inline-block;
+            width: 200px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 100px;
+            border: 8px solid #eee;
+        }
+
+        .score-display {
+            font-size: 48pt;
+            font-weight: bold;
+            color: #00AEEF;
+        }
+
+        .score-label {
+            font-size: 12pt;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        .issues-grid {
+            margin-top: 20px;
+        }
+
+        .issue-card {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 10pt;
+        }
+
+        .issue-critical { background-color: #fff5f5; border-left: 5px solid #e74c3c; color: #c0392b; }
+        .issue-moderate { background-color: #fffaf0; border-left: 5px solid #f39c12; color: #d35400; }
+        .issue-positive { background-color: #f0fff4; border-left: 5px solid #2ecc71; color: #27ae60; }
+
+        /* Tabela de Serviços */
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1cm;
+        }
+
+        .services-table th {
+            text-align: left;
+            padding: 15px;
+            background-color: #1a1a1a;
+            color: white;
+            font-size: 10pt;
+            text-transform: uppercase;
+        }
+
+        .services-table td {
+            padding: 20px 15px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+        }
+
+        .service-name {
+            font-weight: bold;
+            font-size: 13pt;
+            color: #1a1a1a;
+            display: block;
+        }
+
+        .service-desc {
+            font-size: 9pt;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .service-price {
+            font-size: 12pt;
+            font-weight: bold;
+            color: #00AEEF;
+            text-align: right;
+        }
+
+        /* Totais */
+        .totals-section {
+            margin-top: 1cm;
+            text-align: right;
+        }
+
+        .total-box {
+            display: inline-block;
+            background-color: #00AEEF;
+            color: white;
+            padding: 25px 40px;
+            border-radius: 10px;
+            min-width: 250px;
+        }
+
+        .total-label {
+            font-size: 10pt;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .total-amount {
+            font-size: 24pt;
+            font-weight: bold;
+        }
+
+        /* Rodapé */
+        #footer-content {
+            text-align: center;
+            color: #bdc3c7;
+            font-size: 8pt;
+            border-top: 1px solid #ecf0f1;
+            padding-top: 10px;
+        }
+
+        /* Boxes de Autoridade */
+        .highlight-box {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 30px;
+            border-left: 8px solid #00AEEF;
+            margin: 1cm 0;
+        }
+
+        .highlight-text {
+            font-style: italic;
+            font-size: 12pt;
+            line-height: 1.6;
+        }
+
+        .benefit-list {
+            margin-top: 1cm;
+        }
+
+        .benefit-item {
+            margin-bottom: 20px;
+        }
+
+        .benefit-title {
+            font-weight: bold;
+            color: #00AEEF;
+            font-size: 12pt;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Capa -->
+    <div class="cover">
+        <div class="cover-accent"></div>
+        <div class="cover-content">
+            <div class="cover-logo">PURETEGO</div>
+            <div class="cover-tagline">Dominando el mercado local</div>
+            
+            <div class="spacer" style="height: 3cm;"></div>
+            
+            <div class="cover-title">{{ texts.proposal_title }}</div>
+            <div class="cover-divider"></div>
+            
+            <div class="cover-subtitle">
+                Presencia Web • Fotos y Videos 360 • GMB • SEO Local
+            </div>
+            
+            <div class="cover-client">
+                {{ proposal.client_name }}
+            </div>
+        </div>
+        
+        <div class="cover-footer">
+            {{ proposal.proposal_date|format_date }} • PureteGO Commercial Department
+        </div>
+    </div>
+
+    <!-- Página 1: Autoridade e Análise -->
+    <div class="page-container">
+        <div class="section-header">
+            <div class="section-subtitle">01. NUESTRO ENFOQUE</div>
+            <h1 class="section-title">SOBRE PURETEGO</h1>
+        </div>
+
+        <div class="highlight-box">
+            <div class="highlight-text">
+                "Acompañamos la evolución de Google desde sus inicios. Con raíces en Brasil desde 2001,
+                PureteGO nació de la necesidad de conectar negocios locales con clientes reales a través de datos y
+                resultados auditables."
+            </div>
+        </div>
+
+        <p>
+            Somos especialistas en <strong>Geomarketing de Élite</strong>. Mientras otros se enfocan en
+            métricas de vanidad, nosotros nos obsesionamos con el ROI y la intención de compra directa en Google Search y Google Maps.
+        </p>
+
+        <div class="benefit-list">
+            <div class="benefit-item">
+                <div class="benefit-title">Transparencia Radical</div>
+                <div class="benefit-desc">Resultados 100% auditables a través de ferramentas oficiais do Google.</div>
+            </div>
+            <div class="benefit-item">
+                <div class="benefit-title">Enfoque en Ventas</div>
+                <div class="benefit-desc">Optimizamos para o momento exato em que o cliente busca o que você oferece.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Página 2: Auditoria GMB (Se existir) -->
+    {% if proposal.health_check %}
+    <div class="page-container">
+        <div class="section-header">
+            <div class="section-subtitle">02. DIAGNÓSTICO ESTRATÉGICO</div>
+            <h1 class="section-title">{{ texts.audit_title }}</h1>
+        </div>
+
+        <p>{{ texts.audit_subtitle }}</p>
+
+        <div class="audit-summary">
+            <div class="gauge-container">
+                <div class="gauge-box" style="border-color: 
+                    {% if proposal.health_check.score >= 70 %}#2ecc71
+                    {% elif proposal.health_check.score >= 40 %}#f39c12
+                    {% else %}#e74c3c{% endif %};">
+                    <div class="score-display" style="color: 
+                        {% if proposal.health_check.score >= 70 %}#2ecc71
+                        {% elif proposal.health_check.score >= 40 %}#f39c12
+                        {% else %}#e74c3c{% endif %};">
+                        {{ proposal.health_check.score }}
+                    </div>
+                    <div class="score-label">{{ texts.score_label }}</div>
+                </div>
+            </div>
+
+            <div class="issues-grid">
+                <h3 style="color: #1a1a1a; margin-bottom: 15px;">{{ texts.optimization_points }}</h3>
+                
+                {% if proposal.health_check.report_data.top_critical_issues %}
+                <div class="issue-card issue-critical">
+                    <strong>{{ texts.critical_issues }}:</strong>
+                    <ul style="margin: 5px 0 0 20px; padding: 0;">
+                        {% for issue in proposal.health_check.report_data.top_critical_issues %}
+                        <li>{{ issue.name }}: {{ issue.message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if proposal.health_check.report_data.recommendations %}
+                <div class="issue-card issue-moderate">
+                    <strong>Recomendaciones:</strong>
+                    <ul style="margin: 5px 0 0 20px; padding: 0;">
+                        {% for rec in proposal.health_check.report_data.recommendations %}
+                        <li>{{ rec }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Página 3: Proposta Técnica -->
+    <div class="page-container">
+        <div class="section-header">
+            <div class="section-subtitle">03. SOLUCIÓN PROPUESTA</div>
+            <h1 class="section-title">{{ texts.proposal_title }}</h1>
+        </div>
+
+        <p>Preparamos un plan de acción personalizado para fortalecer la presencia digital de <strong>{{ proposal.client_name }}</strong>:</p>
+
+        <table class="services-table">
+            <thead>
+                <tr>
+                    <th width="75%">{{ texts.service }}</th>
+                    <th width="25%" style="text-align: right;">{{ texts.investment }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in proposal.proposal_items %}
+                <tr>
+                    <td>
+                        <span class="service-name">{{ item.name }}</span>
+                        <div class="service-desc">{{ item.description }}</div>
+                    </td>
+                    <td class="service-price">
+                        {{ item.price|format_currency }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="totals-section">
+            <div class="total-box">
+                <div class="total-label">{{ texts.total_investment }}</div>
+                <div class="total-amount">{{ proposal.total_amount|format_currency }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 1.5cm;">
+            <h4 style="margin-bottom: 10px;">{{ texts.payment_terms }}</h4>
+            <p style="color: #2c3e50;">{{ proposal.payment_terms or 'A convenir' }}</p>
+            
+            <div style="background-color: #f8fbfc; padding: 15px; border-radius: 5px; font-size: 9pt; color: #7f8c8d; margin-top: 1cm;">
+                <strong>Nota:</strong> {{ texts.additional_text }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé global -->
+    <div id="footer-content">
+        PURETEGO • {{ company_info.website }} • {{ company_info.phone }} • Página <pdf:pagenumber> de <pdf:pagecount>
+    </div>
+
+</body>
+
+</html>

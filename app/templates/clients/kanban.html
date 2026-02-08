@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Kanban') }}{% endblock %}
+
+{% block head %}
+<style>
+    .kanban-board {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+    }
+
+    .kanban-stage {
+        flex: 0 0 300px;
+        margin-right: 1rem;
+        background-color: var(--bg-base);
+        border: 1px solid var(--border-color);
+        border-radius: 3px;
+        padding: 1rem;
+    }
+
+    .kanban-stage h5 {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    .kanban-card {
+        background-color: var(--bg-card);
+        border-radius: 3px;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+        cursor: grab;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .kanban-cards-container {
+        min-height: 200px;
+    }
+
+    .kanban-card a {
+        color: var(--text-primary);
+        text-decoration: none;
+    }
+
+    .kanban-card a:hover {
+        color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 mb-0">{{ _('Kanban') }}</h1>
+        <div>
+            <form action="{{ url_for('clients.reset_stages') }}" method="POST" class="d-inline"
+                data-confirm="{{ _('WARNING: This will remove all custom columns and move ALL clients to No Stage. Are you sure?') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <button type="submit" class="btn btn-outline-danger me-2">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>{{ _('Restore Default') }}
+                </button>
+            </form>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStageModal">
+                <i class="bi bi-plus-lg me-1"></i>{{ _('New Column') }}
+            </button>
+        </div>
+    </div>
+
+    <div class="kanban-board">
+        {% for data in kanban_data %}
+        <div class="kanban-stage" data-stage-id="{{ data.stage.id }}">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0 text-truncate" title="{{ data.stage.name }}">
+                    {{ data.stage.name }}
+                    <span class="badge bg-secondary rounded-pill ms-1">{{ data.clients|length }}</span>
+                </h5>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm btn-outline-primary p-1 border-0" title="{{ _('Add Client') }}"
+                        onclick="openQuickClientModal({{ data.stage.id }})">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </button>
+                    <button class="btn btn-sm btn-link text-muted p-1 edit-stage-btn" data-id="{{ data.stage.id }}"
+                        data-name="{{ data.stage.name }}" data-order="{{ data.stage.order }}">
+                        <i class="bi bi-pencil" style="font-size: 0.8rem;"></i>
+                    </button>
+                </div>
+            </div>
+            {% if data.stage.total_value > 0 %}
+            <div class="mb-2 text-end text-success fw-bold border-bottom pb-1">
+                Gs. {{ "{:,.0f}".format(data.stage.total_value).replace(',', '.') }}
+            </div>
+            {% endif %}
+
+            <div class="kanban-cards-container" data-stage-id="{{ data.stage.id }}">
+                {% for client in data.clients %}
+                <div class="kanban-card" data-client-id="{{ client.id }}">
+                    <a href="{{ url_for('clients.view', client_id=client.id) }}" class="d-block">
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-1">{{ client.name }}</h6>
+                        </div>
+                        <div class="small text-muted mb-1">{{ client.contact_name or '' }}</div>
+                        {% if client.package_name %}
+                        <div class="badge bg-info text-dark">{{ client.package_name }}</div>
+                        {% endif %}
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal: Create Stage -->
+<div class="modal fade" id="createStageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('New Column') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('clients.create_stage') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">{{ _('Stage Name') }}</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="order" class="form-label">{{ _('Order') }}</label>
+                        <input type="number" class="form-control" name="order" value="10">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Create') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Edit Stage -->
+<div class="modal fade" id="editStageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Edit Stage') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editStageForm" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="stageName" class="form-label">{{ _('Stage Name') }}</label>
+                        <input type="text" class="form-control" id="stageName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="stageOrder" class="form-label">{{ _('Order') }}</label>
+                        <input type="number" class="form-control" id="stageOrder" name="order">
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+                    </div>
+                </form>
+                <hr>
+                <form id="deleteStageForm" method="POST" class="mt-3"
+                    data-confirm="{{ _('Are you sure you want to delete this stage?') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <p class="text-danger small mb-2">{{ _('Are you sure you want to delete this stage?') }}</p>
+                    <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                        <i class="bi bi-trash me-1"></i>{{ _('Delete') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Quick Add Client Modal -->
+<div class="modal fade" id="quickAddClientModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ _('Add Client to Column') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="quickAddClientForm" action="{{ url_for('clients.create') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" id="quickStageId" name="kanban_stage_id" value="">
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Business / Client Name') }} <span
+                                class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Contact Name') }}</label>
+                            <input type="text" class="form-control" name="contact_name">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Phone') }}</label>
+                            <input type="text" class="form-control" name="phone">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Interested Package') }}</label>
+                        <select class="form-select" name="interested_package_id">
+                            <option value="">{{ _('Select a package...') }}</option>
+                            {% for pkg in packages %}
+                            <option value="{{ pkg.id }}">{{ pkg.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="modal-footer px-0 pb-0 mt-3">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel')
+                            }}</button>
+                        <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const translations = {
+        errorMoving: "{{ _('Error moving client') }}",
+        connectionError: "{{ _('Connection error moving client.') }}"
+    };
+
+    function openQuickClientModal(stageId) {
+        document.getElementById('quickStageId').value = stageId;
+        new bootstrap.Modal(document.getElementById('quickAddClientModal')).show();
+    }
+
+    function editStage(id, name, order) {
+        // alert("Debug: Edit Stage " + id);
+        console.log("Opening edit modal for stage:", id);
+        const editForm = document.getElementById('editStageForm');
+        const deleteForm = document.getElementById('deleteStageForm');
+
+        if (editForm) {
+            editForm.action = `/clients/stages/${id}/edit`;
+        } else {
+            alert("Error: Edit Form Missing");
+        }
+
+        if (deleteForm) {
+            deleteForm.action = `/clients/stages/${id}/delete`;
+            // alert("Debug: Delete action set to " + deleteForm.action);
+        } else {
+            alert("Error: Delete Form Missing");
+        }
+
+        document.getElementById('stageName').value = name;
+        document.getElementById('stageOrder').value = order;
+        new bootstrap.Modal(document.getElementById('editStageModal')).show();
+    }
+
+    // Global Confirmation Handler for Forms
+    document.addEventListener('submit', function (e) {
+        // Check if form has data-confirm attribute
+        if (e.target && e.target.dataset.confirm) {
+            if (!confirm(e.target.dataset.confirm)) {
+                e.preventDefault();
+            }
+        }
+    });
+
+    // Event Delegation for Edit Buttons
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.edit-stage-btn');
+        if (btn) {
+            const id = btn.dataset.id;
+            const name = btn.dataset.name;
+            const order = btn.dataset.order;
+            editStage(id, name, order);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const board = document.querySelector(".kanban-board");
+        const containers = document.querySelectorAll(".kanban-cards-container");
+
+        if (typeof Sortable === 'undefined') {
+            console.error('SortableJS not loaded!');
+            return;
+        }
+
+        // 1. Column Reordering
+        new Sortable(board, {
+            animation: 150,
+            handle: '.kanban-stage h5', // Drag by title
+            onEnd: function (evt) {
+                const orderedIds = Array.from(board.children).map(el => el.dataset.stageId);
+                const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+                fetch('/clients/stages/reorder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ order: orderedIds })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert("{{ _('Error reordering columns') }}");
+                        }
+                    })
+                    .catch(error => console.error('Error reordering:', error));
+            }
+        });
+
+        // 2. Card Reordering (Existing Logic)
+        containers.forEach(container => {
+            new Sortable(container, {
+                group: 'kanban',
+                animation: 150,
+                onEnd: function (evt) {
+                    const client_id = evt.item.dataset.clientId;
+                    const new_stage_id = evt.to.dataset.stageId;
+
+                    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+                    fetch(`/clients/${client_id}/move`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({ stage_id: new_stage_id })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.success) {
+                                alert(translations.errorMoving + ': ' + data.message);
+                                evt.from.appendChild(evt.item);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error:', error);
+                            alert(translations.connectionError);
+                            evt.from.appendChild(evt.item);
+                        });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

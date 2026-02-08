@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Clients') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div
+        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ _('Clients') }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <button type="button" class="btn btn-sm btn-success me-2" data-bs-toggle="modal"
+                data-bs-target="#quickActionModal" onclick="setQuickActionType('visit')">
+                <i class="bi bi-geo-alt-fill"></i> {{ _('New Visit') }}
+            </button>
+            <button type="button" class="btn btn-sm btn-info text-white me-2" data-bs-toggle="modal"
+                data-bs-target="#quickActionModal" onclick="setQuickActionType('call')">
+                <i class="bi bi-telephone-fill"></i> {{ _('New Call') }}
+            </button>
+            <a href="{{ url_for('clients.create') }}" class="btn btn-sm btn-primary">
+                <i class="bi bi-plus-lg"></i> {{ _('New Client') }}
+            </a>
+            <a href="{{ url_for('clients.kanban') }}" class="btn btn-sm btn-outline-secondary ms-2">
+                <i class="bi bi-kanban"></i> {{ _('View Kanban') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                <input type="text" id="clientSearch" class="form-control border-start-0 ps-0"
+                    placeholder="{{ _('Search clients (name, contact, decision maker...)') }}"
+                    onkeyup="filterClients()">
+                <select class="form-select" style="max-width: 200px;"
+                    onchange="window.location.href='?stage_id='+this.value">
+                    <option value="" {% if not current_stage_filter %}selected{% endif %}>{{ _('All Stages') }}
+                    </option>
+                    <option value="none" {% if current_stage_filter=='none' %}selected{% endif %}>{{ _('No Stage') }}
+                    </option>
+                    {% for stage in stages %}
+                    <option value="{{ stage.id }}" {% if current_stage_filter==stage.id|string %}selected{% endif %}>{{
+                        stage.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-text mt-1">
+                {{ _('Filter by Company Name, Contact, Receptionist or Decision Maker.') }}
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="clientsTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>{{ _('Name / Business') }}</th>
+                            <th>{{ _('Contact') }}</th>
+                            <th>{{ _('Stage') }}</th>
+                            <th>{{ _('Registration Date') }}</th>
+                            <th>{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr class="client-row" style="cursor: pointer;"
+                            onclick="window.location='{{ url_for('clients.view', client_id=client.id) }}';"
+                            data-search="{{ client.name }} {{ client.contact_name or '' }} {{ client.receptionist_name or '' }} {{ client.decision_maker_name or '' }}">
+                            <td>
+                                <div class="fw-bold">{{ client.name }}</div>
+                                {% if client.gmb_profile_name %}
+                                <small class="text-muted"><i class="bi bi-google"></i> {{ client.gmb_profile_name
+                                    }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ client.contact_name or '-' }}</div>
+                                <small class="text-muted">{{ client.phone or '' }}</small>
+                            </td>
+                            <td>
+                                <div onclick='openChangeStageModal(event, {{ client.id }}, {{ client.name|tojson|safe }}, {{ client.kanban_stage.id if client.kanban_stage else "null" }})'
+                                    style="cursor: pointer;">
+                                    {% if client.kanban_stage %}
+                                    <span class="badge bg-secondary" title="{{ _('Change Stage') }}">{{
+                                        client.kanban_stage.name }} <i class="bi bi-pencil-fill ms-1"
+                                            style="font-size: 0.7em;"></i></span>
+                                    {% else %}
+                                    <span class="badge bg-light text-dark border" title="{{ _('Change Stage') }}">{{
+                                        _('No stage') }} <i class="bi bi-pencil-fill ms-1"
+                                            style="font-size: 0.7em;"></i></span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td>{{ client.created_at|format_date }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm" onclick="event.stopPropagation();">
+                                    <a href="{{ url_for('clients.view', client_id=client.id) }}"
+                                        class="btn btn-outline-primary" title="{{ _('View') }}">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('clients.edit', client_id=client.id) }}"
+                                        class="btn btn-outline-secondary" title="{{ _('Edit') }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr id="noClientsRow">
+                            <td colspan="5" class="text-center py-4">
+                                <p class="text-muted mb-0">{{ _('No clients registered yet.') }}</p>
+                                <a href="{{ url_for('clients.create') }}" class="btn btn-primary btn-sm mt-2">{{
+                                    _('Register First Client') }}</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr id="noResultsRow" style="display: none;">
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                {{ _('No clients found for this search.') }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Change Stage Modal -->
+<div class="modal fade" id="changeStageModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeStageModalTitle">{{ _('Move Client') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="changeStageClientId">
+                <input type="hidden" id="changeStageCsrf" value="{{ csrf_token() }}">
+
+                <div class="mb-3">
+                    <label class="form-label">{{ _('New Stage') }}</label>
+                    <select class="form-select" id="changeStageSelect">
+                        <option value="">{{ _('No Stage') }}</option>
+                        {% for stage in stages %}
+                        <option value="{{ stage.id }}">{{ stage.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="saveStageChange()">{{ _('Save') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function filterClients() {
+        const input = document.getElementById('clientSearch');
+        const filter = input.value.toLowerCase().trim();
+        const rows = document.querySelectorAll('.client-row');
+        const noResultsRow = document.getElementById('noResultsRow');
+        let hasResults = false;
+
+        rows.forEach(row => {
+            const searchText = row.getAttribute('data-search').toLowerCase();
+            if (searchText.includes(filter)) {
+                row.style.display = "";
+                hasResults = true;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        if (noResultsRow) {
+            noResultsRow.style.display = (hasResults || filter === "") ? "none" : "";
+        }
+    }
+
+    // Change Stage Logic
+    const changeStageModal = new bootstrap.Modal(document.getElementById('changeStageModal'));
+
+    function openChangeStageModal(event, clientId, clientName, currentStageId) {
+        event.stopPropagation(); // Prevent row click
+
+        document.getElementById('changeStageClientId').value = clientId;
+        document.getElementById('changeStageModalTitle').innerText = "{{ _('Move') }} " + clientName;
+
+        const select = document.getElementById('changeStageSelect');
+        select.value = currentStageId || "";
+
+        changeStageModal.show();
+    }
+
+    function saveStageChange() {
+        const clientId = document.getElementById('changeStageClientId').value;
+        const newStageId = document.getElementById('changeStageSelect').value;
+        const csrfToken = document.getElementById('changeStageCsrf').value;
+
+        fetch(`/clients/${clientId}/move`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ stage_id: newStageId })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("{{ _('Error moving client') }}: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("{{ _('Connection Error') }}");
+            });
+    }
+</script>
+{% endblock %}

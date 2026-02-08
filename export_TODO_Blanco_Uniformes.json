@@ -1,0 +1,674 @@
+{
+  "client": {
+    "name": "TODO Blanco Uniformes",
+    "gmb_profile_name": "Todo Blanco Uniformes",
+    "contact_name": "Sra Dalila",
+    "phone": "+595 992 435087",
+    "email": "",
+    "address": "Gaspar R De Francia, San Lorenzo 111423 https://share.google/4uofZ9CjvX6jVaUpG",
+    "kanban_stage_name": "Proposta Enviada",
+    "interested_package_name": null,
+    "created_at": "2026-02-02T22:11:09"
+  },
+  "visits": [
+    {
+      "visit_date": "2026-01-28T10:11:00",
+      "notes": "Disse que nao havia recebido a proposta eu confirmei que enviei e a Sra Dalila pediu pra secretaria e me disse que iria analizar com a encarregada de redes sociais e me ligaria, nao vou esperar!",
+      "next_step": "Visitar amanha ter\u00e7a dia 02/02"
+    }
+  ],
+  "health_checks": [
+    {
+      "score": 45,
+      "report_data": {
+        "business_name": "Todo Blanco Uniformes",
+        "criteria": [
+          {
+            "id": 1,
+            "name_pt": "Hor\u00e1rio de Funcionamento",
+            "name_es": "Horario de Funcionamiento",
+            "weight": 6,
+            "type": "critical",
+            "score": 6,
+            "status": "positive",
+            "message": "Hor\u00e1rio configurado"
+          },
+          {
+            "id": 2,
+            "name_pt": "Fotos dos Produtos/Servi\u00e7os",
+            "name_es": "Fotos de Productos/Servicios",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos de produtos/servi\u00e7os"
+          },
+          {
+            "id": 3,
+            "name_pt": "V\u00eddeos",
+            "name_es": "Videos",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem v\u00eddeos"
+          },
+          {
+            "id": 4,
+            "name_pt": "Perfil Verificado",
+            "name_es": "Perfil Verificado",
+            "weight": 8,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Perfil n\u00e3o verificado"
+          },
+          {
+            "id": 5,
+            "name_pt": "Possui Site",
+            "name_es": "Posee Sitio Web",
+            "weight": 7,
+            "type": "critical",
+            "score": 7,
+            "status": "positive",
+            "message": "Possui website"
+          },
+          {
+            "id": 6,
+            "name_pt": "Perguntas e Respostas",
+            "name_es": "Preguntas y Respuestas",
+            "weight": 5,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem perguntas e respostas"
+          },
+          {
+            "id": 7,
+            "name_pt": "Posts/Publica\u00e7\u00f5es",
+            "name_es": "Posts/Publicaciones",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem publica\u00e7\u00f5es"
+          },
+          {
+            "id": 8,
+            "name_pt": "Descri\u00e7\u00e3o do Neg\u00f3cio",
+            "name_es": "Descripci\u00f3n del Negocio",
+            "weight": 7,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem descri\u00e7\u00e3o"
+          },
+          {
+            "id": 9,
+            "name_pt": "Presen\u00e7a nas Redes Sociais",
+            "name_es": "Presencia en Redes Sociales",
+            "weight": 5,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem redes sociais"
+          },
+          {
+            "id": 10,
+            "name_pt": "Presen\u00e7a no Google Maps",
+            "name_es": "Presencia en Google Maps",
+            "weight": 8,
+            "type": "moderate",
+            "score": 8,
+            "status": "positive",
+            "message": "Localiza\u00e7\u00e3o no Maps"
+          },
+          {
+            "id": 11,
+            "name_pt": "Fotos do Exterior",
+            "name_es": "Fotos del Exterior",
+            "weight": 4,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos do exterior"
+          },
+          {
+            "id": 12,
+            "name_pt": "Fotos do Interior",
+            "name_es": "Fotos del Interior",
+            "weight": 4,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos do interior"
+          },
+          {
+            "id": 13,
+            "name_pt": "Informa\u00e7\u00f5es de Produtos e Servi\u00e7os",
+            "name_es": "Informaci\u00f3n de Productos y Servicios",
+            "weight": 6,
+            "type": "moderate",
+            "score": 6,
+            "status": "positive",
+            "message": "Produtos/servi\u00e7os cadastrados"
+          },
+          {
+            "id": 14,
+            "name_pt": "Possui Avalia\u00e7\u00f5es",
+            "name_es": "Posee Evaluaciones",
+            "weight": 7,
+            "type": "positive",
+            "score": 7,
+            "status": "positive",
+            "message": "157 avalia\u00e7\u00f5es"
+          },
+          {
+            "id": 15,
+            "name_pt": "Endere\u00e7o Configurado",
+            "name_es": "Direcci\u00f3n Configurada",
+            "weight": 6,
+            "type": "positive",
+            "score": 6,
+            "status": "positive",
+            "message": "Endere\u00e7o configurado"
+          },
+          {
+            "id": 16,
+            "name_pt": "Possui Logotipo",
+            "name_es": "Posee Logotipo",
+            "weight": 5,
+            "type": "positive",
+            "score": 5,
+            "status": "positive",
+            "message": "Possui logotipo"
+          },
+          {
+            "id": 17,
+            "name_pt": "Resposta a Avalia\u00e7\u00f5es",
+            "name_es": "Respuesta a Evaluaciones",
+            "weight": 4,
+            "type": "positive",
+            "score": 0,
+            "status": "critical",
+            "message": "N\u00e3o responde avalia\u00e7\u00f5es"
+          }
+        ],
+        "summary": {
+          "critical_issues_count": 10,
+          "moderate_issues_count": 0,
+          "positive_points_count": 7,
+          "top_critical_issues": [
+            {
+              "name": "Fotos de Productos/Servicios",
+              "message": "Sem fotos de produtos/servi\u00e7os"
+            },
+            {
+              "name": "Videos",
+              "message": "Sem v\u00eddeos"
+            },
+            {
+              "name": "Perfil Verificado",
+              "message": "Perfil n\u00e3o verificado"
+            },
+            {
+              "name": "Preguntas y Respuestas",
+              "message": "Sem perguntas e respostas"
+            },
+            {
+              "name": "Posts/Publicaciones",
+              "message": "Sem publica\u00e7\u00f5es"
+            }
+          ],
+          "recommendations": [
+            "Perfil GMB necessita de otimiza\u00e7\u00e3o urgente",
+            "Prioridade: Sem fotos de produtos/servi\u00e7os",
+            "Prioridade: Sem v\u00eddeos",
+            "Prioridade: Perfil n\u00e3o verificado"
+          ]
+        }
+      },
+      "created_at": "2026-02-02T22:13:37"
+    },
+    {
+      "score": 45,
+      "report_data": {
+        "business_name": "Todo Blanco Uniformes",
+        "criteria": [
+          {
+            "id": 1,
+            "name_pt": "Hor\u00e1rio de Funcionamento",
+            "name_es": "Horario de Funcionamiento",
+            "weight": 6,
+            "type": "critical",
+            "score": 6,
+            "status": "positive",
+            "message": "Hor\u00e1rio configurado"
+          },
+          {
+            "id": 2,
+            "name_pt": "Fotos dos Produtos/Servi\u00e7os",
+            "name_es": "Fotos de Productos/Servicios",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos de produtos/servi\u00e7os"
+          },
+          {
+            "id": 3,
+            "name_pt": "V\u00eddeos",
+            "name_es": "Videos",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem v\u00eddeos"
+          },
+          {
+            "id": 4,
+            "name_pt": "Perfil Verificado",
+            "name_es": "Perfil Verificado",
+            "weight": 8,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Perfil n\u00e3o verificado"
+          },
+          {
+            "id": 5,
+            "name_pt": "Possui Site",
+            "name_es": "Posee Sitio Web",
+            "weight": 7,
+            "type": "critical",
+            "score": 7,
+            "status": "positive",
+            "message": "Possui website"
+          },
+          {
+            "id": 6,
+            "name_pt": "Perguntas e Respostas",
+            "name_es": "Preguntas y Respuestas",
+            "weight": 5,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem perguntas e respostas"
+          },
+          {
+            "id": 7,
+            "name_pt": "Posts/Publica\u00e7\u00f5es",
+            "name_es": "Posts/Publicaciones",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem publica\u00e7\u00f5es"
+          },
+          {
+            "id": 8,
+            "name_pt": "Descri\u00e7\u00e3o do Neg\u00f3cio",
+            "name_es": "Descripci\u00f3n del Negocio",
+            "weight": 7,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem descri\u00e7\u00e3o"
+          },
+          {
+            "id": 9,
+            "name_pt": "Presen\u00e7a nas Redes Sociais",
+            "name_es": "Presencia en Redes Sociales",
+            "weight": 5,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem redes sociais"
+          },
+          {
+            "id": 10,
+            "name_pt": "Presen\u00e7a no Google Maps",
+            "name_es": "Presencia en Google Maps",
+            "weight": 8,
+            "type": "moderate",
+            "score": 8,
+            "status": "positive",
+            "message": "Localiza\u00e7\u00e3o no Maps"
+          },
+          {
+            "id": 11,
+            "name_pt": "Fotos do Exterior",
+            "name_es": "Fotos del Exterior",
+            "weight": 4,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos do exterior"
+          },
+          {
+            "id": 12,
+            "name_pt": "Fotos do Interior",
+            "name_es": "Fotos del Interior",
+            "weight": 4,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos do interior"
+          },
+          {
+            "id": 13,
+            "name_pt": "Informa\u00e7\u00f5es de Produtos e Servi\u00e7os",
+            "name_es": "Informaci\u00f3n de Productos y Servicios",
+            "weight": 6,
+            "type": "moderate",
+            "score": 6,
+            "status": "positive",
+            "message": "Produtos/servi\u00e7os cadastrados"
+          },
+          {
+            "id": 14,
+            "name_pt": "Possui Avalia\u00e7\u00f5es",
+            "name_es": "Posee Evaluaciones",
+            "weight": 7,
+            "type": "positive",
+            "score": 7,
+            "status": "positive",
+            "message": "157 avalia\u00e7\u00f5es"
+          },
+          {
+            "id": 15,
+            "name_pt": "Endere\u00e7o Configurado",
+            "name_es": "Direcci\u00f3n Configurada",
+            "weight": 6,
+            "type": "positive",
+            "score": 6,
+            "status": "positive",
+            "message": "Endere\u00e7o configurado"
+          },
+          {
+            "id": 16,
+            "name_pt": "Possui Logotipo",
+            "name_es": "Posee Logotipo",
+            "weight": 5,
+            "type": "positive",
+            "score": 5,
+            "status": "positive",
+            "message": "Possui logotipo"
+          },
+          {
+            "id": 17,
+            "name_pt": "Resposta a Avalia\u00e7\u00f5es",
+            "name_es": "Respuesta a Evaluaciones",
+            "weight": 4,
+            "type": "positive",
+            "score": 0,
+            "status": "critical",
+            "message": "N\u00e3o responde avalia\u00e7\u00f5es"
+          }
+        ],
+        "summary": {
+          "critical_issues_count": 10,
+          "moderate_issues_count": 0,
+          "positive_points_count": 7,
+          "top_critical_issues": [
+            {
+              "name": "Fotos de Productos/Servicios",
+              "message": "Sem fotos de produtos/servi\u00e7os"
+            },
+            {
+              "name": "Videos",
+              "message": "Sem v\u00eddeos"
+            },
+            {
+              "name": "Perfil Verificado",
+              "message": "Perfil n\u00e3o verificado"
+            },
+            {
+              "name": "Preguntas y Respuestas",
+              "message": "Sem perguntas e respostas"
+            },
+            {
+              "name": "Posts/Publicaciones",
+              "message": "Sem publica\u00e7\u00f5es"
+            }
+          ],
+          "recommendations": [
+            "Perfil GMB necessita de otimiza\u00e7\u00e3o urgente",
+            "Prioridade: Sem fotos de produtos/servi\u00e7os",
+            "Prioridade: Sem v\u00eddeos",
+            "Prioridade: Perfil n\u00e3o verificado"
+          ]
+        }
+      },
+      "created_at": "2026-02-02T22:19:27"
+    },
+    {
+      "score": 45,
+      "report_data": {
+        "business_name": "Todo Blanco Uniformes",
+        "criteria": [
+          {
+            "id": 1,
+            "name_pt": "Hor\u00e1rio de Funcionamento",
+            "name_es": "Horario de Funcionamiento",
+            "weight": 6,
+            "type": "critical",
+            "score": 6,
+            "status": "positive",
+            "message": "Hor\u00e1rio configurado"
+          },
+          {
+            "id": 2,
+            "name_pt": "Fotos dos Produtos/Servi\u00e7os",
+            "name_es": "Fotos de Productos/Servicios",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos de produtos/servi\u00e7os"
+          },
+          {
+            "id": 3,
+            "name_pt": "V\u00eddeos",
+            "name_es": "Videos",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem v\u00eddeos"
+          },
+          {
+            "id": 4,
+            "name_pt": "Perfil Verificado",
+            "name_es": "Perfil Verificado",
+            "weight": 8,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Perfil n\u00e3o verificado"
+          },
+          {
+            "id": 5,
+            "name_pt": "Possui Site",
+            "name_es": "Posee Sitio Web",
+            "weight": 7,
+            "type": "critical",
+            "score": 7,
+            "status": "positive",
+            "message": "Possui website"
+          },
+          {
+            "id": 6,
+            "name_pt": "Perguntas e Respostas",
+            "name_es": "Preguntas y Respuestas",
+            "weight": 5,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem perguntas e respostas"
+          },
+          {
+            "id": 7,
+            "name_pt": "Posts/Publica\u00e7\u00f5es",
+            "name_es": "Posts/Publicaciones",
+            "weight": 6,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem publica\u00e7\u00f5es"
+          },
+          {
+            "id": 8,
+            "name_pt": "Descri\u00e7\u00e3o do Neg\u00f3cio",
+            "name_es": "Descripci\u00f3n del Negocio",
+            "weight": 7,
+            "type": "critical",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem descri\u00e7\u00e3o"
+          },
+          {
+            "id": 9,
+            "name_pt": "Presen\u00e7a nas Redes Sociais",
+            "name_es": "Presencia en Redes Sociales",
+            "weight": 5,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem redes sociais"
+          },
+          {
+            "id": 10,
+            "name_pt": "Presen\u00e7a no Google Maps",
+            "name_es": "Presencia en Google Maps",
+            "weight": 8,
+            "type": "moderate",
+            "score": 8,
+            "status": "positive",
+            "message": "Localiza\u00e7\u00e3o no Maps"
+          },
+          {
+            "id": 11,
+            "name_pt": "Fotos do Exterior",
+            "name_es": "Fotos del Exterior",
+            "weight": 4,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos do exterior"
+          },
+          {
+            "id": 12,
+            "name_pt": "Fotos do Interior",
+            "name_es": "Fotos del Interior",
+            "weight": 4,
+            "type": "moderate",
+            "score": 0,
+            "status": "critical",
+            "message": "Sem fotos do interior"
+          },
+          {
+            "id": 13,
+            "name_pt": "Informa\u00e7\u00f5es de Produtos e Servi\u00e7os",
+            "name_es": "Informaci\u00f3n de Productos y Servicios",
+            "weight": 6,
+            "type": "moderate",
+            "score": 6,
+            "status": "positive",
+            "message": "Produtos/servi\u00e7os cadastrados"
+          },
+          {
+            "id": 14,
+            "name_pt": "Possui Avalia\u00e7\u00f5es",
+            "name_es": "Posee Evaluaciones",
+            "weight": 7,
+            "type": "positive",
+            "score": 7,
+            "status": "positive",
+            "message": "157 avalia\u00e7\u00f5es"
+          },
+          {
+            "id": 15,
+            "name_pt": "Endere\u00e7o Configurado",
+            "name_es": "Direcci\u00f3n Configurada",
+            "weight": 6,
+            "type": "positive",
+            "score": 6,
+            "status": "positive",
+            "message": "Endere\u00e7o configurado"
+          },
+          {
+            "id": 16,
+            "name_pt": "Possui Logotipo",
+            "name_es": "Posee Logotipo",
+            "weight": 5,
+            "type": "positive",
+            "score": 5,
+            "status": "positive",
+            "message": "Possui logotipo"
+          },
+          {
+            "id": 17,
+            "name_pt": "Resposta a Avalia\u00e7\u00f5es",
+            "name_es": "Respuesta a Evaluaciones",
+            "weight": 4,
+            "type": "positive",
+            "score": 0,
+            "status": "critical",
+            "message": "N\u00e3o responde avalia\u00e7\u00f5es"
+          }
+        ],
+        "summary": {
+          "critical_issues_count": 10,
+          "moderate_issues_count": 0,
+          "positive_points_count": 7,
+          "top_critical_issues": [
+            {
+              "name": "Fotos de Productos/Servicios",
+              "message": "Sem fotos de produtos/servi\u00e7os"
+            },
+            {
+              "name": "Videos",
+              "message": "Sem v\u00eddeos"
+            },
+            {
+              "name": "Perfil Verificado",
+              "message": "Perfil n\u00e3o verificado"
+            },
+            {
+              "name": "Preguntas y Respuestas",
+              "message": "Sem perguntas e respostas"
+            },
+            {
+              "name": "Posts/Publicaciones",
+              "message": "Sem publica\u00e7\u00f5es"
+            }
+          ],
+          "recommendations": [
+            "Perfil GMB necessita de otimiza\u00e7\u00e3o urgente",
+            "Prioridade: Sem fotos de produtos/servi\u00e7os",
+            "Prioridade: Sem v\u00eddeos",
+            "Prioridade: Perfil n\u00e3o verificado"
+          ]
+        }
+      },
+      "created_at": "2026-02-03T07:37:01"
+    }
+  ],
+  "proposals": [
+    {
+      "status": "draft",
+      "total_amount": 3500000.0,
+      "payment_terms": "50% a la firma, 50% contra entrega.",
+      "pdf_file_path": "C:\\ProAG\\puretego-crm\\generated_pdfs\\propuesta_TODO_Blanco_Uniformes_20260203.pdf",
+      "created_at": "2026-02-03T07:37:58",
+      "items": [
+        {
+          "service_name": "Dominaci\u00f3n en Google Maps - Pack 90 d\u00edas",
+          "price": 3500000.0,
+          "description": "Auditor\u00eda SEO Local avanzada, optimizaci\u00f3n t\u00e9cnica..."
+        }
+      ]
+    }
+  ]
+}
