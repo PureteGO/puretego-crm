@@ -347,7 +347,13 @@ h4 {
 }
 
 h5,
-h6 {
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
   font-size: 1rem;
 }
 
@@ -428,6 +434,10 @@ a:hover {
 
 [data-theme="light"] .theme-toggle .bi-moon-fill {
   display: none;
+}
+
+[data-theme="light"] .navbar-toggler-icon {
+  filter: invert(1) grayscale(100%) brightness(10%);
 }
 
 /* Light theme navbar adjustments */

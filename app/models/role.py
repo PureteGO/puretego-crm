@@ -32,6 +32,7 @@ class Role(Base):
     can_manage_gmb = Column(Boolean, default=False)         # Otimizar/Editar GMB Profile
     can_manage_healthchecks = Column(Boolean, default=False) # Criar/Rodar HealthChecks
     can_manage_tickets = Column(Boolean, default=True)      # Criar/Ver tickets operacionais
+    can_manage_finance = Column(Boolean, default=False)     # Acesso ao módulo financeiro
     
     # Relationships
     users = relationship('User', back_populates='role')
@@ -59,7 +60,8 @@ class Role(Base):
             'can_export_data': self.can_export_data,
             'can_manage_gmb': self.can_manage_gmb,
             'can_manage_healthchecks': self.can_manage_healthchecks,
-            'can_manage_tickets': self.can_manage_tickets
+            'can_manage_tickets': self.can_manage_tickets,
+            'can_manage_finance': self.can_manage_finance
         }
     
     def to_dict(self):
@@ -90,7 +92,8 @@ DEFAULT_ROLES = [
         'can_delete_clients': True,
         'can_generate_proposals': True,
         'can_view_reports': True,
-        'can_export_data': True
+        'can_export_data': True,
+        'can_manage_finance': True
     },
     {
         'name': 'manager',
@@ -103,7 +106,8 @@ DEFAULT_ROLES = [
         'can_delete_clients': True,
         'can_generate_proposals': True,
         'can_view_reports': True,
-        'can_export_data': True
+        'can_export_data': True,
+        'can_manage_finance': True
     },
     {
         'name': 'sales',
@@ -116,7 +120,8 @@ DEFAULT_ROLES = [
         'can_delete_clients': False,
         'can_generate_proposals': True,
         'can_view_reports': False,
-        'can_export_data': False
+        'can_export_data': False,
+        'can_manage_finance': False
     },
     {
         'name': 'sdr',
@@ -129,7 +134,8 @@ DEFAULT_ROLES = [
         'can_delete_clients': False,
         'can_generate_proposals': False,
         'can_view_reports': False,
-        'can_export_data': False
+        'can_export_data': False,
+        'can_manage_finance': False
     },
     {
         'name': 'traffic',
@@ -142,7 +148,8 @@ DEFAULT_ROLES = [
         'can_delete_clients': False,
         'can_generate_proposals': False,
         'can_view_reports': True,
-        'can_export_data': False
+        'can_export_data': False,
+        'can_manage_finance': False
     },
     {
         'name': 'creative',
@@ -155,7 +162,8 @@ DEFAULT_ROLES = [
         'can_delete_clients': False,
         'can_generate_proposals': False,
         'can_view_reports': False,
-        'can_export_data': False
+        'can_export_data': False,
+        'can_manage_finance': False
     },
     {
         'name': 'finance',
@@ -168,7 +176,8 @@ DEFAULT_ROLES = [
         'can_delete_clients': False,
         'can_generate_proposals': True,
         'can_view_reports': True,
-        'can_export_data': True
+        'can_export_data': True,
+        'can_manage_finance': True
     },
     {
         'name': 'gmb_manager',
@@ -184,7 +193,8 @@ DEFAULT_ROLES = [
         'can_export_data': False,
         'can_manage_gmb': True,
         'can_manage_healthchecks': True,
-        'can_manage_tickets': True
+        'can_manage_tickets': True,
+        'can_manage_finance': False
     },
     {
         'name': 'partner',
@@ -200,6 +210,7 @@ DEFAULT_ROLES = [
         'can_export_data': True,
         'can_manage_gmb': True,
         'can_manage_healthchecks': True,
-        'can_manage_tickets': True
+        'can_manage_tickets': True,
+        'can_manage_finance': True
     }
 ]

@@ -10,7 +10,7 @@
                 <div class="card-body text-center">
                     <img src="{{ url_for('static', filename='branding/logo.png') }}" alt="Maps2GO"
                         class="img-fluid mb-4" style="max-height: 80px;">
-                    <h3 class="card-title text-center mb-4 d-none">Maps2GO CRM</h3>
+                    <!-- <h3 class="card-title text-center mb-4 d-none">Maps2GO CRM</h3> -->
                     <form method="POST" action="{{ url_for('auth.login') }}">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">

@@ -34,6 +34,7 @@ Status: **In Progress**
 *   [x] **Fix Syntax/Linting**: Address quoting issues in `clients/index.html` (Done).
 *   [x] **Fix Kanban Deletion**: Debug and fix the "Eliminar" (delete stage) functionality in `kanban.html`.
 *   [x] **Translation Standardization**: Review and ensure consistent English/Spanish/Portuguese translations across the Kanban and Client views.
+*   [x] **Fix Financial Module**: Restore missing Finance navigation and fix `DetachedInstanceError` crashes.
 
 ## Phase 2: Company Configuration (Currency & Settings)
 Status: **Planned**
@@ -73,6 +74,15 @@ Status: **Planned**
     *   Create `Task` model with `company_id`, `assigned_to`, and `client_id` associations.
     *   Implement "Common Tasks" templates (e.g., SDR Follow-up, Closer Documentation).
     *   Add a Dashboard "To-Do" list widget for all users.
+
+## Phase 6: Advanced Commissions & Partners (Requested)
+Status: **High Priority**
+
+*   **Objective**: Enhanced commission management for complex sales structures.
+*   **Tasks**:
+    *   **Partner/Freelancer Registry**: Create a model/registry for external beneficiaries who are NOT full system users (e.g., outsourced partners, freelancers).
+    *   **Advanced Commission Splits**: Implement logic to allow splitting a single deal's commission among multiple beneficiaries (e.g., 50% Closer, 25% SDR, 25% Partner).
+    *   **Manual Commission Entry**: UI to manually add or adjust commission records for closed deals.
 
 ---
 

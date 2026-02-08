@@ -1,8 +1,3 @@
-"""
-PURETEGO CRM - Finance Routes
-Gestão de Contas a Receber e Faturamento
-"""
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app.routes.auth import login_required, get_current_user
 from app.utils.decorators import permission_required
@@ -12,6 +7,7 @@ from app.utils.tenant import filter_by_company
 from config.database import get_db
 from datetime import datetime, date
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 
 bp = Blueprint('finance', __name__, url_prefix='/finance')
 
@@ -20,7 +16,11 @@ bp = Blueprint('finance', __name__, url_prefix='/finance')
 def list_receivables():
     """Listagem de contas a receber"""
     with get_db() as db:
-        query = filter_by_company(db.query(Receivable), Receivable)
+        # Use eager loading to prevent DetachedInstanceError
+        query = filter_by_company(db.query(Receivable).options(
+            joinedload(Receivable.client), 
+            joinedload(Receivable.project)
+        ), Receivable)
         
         # Filtros básicos (status)
         status = request.args.get('status')
@@ -28,6 +28,10 @@ def list_receivables():
             query = query.filter(Receivable.status == status)
             
         receivables = query.order_by(Receivable.due_date.asc()).all()
+        for r in receivables:
+            if r.client: db.expunge(r.client)
+            if r.project: db.expunge(r.project)
+            db.expunge(r)
         
         # Métricas rápidas
         stats = {
@@ -74,7 +78,7 @@ def mark_as_paid(id):
 def send_invoice(receivable_id):
     """Envia fatura/cobrança para o cliente via e-mail"""
     with get_db() as db:
-        receivable = db.query(Receivable).filter(Receivable.id == receivable_id).first()
+        receivable = db.query(Receivable).options(joinedload(Receivable.client)).filter(Receivable.id == receivable_id).first()
         
         if not receivable:
             flash('Cobrança não encontrada.', 'error')
@@ -118,6 +122,8 @@ def send_invoice(receivable_id):
             flash(f'Erro ao enviar e-mail: {error}', 'error')
             
     return redirect(url_for('finance.list_receivables'))
+
+@bp.route('/get-summary')
 @login_required
 def get_finance_summary():
     """API: Resumo financeiro para o dashboard"""
@@ -179,6 +185,8 @@ def list_payables():
 
         query = filter_by_company(db.query(Payable), Payable)
         payables = query.order_by(Payable.due_date.asc()).all()
+        for p in payables:
+            db.expunge(p)
         
         # Stats de payables
         stats = {
@@ -209,8 +217,12 @@ def pay_payable(id):
 def list_commissions():
     """Listagem de comissões calculadas"""
     with get_db() as db:
-        query = filter_by_company(db.query(Commission), Commission)
+        query = filter_by_company(db.query(Commission).options(joinedload(Commission.user)), Commission)
         commissions = query.order_by(Commission.created_at.desc()).all()
+        for c in commissions:
+            if c.user: db.expunge(c.user)
+            if c.deal: db.expunge(c.deal)
+            db.expunge(c)
         
         stats = {
             'total_pending': filter_by_company(db.query(func.sum(Commission.amount)), Commission).filter(Commission.status == 'pending').scalar() or 0,

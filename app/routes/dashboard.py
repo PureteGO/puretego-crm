@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, session
 from app.routes.auth import login_required
-from app.models import Client, Visit, Proposal, HealthCheck, KanbanStage, Interaction, Project, ProjectTicket, Deal, Receivable
+from app.models import Client, Visit, Proposal, HealthCheck, KanbanStage, Interaction, Project, ProjectTicket, Deal, Receivable, Company, User
 from app.utils.tenant import filter_by_company
 from config.database import get_db
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
+from app.models.task import Task
 
 bp = Blueprint('dashboard', __name__, url_prefix='/')
 
@@ -164,5 +165,44 @@ def index():
                          data['onboarding_guide']['users_added'], data['onboarding_guide']['clients_added']]
                 data['onboarding_percent'] = int((sum(steps) / len(steps)) * 100)
     
+        # --- Overdue Items for Modal ---
+        overdue_items = []
+        
+        # 1. Overdue Interactions
+        overdue_interactions = db.query(Interaction).options(joinedload(Interaction.client), joinedload(Interaction.type)).filter(
+            Interaction.user_id == user_id,
+            Interaction.status == 'scheduled',
+            Interaction.date < datetime.now()
+        ).all()
+        
+        for i in overdue_interactions:
+            overdue_items.append({
+                'type': 'interaction',
+                'id': i.id,
+                'title': f"{i.type.name} - {i.client.name}",
+                'date': i.date,
+                'url': f"/clients/{i.client_id}"  # Direct link to client
+            })
+            
+        # 2. Overdue Tasks
+        overdue_tasks = filter_by_company(db.query(Task), Task).filter(
+            Task.status == 'pending',
+            Task.due_date < datetime.now(),
+            or_(Task.user_id == user_id, (Task.user_id == None) & (Task.role_target == user_role))
+        ).all()
+        
+        for t in overdue_tasks:
+            overdue_items.append({
+                'type': 'task',
+                'id': t.id,
+                'title': t.title,
+                'date': t.due_date,
+                'url': '#' # Tasks might need a specific view, for now just show them
+            })
+            
+        # Sort by date (oldest first)
+        overdue_items.sort(key=lambda x: x['date'])
+        data['overdue_items'] = overdue_items
+
         return render_template('dashboard/index.html', **data)
 

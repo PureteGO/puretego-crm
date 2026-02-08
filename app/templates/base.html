@@ -33,13 +33,14 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard.index') }}">
-                {% if session.get('company_logo') %}
+                {% if session.get('company_logo') and 'puretego' not in session.get('company_logo') %}
                 <img src="{{ session.get('company_logo') }}" alt="{{ session.get('company_name', 'Logo') }}"
                     class="company-logo-navbar" style="height: 32px; max-width: 150px; object-fit: contain;">
                 {% else %}
-                <img src="{{ url_for('static', filename='branding/logo_navbar.png') }}"
-                    onerror="this.src='{{ url_for('static', filename='branding/logo.png') }}';" alt="Maps2GO CRM"
-                    class="company-logo-navbar me-2" style="height: 32px; max-width: 180px; object-fit: contain;">
+                <img src="{{ url_for('static', filename='branding/logo.png') }}"
+                    onerror="this.src='{{ url_for('static', filename='branding/maps2go_logo.svg') }}';"
+                    alt="Maps2GO CRM" class="company-logo-navbar me-2"
+                    style="height: 32px; max-width: 180px; object-fit: contain;">
                 <span class="navbar-brand-text d-none d-sm-inline"
                     title="{{ _('Upload your logo in Company Settings') }}">
                     {{ session.get('company_name', 'Maps2GO CRM') }}
@@ -89,6 +90,23 @@
                         <a class="nav-link" href="{{ url_for('proposals.index') }}"><i
                                 class="bi bi-file-earmark-text"></i> {{ _("Proposals") }}</a>
                     </li>
+                    {% if session.get('permissions', {}).get('can_manage_finance', False) or session.get('role') in
+                    ['owner', 'admin', 'finance'] %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="financeDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-cash-coin"></i> {{ _('Finance') }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="financeDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('finance.list_receivables') }}">{{
+                                    _('Accounts Receivable') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('finance.list_payables') }}">{{
+                                    _('Accounts Payable') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('finance.list_commissions') }}">{{
+                                    _('Commissions') }}</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
                     {% if session.get('workflow_mode') == 'structured' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('projects.index') }}"><i class="bi bi-briefcase"></i> {{

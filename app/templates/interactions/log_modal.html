@@ -156,9 +156,14 @@
 
         const url = isUpdate ? `/interactions/${interactionId}/update` : '/interactions/create';
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify(formData)
         })
             .then(r => r.json())
@@ -198,9 +203,14 @@
             status: 'scheduled'
         };
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         fetch('/interactions/create', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify(formData)
         })
             .then(r => r.json())

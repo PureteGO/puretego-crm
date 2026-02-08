@@ -10,7 +10,7 @@ from app.utils.tenant import filter_by_company
 from app.models import User, Role, Company
 from config.database import get_db
 from sqlalchemy.orm import joinedload
-from app.utils.saas_limits import PLAN_LEAN, PLAN_STRUCTURED
+from app.utils.saas_limits import PLAN_LEAN, PLAN_PURETEGO
 
 bp = Blueprint('users', __name__, url_prefix='/users')
 
@@ -52,7 +52,7 @@ def index():
         
         # Filter roles based on plan
         plan = session.get('company_plan')
-        if plan not in [PLAN_LEAN, PLAN_STRUCTURED]:
+        if plan not in [PLAN_LEAN, PLAN_PURETEGO]:
              roles = [r for r in roles if r.name != 'gmb_manager']
 
         roles_list = [{'id': r.id, 'name': r.name, 'display_name': r.display_name} for r in roles]
@@ -80,7 +80,7 @@ def create():
                 flash('Este email já está em uso.', 'error')
                 roles = db.query(Role).order_by(Role.id).all()
                 plan = session.get('company_plan')
-                if plan not in [PLAN_LEAN, PLAN_STRUCTURED]:
+                if plan not in [PLAN_LEAN, PLAN_PURETEGO]:
                      roles = [r for r in roles if r.name != 'gmb_manager']
                 roles_list = [{'id': r.id, 'name': r.name, 'display_name': r.display_name} for r in roles]
                 return render_template('users/create.html', roles=roles_list)
@@ -105,7 +105,7 @@ def create():
     with get_db() as db:
         roles = db.query(Role).order_by(Role.id).all()
         plan = session.get('company_plan')
-        if plan not in [PLAN_LEAN, PLAN_STRUCTURED]:
+        if plan not in [PLAN_LEAN, PLAN_PURETEGO]:
              roles = [r for r in roles if r.name != 'gmb_manager']
         roles_list = [{'id': r.id, 'name': r.name, 'display_name': r.display_name} for r in roles]
     
@@ -166,7 +166,7 @@ def edit(user_id):
         
         roles = db.query(Role).order_by(Role.id).all()
         plan = session.get('company_plan')
-        if plan not in [PLAN_LEAN, PLAN_STRUCTURED]:
+        if plan not in [PLAN_LEAN, PLAN_PURETEGO]:
              roles = [r for r in roles if r.name != 'gmb_manager']
         roles_list = [{'id': r.id, 'name': r.name, 'display_name': r.display_name} for r in roles]
         

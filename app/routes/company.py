@@ -75,6 +75,9 @@ def settings():
             'smtp_from_name': company.smtp_from_name or '',
             'has_password': bool(company.smtp_password)
         }
+        
+        # Detach company from session to allow use in template after session closes
+        db.expunge(company)
     
     return render_template('company/settings.html', 
                            company=company, 
@@ -233,12 +236,15 @@ def email_templates():
             (EmailTemplate.company_id == company_id) | (EmailTemplate.company_id == None)
         ).all()
         
-        # Agrupar por área para o template
-        grouped = {
-            'sales': [t for t in templates if t.area == 'sales'],
-            'finance': [t for t in templates if t.area == 'finance'],
-            'general': [t for t in templates if t.area == 'general']
-        }
+        for t in templates:
+            db.expunge(t)
+            
+    # Agrupar por área para o template
+    grouped = {
+        'sales': [t for t in templates if t.area == 'sales'],
+        'finance': [t for t in templates if t.area == 'finance'],
+        'general': [t for t in templates if t.area == 'general']
+    }
         
     return render_template('company/email_templates.html', templates=grouped)
 
@@ -293,6 +299,8 @@ def edit_email_template(code):
             flash('Template de e-mail atualizado!', 'success')
             return redirect(url_for('company.email_templates'))
             
+        db.expunge(template)
+            
     return render_template('company/edit_email_template.html', template=template)
 
 
@@ -316,6 +324,9 @@ def restore_email_template(code):
             flash('Template restaurado para o padrão global.', 'success')
             
     return redirect(url_for('company.email_templates'))
+
+
+@bp.route('/test-email', methods=['POST'])
 @login_required
 @permission_required('can_manage_company')
 def test_email():

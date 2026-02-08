@@ -164,7 +164,7 @@ def create_app(config_object=None):
                 Task.company_id == session.get('company_id'),
                 Task.status == 'pending',
                 Task.due_date < datetime.now(),
-                or_(Task.user_id == user.id, (Task.user_id == None) & (Task.role_target == user.role.name))
+                or_(Task.user_id == user.id, (Task.user_id == None) & (Task.role_target == (user.role.name if user.role else 'sales')))
             ).scalar() or 0
             
             overdue_count += task_overdue
