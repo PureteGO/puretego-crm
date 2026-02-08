@@ -1,9 +1,11 @@
-# Neutralized htaccess to test basic connectivity
-# This removes all Passenger/Python directives to see if the server serves static files.
+# PURETEGO CRM - Fresh Install 3.11
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home2/appmaps2go/maps2go_crm"
+PassengerBaseURI "/"
+PassengerPython "/home2/appmaps2go/virtualenv/maps2go_crm/3.11/bin/python"
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
 
 RewriteEngine On
 RewriteBase /
-
-# If file exists, serve it
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule . - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ run.py/$1 [L]
