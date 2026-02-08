@@ -1,9 +1,10 @@
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
 PassengerAppRoot "/home2/appmaps2go/maps2go_crm"
 PassengerBaseURI "/"
-PassengerPython "/home2/appmaps2go/virtualenv/maps2go_crm/3.11/bin/python"
+PassengerPython "/home2/appmaps2go/virtualenv/maps2go_crm/3.10/bin/python"
 # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
 
+# Configurações de Redirecionamento (Opcional, mas recomendado para o Passenger)
 RewriteEngine On
 RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
