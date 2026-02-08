@@ -1,17 +1,13 @@
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
-PassengerAppRoot "/home2/appmaps2go/maps2go_crm"
-PassengerBaseURI "/"
-PassengerPython "/home2/appmaps2go/virtualenv/maps2go_crm/3.10/bin/python"
-# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# PURETEGO CRM - Minimal htaccess to restore access
+# Se este arquivo der erro 500 para o .txt, o problema é no Apache do servidor.
 
-# Configurações de Redirecionamento (Opcional, mas recomendado para o Passenger)
 RewriteEngine On
 RewriteBase /
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.*)$ passenger_wsgi.py/$1 [L]
 
-# Configurações de segurança
-<Files ".env">
-    Order allow,deny
-    Deny from all
-</Files>
+# Se o arquivo existir, serve ele direto (ex: test_server.txt)
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule . - [L]
+
+# Caso contrário, manda para o app (ajustado conforme o Setup Python App)
+# Note: o cPanel geralmente insere os blocos PASSENGER automaticamente.
+# Se você desativou o app, este arquivo deve servir apenas o estático.
