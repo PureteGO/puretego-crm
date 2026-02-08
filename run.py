@@ -1,19 +1,20 @@
-"""
-PURETEGO CRM - Application Entry Point
-Arquivo principal para executar a aplicação
-"""
-
+import sys
+import os
 from dotenv import load_dotenv
-load_dotenv()  # Carrega variáveis do .env
+
+# Ensure the app directory is in the path
+sys.path.insert(0, os.path.dirname(__file__))
+
+# Load environment variables
+load_dotenv()
 
 from app import create_app
+from config.settings import ProductionConfig
 
-app = create_app()
+# Create the application object for Passenger
+# Passenger looks for a variable named 'application' by default
+application = create_app(ProductionConfig)
+app = application # Fallback for entry point 'app'
 
 if __name__ == '__main__':
-    # Executar em modo de desenvolvimento
-    app.run(
-        host='0.0.0.0',
-        port=5000,
-        debug=True
-    )
+    application.run(host='0.0.0.0', port=5000)
