@@ -1,3 +1,4 @@
+# Deploy to cPanel (Triggered after secrets update)
 name: Deploy to cPanel
 
 on:
