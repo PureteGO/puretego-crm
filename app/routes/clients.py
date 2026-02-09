@@ -174,7 +174,9 @@ def view(client_id):
             joinedload(Client.kanban_stage),
             joinedload(Client.interested_package),
             joinedload(Client.gmb_location_links),
-            joinedload(Client.projects)
+            joinedload(Client.projects),
+            joinedload(Client.owner),
+            joinedload(Client.rankings)
         ).filter(Client.id == client_id, Client.is_active.is_(True)).first()
         
         connections = db.query(GoogleConnection).filter(
