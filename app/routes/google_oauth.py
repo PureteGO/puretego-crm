@@ -234,6 +234,37 @@ def locations(connection_id):
                            error_message=error_message)
 
 
+@bp.route('/repair-permissions')
+@login_required
+def repair_permissions():
+    """Utility route to fix missing GMB permissions for Owner and Manager roles in DB"""
+    with get_db() as db:
+        from app.models import Role
+        # Update Owner roles
+        owners = db.query(Role).filter(Role.name == 'owner').all()
+        for role in owners:
+            role.can_manage_gmb = True
+            role.can_manage_healthchecks = True
+        
+        # Update Manager roles
+        managers = db.query(Role).filter(Role.name == 'manager').all()
+        for role in managers:
+            role.can_manage_gmb = True
+            role.can_manage_healthchecks = True
+
+        db.commit()
+        
+        # Force session refresh of permissions
+        from app.utils.decorators import get_current_user
+        user = get_current_user()
+        if user and user.role:
+            session['permissions'] = user.role.get_permissions_dict()
+            session['role'] = user.role.name
+            
+        flash(_('Permissões de GMB restauradas para Proprietários e Gerentes.'), 'success')
+        return redirect(url_for('google_oauth.dashboard'))
+
+
 @bp.route('/connect')
 @login_required  
 def connect():

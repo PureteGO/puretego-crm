@@ -93,6 +93,8 @@ DEFAULT_ROLES = [
         'can_generate_proposals': True,
         'can_view_reports': True,
         'can_export_data': True,
+        'can_manage_gmb': True,
+        'can_manage_healthchecks': True,
         'can_manage_finance': True
     },
     {
@@ -107,6 +109,8 @@ DEFAULT_ROLES = [
         'can_generate_proposals': True,
         'can_view_reports': True,
         'can_export_data': True,
+        'can_manage_gmb': True,
+        'can_manage_healthchecks': True,
         'can_manage_finance': True
     },
     {
