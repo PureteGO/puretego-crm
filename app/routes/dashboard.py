@@ -68,6 +68,7 @@ def index():
             data['total_pipeline_value'] = proposals_value_query.filter(Proposal.status != 'rejected').scalar() or 0
             
             # Won amount = total sum of accepted proposals this month
+            first_day_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
             data['won_amount'] = filter_by_company(db.query(func.sum(Proposal.total_amount)).join(Client), Client).filter(
                 Proposal.status == 'accepted',
                 Proposal.updated_at >= first_day_month
