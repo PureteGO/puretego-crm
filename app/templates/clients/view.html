@@ -397,7 +397,7 @@
                             <h5 class="mb-0">{{ _('Performance') }}</h5>
                             {% if client.gmb_location_links|length > 1 %}
                             <select class="form-select form-select-sm w-auto"
-                                onchange="window.location.href='{{ url_for('clients.view', client_id=client.id, _anchor='insights') }}&gmb_link_id=' + this.value">
+                                onchange="window.location.href='{{ url_for('clients.view', client_id=client.id, _anchor='insights') }}' + '&gmb_link_id=' + this.value">
                                 {% for link in client.gmb_location_links %}
                                 <option value="{{ link.id }}" {% if link.id==selected_link_id %}selected{% endif %}>{{
                                     link.gmb_location_title }}</option>
@@ -410,7 +410,7 @@
 
                         {% if selected_link and current_user.can_manage_gmb_for(client) %}
                         <form
-                            action="{{ url_for('integrations.sync_insights', connection_id=selected_link.google_connection_id, link_id=selected_link.id) }}"
+                            action="{{ url_for('google_oauth.sync_insights', connection_id=selected_link.google_connection_id, link_id=selected_link.id) }}"
                             method="POST">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="btn btn-sm btn-outline-primary">
