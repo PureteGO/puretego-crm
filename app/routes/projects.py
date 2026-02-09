@@ -4,6 +4,8 @@ from app.models import Project, ProjectTicket, Client
 from app.utils.tenant import filter_by_company
 from config.database import get_db
 from datetime import datetime
+from flask_babel import gettext as _
+import logging
 
 bp = Blueprint('projects', __name__, url_prefix='/projects')
 
@@ -71,23 +73,28 @@ def create(client_id):
 @login_required
 def view(project_id):
     """View project details and tickets."""
-    with get_db() as db:
-        from sqlalchemy.orm import joinedload
-        project = db.query(Project).options(
-            joinedload(Project.client),
-            joinedload(Project.tickets)
-        ).filter(Project.id == project_id).first()
-        
-        if not project:
-            flash('Projeto não encontrado.', 'error')
-            return redirect(url_for('projects.index'))
+    try:
+        with get_db() as db:
+            from sqlalchemy.orm import joinedload
+            project = db.query(Project).options(
+                joinedload(Project.client),
+                joinedload(Project.tickets)
+            ).filter(Project.id == project_id).first()
             
-        # Fetch related history for context
-        from app.models import HealthCheck, Proposal
-        health_checks = db.query(HealthCheck).filter_by(client_id=project.client_id).order_by(HealthCheck.created_at.desc()).limit(5).all()
-        proposals = db.query(Proposal).filter_by(client_id=project.client_id).order_by(Proposal.created_at.desc()).limit(5).all()
-            
-    return render_template('projects/view.html', project=project, health_checks=health_checks, proposals=proposals)
+            if not project:
+                flash(_('Projeto não encontrado.'), 'error')
+                return redirect(url_for('projects.index'))
+                
+            # Fetch related history for context
+            from app.models import HealthCheck, Proposal
+            health_checks = db.query(HealthCheck).filter_by(client_id=project.client_id).order_by(HealthCheck.created_at.desc()).limit(5).all()
+            proposals = db.query(Proposal).filter_by(client_id=project.client_id).order_by(Proposal.created_at.desc()).limit(5).all()
+                
+        return render_template('projects/view.html', project=project, health_checks=health_checks, proposals=proposals)
+    except Exception as e:
+        logging.error(f"Error in projects.view: {str(e)}", exc_info=True)
+        flash(_('Erro ao carregar projeto: %(error)s', error=str(e)), 'error')
+        return redirect(url_for('projects.index'))
 
 @bp.route('/<int:project_id>/ticket/add', methods=['POST'])
 @login_required

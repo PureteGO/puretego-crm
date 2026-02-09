@@ -208,7 +208,9 @@ def locations(connection_id):
         
         # RBAC Filtering
         if user and user.role:
-            if user.role.name == 'gmb_manager' and not user.role.can_edit_all_clients:
+            role_name = getattr(user.role, 'name', None)
+            can_edit_all = getattr(user.role, 'can_edit_all_clients', False)
+            if role_name == 'gmb_manager' and not can_edit_all:
                 query = query.filter(Client.owner_id == user.id)
             
         clients = query.order_by(Client.name).all()
@@ -255,8 +257,10 @@ def locations(connection_id):
                                error_message=error_message)
     except Exception as e:
         import traceback
-        current_app.logger.error(f"FATAL ERROR in google_oauth.locations: {str(e)}\n{traceback.format_exc()}")
-        flash(_('Ocorreu um erro interno ao carregar os locais. Por favor, tente novamente mais tarde.'), 'error')
+        error_details = f"{str(e)}\n{traceback.format_exc()}"
+        current_app.logger.error(f"FATAL ERROR in google_oauth.locations: {error_details}")
+        # Show specific error for debugging on production
+        flash(_('Erro ao carregar locais: %(error)s', error=str(e)), 'error')
         return redirect(url_for('google_oauth.dashboard'))
 
 
@@ -575,10 +579,7 @@ def link_location(connection_id):
         if not connection:
             flash(_('Conexión no encontrada.'), 'error')
             return redirect(url_for('google_oauth.dashboard'))
-        
-        # RBAC Check: GMB Manager can only link to clients they own (or any if can_edit_all_clients)
-        from app.models import Client
-        from app.utils.decorators import get_current_user
+
         client = db.query(Client).get(int(client_id))
         user = get_current_user()
         if not client or not user.can_manage_gmb_for(client):
@@ -730,13 +731,13 @@ def review_reply():
             flash(_('Dados incompletos para a resposta.'), 'error')
             return redirect(request.referrer or url_for('google_oauth.dashboard'))
             
-        from app.models import GoogleConnection
-        from flask_login import current_user
+        from app.utils.decorators import get_current_user
+        user = get_current_user()
         
         with get_db() as db:
             connection = db.query(GoogleConnection).filter(
                 GoogleConnection.id == int(connection_id),
-                GoogleConnection.company_id == current_user.company_id
+                GoogleConnection.company_id == user.company_id
             ).first()
             
             if not connection:

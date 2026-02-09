@@ -3,7 +3,7 @@
 {% block title %}{{ project.name }}{% endblock %}
 
 {% block content %}
-{% if session.get('user_role') in ['owner', 'admin'] or session.get('is_superadmin') %}
+{% if session.get('role') in ['owner', 'admin'] or session.get('is_superadmin') %}
 <!-- Modal: Renew Project -->
 <div class="modal fade" id="renewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -140,7 +140,7 @@
                             <i class="bi bi-play-circle"></i> {{ _('Iniciar Execução') }}
                         </button>
                     </form>
-                    {% if session.get('is_superadmin') or session.get('user_role') in ['owner', 'admin'] %}
+                    {% if session.get('is_superadmin') or session.get('role') in ['owner', 'admin'] %}
                     <div class="mt-3 pt-3 border-top">
                         <label class="small text-muted d-block mb-2">{{ _('Ações Administrativas') }}</label>
                         <form action="{{ url_for('projects.update_status', project_id=project.id) }}" method="POST"
@@ -172,7 +172,7 @@
                 <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addTicketModal">
                     <i class="bi bi-plus-circle"></i> {{ _('Nova Tarefa') }}
                 </button>
-                {% if session.get('user_role') in ['owner', 'admin'] or session.get('is_superadmin') %}
+                {% if session.get('role') in ['owner', 'admin'] or session.get('is_superadmin') %}
                 <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#renewModal">
                     <i class="bi bi-arrow-repeat"></i> {{ _('Renovar Contrato') }}
                 </button>

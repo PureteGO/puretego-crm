@@ -173,7 +173,14 @@ class HealthCheckService:
                 'moderate_issues_count': moderate_issues,
                 'positive_points_count': positive_points,
                 'text': f"Score Público: {score}/100"
-            }
+            },
+            'criteria': [
+                {
+                    'name': res['name_es'],
+                    'status': 'Detectado' if res['passed'] else 'Não detectado',
+                    'score': 100 if res['passed'] else 0
+                } for res in criteria_results
+            ]
         }
         
         check_id = None
@@ -406,7 +413,14 @@ class HealthCheckService:
                 'moderate_issues_count': moderate_issues,
                 'positive_points_count': positive_points,
                 'text': f"Auditoria Oficial: {score}/100"
-            }
+            },
+            'criteria': [
+                {
+                    'name': d.split(':')[0],
+                    'status': d.split(':')[1].strip() if ':' in d else d,
+                    'score': 100 if 'ok' in d.lower() or 'excelente' in d.lower() or 'bom' in d.lower() else 50
+                } for d in details
+            ]
         }
         
         # Salvar auditoria

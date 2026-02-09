@@ -83,23 +83,32 @@ def agenda():
     end_of_today = now.replace(hour=23, minute=59, second=59)
     end_of_7_days = (now + timedelta(days=7)).replace(hour=23, minute=59, second=59)
     
+    user_id = session.get('user_id')
+    user_role = session.get('role') or 'sales'
+    company_id = session.get('company_id')
+    
     with get_db() as db:
         from sqlalchemy.orm import joinedload
-        # 1. Interactions: Overdue & Today
-        urgent_tasks = db.query(Interaction).options(joinedload(Interaction.client), joinedload(Interaction.type))\
-            .filter(
+        
+        # Base query for interactions
+        interaction_query = db.query(Interaction).options(joinedload(Interaction.client), joinedload(Interaction.type))\
+            .join(Client).filter(
                 Interaction.status == 'scheduled',
-                Interaction.date <= end_of_today,
-                Interaction.user_id == session['user_id']
-            ).order_by(Interaction.date).all()
+                Client.company_id == company_id
+            )
+            
+        # If not an privileged role, filter by current user only
+        if user_role not in ['owner', 'admin', 'manager', 'superadmin']:
+            interaction_query = interaction_query.filter(Interaction.user_id == user_id)
+            
+        # 1. Interactions: Overdue & Today
+        urgent_tasks = interaction_query.filter(Interaction.date <= end_of_today)\
+            .order_by(Interaction.date).all()
         
         # 2. Interactions: Upcoming (Next 7 Days)
-        future_tasks = db.query(Interaction).options(joinedload(Interaction.client), joinedload(Interaction.type))\
-            .filter(
-                Interaction.status == 'scheduled',
+        future_tasks = interaction_query.filter(
                 Interaction.date > end_of_today,
-                Interaction.date <= end_of_7_days,
-                Interaction.user_id == session['user_id']
+                Interaction.date <= end_of_7_days
             ).order_by(Interaction.date).all()
 
         # 3. Visits (Treat as Interactions)
