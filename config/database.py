@@ -14,6 +14,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Define se usa SQLite ou não (padrão False)
+USE_SQLITE = os.environ.get('USE_SQLITE', 'False').lower() == 'true'
+
 # Prioridade 1: Usar DATABASE_URL se existir (ideal para cPanel/Production)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
