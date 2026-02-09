@@ -160,10 +160,17 @@ def locations(connection_id):
     """View and manage locations for a Google connection"""
     company_id = session.get('company_id')
     
-    # Check basic permission
-    if not session.get('permissions', {}).get('can_manage_gmb', False):
-        flash(_('Você não tem permissão para gerenciar integrações Google.'), 'error')
-        return redirect(url_for('dashboard.index'))
+    # Check basic permission - Allow superadmin or direct DB check fallback
+    is_superadmin = session.get('is_superadmin', False)
+    has_permission = session.get('permissions', {}).get('can_manage_gmb', False)
+    
+    if not is_superadmin and not has_permission:
+        # Final fallback: check DB in case session is stale
+        from app.utils.decorators import get_current_user
+        user = get_current_user()
+        if not user or not user.has_permission('can_manage_gmb'):
+            flash(_('Você não tem permissão para gerenciar integrações Google.'), 'error')
+            return redirect(url_for('dashboard.index'))
 
     with get_db() as db:
         connection = db.query(GoogleConnection).filter(
@@ -238,31 +245,33 @@ def locations(connection_id):
 @login_required
 def repair_permissions():
     """Utility route to fix missing GMB permissions for Owner and Manager roles in DB"""
-    with get_db() as db:
-        from app.models import Role
-        # Update Owner roles
-        owners = db.query(Role).filter(Role.name == 'owner').all()
-        for role in owners:
-            role.can_manage_gmb = True
-            role.can_manage_healthchecks = True
-        
-        # Update Manager roles
-        managers = db.query(Role).filter(Role.name == 'manager').all()
-        for role in managers:
-            role.can_manage_gmb = True
-            role.can_manage_healthchecks = True
-
-        db.commit()
-        
-        # Force session refresh of permissions
-        from app.utils.decorators import get_current_user
-        user = get_current_user()
-        if user and user.role:
-            session['permissions'] = user.role.get_permissions_dict()
-            session['role'] = user.role.name
+    from config.database import db_session
+    from app.models import Role, User
+    
+    # Update ALL roles of type owner and manager to have GMB permissions
+    roles_to_fix = db_session.query(Role).filter(Role.name.in_(['owner', 'manager'])).all()
+    for role in roles_to_fix:
+        role.can_manage_gmb = True
+        role.can_manage_healthchecks = True
+    
+    db_session.commit()
+    
+    # Force session refresh of permissions for the current user
+    user_id = session.get('user_id')
+    user = db_session.query(User).filter(User.id == user_id).first()
+    
+    if user and user.role:
+        # Refresh the relationship to ensure we have updated role data
+        db_session.refresh(user.role)
+        session['permissions'] = user.role.get_permissions_dict()
+        session['role'] = user.role.name
+        # Clear g.current_user to force decorators to reload it next time
+        from flask import g
+        if hasattr(g, 'current_user'):
+            g.current_user = None
             
-        flash(_('Permissões de GMB restauradas para Proprietários e Gerentes.'), 'success')
-        return redirect(url_for('google_oauth.dashboard'))
+    flash(_('Permissões de GMB restauradas para Proprietários e Gerentes. Sua sessão foi atualizada.'), 'success')
+    return redirect(url_for('dashboard.index'))
 
 
 @bp.route('/connect')
