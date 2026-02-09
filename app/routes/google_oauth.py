@@ -116,9 +116,10 @@ def dashboard():
                                 locations = service.list_locations(account['name'])
                                 
                                 for loc in locations:
-                                    # Check if linked
                                     is_linked = loc['name'] in existing_links
                                     linked_client_name = None
+                                    link_id = None
+                                    
                                     if is_linked:
                                         link = existing_links[loc['name']]
                                         linked_client_name = link.client.name if link.client else _('Cliente eliminado')
@@ -200,9 +201,10 @@ def locations(connection_id):
             Client.is_active == True
         )
         
-        # GMB Manager can only see their own clients unless they have global edit permission
-        if user.role.name == 'gmb_manager' and not user.role.can_edit_all_clients:
-            query = query.filter(Client.owner_id == user.id)
+        # RBAC Filtering
+        if user and user.role:
+            if user.role.name == 'gmb_manager' and not user.role.can_edit_all_clients:
+                query = query.filter(Client.owner_id == user.id)
             
         clients = query.order_by(Client.name).all()
         
@@ -224,6 +226,10 @@ def locations(connection_id):
                     for loc in account_locations:
                         loc['account_name'] = account['accountName']
                         loc['is_linked'] = loc['name'] in linked_locations
+                        loc['linked_client_id'] = None
+                        loc['linked_client_name'] = None
+                        loc['link_id'] = None
+                        
                         if loc['is_linked']:
                             link = linked_locations[loc['name']]
                             loc['linked_client_id'] = link.client_id
