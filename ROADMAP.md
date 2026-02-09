@@ -24,6 +24,7 @@
 
 ### 4. Gestão de SEO (Rankings)
 - [x] Correção de erro 500 ao adicionar palavras-chave (Imports fixados).
+- [ ] **Refatorar Lógica de Detecção de Rankings:** O sistema atual falha em identificar a posição mesmo quando a empresa está em #1. Necessário melhorar a precisão do matching (usar CID, site ou endereço) e debugar o retorno da API Serper.
 - [ ] Gráfico de histórico de posições dentro da aba SEO do cliente.
 
 ### 5. Traduções e UX
