@@ -83,11 +83,14 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if loc.is_linked %}
+                                {% if loc.is_linked and loc.linked_client_id %}
                                 <a href="{{ url_for('clients.view', client_id=loc.linked_client_id) }}"
                                     class="text-decoration-none">
-                                    <i class="bi bi-person me-1"></i>{{ loc.linked_client_name }}
+                                    <i class="bi bi-person me-1"></i>{{ loc.linked_client_name or _('Cliente') }}
                                 </a>
+                                {% elif loc.is_linked %}
+                                <span class="text-muted"><i class="bi bi-exclamation-circle me-1"></i>{{ _('Vínculo
+                                    inválido') }}</span>
                                 {% else %}
                                 <!-- Link form -->
                                 <form action="{{ url_for('google_oauth.link_location', connection_id=connection.id) }}"
