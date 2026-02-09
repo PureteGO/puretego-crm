@@ -660,35 +660,37 @@ def manage_location(connection_id, location_name):
 @bp.route('/manage/review/reply', methods=['POST'])
 @login_required
 def review_reply():
-    connection_id = request.form.get('connection_id')
-    review_name = request.form.get('review_name')
-    comment = request.form.get('comment')
-    
-    if not all([connection_id, review_name, comment]):
-        flash(_('Dados incompletos para a resposta.'), 'error')
-        return redirect(request.referrer or url_for('google_oauth.dashboard'))
-        
-    db = next(get_db())
-    from app.models import GoogleConnection
-    from flask_login import current_user
-    connection = db.query(GoogleConnection).filter(
-        GoogleConnection.id == connection_id,
-        GoogleConnection.company_id == current_user.company_id
-    ).first()
-    
-    if not connection:
-        flash(_('Conexão não encontrada.'), 'error')
-        return redirect(url_for('google_oauth.dashboard'))
-        
     try:
-        from app.services.google_business_service import GoogleBusinessService
-        from flask import current_app
-        service = GoogleBusinessService(connection) # Pass connection object directly
-        service.update_review_reply(review_name, comment)
+        connection_id = request.form.get('connection_id')
+        review_name = request.form.get('review_name')
+        comment = request.form.get('comment')
+        
+        if not all([connection_id, review_name, comment]):
+            flash(_('Dados incompletos para a resposta.'), 'error')
+            return redirect(request.referrer or url_for('google_oauth.dashboard'))
+            
+        from app.models import GoogleConnection
+        from flask_login import current_user
+        
+        with get_db() as db:
+            connection = db.query(GoogleConnection).filter(
+                GoogleConnection.id == int(connection_id),
+                GoogleConnection.company_id == current_user.company_id
+            ).first()
+            
+            if not connection:
+                flash(_('Conexão não encontrada.'), 'error')
+                return redirect(url_for('google_oauth.dashboard'))
+                
+            from app.services.google_business_service import GoogleBusinessService
+            service = GoogleBusinessService(connection)
+            service.update_review_reply(review_name, comment)
+            
         flash(_('Resposta enviada com sucesso!'), 'success')
+        
     except Exception as e:
-        current_app.logger.error(f"Error replying to review {review_name}: {e}")
-        flash(f"Erro ao enviar resposta: {str(e)}", 'error')
+        current_app.logger.error(f"Error replying to review: {e}")
+        flash(_('Erro ao enviar resposta: ') + str(e), 'error')
         
     return redirect(request.referrer or url_for('google_oauth.dashboard'))
 
