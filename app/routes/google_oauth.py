@@ -679,6 +679,10 @@ def manage_location(connection_id, location_name):
         try:
             # 1. Get Location Details (Full info + Summary for ratings)
             location_details = service.get_location_details(location_name)
+            
+            # Debug log the URLs
+            current_app.logger.info(f"Fetching summary/reviews for: {location_name}")
+            
             summary_v4 = service.get_location_summary_v4(location_name)
             
             # 2. Get Reviews (Soft fail if API not enabled or access denied)
@@ -706,7 +710,8 @@ def manage_location(connection_id, location_name):
                                    location=location_details,
                                    link=link,
                                    reviews=reviews,
-                                   review_error=review_error)
+                                   review_error=review_error,
+                                   debug_location=location_name)
                                    
         except Exception as e:
             current_app.logger.error(f"Error managing location {location_name}: {e}")
