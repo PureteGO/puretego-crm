@@ -16,8 +16,13 @@ class HealthCheckService:
     def perform_public_audit(client_id, query, location=None):
         """
         Realiza uma auditoria baseada em dados públicos (Serper.dev).
-        Lógica DE PONTUAÇÃO RIGOROSA (Estilo Perplexity/Auditores Reais).
+        Mapeia os dados para os 17 Critérios oficiais (Config.HEALTH_CHECK_CRITERIA).
+        
+        Nota: Em auditoria PÚBLICA, muitos itens retornam False (Vídeos, Posts, Q&A)
+        pois não são visíveis sem API oficial. Isso gera um score baixo (~40-50)
+        que motiva o cliente a conectar a conta.
         """
+        from config.settings import Config
         serper = SerperService()
         result = serper.search_places(query, location=location, limit=1)
         
@@ -25,163 +30,116 @@ class HealthCheckService:
             return {'success': False, 'error': 'Empresa não encontrada nos mapas.'}
             
         place_data = result['places'][0]
-        
-        # --- Lógica de Pontuação Rigorosa ---
-        # Objetivo: Um perfil "médio" deve ter nota ~40-50.
-        # Um perfil "bom" ~70-80.
-        # Perfeito ~95-100.
+        criteria = Config.HEALTH_CHECK_CRITERIA
         
         score = 0
+        criteria_results = []
         details = []
         positive_points = 0
         moderate_issues = 0
         critical_issues = 0
         
-        # --- 1. Fundamentos Digitais (Max 30) ---
-        # Nome e Categoria (Básico do Básico)
-        if place_data.get('title') and place_data.get('category'):
-            score += 5
-            positive_points += 1
-            details.append(f"Identidade básica: {place_data.get('category')}")
-        else:
-            details.append("Categoria ou nome mal definidos.")
-            moderate_issues += 1
+        # Avaliar cada critério
+        for c in criteria:
+            cid = c['id']
+            passed = False
+            name = c['name_pt']
+            
+            # --- Mapeamento Serper -> Critérios ---
+            if cid == 1: # Horário
+                passed = bool(place_data.get('hours') or place_data.get('openingHours'))
+            elif cid == 2: # Fotos Produtos
+                passed = False # Difícil detectar
+            elif cid == 3: # Vídeos
+                passed = False
+            elif cid == 4: # Verificado
+                passed = False
+            elif cid == 5: # Site
+                passed = bool(place_data.get('website'))
+            elif cid == 6: # Q&A
+                passed = False
+            elif cid == 7: # Posts
+                passed = False
+            elif cid == 8: # Descrição
+                passed = bool(place_data.get('description') or place_data.get('snippet'))
+            elif cid == 9: # Redes Sociais
+                # Às vezes serper traz 'profiles'
+                passed = bool(place_data.get('profiles')) 
+            elif cid == 10: # Presença Maps
+                passed = bool(place_data.get('cid') or place_data.get('placeId'))
+            elif cid == 11: # Fotos Exterior (Usamos thumbnail como proxy)
+                passed = bool(place_data.get('thumbnail') or place_data.get('image'))
+            elif cid == 12: # Fotos Interior
+                passed = False
+            elif cid == 13: # Info Produtos (Categoria)
+                passed = bool(place_data.get('category'))
+            elif cid == 14: # Avaliações
+                passed = (place_data.get('reviews', 0) > 0)
+            elif cid == 15: # Endereço
+                passed = bool(place_data.get('address'))
+            elif cid == 16: # Logotipo
+                passed = False
+            elif cid == 17: # Resposta
+                passed = False
 
-        # Website (CRÍTICO - Grande diferencial)
-        if place_data.get('website'):
-            score += 15
-            positive_points += 1
-            details.append("Website vinculado (Autoridade +15).")
-        else:
-            # Penalidade Severa implícita (perde 15 pontos possíveis)
-            details.append("Sem website vinculado (Perda crítica de tráfego/autoridade).")
-            critical_issues += 1
-            
-        # Endereço Físico Validado
-        if place_data.get('address'):
-            score += 5
-            positive_points += 1
-        else:
-            details.append("Endereço não listado claramente.")
-            moderate_issues += 1
-            
-        # CID/Place ID
-        if place_data.get('cid') or place_data.get('placeId'):
-            score += 5 # Apenas ter o ID não é mérito, é obrigação.
-            positive_points += 1
-            
-        # --- 2. Contato e Acessibilidade (Max 20) ---
-        # Telefone
-        phone = place_data.get('phone') or place_data.get('phoneNumber')
-        if phone:
-            score += 10
-            positive_points += 1
-            details.append("Telefone disponível.")
-        else:
-            details.append("Sem telefone de contato (Perda crítica de leads).")
-            critical_issues += 1
-            
-        # Horário de Funcionamento (Indica perfil ativo)
-        # Serper retorna 'hours' ou 'openingHours' muitas vezes como texto ou lista
-        if place_data.get('hours') or place_data.get('openingHours'):
-            score += 10
-            positive_points += 1
-            details.append("Horário de funcionamento cadastrado.")
-        else:
-            details.append("Sem horário de funcionamento (Clientes não sabem quando ir).")
-            moderate_issues += 1
-
-        # --- 3. Reputação e Prova Social (Max 35) ---
-        rating = place_data.get('rating', 0)
-        reviews = place_data.get('reviews', 0) or place_data.get('user_ratings_total', 0)
-        
-        # Avaliação (Qualidade)
-        if reviews > 0:
-            if rating >= 4.8:
-                score += 15
-                details.append(f"Avaliação Excepcional ({rating}).")
-            elif rating >= 4.4:
-                score += 10
-                details.append(f"Boa Avaliação ({rating}).")
-            elif rating >= 4.0:
-                score += 5
-                details.append(f"Avaliação aceitável ({rating}).")
+            # Contabilizar
+            if passed:
+                score += c['weight']
+                positive_points += 1
+                details.append(f"{name}: OK")
             else:
-                score -= 5 # Penalidade por nota ruim
-                details.append(f"Avaliação baixa ({rating}). Alerta de reputação!")
-                critical_issues += 1
-        else:
-            # Sem reviews = Sem prova social
-            details.append("Zero avaliações. Perfil invisível socialmente.")
-            critical_issues += 1
-            
-        # Volume (Quantidade gera relevância)
-        if reviews > 100:
-            score += 20
-            positive_points += 1
-            details.append(f"Autoridade estabelecida ({reviews} reviews).")
-        elif reviews > 50:
-            score += 15
-            positive_points += 1
-        elif reviews > 20:
-            score += 10
-        elif reviews > 5:
-            score += 5
-        else:
-             details.append(f"Poucos reviews ({reviews}). Baixa relevância.")
-             moderate_issues += 1
+                if c['type'] == 'critical':
+                    critical_issues += 1
+                    details.append(f"{name}: Ausente/Não detectado")
+                elif c['type'] == 'moderate':
+                    moderate_issues += 1
+                
+            criteria_results.append({
+                'id': cid,
+                'name_pt': c['name_pt'],
+                'name_es': c['name_es'],
+                'passed': passed,
+                'weight': c['weight'],
+                'type': c['type']
+            })
 
-        # --- 4. Conteúdo Visual (Max 15) ---
-        # Serper geralmente retorna 'thumbnail' ou 'imageUrl' se tiver foto
-        if place_data.get('thumbnail') or place_data.get('imageUrl') or place_data.get('image'):
-            score += 15
-            positive_points += 1
-            details.append("Presença visual detectada (Capa/Fotos).")
-        else:
-            details.append("Sem fotos de destaque aparentes.")
-            moderate_issues += 1
-            
-        # --- Ajustes Finais ---
-        score = min(100, max(0, score)) # Clamp entre 0 e 100
+        # Relatório final
+        score = min(100, max(0, score))
         
-        # Mapeando para o formato detalhado do relatório
-        top_critical_issues = []
+        # Recomendações baseadas nas falhas
         recommendations = []
-        
-        for detail in details:
-            if any(x in detail.lower() for x in ["crítica", "sem website", "sem telefone", "zero", "baixa"]):
-                top_critical_issues.append({
-                    'name': 'Ponto Crítico',
-                    'message': detail
-                })
-                recommendations.append(f"Prioridade: {detail}")
-            elif "melhorar" in detail.lower() or "poucos" in detail.lower():
-                 recommendations.append(f"Oportunidade: {detail}")
-            else:
-                 recommendations.append(f"Manter: {detail}")
-                 
-        if score < 40:
-             recommendations.append("URGENTE: Este perfil precisa de uma revitalização completa.")
-        elif score < 70:
-             recommendations.append("Melhoria: Foque em conseguir mais reviews e adicionar fotos.")
+        for res in criteria_results:
+            if not res['passed']:
+                recommendations.append(f"Faltante: {res['name_es']} ({res['weight']} pts)")
+                
+        if score < 50:
+             recommendations.insert(0, "URGENTE: Conecte sua conta do Google para análise completa e verificada.")
 
+        # Top critical issues para o card
+        top_critical_issues = []
+        for res in criteria_results:
+             if not res['passed'] and res['type'] == 'critical':
+                  top_critical_issues.append({
+                      'name': res['name_es'],
+                      'message': 'Não detectado publicamente.'
+                  })
+        
         report_data = {
             'business_name': place_data.get('title'),
             'source_data': place_data,
             'details': details,
+            'criteria_results': criteria_results, # NOVA CHAVE COM OS 17 PONTOS
             'top_critical_issues': top_critical_issues,
-            'recommendations': recommendations,
+            'recommendations': recommendations[:5], # Top 5 dicas
             'summary': { 
                 'critical_issues_count': critical_issues,
                 'moderate_issues_count': moderate_issues,
                 'positive_points_count': positive_points,
-                'text': f"Score Rigoroso: {score}/100 - {critical_issues} alertas críticos."
+                'text': f"Score Público: {score}/100"
             }
         }
         
-        # Salvar no banco (se houver client_id)
         check_id = None
-        
         if client_id:
             with get_db() as db:
                 health_check = HealthCheck(
@@ -201,7 +159,6 @@ class HealthCheckService:
             'success': True, 
             'check_id': check_id, 
             'score': score,
-            'details': details,
             'report': report_data 
         }
 
