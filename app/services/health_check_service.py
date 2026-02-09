@@ -80,7 +80,7 @@ class HealthCheckService:
                 # Inferir: Se tem CID, Telefone e Reviews, é altamente provável que seja gerenciado/verificado
                 has_id = bool(place_data.get('cid') or place_data.get('placeId'))
                 has_phone = bool(place_data.get('phone') or place_data.get('phoneNumber'))
-                has_reviews = place_data.get('reviews', 0) > 0 or place_data.get('ratingCount', 0) > 0
+                has_reviews = (place_data.get('reviews') or 0) > 0 or (place_data.get('ratingCount') or 0) > 0
                 passed = (has_id and has_phone and has_reviews)
             elif cid == 5: # Site
                 passed = bool(place_data.get('website'))
@@ -103,7 +103,7 @@ class HealthCheckService:
             elif cid == 13: # Info Produtos (Categoria)
                 passed = bool(place_data.get('category'))
             elif cid == 14: # Avaliações
-                passed = (place_data.get('reviews', 0) > 0 or place_data.get('ratingCount', 0) > 0)
+                passed = ((place_data.get('reviews') or 0) > 0 or (place_data.get('ratingCount') or 0) > 0)
             elif cid == 15: # Endereço
                 passed = bool(place_data.get('address'))
             elif cid == 16: # Logotipo
