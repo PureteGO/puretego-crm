@@ -45,12 +45,13 @@ def official_check(client_id):
         result = HealthCheckService.perform_official_audit(client_id)
         if result['success']:
             flash(_('Auditoria Oficial realizada com sucesso!'), 'success')
+            return redirect(url_for('health_checks.view', health_check_id=result['check_id']))
         else:
             flash(_('Erro: %(error)s', error=result.get('error', 'Erro desconhecido')), 'error')
+            return redirect(url_for('clients.view', client_id=client_id))
     except Exception as e:
         flash(_('Erro interno ao processar auditoria oficial.'), 'error')
-        
-    return redirect(url_for('clients.view', client_id=client_id))
+        return redirect(url_for('clients.view', client_id=client_id))
 
 from app.services.health_check_service import HealthCheckService
 
@@ -77,7 +78,7 @@ def create(client_id):
                 
                 if result['success']:
                     flash('Health Check realizado com sucesso!', 'success')
-                    return redirect(url_for('clients.view', client_id=client.id))
+                    return redirect(url_for('health_checks.view', health_check_id=result['check_id']))
                 else:
                     flash(f"Erro: {result.get('error')}", 'error')
                     
