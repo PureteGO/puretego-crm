@@ -7,8 +7,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from app.routes.auth import login_required
 from app.models import Client, KanbanStage, Visit, HealthCheck, Proposal, Interaction, ServicePackage
 from app.utils.tenant import filter_by_company, set_tenant_context
+from app.utils.decorators import get_current_user
 from config.database import get_db
-from datetime import datetime
+from datetime import datetime, timedelta
 
 bp = Blueprint('clients', __name__, url_prefix='/clients')
 
