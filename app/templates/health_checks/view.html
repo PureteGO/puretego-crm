@@ -59,10 +59,21 @@
             <div class="card shadow mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">{{ _('Audit Details') }}</h5>
-                    <a href="{{ url_for('proposals.create', client_id=health_check.client_id) }}"
-                        class="btn btn-sm btn-primary">
-                        <i class="bi bi-file-earmark-plus"></i> {{ _('Create Proposal Based on this') }}
-                    </a>
+                    <div class="d-flex gap-2">
+                        {% if health_check.source == 'public' %}
+                        <form action="{{ url_for('health_checks.official_check', client_id=health_check.client_id) }}"
+                            method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-info text-white">
+                                <i class="bi bi-google"></i> {{ _('Realizar Auditoría Oficial') }}
+                            </button>
+                        </form>
+                        {% endif %}
+                        <a href="{{ url_for('proposals.create', client_id=health_check.client_id) }}"
+                            class="btn btn-sm btn-primary">
+                            <i class="bi bi-file-earmark-plus"></i> {{ _('Create Proposal Based on this') }}
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     {% set report = health_check.get_report_data() %}
