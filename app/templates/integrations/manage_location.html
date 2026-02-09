@@ -89,6 +89,12 @@
             <div class="tab-content" id="manageTabsContent">
                 <!-- Reviews Tab -->
                 <div class="tab-pane fade show active" id="reviews" role="tabpanel">
+                    {% if review_error %}
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i> {{ review_error }}
+                    </div>
+                    {% endif %}
+
                     {% if reviews %}
                     <div class="list-group list-group-flush">
                         {% for review in reviews %}
@@ -110,16 +116,43 @@
                             <p class="mb-1">{{ review.comment }}</p>
 
                             {% if review.replyComment %}
-                            <div class="bg-light p-3 rounded mt-2 ms-4">
-                                <small class="fw-bold d-block mb-1">{{ _('Tu respuesta:') }}</small>
+                            <div class="bg-light p-3 rounded mt-2 ms-4 border-start border-primary border-4">
+                                <small class="fw-bold d-block mb-1 text-primary"><i class="bi bi-reply"></i> {{ _('Sua
+                                    resposta:') }}</small>
                                 <p class="mb-0 fs-7 italic">{{ review.replyComment }}</p>
-                                <small class="text-muted">{{ review.replyTime[:10] if review.replyTime else '' }}</small>
+                                <small class="text-muted">{{ review.replyTime[:10] if review.replyTime else ''
+                                    }}</small>
                             </div>
                             {% else %}
-                            <div class="mt-2">
-                            <div class="mt-2">
-                                <button class="btn btn-sm btn-outline-primary" disabled title="Coming soon">{{
-                                    _('Responder') }}</button>
+                            <div class="mt-2 text-end">
+                                <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#replyForm{{ loop.index }}">
+                                    <i class="bi bi-chat-dots"></i> {{ _('Responder') }}
+                                </button>
+
+                                <div class="collapse mt-2 text-start" id="replyForm{{ loop.index }}">
+                                    <form action="{{ url_for('google_oauth.review_reply') }}" method="POST"
+                                        class="bg-light p-3 rounded shadow-sm border">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="connection_id" value="{{ connection.id }}">
+                                        <input type="hidden" name="review_name" value="{{ review.name }}">
+
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-bold">{{ _('Nueva Respuesta') }}</label>
+                                            <textarea name="comment" class="form-control form-control-sm" rows="3"
+                                                placeholder="{{ _('Escriba su respuesta aquí...') }}"
+                                                required></textarea>
+                                        </div>
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <button type="button" class="btn btn-sm btn-secondary"
+                                                data-bs-toggle="collapse" data-bs-target="#replyForm{{ loop.index }}">{{
+                                                _('Cancelar') }}</button>
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-send"></i> {{ _('Enviar Respuesta') }}
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                             {% endif %}
                         </div>

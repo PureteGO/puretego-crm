@@ -23,13 +23,34 @@ class HealthCheckService:
         que motiva o cliente a conectar a conta.
         """
         from config.settings import Config
+        # 1. Buscar no Serper (Maps)
         serper = SerperService()
-        result = serper.search_places(query, location=location, limit=1)
+        search_res = serper.search_places(business_name, limit=1)
         
-        if not result.get('success') or not result.get('places'):
-            return {'success': False, 'error': 'Empresa não encontrada nos mapas.'}
+        # Se não encontrou, tenta ser mais flexível com o nome
+        if not search_res['success'] or not search_res.get('places'):
+            # 1. Tentar limpar o nome (remover o que vem após hífen ou parênteses)
+            clean_name = business_name.split("-")[0].split("(")[0].strip()
             
-        place_data = result['places'][0]
+            # 2. Tentar buscar com o nome limpo + cidade para ser mais específico
+            from app.models import Client
+            with get_db() as db:
+                client = db.query(Client).get(client_id)
+                query = clean_name
+                if client and (client.city or client.address):
+                    location_hint = client.city or client.address.split(',')[0]
+                    query = f"{clean_name} {location_hint}"
+                
+                search_res = serper.search_places(query, limit=1)
+                
+            # 3. Fallback: Se ainda falhar, tenta apenas o nome limpo
+            if (not search_res['success'] or not search_res.get('places')) and clean_name != query:
+                search_res = serper.search_places(clean_name, limit=1)
+
+        if not search_res['success'] or not search_res.get('places'):
+            return {'success': False, 'error': 'Empresa não encontrada nos mapas. Tente um nome mais simples (ex: apenas Universidad Autonoma San Sebastián).'}
+            
+        place_data = search_res['places'][0]
         criteria = Config.HEALTH_CHECK_CRITERIA
         
         score = 0

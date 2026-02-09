@@ -271,6 +271,10 @@ class GoogleBusinessService:
         
         try:
             response = requests.get(url, headers=self._get_headers(), params=params, timeout=30)
+            
+            if response.status_code == 403:
+                 raise Exception("Acceso Denegado (403): La 'Google My Business API' podría no estar habilitada en su Google Cloud Console o su cuenta no tiene permisos suficientes para este perfil.")
+            
             response.raise_for_status()
             
             data = response.json()
@@ -299,6 +303,41 @@ class GoogleBusinessService:
             
         except requests.exceptions.RequestException as e:
             raise Exception(f"Error listing reviews: {str(e)}")
+
+    def update_review_reply(self, review_name: str, comment: str) -> Dict:
+        """
+        Update or create a reply to a review.
+        PUT https://mybusiness.googleapis.com/v4/{reviewName}/reply
+        
+        Args:
+            review_name: Full review name (accounts/*/locations/*/reviews/*)
+            comment: The reply text
+        """
+        url = f"https://mybusiness.googleapis.com/v4/{review_name}/reply"
+        data = {
+            'comment': comment
+        }
+        
+        try:
+            response = requests.put(url, headers=self._get_headers(), json=data, timeout=30)
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            raise Exception(f"Error updating review reply: {str(e)}")
+
+    def delete_review_reply(self, review_name: str) -> bool:
+        """
+        Delete a reply to a review.
+        DELETE https://mybusiness.googleapis.com/v4/{reviewName}/reply
+        """
+        url = f"https://mybusiness.googleapis.com/v4/{review_name}/reply"
+        
+        try:
+            response = requests.delete(url, headers=self._get_headers(), timeout=30)
+            response.raise_for_status()
+            return True
+        except Exception:
+            return False
     
     def list_media(self, location_name: str) -> List[Dict]:
         """

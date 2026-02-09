@@ -636,21 +636,62 @@ def manage_location(connection_id, location_name):
                 db.commit()
                 flash(_('Perfil habilitado para administración.'), 'success')
             
-            # 2. Get Reviews
-            reviews = service.list_reviews(location_name)
-            
-            # 3. Get Insights (TODO: Add later)
+            # 2. Get Reviews (Soft fail if API not enabled or access denied)
+            reviews = []
+            review_error = None
+            try:
+                reviews = service.list_reviews(location_name)
+            except Exception as e:
+                review_error = str(e)
+                current_app.logger.warning(f"Failed to fetch reviews for {location_name}: {e}")
             
             return render_template('integrations/manage_location.html',
                                    connection=connection,
                                    location=location_details,
                                    link=link,
-                                   reviews=reviews)
+                                   reviews=reviews,
+                                   review_error=review_error)
                                    
         except Exception as e:
             current_app.logger.error(f"Error managing location {location_name}: {e}")
             flash(_('Error al obtener datos de Google: %(error)s', error=str(e)), 'error')
             return redirect(url_for('google_oauth.dashboard'))
+
+@bp.route('/manage/review/reply', methods=['POST'])
+@login_required
+def review_reply():
+    connection_id = request.form.get('connection_id')
+    review_name = request.form.get('review_name')
+    comment = request.form.get('comment')
+    
+    if not all([connection_id, review_name, comment]):
+        flash(_('Dados incompletos para a resposta.'), 'error')
+        return redirect(request.referrer or url_for('google_oauth.dashboard'))
+        
+    db = next(get_db())
+    from app.models import GoogleConnection
+    from flask_login import current_user
+    connection = db.query(GoogleConnection).filter(
+        GoogleConnection.id == connection_id,
+        GoogleConnection.company_id == current_user.company_id
+    ).first()
+    
+    if not connection:
+        flash(_('Conexão não encontrada.'), 'error')
+        return redirect(url_for('google_oauth.dashboard'))
+        
+    try:
+        from app.services.google_business_service import GoogleBusinessService
+        from flask import current_app
+        service = GoogleBusinessService(connection) # Pass connection object directly
+        service.update_review_reply(review_name, comment)
+        flash(_('Resposta enviada com sucesso!'), 'success')
+    except Exception as e:
+        current_app.logger.error(f"Error replying to review {review_name}: {e}")
+        flash(f"Erro ao enviar resposta: {str(e)}", 'error')
+        
+    return redirect(request.referrer or url_for('google_oauth.dashboard'))
+
 @bp.route('/insights/sync/<int:connection_id>/<int:link_id>', methods=['POST'])
 @login_required
 def sync_insights(connection_id, link_id):
