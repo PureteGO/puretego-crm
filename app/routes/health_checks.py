@@ -3,6 +3,7 @@ from app.routes.auth import login_required
 from app.models import HealthCheck, Client
 from app.services import SerpApiService
 from config.database import get_db
+from app.services.health_check_service import HealthCheckService
 import json
 
 bp = Blueprint('health_checks', __name__, url_prefix='/health-checks')
@@ -53,9 +54,8 @@ def official_check(client_id):
         flash(_('Erro interno ao processar auditoria oficial.'), 'error')
         return redirect(url_for('clients.view', client_id=client_id))
 
-from app.services.health_check_service import HealthCheckService
 
-# ... imports ...
+# Health Check Routes
 
 @bp.route('/create/<int:client_id>', methods=['GET', 'POST'])
 @login_required
