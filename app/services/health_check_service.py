@@ -25,12 +25,12 @@ class HealthCheckService:
         from config.settings import Config
         # 1. Buscar no Serper (Maps)
         serper = SerperService()
-        search_res = serper.search_places(business_name, limit=1)
+        search_res = serper.search_places(query, limit=1)
         
         # Se não encontrou, tenta ser mais flexível com o nome
         if not search_res['success'] or not search_res.get('places'):
             # 1. Tentar limpar o nome (remover o que vem após hífen ou parênteses)
-            clean_name = business_name.split("-")[0].split("(")[0].strip()
+            clean_name = query.split("-")[0].split("(")[0].strip()
             
             # 2. Tentar buscar com o nome limpo + cidade para ser mais específico
             from app.models import Client
