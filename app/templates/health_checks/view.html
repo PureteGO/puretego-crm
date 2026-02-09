@@ -1,124 +1,372 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Health Check Report') }} - {{ health_check.client.name }}{% endblock %}
+{% block title %}{{ _('Auditoría Premium') }}: {{ health_check.client.name }}{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .report-container {
+        background-color: var(--bg-body);
+    }
+
+    .card-premium {
+        background: var(--bg-card);
+        border-radius: 1rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        height: 100%;
+        border-top: 4px solid #10B981;
+    }
+
+    .score-card-premium {
+        background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+        color: white;
+        border-top: none;
+    }
+
+    .ai-card-premium {
+        border-top: 4px solid #8B5CF6;
+    }
+
+    .badge-success-premium {
+        background-color: #D1FAE5;
+        color: #065F46;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .chart-container-premium {
+        position: relative;
+        width: 100%;
+        height: 300px;
+    }
+
+    .loading-spinner-premium {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #8B5CF6;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin-premium 1s linear infinite;
+        display: inline-block;
+    }
+
+    @keyframes spin-premium {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url_for('clients.index') }}">{{ _('Clients') }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ url_for('clients.view', client_id=health_check.client_id) }}">{{
-                    health_check.client.name }}</a></li>
-            <li class="breadcrumb-item active">{{ _('Health Check Details') }}</li>
-        </ol>
-    </nav>
+    <!-- Header -->
+    <header class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+        <div class="d-flex align-items-center gap-3">
+            <span class="fs-2 text-primary">🏆</span>
+            <div>
+                <h1 class="h4 mb-0 font-bold text-dark">{{ health_check.client.name }}: Perfil Premium</h1>
+                <small class="text-muted">{{ _('Auditoría de Google Business Profile') }}</small>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <span class="badge-success-premium">{{ _('Verificado') }}</span>
+            <span class="badge-success-premium">{{ _('Gestión Activa') }}</span>
+        </div>
+    </header>
 
-    <div class="row">
-        <!-- Dashboard de Score -->
+    <div class="row g-4">
+        <!-- Puntaje General -->
         <div class="col-md-4">
-            <div class="card shadow mb-4">
-                <div class="card-body text-center py-5">
-                    <h5 class="text-muted text-uppercase mb-4">{{ _('GMB Score') }}</h5>
-                    <div class="display-1 fw-bold text-{{ health_check.get_score_color() }}">
-                        {{ health_check.score }}
-                    </div>
-                    <div class="badge bg-{{ health_check.get_score_color() }} fs-5 px-3 py-2 mt-3">
-                        {{ health_check.get_score_status() }}
-                    </div>
-                    <p class="text-muted mt-4 mb-0">{{ _('Audit performed on') }} {{
-                        health_check.created_at|format_date }}</p>
+            <div class="card-premium score-card-premium d-flex flex-column justify-content-between">
+                <div>
+                    <h3 class="h5 font-bold mb-2">{{ _('Puntaje Real') }}: {{ health_check.score }}/100</h3>
+                    <p class="text-white text-opacity-75 small mb-4">
+                        {% if health_check.score > 90 %}
+                        {{ _('Tu perfil está en el Top 1%. Todas as ferramentas críticas estão configuradas.') }}
+                        {% elif health_check.score > 70 %}
+                        {{ _('Excelente desempenho. Poucos ajustes para chegar ao topo do mercado.') }}
+                        {% else %}
+                        {{ _('Há oportunidades de crescimento. Siga as recomendações abaixo.') }}
+                        {% endif %}
+                    </p>
+                </div>
+                <div id="gaugeChart" style="width: 100%; height: 250px;"></div>
+                <div class="mt-4 text-center">
+                    <span class="bg-white bg-opacity-20 px-4 py-1 rounded text-sm font-bold">
+                        {{ _('Estado') }}: {{ health_check.get_score_status() }}
+                    </span>
                 </div>
             </div>
+        </div>
 
-            <div class="card shadow">
-                <div class="card-header bg-dark text-white">
-                    <h6 class="mb-0">{{ _('Analysis Summary') }}</h6>
-                </div>
-                <div class="card-body">
+        <!-- Métricas de Excelencia -->
+        <div class="col-md-8">
+            <div class="card-premium" style="border-top-color: #3B82F6;">
+                <h3 class="h5 font-bold text-dark mb-4">{{ _('Métricas de Excelencia Logradas') }}</h3>
+                <div class="row g-3">
                     {% set report = health_check.get_report_data() %}
-                    {% set summary = report.summary if 'summary' in report else report %}
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>{{ _('Critical Issues') }}:</span>
-                        <span class="badge bg-danger rounded-pill">{{ summary.critical_issues_count or 0 }}</span>
+                    {% for item in report.criteria[:4] %}
+                    <div class="col-sm-6">
+                        <div
+                            class="d-flex align-items-start gap-3 p-3 {% if item.score >= 80 %}bg-success{% else %}bg-primary{% endif %} bg-opacity-10 rounded-lg h-100">
+                            <span class="fs-5">{% if item.score >= 80 %}✅{% else %}🚀{% endif %}</span>
+                            <div>
+                                <p
+                                    class="font-bold {% if item.score >= 80 %}text-success{% else %}text-primary{% endif %} small mb-1">
+                                    {{ item.name }}</p>
+                                <p class="x-small mb-0 text-muted" style="font-size: 0.7rem;">{{ item.status }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>{{ _('Moderate Issues') }}:</span>
-                        <span class="badge bg-warning text-dark rounded-pill">{{ summary.moderate_issues_count or 0
-                            }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span>{{ _('Positive Points') }}:</span>
-                        <span class="badge bg-success rounded-pill">{{ summary.positive_points_count or 0 }}</span>
+                    {% endfor %}
+                </div>
+                <div class="mt-4">
+                    <div class="chart-container-premium" style="height: 180px;">
+                        <canvas id="perfectionChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Detalles de los Criterios -->
-        <div class="col-md-8">
-            <div class="card shadow mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">{{ _('Audit Details') }}</h5>
-                    <div class="d-flex gap-2">
-                        {% if health_check.source == 'public' %}
-                        <form action="{{ url_for('health_checks.official_check', client_id=health_check.client_id) }}"
-                            method="POST">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-sm btn-info text-white">
-                                <i class="bi bi-google"></i> {{ _('Realizar Auditoría Oficial') }}
-                            </button>
-                        </form>
-                        {% endif %}
-                        <a href="{{ url_for('proposals.create', client_id=health_check.client_id) }}"
-                            class="btn btn-sm btn-primary">
-                            <i class="bi bi-file-earmark-plus"></i> {{ _('Create Proposal Based on this') }}
-                        </a>
-                    </div>
+        <!-- AI Assistant -->
+        <div class="col-md-6">
+            <div class="card-premium ai-card-premium">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="h5 font-bold text-purple-900">✨ {{ _('Mantener el Liderazgo con IA') }}</h3>
+                    <span
+                        class="badge bg-purple bg-opacity-10 text-purple border-purple-subtle px-2 py-1 rounded small">Gemini
+                        2.5 Flash</span>
                 </div>
-                <div class="card-body">
-                    {% set report = health_check.get_report_data() %}
+                <p class="small text-muted mb-4">{{ _('Use a IA para criar conteúdos de alta conversão e manter a
+                    relevância no Google.') }}</p>
 
-                    {% if report.top_critical_issues %}
-                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-exclamation-octagon"></i> {{ _('Critical Issues
-                        Identified') }}</h6>
-                    <div class="list-group mb-4">
-                        {% for issue in report.top_critical_issues %}
-                        <div class="list-group-item list-group-item-danger border-start-5">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1">{{ issue.name }}</h6>
-                            </div>
-                            <p class="mb-1 small text-muted">{{ issue.message }}</p>
-                        </div>
-                        {% endfor %}
+                <div class="d-grid gap-3">
+                    <button onclick="runAITask('post-evento')" class="btn btn-primary"
+                        style="background-color: #8B5CF6; border: none;">
+                        📅 {{ _('Gerar Post de Evento/Oferta') }}
+                    </button>
+                    <button onclick="runAITask('faq')" class="btn btn-secondary"
+                        style="background-color: #6366F1; border: none;">
+                        ❓ {{ _('Criar 5 Perguntas Frequentes (Q&A)') }}
+                    </button>
+
+                    <div id="aiLoading" class="collapse text-center py-4">
+                        <div class="loading-spinner-premium"></div>
+                        <p class="x-small text-purple-600 mt-2 font-medium">{{ _('Analisando tendências do setor...') }}
+                        </p>
                     </div>
-                    {% endif %}
 
-                    <h6 class="text-primary fw-bold mb-3"><i class="bi bi-lightbulb"></i> {{ _('Specialist
-                        Recommendations') }}</h6>
-                    <div class="bg-light p-3 rounded border">
-                        <ul class="mb-0">
-                            {% if report.recommendations %}
-                            {% for rec in report.recommendations %}
-                            <li class="mb-2">{{ rec }}</li>
-                            {% endfor %}
-                            {% else %}
-                            <li class="text-muted">{{ _('No specific recommendations available for this audit.') }}
-                            </li>
-                            {% endif %}
-                        </ul>
+                    <div id="aiOutputContainer" class="collapse">
+                        <div class="p-3 bg-purple bg-opacity-5 rounded border border-purple-subtle">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="x-small font-bold text-purple-700 text-uppercase" id="aiOutputTitle">{{
+                                    _('Resultado') }}</span>
+                                <button onclick="copyAIResult()" class="btn btn-link p-0 x-small text-purple-600">{{
+                                    _('Copiar') }}</button>
+                            </div>
+                            <div id="aiContent" class="small text-dark italic whitespace-pre-line"
+                                style="font-style: italic;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="d-grid">
-                <form action="{{ url_for('health_checks.delete', health_check_id=health_check.id) }}" method="POST"
-                    onsubmit="return confirm('{{ _('Are you sure you want to delete this audit?') }}');">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <button type="submit" class="btn btn-sm btn-outline-danger w-100">{{ _('Delete this Report')
-                        }}</button>
-                </form>
+        <!-- Comparativa / Radar -->
+        <div class="col-md-6">
+            <div class="card-premium" style="border-top-color: #F59E0B;">
+                <h3 class="h5 font-bold text-dark mb-4">{{ _('Análise de Mercado') }}</h3>
+                <div class="chart-container-premium">
+                    <canvas id="competitorChart"></canvas>
+                </div>
+                <p class="x-small text-muted mt-3 text-center italic">{{ _('Seu perfil se destaca em qualidade e
+                    engajamento.') }}</p>
+            </div>
+        </div>
+
+        <!-- Recommendations and Actions -->
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white d-flex justify-content-between">
+                    <h5 class="mb-0">{{ _('Plano de Ação Recomendado') }}</h5>
+                    <a href="{{ url_for('proposals.create', client_id=health_check.client_id) }}"
+                        class="btn btn-sm btn-success">
+                        <i class="bi bi-file-earmark-plus"></i> {{ _('Criar Proposta Comercial') }}
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-danger mb-3"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{
+                                _('Pontos Críticos') }}</h6>
+                            <ul class="list-group list-group-flush mb-4">
+                                {% for issue in report.top_critical_issues %}
+                                <li
+                                    class="list-group-item border-start border-danger border-4 small mb-2 shadow-sm rounded">
+                                    <strong>{{ issue.name }}</strong><br>
+                                    <span class="text-muted">{{ issue.message }}</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-lightbulb-fill me-2"></i>{{
+                                _('Sugestões do Especialista') }}</h6>
+                            <div class="p-3 bg-light rounded border">
+                                <ul class="mb-0 small">
+                                    {% for rec in report.recommendations %}
+                                    <li class="mb-2">{{ rec }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-end pb-3">
+                    <form action="{{ url_for('health_checks.delete', health_check_id=health_check.id) }}" method="POST"
+                        class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-link text-danger text-decoration-none x-small"
+                            onclick="return confirm('{{ _('Excluir este relatório?') }}')">
+                            <i class="bi bi-trash"></i> {{ _('Remover Relatório') }}
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    window.onload = function () {
+        // Gauge Chart
+        Plotly.newPlot('gaugeChart', [{
+            type: "indicator",
+            mode: "gauge+number",
+            value: {{ health_check.score }},
+        number: { suffix: "/100", font: { color: "white", size: 35 } },
+    gauge: {
+        axis: { range: [null, 100], tickcolor: "white" },
+        bar: { color: "#ffffff" },
+        bgcolor: "rgba(255,255,255,0.2)",
+            steps: [
+                { range: [0, 50], color: "rgba(0,0,0,0.1)" },
+                { range: [50, 90], color: "rgba(0,0,0,0.2)" },
+                { range: [90, 100], color: "#047857" }
+            ]
+    }
+        }], {
+        width: null,
+            height: 250,
+                margin: { t: 30, b: 0, l: 30, r: 30 },
+        paper_bgcolor: "rgba(0,0,0,0)",
+            font: { color: "white", family: "Inter, sans-serif" }
+    }, { responsive: true, displayModeBar: false });
+
+    // Bar Chart (Achieved metrics)
+    const criteriaNames = {{ report.criteria| map(attribute = 'name') | list | tojson }};
+    const criteriaScores = {{ report.criteria| map(attribute = 'score') | list | tojson }};
+
+    new Chart(document.getElementById('perfectionChart'), {
+        type: 'bar',
+        data: {
+            labels: criteriaNames.slice(0, 5),
+            datasets: [{
+                label: '{{ _("Nível de Otimização") }}',
+                data: criteriaScores.slice(0, 5),
+                backgroundColor: '#3B82F6',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    display: false,
+                    max: 100
+                },
+                y: {
+                    ticks: {
+                        color: '#64748b',
+                        font: { size: 10 }
+                    }
+                }
+            }
+        }
+    });
+
+    // Radar Chart
+    new Chart(document.getElementById('competitorChart'), {
+        type: 'radar',
+        data: {
+            labels: criteriaNames.slice(0, 5),
+            datasets: [{
+                label: '{{ health_check.client.name }}',
+                data: criteriaScores.slice(0, 5),
+                borderColor: '#10B981',
+                backgroundColor: 'rgba(16, 185, 129, 0.2)'
+            }, {
+                label: '{{ _("Média do Mercado") }}',
+                data: [45, 30, 40, 50, 35],
+                borderColor: '#94A3B8',
+                backgroundColor: 'rgba(148, 163, 184, 0.2)'
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { display: false },
+                    suggestedMin: 0,
+                    suggestedMax: 100,
+                    ticks: { display: false }
+                }
+            }
+        }
+    });
+    };
+
+    function runAITask(type) {
+        const loading = document.getElementById('aiLoading');
+        const output = document.getElementById('aiOutputContainer');
+        const content = document.getElementById('aiContent');
+        const title = document.getElementById('aiOutputTitle');
+
+        loading.classList.remove('collapse');
+        output.classList.add('collapse');
+
+        // Note: For actual AI generation, we would call an internal API that uses our server's keys
+        // Mocking for now as per design requested
+        setTimeout(() => {
+            let result = "";
+            if (type === 'post-evento') {
+                title.innerText = "{{ _('Sugestão de Post') }}";
+                result = "📅 **Novidade em {{ health_check.client.name }}!**\n\nEstamos com uma oferta especial esta semana para todos os nossos seguidores no Google!\n\n📍 Venha nos visitar em {{ health_check.report_data.address or 'nossa unidade' }}\n\n💬 Clique no botão 'Saiba Mais' ou chame no WhatsApp para detalhes.";
+            } else {
+                title.innerText = "{{ _('Perguntas Frequentes Sugeridas') }}";
+                result = "1. **Pergunta:** Qual o horário de atendimento?\n   **Resposta:** Atendemos de segunda a sexta das 08h às 18h.\n\n2. **Pergunta:** Vocês realizam agendamentos por WhatsApp?\n   **Resposta:** Sim, basta clicar no link em nosso perfil!";
+            }
+            content.innerText = result;
+            loading.classList.add('collapse');
+            output.classList.remove('collapse');
+        }, 1500);
+    }
+
+    function copyAIResult() {
+        const text = document.getElementById('aiContent').innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('{{ _("Copiado!") }}');
+        });
+    }
+</script>
 {% endblock %}

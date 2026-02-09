@@ -21,6 +21,34 @@
         </div>
     </div>
 
+    <style>
+        .score-card {
+            background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+            color: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .ai-card {
+            border-top: 4px solid #8B5CF6;
+            border-radius: 1rem;
+        }
+
+        .btn-emerald {
+            background-color: #10B981;
+            border-color: #10B981;
+        }
+
+        .btn-emerald:hover {
+            background-color: #059669;
+            border-color: #059669;
+        }
+
+        .border-start-5 {
+            border-left-width: 5px !important;
+        }
+    </style>
+
     {% if onboarding_guide and onboarding_percent < 100 %} <!-- Onboarding Guide for Owners -->
         <div class="row mb-4">
             <div class="col-12">
@@ -150,14 +178,16 @@
                                 }}</button>
                         </div>
                         <div id="quickCheckResult" class="d-none animate__animated animate__fadeIn">
-                            <div class="alert alert-secondary d-flex align-items-center" role="alert">
-                                <div class="spinner-border text-primary me-3" role="status" id="quickCheckSpinner">
-                                    <span class="visually-hidden">{{ _('Loading...') }}</span>
+                            <div class="alert alert-secondary border-0 p-0" role="alert"
+                                style="background: transparent;">
+                                <div id="quickCheckSpinner"
+                                    class="d-flex align-items-center justify-content-center p-5">
+                                    <div class="spinner-border text-primary me-3" role="status">
+                                        <span class="visually-hidden">{{ _('Loading...') }}</span>
+                                    </div>
+                                    <strong>{{ _('Analyzing...') }}</strong>
                                 </div>
-                                <div id="quickCheckContent">
-                                    <strong>{{ _('Analyzing...') }}</strong> {{ _('Please wait while we query Google.')
-                                    }}
-                                </div>
+                                <div id="quickCheckContent"></div>
                             </div>
                         </div>
                         <!-- Result Modal Trigger (Hidden) -->
@@ -812,48 +842,82 @@
 
                 if (data.success) {
                     const summary = data.report.summary;
+                    const scoreStatus = data.score > 90 ? 'Líder de Mercado' : (data.score > 70 ? 'Ótimo' : (data.score > 40 ? 'Regular' : 'Crítico'));
+
                     contentDiv.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center w-100 mb-3">
-                        <div>
-                            <h4 class="alert-heading text-success mb-0"><i class="bi bi-check-circle-fill"></i> ${translations.analysisComplete}</h4>
-                            <p class="mb-0">${translations.businessFound}: <strong>${data.report.business_name}</strong></p>
-                        </div>
-                        <div class="text-center ms-3">
-                            <h2 class="display-4 fw-bold ${data.score > 70 ? 'text-success' : (data.score > 40 ? 'text-warning' : 'text-danger')} mb-0">${data.score}</h2>
-                            <small class="text-muted">${translations.points}</small>
-                        </div>
-                    </div>
-
-                    <div class="card border-0 shadow-sm mb-3">
-                        <div class="card-header bg-dark text-white py-2">
-                            <h6 class="mb-0 fw-bold">${translations.analysisResume}</h6>
-                        </div>
-                        <div class="card-body py-2">
-                            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
-                                <span class="fw-medium">${translations.criticalPoints}:</span>
-                                <span class="badge rounded-pill bg-danger fs-6">${summary.critical_issues_count}</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
-                                <span class="fw-medium">${translations.moderatePoints}:</span>
-                                <span class="badge rounded-pill bg-warning text-dark fs-6">${summary.moderate_issues_count}</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-medium">${translations.positivePoints}:</span>
-                                <span class="badge rounded-pill bg-success fs-6">${summary.positive_points_count}</span>
+                    <div class="row g-4">
+                        <div class="col-md-5">
+                            <div class="score-card h-100 shadow-sm">
+                                <div class="mb-3">
+                                    <h5 class="fw-bold mb-1">${translations.analysisComplete}</h5>
+                                    <p class="small text-white opacity-75 mb-0">${translations.businessFound}: <strong>${data.report.business_name}</strong></p>
+                                </div>
+                                <div id="gaugeChart" style="width: 100%; height: 220px;"></div>
+                                <div class="mt-2 text-center">
+                                    <span class="bg-white bg-opacity-20 px-4 py-1 rounded-pill text-sm font-bold">${scoreStatus}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        ${data.health_check_id
-                            ? `<a href="/health-checks/${data.health_check_id}" class="btn btn-primary">${translations.viewFullReport}</a>`
-                            : `<button class="btn btn-success" onclick="createLeadFromQuickCheck()">${translations.createLead}</button>`
+                        <div class="col-md-7">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-transparent border-0 pt-3">
+                                    <h6 class="mb-0 fw-bold"><i class="bi bi-list-check me-2 text-primary"></i>${translations.analysisResume}</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-danger bg-opacity-10 rounded">
+                                        <div class="small fw-bold text-danger"><i class="bi bi-exclamation-octagon me-1"></i>${translations.criticalPoints}</div>
+                                        <span class="badge bg-danger rounded-pill">${summary.critical_issues_count}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-warning bg-opacity-10 rounded">
+                                        <div class="small fw-bold text-warning-emphasis"><i class="bi bi-exclamation-triangle me-1"></i>${translations.moderatePoints}</div>
+                                        <span class="badge bg-warning text-dark rounded-pill">${summary.moderate_issues_count}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 bg-success bg-opacity-10 rounded">
+                                        <div class="small fw-bold text-success"><i class="bi bi-check-circle me-1"></i>${translations.positivePoints}</div>
+                                        <span class="badge bg-success rounded-pill">${summary.positive_points_count}</span>
+                                    </div>
+                                    
+                                    <div class="d-grid mt-4">
+                                        ${data.health_check_id
+                            ? `<a href="/health-checks/${data.health_check_id}" class="btn btn-primary shadow-sm"><i class="bi bi-eye-fill me-1"></i>${translations.viewFullReport}</a>`
+                            : `<button class="btn btn-emerald text-white shadow-sm" onclick="createLeadFromQuickCheck()"><i class="bi bi-person-plus-fill me-1"></i>${translations.createLead}</button>`
                         }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 `;
 
+                    // Render Gauge
+                    setTimeout(() => {
+                        Plotly.newPlot('gaugeChart', [{
+                            type: "indicator",
+                            mode: "gauge+number",
+                            value: data.score,
+                            number: { suffix: "/100", font: { color: "white", size: 30 } },
+                            gauge: {
+                                axis: { range: [null, 100], tickcolor: "white" },
+                                bar: { color: "#ffffff" },
+                                bgcolor: "rgba(255,255,255,0.2)",
+                                steps: [
+                                    { range: [0, 40], color: "rgba(239, 68, 68, 0.4)" },
+                                    { range: [40, 70], color: "rgba(245, 158, 11, 0.4)" },
+                                    { range: [70, 90], color: "rgba(16, 185, 129, 0.4)" },
+                                    { range: [90, 100], color: "#065f46" }
+                                ]
+                            }
+                        }], {
+                            width: null,
+                            height: 220,
+                            margin: { t: 30, b: 20, l: 30, r: 30 },
+                            paper_bgcolor: "rgba(0,0,0,0)",
+                            font: { color: "white", family: 'Inter, sans-serif' }
+                        }, { responsive: true, displayModeBar: false });
+                    }, 100);
+
                     window.lastQuickCheckResult = data;
-                    resultDiv.querySelector('.alert').className = 'alert alert-light border shadow-sm';
+                    resultDiv.querySelector('.alert').className = 'alert alert-light border-0 p-0';
                 } else {
                     contentDiv.innerHTML = `
                     <strong class="text-danger">${translations.error}:</strong> ${data.message}
