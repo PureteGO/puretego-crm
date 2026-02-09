@@ -199,6 +199,7 @@ class HealthCheckService:
             loc_details = service.get_location_details(location_name)
             reviews = service.list_reviews(location_name, page_size=50)
             media_items = service.list_media(location_name)
+            vcom_state = service.get_voice_of_merchant_state(location_name)
         except Exception as e:
              return {'success': False, 'error': f'Erro de API Google: {str(e)}'}
 
@@ -209,10 +210,19 @@ class HealthCheckService:
         moderate_issues = 0
         critical_issues = 0
         
-        # --- A. Verificação Básica (Max 30) ---
+        # --- A. Verificação Básica (Max 35) ---
         if loc_details.get('title'):
             score += 5
             positive_points += 1
+            
+        # Status de Verificação (Voice of Merchant)
+        if vcom_state.get('hasVoiceOfMerchant'):
+            score += 10
+            positive_points += 1
+            details.append("Perfil Verificado e Gerenciado (Confirmado via Google)")
+        else:
+            details.append("Perfil não verificado ou requer ação no Google Business Profile.")
+            critical_issues += 1
         
         # Categoria (Metadata ou Profile)
         # A API v1 retorna categories dentro de 'profile' ou 'storefrontAddress'?? 

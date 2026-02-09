@@ -208,6 +208,28 @@ class GoogleBusinessService:
             
         except requests.exceptions.RequestException as e:
             raise Exception(f"Error getting location details: {str(e)}")
+
+    def get_voice_of_merchant_state(self, location_name: str) -> Dict:
+        """
+        Verify if a business profile is verified using the Voice of Merchant API.
+        GET https://mybusinessverifications.googleapis.com/v1/{locationName}/VoiceOfMerchantState
+        """
+        if '/locations/' in location_name:
+            try:
+                real_name = 'locations/' + location_name.split('/locations/')[1]
+            except:
+                real_name = location_name
+        else:
+            real_name = location_name
+
+        url = f"https://mybusinessverifications.googleapis.com/v1/{real_name}/VoiceOfMerchantState"
+        
+        try:
+            response = requests.get(url, headers=self._get_headers(), timeout=30)
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            return {'hasVoiceOfMerchant': False, 'error': str(e)}
     
     def list_reviews(self, location_name: str, page_size: int = 50) -> List[Dict]:
         """
