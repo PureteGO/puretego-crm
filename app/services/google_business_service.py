@@ -209,6 +209,26 @@ class GoogleBusinessService:
         except requests.exceptions.RequestException as e:
             raise Exception(f"Error getting location details: {str(e)}")
 
+    def get_location_summary_v4(self, location_name: str) -> Dict:
+        """
+        Get location summary from v4 API (includes ratings/reviews count).
+        GET https://mybusiness.googleapis.com/v4/{location_name}
+        """
+        url = f"https://mybusiness.googleapis.com/v4/{location_name}"
+        try:
+            response = requests.get(url, headers=self._get_headers(), timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            return {
+                'averageRating': data.get('averageRating', 0),
+                'totalReviewCount': data.get('totalReviewCount', 0)
+            }
+        except Exception as e:
+            from flask import current_app
+            current_app.logger.error(f"Error getting v4 summary for {location_name}: {e}")
+            return {'averageRating': 0, 'totalReviewCount': 0}
+
+
     def get_voice_of_merchant_state(self, location_name: str) -> Dict:
         """
         Verify if a business profile is verified using the Voice of Merchant API.

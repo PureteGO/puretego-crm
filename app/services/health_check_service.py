@@ -143,7 +143,14 @@ class HealthCheckService:
                 recommendations.append(f"Faltante: {res['name_es']} ({res['weight']} pts)")
                 
         if score < 50:
-             recommendations.insert(0, "URGENTE: Conecte sua conta do Google para análise completa e verificada.")
+             is_already_linked = False
+             if client_id:
+                 with get_db() as db:
+                     from app.models import GMBLocationLink
+                     is_already_linked = db.query(GMBLocationLink).filter(GMBLocationLink.client_id == client_id).first() is not None
+             
+             if not is_already_linked:
+                 recommendations.insert(0, "URGENTE: Conecte sua conta do Google para análise completa e verificada.")
 
         # Top critical issues para o card
         top_critical_issues = []

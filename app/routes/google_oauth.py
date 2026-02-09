@@ -618,8 +618,12 @@ def manage_location(connection_id, location_name):
         service = GoogleBusinessService(connection)
         
         try:
-            # 1. Get Location Details
+            # 1. Get Location Details (Full info + Summary for ratings)
             location_details = service.get_location_details(location_name)
+            summary_v4 = service.get_location_summary_v4(location_name)
+            location_details['averageRating'] = summary_v4.get('averageRating', 0)
+            location_details['totalReviewCount'] = summary_v4.get('totalReviewCount', 0)
+
             
             if not link:
                 # Auto-create link for management (Client-less)

@@ -52,10 +52,13 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <h6 class="text-muted text-uppercase small">{{ _('Teléfono') }}</h6>
-                    <p class="mb-0">{{ location.phoneNumbers.primaryPhone if location.phoneNumbers else '-' }}</p>
+            <div class="card shadow-sm h-100 bg-light">
+                <div class="card-body text-center">
+                    <h6 class="text-muted text-uppercase small">{{ _('Rating') }}</h6>
+                    <h3 class="mb-0 text-warning">
+                        {{ location.averageRating }} <i class="bi bi-star-fill"></i>
+                    </h3>
+                    <small class="text-muted">({{ location.totalReviewCount }} {{ _('reseñas') }})</small>
                 </div>
             </div>
         </div>
