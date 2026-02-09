@@ -16,7 +16,7 @@ class HealthCheckService:
     def perform_public_audit(client_id, query, location=None):
         """
         Realiza uma auditoria baseada em dados públicos (Serper.dev).
-        Não requer conexão oficial com Google Business Profile.
+        Lógica DE PONTUAÇÃO RIGOROSA (Estilo Perplexity/Auditores Reais).
         """
         serper = SerperService()
         result = serper.search_places(query, location=location, limit=1)
@@ -26,113 +26,144 @@ class HealthCheckService:
             
         place_data = result['places'][0]
         
-        # --- Lógica de Pontuação (Refinada para ser mais rigorosa) ---
+        # --- Lógica de Pontuação Rigorosa ---
+        # Objetivo: Um perfil "médio" deve ter nota ~40-50.
+        # Um perfil "bom" ~70-80.
+        # Perfeito ~95-100.
+        
         score = 0
         details = []
         positive_points = 0
         moderate_issues = 0
         critical_issues = 0
         
-        # 1. Presença e Visibilidade (Max 30)
-        # Título exato ajuda, mas verificar categoria é importante
-        if place_data.get('category'):
-            score += 10
+        # --- 1. Fundamentos Digitais (Max 30) ---
+        # Nome e Categoria (Básico do Básico)
+        if place_data.get('title') and place_data.get('category'):
+            score += 5
             positive_points += 1
-            details.append(f"Categoria identificada: {place_data.get('category')}")
+            details.append(f"Identidade básica: {place_data.get('category')}")
         else:
-            details.append("Categoria não definida (perda de visibilidade).")
+            details.append("Categoria ou nome mal definidos.")
+            moderate_issues += 1
+
+        # Website (CRÍTICO - Grande diferencial)
+        if place_data.get('website'):
+            score += 15
+            positive_points += 1
+            details.append("Website vinculado (Autoridade +15).")
+        else:
+            # Penalidade Severa implícita (perde 15 pontos possíveis)
+            details.append("Sem website vinculado (Perda crítica de tráfego/autoridade).")
+            critical_issues += 1
+            
+        # Endereço Físico Validado
+        if place_data.get('address'):
+            score += 5
+            positive_points += 1
+        else:
+            details.append("Endereço não listado claramente.")
             moderate_issues += 1
             
-        if place_data.get('cid'): # Tem ID do Google Maps definido
+        # CID/Place ID
+        if place_data.get('cid') or place_data.get('placeId'):
+            score += 5 # Apenas ter o ID não é mérito, é obrigação.
+            positive_points += 1
+            
+        # --- 2. Contato e Acessibilidade (Max 20) ---
+        # Telefone
+        phone = place_data.get('phone') or place_data.get('phoneNumber')
+        if phone:
+            score += 10
+            positive_points += 1
+            details.append("Telefone disponível.")
+        else:
+            details.append("Sem telefone de contato (Perda crítica de leads).")
+            critical_issues += 1
+            
+        # Horário de Funcionamento (Indica perfil ativo)
+        # Serper retorna 'hours' ou 'openingHours' muitas vezes como texto ou lista
+        if place_data.get('hours') or place_data.get('openingHours'):
+            score += 10
+            positive_points += 1
+            details.append("Horário de funcionamento cadastrado.")
+        else:
+            details.append("Sem horário de funcionamento (Clientes não sabem quando ir).")
+            moderate_issues += 1
+
+        # --- 3. Reputação e Prova Social (Max 35) ---
+        rating = place_data.get('rating', 0)
+        reviews = place_data.get('reviews', 0) or place_data.get('user_ratings_total', 0)
+        
+        # Avaliação (Qualidade)
+        if reviews > 0:
+            if rating >= 4.8:
+                score += 15
+                details.append(f"Avaliação Excepcional ({rating}).")
+            elif rating >= 4.4:
+                score += 10
+                details.append(f"Boa Avaliação ({rating}).")
+            elif rating >= 4.0:
+                score += 5
+                details.append(f"Avaliação aceitável ({rating}).")
+            else:
+                score -= 5 # Penalidade por nota ruim
+                details.append(f"Avaliação baixa ({rating}). Alerta de reputação!")
+                critical_issues += 1
+        else:
+            # Sem reviews = Sem prova social
+            details.append("Zero avaliações. Perfil invisível socialmente.")
+            critical_issues += 1
+            
+        # Volume (Quantidade gera relevância)
+        if reviews > 100:
             score += 20
             positive_points += 1
-        else:
-            details.append("Sem ID de mapa claro.")
-            critical_issues += 1
-
-        # 2. Avaliação e Reputação (Max 30)
-        rating = place_data.get('rating', 0)
-        reviews = place_data.get('reviews', 0)
-        
-        if reviews > 0:
-            if rating >= 4.5:
-                score += 15
-                positive_points += 1
-                details.append(f"Excelente avaliação ({rating}).")
-            elif rating >= 4.0:
-                score += 10
-                moderate_issues += 1
-                details.append(f"Avaliação boa ({rating}), mas pode melhorar.")
-            else:
-                critical_issues += 1
-                details.append(f"Avaliação baixa ({rating}). Requer gestão de crise.")
-        else:
-            critical_issues += 1
-            details.append("Sem avaliações. Perfil fantasma.")
-
-        if reviews > 50:
+            details.append(f"Autoridade estabelecida ({reviews} reviews).")
+        elif reviews > 50:
             score += 15
             positive_points += 1
-            details.append(f"Alto volume de reviews ({reviews}).")
-        elif reviews > 10:
-            score += 5
-            moderate_issues += 1
-            details.append(f"Volume de reviews moderado ({reviews}).")
-        elif reviews > 0:
-            critical_issues += 1
-            details.append(f"Baixo volume de reviews ({reviews}).")
-            
-        # 3. Informações de Contato e Conversão (Max 40)
-        # Telefone (Vital para WhatsApp)
-        if place_data.get('phone'): 
-            score += 15
-            positive_points += 1
-        else: 
-            details.append("Sem telefone (Perda crítica de leads).")
-            critical_issues += 1
-            
-        # Website
-        if place_data.get('website'): 
-            score += 15
-            positive_points += 1
-        else: 
-            # Penalidade menor se tiver telefone, mas ainda ruim
-            details.append("Sem website (Perda de autoridade).")
-            moderate_issues += 1
-            
-        # Endereço
-        if place_data.get('address'): 
+        elif reviews > 20:
             score += 10
-            positive_points += 1
-        else: 
-            details.append("Endereço incompleto.")
-            moderate_issues += 1
+        elif reviews > 5:
+            score += 5
+        else:
+             details.append(f"Poucos reviews ({reviews}). Baixa relevância.")
+             moderate_issues += 1
 
-        # ... (Previous scoring logic) ...
-        
-        # Penalidades extras (Simuladas baseadas na falta de dados ricos)
-        if score < 50:
-             details.append("Provável ausência de fotos 360º/Tour Virtual.")
-             details.append("Verificação de perfil pendente (estimado).")
-             critical_issues += 2
+        # --- 4. Conteúdo Visual (Max 15) ---
+        # Serper geralmente retorna 'thumbnail' ou 'imageUrl' se tiver foto
+        if place_data.get('thumbnail') or place_data.get('imageUrl') or place_data.get('image'):
+            score += 15
+            positive_points += 1
+            details.append("Presença visual detectada (Capa/Fotos).")
+        else:
+            details.append("Sem fotos de destaque aparentes.")
+            moderate_issues += 1
+            
+        # --- Ajustes Finais ---
+        score = min(100, max(0, score)) # Clamp entre 0 e 100
         
         # Mapeando para o formato detalhado do relatório
         top_critical_issues = []
         recommendations = []
         
         for detail in details:
-            if "crítico" in detail.lower() or "ausente" in detail.lower() or "fantasma" in detail.lower():
+            if any(x in detail.lower() for x in ["crítica", "sem website", "sem telefone", "zero", "baixa"]):
                 top_critical_issues.append({
-                    'name': 'Problema Detectado',
+                    'name': 'Ponto Crítico',
                     'message': detail
                 })
-                recommendations.append(f"Corrigir: {detail}")
+                recommendations.append(f"Prioridade: {detail}")
+            elif "melhorar" in detail.lower() or "poucos" in detail.lower():
+                 recommendations.append(f"Oportunidade: {detail}")
             else:
-                 recommendations.append(f"Melhorar: {detail}")
+                 recommendations.append(f"Manter: {detail}")
                  
-        if score < 50:
-             recommendations.append("Recomendamos contratar um Tour Virtual 360º para aumentar a relevância.")
-             recommendations.append("Responda a todas as avaliações pendentes para melhorar o engajamento.")
+        if score < 40:
+             recommendations.append("URGENTE: Este perfil precisa de uma revitalização completa.")
+        elif score < 70:
+             recommendations.append("Melhoria: Foque em conseguir mais reviews e adicionar fotos.")
 
         report_data = {
             'business_name': place_data.get('title'),
@@ -144,7 +175,7 @@ class HealthCheckService:
                 'critical_issues_count': critical_issues,
                 'moderate_issues_count': moderate_issues,
                 'positive_points_count': positive_points,
-                'text': f"Análise detectou {critical_issues} pontos críticos."
+                'text': f"Score Rigoroso: {score}/100 - {critical_issues} alertas críticos."
             }
         }
         
@@ -159,7 +190,7 @@ class HealthCheckService:
                     report_data=report_data
                 )
                 health_check.source = 'public'
-                health_check.origin_id = place_data.get('cid') or place_data.get('place_id')
+                health_check.origin_id = place_data.get('cid') or place_data.get('placeId')
                 
                 db.add(health_check)
                 db.commit()

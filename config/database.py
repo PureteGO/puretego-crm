@@ -14,9 +14,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-USE_SQLITE = os.environ.get('USE_SQLITE') == 'True'
+# Prioridade 1: Usar DATABASE_URL se existir (ideal para cPanel/Production)
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
-if USE_SQLITE:
+if DATABASE_URL:
+    # Criar engine do SQLAlchemy usando a URL completa
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        echo=False
+    )
+elif USE_SQLITE:
     BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     DB_PATH = os.path.join(BASE_DIR, 'app.db')
     DATABASE_URL = f"sqlite:///{DB_PATH}"
@@ -37,7 +46,7 @@ else:
         'charset': 'utf8mb4'
     }
 
-    # Criar URL de conexão
+    # Criar URL de conexão manualmente
     DATABASE_URL = (
         f"mysql+pymysql://{DB_CONFIG['user']}:{DB_CONFIG['password']}"
         f"@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
@@ -49,7 +58,7 @@ else:
         DATABASE_URL,
         pool_pre_ping=True,
         pool_recycle=3600,
-        echo=False  # Mude para True para debug SQL
+        echo=False
     )
 
 # Criar session factory
