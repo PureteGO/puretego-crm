@@ -176,7 +176,15 @@ class GoogleBusinessService:
         Args:
             location_name: Full location name (e.g., "accounts/123/locations/456")
         """
-        url = f"{self.LOCATIONS_API_BASE}/{location_name}"
+        if '/locations/' in location_name:
+             try:
+                real_name = 'locations/' + location_name.split('/locations/')[1]
+             except:
+                real_name = location_name
+        else:
+             real_name = location_name
+
+        url = f"{self.LOCATIONS_API_BASE}/{real_name}"
         params = {
             'readMask': 'name,title,storefrontAddress,phoneNumbers,websiteUri,regularHours,profile,metadata,categories,locationState,latlng,serviceArea'
         }
