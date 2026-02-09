@@ -300,7 +300,7 @@
             handle: '.kanban-stage h5', // Drag by title
             onEnd: function (evt) {
                 const orderedIds = Array.from(board.children).map(el => el.dataset.stageId);
-                const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
                 fetch('/clients/stages/reorder', {
                     method: 'POST',
@@ -329,7 +329,7 @@
                     const client_id = evt.item.dataset.clientId;
                     const new_stage_id = evt.to.dataset.stageId;
 
-                    const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
                     fetch(`/clients/${client_id}/move`, {
                         method: 'POST',
