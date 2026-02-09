@@ -51,7 +51,7 @@ def get_redirect_uri():
     env = os.environ.get('FLASK_ENV', os.environ.get('ENVIRONMENT', 'development'))
     
     if env == 'production':
-        return 'https://app.maps2go.online/integrations/google/callback'
+        return 'https://app2.maps2go.online/integrations/google/callback'
     else:
         # Local development - use dynamic URL if in request context
         try:

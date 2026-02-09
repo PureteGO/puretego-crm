@@ -4,7 +4,7 @@ name: Deploy to cPanel
 on:
   push:
     branches:
-      - main  # Ou sua branch principal
+      - main
 
 jobs:
   web-deploy:
@@ -14,14 +14,14 @@ jobs:
     - name: 🚚 Get latest code
       uses: actions/checkout@v4
 
-    - name: 📂 Sync files
+    - name: 🚀 Deploy to Production (app2)
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: app2.maps2go.online
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./
-        server-dir: /app2.maps2go.online/  # Ajuste conforme o caminho da sua app no cPanel
+        server-dir: /app2.maps2go.online/
         exclude: |
           **/.git*
           **/.git*/**

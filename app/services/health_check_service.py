@@ -225,10 +225,16 @@ class HealthCheckService:
         # 2. Buscar Dados Reais (API)
         try:
             loc_details = service.get_location_details(location_name)
+            summary_v4 = service.get_location_summary_v4(location_name)
             reviews = service.list_reviews(location_name, page_size=50)
             media_items = service.list_media(location_name)
             vcom_state = service.get_voice_of_merchant_state(location_name)
             verifications = service.list_verifications(location_name)
+            
+            # Integrar dados globais do sumário v4
+            loc_details['averageRating'] = summary_v4.get('averageRating', 0)
+            loc_details['totalReviewCount'] = summary_v4.get('totalReviewCount', 0)
+            
         except Exception as e:
              return {'success': False, 'error': f'Erro de API Google: {str(e)}'}
 
@@ -249,11 +255,12 @@ class HealthCheckService:
         gain_vcom = vcom_state.get('gainVoiceOfMerchant', {})
         
         if is_verified:
-            score += 10
+            score += 15 # Aumentado para 15
             positive_points += 1
             details.append("Perfil Verificado e Gerenciado (Confirmado via Google)")
         else:
             # Analisar motivo da não-verificação
+            msg = "Perfil não verificado ou requer ação manual no Google Business Profile."
             if 'resolveOwnershipConflict' in gain_vcom:
                 msg = "Conflito de Propriedade: Outra pessoa já verificou este local no Google."
             elif 'complyWithGuidelines' in gain_vcom:
@@ -265,8 +272,6 @@ class HealthCheckService:
                      msg = "Verificação em Andamento: O processo foi iniciado mas ainda não foi concluído no Google."
                  else:
                      msg = "Perfil não Verificado: Requer iniciar o processo de verificação oficial."
-            else:
-                 msg = "Perfil não verificado ou requer ação manual no Google Business Profile."
             
             details.append(msg)
             critical_issues += 1
@@ -279,14 +284,14 @@ class HealthCheckService:
         # Vamos focar no que temos certeza: Telefone, Site, Horário.
         
         if loc_details.get('phoneNumbers'):
-            score += 10
+            score += 5
             positive_points += 1
         else:
             details.append("Sem telefone cadastrado.")
             critical_issues += 1
             
         if loc_details.get('websiteUri'):
-            score += 10
+            score += 5
             positive_points += 1
         else:
             details.append("Sem website vinculado.")
@@ -331,64 +336,68 @@ class HealthCheckService:
         else:
             details.append("Sem fotos do interior/loja.") # Não penaliza tanto, mas não pontua.
 
-        # --- C. Reputação (Max 40) ---
-        # Reviews
-        review_count = len(reviews)
-        total_rating = sum([r.get('starRating', 0) for r in reviews])
-        avg_rating = (total_rating / review_count) if review_count > 0 else 0
+        # --- C. Reputação (Max 35) ---
+        # Reviews usando dados globais (v4 summary)
+        avg_rating = loc_details.get('averageRating', 0)
+        review_count = loc_details.get('totalReviewCount', 0)
         
-        # Taxa de Resposta
+        # Taxa de Resposta (estimada pelas últimas 50)
+        recent_reviews_count = len(reviews)
         replied_count = sum([1 for r in reviews if r.get('hasReply')])
-        reply_rate = (replied_count / review_count) * 100 if review_count > 0 else 0
+        reply_rate = (replied_count / recent_reviews_count) * 100 if recent_reviews_count > 0 else 0
         
         if review_count > 0:
             if avg_rating >= 4.5:
                 score += 15
                 positive_points += 1
-                details.append(f"Excelente avaliação ({avg_rating:.1f}).")
+                details.append(f"Excelente avaliação média ({avg_rating:.1f} estrelas).")
             elif avg_rating >= 4.0:
                  score += 10
+                 details.append(f"Boa avaliação média ({avg_rating:.1f} estrelas).")
                  moderate_issues += 1
             else:
-                 details.append(f"Avaliação baixa ({avg_rating:.1f}).")
+                 details.append(f"Avaliação média baixa ({avg_rating:.1f} estrelas).")
                  critical_issues += 1
                  
             # Reply Rate importa muito para gestão
             if reply_rate >= 90:
                 score += 15
                 positive_points += 1
-                details.append("Excelente taxa de resposta.")
+                details.append("Excelente taxa de resposta recente.")
             elif reply_rate >= 50:
                 score += 5
                 moderate_issues += 1
-                details.append(f"Taxa de resposta média ({reply_rate:.0f}%).")
+                details.append(f"Taxa de resposta recente moderada ({reply_rate:.0f}%).")
             else:
                 critical_issues += 1
-                details.append(f"Baixa taxa de resposta ({reply_rate:.0f}%).")
+                details.append(f"Baixa taxa de resposta recente ({reply_rate:.0f}%).")
+                
+            # Penalidade extra se review count for alto mas reply rate for 0
+            if review_count > 20 and reply_rate < 10:
+                 score -= 10
+                 details.append("Alerta: Alto volume de avaliações sem resposta!")
+                 critical_issues += 1
         else:
-            details.append("Sem avaliações.")
+            details.append("Sem avaliações no perfil.")
             critical_issues += 1
-            
-        # Penalidade extra se review count for alto mas reply rate for 0
-        if review_count > 20 and reply_rate < 10:
-             score -= 10
-             details.append("Alerta: Muitas avaliações sem resposta!")
-             critical_issues += 1
 
         # --- Montar Relatório ---
         top_critical_issues = []
         recommendations = []
         
         for detail in details:
-            if "crítico" in detail.lower() or "sem" in detail.lower() or "baixa" in detail.lower():
-                top_critical_issues.append({'name': 'Atenção', 'message': detail})
-                recommendations.append(f"Ação: {detail}")
+            if any(x in detail.lower() for x in ["pendente", "conflito", "suspenso", "não verificado", "sem", "baixa", "alerta"]):
+                top_critical_issues.append({'name': 'Atenção Corretiva', 'message': detail})
+                recommendations.append(f"Ação Corretiva: {detail}")
             else:
-                 recommendations.append(f"Manter: {detail}")
+                 recommendations.append(f"Ponto Positivo: {detail}")
 
+        # Relatório final formatado
+        score = min(100, max(0, score))
+        
         report_data = {
             'business_name': loc_details.get('title'),
-            'source_data': loc_details, # Dados brutos
+            'source_data': loc_details,
             'details': details,
             'top_critical_issues': top_critical_issues,
             'recommendations': recommendations,
@@ -407,7 +416,7 @@ class HealthCheckService:
                 score=score,
                 report_data=report_data
             )
-            health_check.source = 'official' # Oficial!
+            health_check.source = 'official'
             health_check.origin_id = location_name
             
             db.add(health_check)
