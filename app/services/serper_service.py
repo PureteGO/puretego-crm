@@ -30,20 +30,17 @@ class SerperService:
             response.raise_for_status()
             data = response.json()
             
-            # Formatar resultados
+            # Formatar resultados (Passar objeto completo para Health Check)
             places = []
             for item in data.get('places', [])[:limit]:
-                places.append({
-                    'title': item.get('title'),
-                    'address': item.get('address'),
+                # Garantir campos normalizados essenciais enquanto mantém o raw data
+                place_obj = item.copy()
+                place_obj.update({
                     'phone': item.get('phoneNumber'),
-                    'website': item.get('website'),
-                    'rating': item.get('rating'),
                     'reviews': item.get('ratingCount'),
-                    'category': item.get('category'),
-                    'cid': item.get('cid'),
-                    'place_id': item.get('placeId')
+                    'place_id': item.get('placeId') or item.get('cid') # Fallback
                 })
+                places.append(place_obj)
             return {'success': True, 'places': places}
         except requests.exceptions.RequestException as e:
             return {'success': False, 'error': str(e)}
