@@ -165,7 +165,8 @@ def locations(connection_id):
     
     # Check basic permission - Allow superadmin or direct DB check fallback
     is_superadmin = session.get('is_superadmin', False)
-    has_permission = session.get('permissions', {}).get('can_manage_gmb', False)
+    permissions = session.get('permissions') or {}
+    has_permission = permissions.get('can_manage_gmb', False)
     
     if not is_superadmin and not has_permission:
         # Final fallback: check DB in case session is stale
@@ -175,21 +176,25 @@ def locations(connection_id):
             flash(_('Você não tem permissão para gerenciar integrações Google.'), 'error')
             return redirect(url_for('dashboard.index'))
 
-    with get_db() as db:
-        connection = db.query(GoogleConnection).filter(
-            GoogleConnection.id == connection_id,
-            GoogleConnection.company_id == company_id
-        ).first()
-        
-        if not connection:
-            flash(_('Conexão não encontrada.'), 'error')
-            return redirect(url_for('google_oauth.dashboard'))
-        
-        # Get already linked locations
-        linked_locations = {
-            link.gmb_location_name: link 
-            for link in connection.location_links
-        }
+    try:
+        with get_db() as db:
+            connection = db.query(GoogleConnection).filter(
+                GoogleConnection.id == connection_id,
+                GoogleConnection.company_id == company_id
+            ).first()
+            
+            if not connection:
+                flash(_('Conexão não encontrada.'), 'error')
+                return redirect(url_for('google_oauth.dashboard'))
+            
+            # Get already linked locations
+            linked_locations = {}
+            if connection.location_links:
+                linked_locations = {
+                    link.gmb_location_name: link 
+                    for link in connection.location_links
+                    if link.gmb_location_name
+                }
         
         # Get clients for dropdown
         from app.models import Client
@@ -243,11 +248,16 @@ def locations(connection_id):
             error_message = str(e)
             current_app.logger.error(f"Error fetching Google locations: {e}")
     
-    return render_template('integrations/location_mapping.html',
-                           connection=connection,
-                           locations=locations_data,
-                           clients=clients,
-                           error_message=error_message)
+        return render_template('integrations/location_mapping.html',
+                               connection=connection,
+                               locations=locations_data,
+                               clients=clients,
+                               error_message=error_message)
+    except Exception as e:
+        import traceback
+        current_app.logger.error(f"FATAL ERROR in google_oauth.locations: {str(e)}\n{traceback.format_exc()}")
+        flash(_('Ocorreu um erro interno ao carregar os locais. Por favor, tente novamente mais tarde.'), 'error')
+        return redirect(url_for('google_oauth.dashboard'))
 
 
 @bp.route('/repair-permissions')
