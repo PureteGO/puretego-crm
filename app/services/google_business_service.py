@@ -214,10 +214,16 @@ class GoogleBusinessService:
         Get location summary from v4 API (includes ratings/reviews count).
         GET https://mybusiness.googleapis.com/v4/{location_name}
         """
+        # Ensure location_name is in the correct format for v4 (accounts/X/locations/Y)
         url = f"https://mybusiness.googleapis.com/v4/{location_name}"
         try:
             response = requests.get(url, headers=self._get_headers(), timeout=30)
-            response.raise_for_status()
+            
+            from flask import current_app
+            if response.status_code != 200:
+                current_app.logger.error(f"GMB v4 Summary Error {response.status_code} for {location_name}: {response.text}")
+                return {'averageRating': 0, 'totalReviewCount': 0, 'error': response.status_code}
+                
             data = response.json()
             return {
                 'averageRating': data.get('averageRating', 0),
@@ -225,8 +231,8 @@ class GoogleBusinessService:
             }
         except Exception as e:
             from flask import current_app
-            current_app.logger.error(f"Error getting v4 summary for {location_name}: {e}")
-            return {'averageRating': 0, 'totalReviewCount': 0}
+            current_app.logger.error(f"Exception getting v4 summary for {location_name}: {e}")
+            return {'averageRating': 0, 'totalReviewCount': 0, 'exception': str(e)}
 
 
     def get_voice_of_merchant_state(self, location_name: str) -> Dict:
@@ -292,13 +298,21 @@ class GoogleBusinessService:
         try:
             response = requests.get(url, headers=self._get_headers(), params=params, timeout=30)
             
+            from flask import current_app
             if response.status_code == 403:
+                 current_app.logger.error(f"GMB Reviews 403 Forbidden for {location_name}. Check if API is enabled and scopes are correct.")
                  raise Exception("Acceso Denegado (403): La 'Google My Business API' podría no estar habilitada en su Google Cloud Console o su cuenta no tiene permisos suficientes para este perfil.")
+            
+            if response.status_code != 200:
+                 current_app.logger.error(f"GMB Reviews Error {response.status_code}: {response.text}")
             
             response.raise_for_status()
             
             data = response.json()
             reviews = data.get('reviews', [])
+            
+            if not reviews:
+                 current_app.logger.info(f"GMB API returned successfully but with 0 reviews for {location_name}")
             
             result = []
             for review in reviews:

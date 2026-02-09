@@ -621,24 +621,6 @@ def manage_location(connection_id, location_name):
             # 1. Get Location Details (Full info + Summary for ratings)
             location_details = service.get_location_details(location_name)
             summary_v4 = service.get_location_summary_v4(location_name)
-            location_details['averageRating'] = summary_v4.get('averageRating', 0)
-            location_details['totalReviewCount'] = summary_v4.get('totalReviewCount', 0)
-
-            
-            if not link:
-                # Auto-create link for management (Client-less)
-                link = GMBLocationLink(
-                    company_id=company_id,
-                    google_connection_id=connection_id,
-                    client_id=None, # Managed only
-                    gmb_location_name=location_name,
-                    gmb_location_title=location_details.get('title'),
-                    gmb_location_address=location_details.get('address'),
-                    is_primary=True
-                )
-                db.add(link)
-                db.commit()
-                flash(_('Perfil habilitado para administración.'), 'success')
             
             # 2. Get Reviews (Soft fail if API not enabled or access denied)
             reviews = []
@@ -648,6 +630,17 @@ def manage_location(connection_id, location_name):
             except Exception as e:
                 review_error = str(e)
                 current_app.logger.warning(f"Failed to fetch reviews for {location_name}: {e}")
+
+            # Merge summary data
+            location_details['averageRating'] = summary_v4.get('averageRating', 0)
+            location_details['totalReviewCount'] = summary_v4.get('totalReviewCount', 0)
+
+            # Fallback Rating Calculation: if summary is 0 but we have reviews, calculate local avg
+            if (not location_details['averageRating'] or location_details['averageRating'] == 0) and reviews:
+                total_stars = sum([r.get('starRating', 0) for r in reviews])
+                location_details['averageRating'] = round(total_stars / len(reviews), 1)
+                if not location_details['totalReviewCount']:
+                    location_details['totalReviewCount'] = len(reviews)
             
             return render_template('integrations/manage_location.html',
                                    connection=connection,
