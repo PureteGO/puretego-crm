@@ -122,6 +122,7 @@ def dashboard():
                                     if is_linked:
                                         link = existing_links[loc['name']]
                                         linked_client_name = link.client.name if link.client else _('Cliente eliminado')
+                                        link_id = link.id
                                     
                                     all_locations.append({
                                         'connection_id': conn.id,
@@ -129,10 +130,11 @@ def dashboard():
                                         'account_name': account['accountName'],
                                         'name': loc['name'],
                                         'title': loc['title'],
-                                        'address': loc['address'],
-                                        'city': loc['city'],
+                                        'address': loc.get('address', ''),
+                                        'city': loc.get('city', ''),
                                         'is_linked': is_linked,
                                         'linked_client_name': linked_client_name,
+                                        'link_id': link_id,
                                         # Manage URL handles auto-linking
                                         'manage_url': url_for('google_oauth.manage_location', connection_id=conn.id, location_name=loc['name']),
                                         'link_url': url_for('google_oauth.locations', connection_id=conn.id)
@@ -226,6 +228,7 @@ def locations(connection_id):
                             link = linked_locations[loc['name']]
                             loc['linked_client_id'] = link.client_id
                             loc['linked_client_name'] = link.client.name if link.client else None
+                            loc['link_id'] = link.id
                         locations_data.append(loc)
                 except Exception as e:
                     current_app.logger.warning(f"Error fetching locations for {account['name']}: {e}")
