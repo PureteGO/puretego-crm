@@ -346,17 +346,17 @@ class HealthCheckService:
         replied_count = sum([1 for r in reviews if r.get('hasReply')])
         reply_rate = (replied_count / recent_reviews_count) * 100 if recent_reviews_count > 0 else 0
         
-        if review_count > 0:
-            if avg_rating >= 4.5:
+        if (review_count or 0) > 0:
+            if (avg_rating or 0) >= 4.5:
                 score += 15
                 positive_points += 1
-                details.append(f"Excelente avaliação média ({avg_rating:.1f} estrelas).")
-            elif avg_rating >= 4.0:
+                details.append(f"Excelente avaliação média ({(avg_rating or 0):.1f} estrelas).")
+            elif (avg_rating or 0) >= 4.0:
                  score += 10
-                 details.append(f"Boa avaliação média ({avg_rating:.1f} estrelas).")
+                 details.append(f"Boa avaliação média ({(avg_rating or 0):.1f} estrelas).")
                  moderate_issues += 1
             else:
-                 details.append(f"Avaliação média baixa ({avg_rating:.1f} estrelas).")
+                 details.append(f"Avaliação média baixa ({(avg_rating or 0):.1f} estrelas).")
                  critical_issues += 1
                  
             # Reply Rate importa muito para gestão
@@ -373,7 +373,7 @@ class HealthCheckService:
                 details.append(f"Baixa taxa de resposta recente ({reply_rate:.0f}%).")
                 
             # Penalidade extra se review count for alto mas reply rate for 0
-            if review_count > 20 and reply_rate < 10:
+            if (review_count or 0) > 20 and (reply_rate or 0) < 10:
                  score -= 10
                  details.append("Alerta: Alto volume de avaliações sem resposta!")
                  critical_issues += 1
