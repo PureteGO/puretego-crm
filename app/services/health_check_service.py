@@ -46,14 +46,21 @@ class HealthCheckService:
             name = c['name_pt']
             
             # --- Mapeamento Serper -> Critérios ---
+            # --- Mapeamento Serper -> Critérios ---
             if cid == 1: # Horário
                 passed = bool(place_data.get('hours') or place_data.get('openingHours'))
             elif cid == 2: # Fotos Produtos
-                passed = False # Difícil detectar
+                # Inferir: Se tem foto de capa, provavelmente tem produtos/serviços visíveis
+                passed = bool(place_data.get('thumbnail') or place_data.get('image'))
             elif cid == 3: # Vídeos
+                # Impossível detectar publicamente via Serper simples
                 passed = False
             elif cid == 4: # Verificado
-                passed = False
+                # Inferir: Se tem CID, Telefone e Reviews, é altamente provável que seja gerenciado/verificado
+                has_id = bool(place_data.get('cid') or place_data.get('placeId'))
+                has_phone = bool(place_data.get('phone') or place_data.get('phoneNumber'))
+                has_reviews = place_data.get('reviews', 0) > 0 or place_data.get('ratingCount', 0) > 0
+                passed = (has_id and has_phone and has_reviews)
             elif cid == 5: # Site
                 passed = bool(place_data.get('website'))
             elif cid == 6: # Q&A
@@ -70,15 +77,17 @@ class HealthCheckService:
             elif cid == 11: # Fotos Exterior (Usamos thumbnail como proxy)
                 passed = bool(place_data.get('thumbnail') or place_data.get('image'))
             elif cid == 12: # Fotos Interior
-                passed = False
+                # Inferir: Mesmo da regra de produtos
+                passed = bool(place_data.get('thumbnail') or place_data.get('image'))
             elif cid == 13: # Info Produtos (Categoria)
                 passed = bool(place_data.get('category'))
             elif cid == 14: # Avaliações
-                passed = (place_data.get('reviews', 0) > 0)
+                passed = (place_data.get('reviews', 0) > 0 or place_data.get('ratingCount', 0) > 0)
             elif cid == 15: # Endereço
                 passed = bool(place_data.get('address'))
             elif cid == 16: # Logotipo
-                passed = False
+                # Inferir: Se tem thumbnail, assumimos que tem logo ou foto principal
+                passed = bool(place_data.get('thumbnail') or place_data.get('image'))
             elif cid == 17: # Resposta
                 passed = False
 
