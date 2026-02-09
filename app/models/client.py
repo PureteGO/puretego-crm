@@ -113,5 +113,18 @@ class Client(Base):
         
         return data
     
+    def get_primary_gmb_link(self):
+        """Returns the primary GMB location link or the first one if none is primary."""
+        if not self.gmb_location_links:
+            return None
+        
+        # Try to find primary
+        for link in self.gmb_location_links:
+            if link.is_primary:
+                return link
+        
+        # Fallback to first
+        return self.gmb_location_links[0]
+
     def __repr__(self):
         return f'<Client {self.name}>'

@@ -209,17 +209,31 @@ def view(client_id):
         insights_data = []
         is_linked = False
         
-        primary_link = db.query(GMBLocationLink).filter(
-            GMBLocationLink.client_id == client_id,
-            GMBLocationLink.is_primary == True
-        ).first()
+        # Support selecting a specific profile for insights
+        selected_link_id = request.args.get('gmb_link_id')
+        if selected_link_id and selected_link_id.isdigit():
+            selected_link = db.query(GMBLocationLink).filter(
+                GMBLocationLink.id == int(selected_link_id),
+                GMBLocationLink.client_id == client_id
+            ).first()
+        else:
+            selected_link = db.query(GMBLocationLink).filter(
+                GMBLocationLink.client_id == client_id,
+                GMBLocationLink.is_primary == True
+            ).first()
+            if not selected_link:
+                selected_link = db.query(GMBLocationLink).filter(
+                    GMBLocationLink.client_id == client_id
+                ).first()
+        
+        selected_link_id = selected_link.id if selected_link else None
 
-        if primary_link:
+        if selected_link:
             is_linked = True
             # Get last 30 days of metrics
             start_date = datetime.utcnow() - timedelta(days=31)
             raw_insights = db.query(GMBInsight).filter(
-                GMBInsight.location_link_id == primary_link.id,
+                GMBInsight.location_link_id == selected_link.id,
                 GMBInsight.date >= start_date
             ).order_by(GMBInsight.date.asc()).all()
             
@@ -250,7 +264,9 @@ def view(client_id):
             interactions=interactions,
             connections=connections,
             insights=insights_data,
-            is_linked=is_linked
+            is_linked=is_linked,
+            selected_link_id=selected_link_id,
+            selected_link=selected_link
         )
 
 

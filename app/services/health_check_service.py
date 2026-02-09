@@ -207,7 +207,7 @@ class HealthCheckService:
         }
 
     @staticmethod
-    def perform_official_audit(client_id):
+    def perform_official_audit(client_id, location_link_id=None):
         """
         Realiza auditoria usando dados OFICIAIS da API do Google Business Profile.
         Requer que o cliente tenha um perfil vinculado.
@@ -216,15 +216,26 @@ class HealthCheckService:
         from app.models import GMBLocationLink
         
         # 1. Obter Serviço e Link
-        service = get_service_for_client(client_id)
+        service = get_service_for_client(client_id, location_link_id)
         if not service:
-             return {'success': False, 'error': 'Cliente não possui perfil do Google vinculado.'}
+             return {'success': False, 'error': 'Cliente não possui perfil do Google vinculado ou o perfil especificado não foi encontrado.'}
         
         with get_db() as db:
-             link = db.query(GMBLocationLink).filter(
-                GMBLocationLink.client_id == client_id,
-                GMBLocationLink.is_primary == True
-             ).first()
+             if location_link_id:
+                 link = db.query(GMBLocationLink).filter(
+                    GMBLocationLink.id == location_link_id,
+                    GMBLocationLink.client_id == client_id
+                 ).first()
+             else:
+                 link = db.query(GMBLocationLink).filter(
+                    GMBLocationLink.client_id == client_id,
+                    GMBLocationLink.is_primary == True
+                 ).first()
+                 if not link:
+                     link = db.query(GMBLocationLink).filter(
+                        GMBLocationLink.client_id == client_id
+                     ).first()
+                     
              if not link:
                  return {'success': False, 'error': 'Vínculo de perfil não encontrado.'}
              location_name = link.gmb_location_name
@@ -343,10 +354,19 @@ class HealthCheckService:
         else:
             details.append("Sem fotos do interior/loja.") # Não penaliza tanto, mas não pontua.
 
-        # --- C. Reputação (Max 35) ---
-        # Reviews usando dados globais (v4 summary)
+        # reviews usando dados globais (v4 summary)
         avg_rating = loc_details.get('averageRating', 0)
         review_count = loc_details.get('totalReviewCount', 0)
+        
+        # Fallback: Se API v4 falhar ou retornar zero, tentar usar os reviews em cache
+        if (avg_rating or 0) == 0:
+            with get_db() as db:
+                from app.models import GMBReview
+                # Nota: link.id deve estar disponível do passo 1
+                cached_reviews = db.query(GMBReview).filter(GMBReview.location_link_id == link.id).all()
+                if cached_reviews:
+                    review_count = len(cached_reviews)
+                    avg_rating = sum([r.star_rating for r in cached_reviews]) / review_count
         
         # Taxa de Resposta (estimada pelas últimas 50)
         recent_reviews_count = len(reviews)

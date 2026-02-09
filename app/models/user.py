@@ -44,12 +44,14 @@ class User(Base):
     interactions = relationship('Interaction', back_populates='user')
     owned_clients = relationship('Client', foreign_keys='Client.owner_id', back_populates='owner')
     
-    def __init__(self, name, email, password, company_id=None, role_id=None):
+    def __init__(self, name, email, password, company_id=None, role_id=None, base_salary=0.0, receives_commission=True):
         self.name = name
         self.email = email
         self.set_password(password)
         self.company_id = company_id
         self.role_id = role_id
+        self.base_salary = base_salary
+        self.receives_commission = receives_commission
     
     def set_password(self, password):
         """Criptografa e define a senha do usuário"""

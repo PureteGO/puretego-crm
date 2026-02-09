@@ -242,6 +242,7 @@ def locations(connection_id):
                             loc['linked_client_id'] = link.client_id
                             loc['linked_client_name'] = link.client.name if link.client else None
                             loc['link_id'] = link.id
+                            loc['is_primary'] = link.is_primary
                         locations_data.append(loc)
                 except Exception as e:
                     current_app.logger.warning(f"Error fetching locations for {account['name']}: {e}")
@@ -552,7 +553,12 @@ def api_locations(connection_id):
             
             return jsonify({'success': True, 'locations': all_locations})
         except Exception as e:
-            return jsonify({'success': False, 'message': str(e)}), 500
+            msg = str(e)
+            if "429" in msg or "Quota" in msg:
+                msg = _("Quota excedida ou API não ativada no Google Cloud. Por favor, verifique as configurações no Console do Google Cloud.")
+            elif "403" in msg or "Permission" in msg:
+                msg = _("Permissão negada. Verifique se a conta tem acesso aos perfis e se as APIs estão ativadas.")
+            return jsonify({'success': False, 'message': msg}), 500
 
 @bp.route('/locations/<int:connection_id>/link', methods=['POST'])
 @login_required
@@ -599,6 +605,12 @@ def link_location(connection_id):
             existing.gmb_location_address = location_address
             flash(_('Vínculo actualizado.'), 'success')
         else:
+            # Check if this is the first link for this client
+            from app.models import GMBLocationLink
+            has_links = db.query(GMBLocationLink).filter(
+                GMBLocationLink.client_id == int(client_id)
+            ).first() is not None
+            
             # Create new link
             link = GMBLocationLink(
                 company_id=company_id,
@@ -607,7 +619,7 @@ def link_location(connection_id):
                 gmb_location_name=location_name,
                 gmb_location_title=location_title,
                 gmb_location_address=location_address,
-                is_primary=True
+                is_primary=not has_links # Primary if it's the first one
             )
             db.add(link)
             flash(_('Perfil vinculado exitosamente.'), 'success')
@@ -615,6 +627,36 @@ def link_location(connection_id):
         db.commit()
     
     return redirect(url_for('google_oauth.locations', connection_id=connection_id))
+
+
+@bp.route('/locations/<int:connection_id>/set-primary/<int:link_id>', methods=['POST'])
+@login_required
+def set_primary_location(connection_id, link_id):
+    """Set a specific GMB location as primary for its client"""
+    company_id = session.get('company_id')
+    
+    with get_db() as db:
+        from app.models import GMBLocationLink
+        link = db.query(GMBLocationLink).filter(
+            GMBLocationLink.id == link_id,
+            GMBLocationLink.company_id == company_id,
+            GMBLocationLink.google_connection_id == connection_id
+        ).first()
+        
+        if link:
+            # RBAC Check
+            from app.utils.decorators import get_current_user
+            user = get_current_user()
+            if link.client and not user.can_manage_gmb_for(link.client):
+                flash(_('Você não tem permissão para alterar este vínculo.'), 'error')
+                return redirect(url_for('google_oauth.locations', connection_id=connection_id))
+
+            link.set_as_primary(db)
+            flash(_('Perfil definido como principal.'), 'success')
+        else:
+            flash(_('Vínculo no encontrado.'), 'error')
+    
+    return redirect(request.referrer or url_for('google_oauth.locations', connection_id=connection_id))
 
 
 @bp.route('/locations/<int:connection_id>/unlink/<int:link_id>', methods=['POST'])

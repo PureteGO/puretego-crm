@@ -43,7 +43,11 @@ def index():
 def official_check(client_id):
     """Trigger an official health check audit for a linked client."""
     try:
-        result = HealthCheckService.perform_official_audit(client_id)
+        location_link_id = request.form.get('location_link_id') or request.json.get('location_link_id') if request.is_json else None
+        if location_link_id:
+            location_link_id = int(location_link_id)
+            
+        result = HealthCheckService.perform_official_audit(client_id, location_link_id)
         if result['success']:
             flash(_('Auditoria Oficial realizada com sucesso!'), 'success')
             return redirect(url_for('health_checks.view', health_check_id=result['check_id']))
@@ -69,8 +73,9 @@ def create(client_id):
         
         if request.method == 'POST':
             # Se for auditoria pública (manual)
-            query = request.form.get('business_name') or client.gmb_profile_name or client.name
-            location = request.form.get('location') or client.address
+            primary_link = client.get_primary_gmb_link()
+            query = request.form.get('business_name') or (primary_link.gmb_location_title if primary_link else None) or client.gmb_profile_name or client.name
+            location = request.form.get('location') or (primary_link.gmb_location_address if primary_link else None) or client.address
             
             try:
                 # Usar serviço de Health Check (Public Audit)

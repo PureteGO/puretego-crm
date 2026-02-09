@@ -222,9 +222,13 @@ class GoogleBusinessService:
             from flask import current_app
             if response.status_code != 200:
                 current_app.logger.error(f"GMB v4 Summary Error {response.status_code} for {location_name}: {response.text}")
-                return {'averageRating': 0, 'totalReviewCount': 0, 'error': response.status_code}
+                # Try to return something even if error, to signal failure
+                return {'averageRating': 0, 'totalReviewCount': 0, 'error': response.status_code, 'raw_response': response.text}
                 
             data = response.json()
+            # Log the full data for debugging rating issues
+            current_app.logger.info(f"GMB v4 Summary Data for {location_name}: {data}")
+            
             return {
                 'averageRating': data.get('averageRating', 0),
                 'totalReviewCount': data.get('totalReviewCount', 0)
@@ -424,61 +428,70 @@ class GoogleBusinessService:
     def sync_reviews_to_cache(self, location_link_id: int) -> int:
         """
         Sync reviews from Google to local cache.
-        
-        Args:
-            location_link_id: ID of the GMBLocationLink
-            
-        Returns:
-            Number of reviews synced
+        Fetches up to 150 reviews (3 pages) to ensure cache is warm.
         """
         with get_db() as db:
-            link = db.query(GMBLocationLink).get(location_link_id)
-            if not link:
-                raise ValueError("Location link not found")
-            
             try:
-                reviews = self.list_reviews(link.gmb_location_name)
-                synced_count = 0
+                # Fetch up to 10 pages (total 500 reviews)
+                for _ in range(10):
+                    try:
+                        url = f"https://mybusiness.googleapis.com/v4/{location_name}/reviews"
+                        params = {'pageSize': 50}
+                        if next_page_token:
+                            params['pageToken'] = next_page_token
+                            
+                        response = requests.get(url, headers=self._get_headers(), params=params, timeout=30)
+                        response.raise_for_status()
+                        data = response.json()
+                        
+                        page_reviews = data.get('reviews', [])
+                        all_reviews.extend(page_reviews)
+                        
+                        next_page_token = data.get('nextPageToken')
+                        if not next_page_token:
+                            break
+                    except Exception as e:
+                        from flask import current_app
+                        current_app.logger.error(f"Error fetching reviews page: {e}")
+                        break
+
+                if not all_reviews:
+                    return 0
                 
-                for review_data in reviews:
-                    # Check if review already exists
+                count = 0
+                for review_data in all_reviews:
+                    # Check if exists
+                    review_name = review_data.get('name')
                     existing = db.query(GMBReview).filter(
-                        GMBReview.google_review_id == review_data['name']
+                        GMBReview.gmb_review_id == review_name
                     ).first()
                     
                     if existing:
-                        # Update existing
-                        existing.star_rating = review_data['starRating']
-                        existing.comment = review_data['comment']
-                        existing.reply_text = review_data['replyComment']
-                        existing.synced_at = datetime.utcnow()
+                        # Update potentially
+                        existing.star_rating = self._parse_star_rating(review_data.get('starRating'))
+                        existing.comment = review_data.get('comment', '')
+                        reply = review_data.get('reviewReply', {})
+                        existing.reply_comment = reply.get('comment', '')
+                        if 'updateTime' in review_data:
+                            try:
+                                existing.updated_at = datetime.fromisoformat(review_data['updateTime'].replace('Z', '+00:00'))
+                            except:
+                                pass
                     else:
-                        # Create new
-                        review = GMBReview(
+                        new_review = GMBReview(
                             location_link_id=location_link_id,
-                            google_review_id=review_data['name'],
-                            reviewer_name=review_data['reviewerName'],
-                            reviewer_photo_url=review_data['reviewerPhotoUrl'],
-                            star_rating=review_data['starRating'],
-                            comment=review_data['comment'],
-                            review_date=datetime.fromisoformat(
-                                review_data['createTime'].replace('Z', '+00:00')
-                            ) if review_data['createTime'] else datetime.utcnow(),
-                            reply_text=review_data['replyComment'],
-                            reply_date=datetime.fromisoformat(
-                                review_data['replyTime'].replace('Z', '+00:00')
-                            ) if review_data['replyTime'] else None
+                            gmb_review_id=review_name,
+                            reviewer_name=review_data.get('reviewer', {}).get('displayName', 'Anonymous'),
+                            star_rating=self._parse_star_rating(review_data.get('starRating')),
+                            comment=review_data.get('comment', ''),
+                            reply_comment=review_data.get('reviewReply', {}).get('comment', ''),
+                            review_date=datetime.fromisoformat(review_data['createTime'].replace('Z', '+00:00')) if 'createTime' in review_data else datetime.utcnow()
                         )
-                        db.add(review)
-                        synced_count += 1
+                        db.add(new_review)
+                        count += 1
                 
-                # Update sync timestamp
-                link.last_sync_at = datetime.utcnow()
-                link.sync_error = None
                 db.commit()
-                
-                return synced_count
-                
+                return count
             except Exception as e:
                 link.sync_error = str(e)[:500]
                 db.commit()
@@ -610,13 +623,24 @@ def get_service_for_connection(connection_id: int) -> GoogleBusinessService:
         return GoogleBusinessService(connection)
 
 
-def get_service_for_client(client_id: int) -> Optional[GoogleBusinessService]:
-    """Get a GoogleBusinessService for a client's primary GMB location"""
+def get_service_for_client(client_id: int, location_link_id: Optional[int] = None) -> Optional[GoogleBusinessService]:
+    """Get a GoogleBusinessService for a client's specific or primary GMB location"""
     with get_db() as db:
-        link = db.query(GMBLocationLink).filter(
-            GMBLocationLink.client_id == client_id,
-            GMBLocationLink.is_primary == True
-        ).first()
+        if location_link_id:
+            link = db.query(GMBLocationLink).filter(
+                GMBLocationLink.id == location_link_id,
+                GMBLocationLink.client_id == client_id
+            ).first()
+        else:
+            link = db.query(GMBLocationLink).filter(
+                GMBLocationLink.client_id == client_id,
+                GMBLocationLink.is_primary == True
+            ).first()
+            # If no primary, grab the first one
+            if not link:
+                link = db.query(GMBLocationLink).filter(
+                    GMBLocationLink.client_id == client_id
+                ).first()
         
         if not link:
             return None

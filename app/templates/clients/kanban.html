@@ -7,16 +7,32 @@
     .kanban-board {
         display: flex;
         overflow-x: auto;
+        gap: 1rem;
         padding-bottom: 1rem;
+        align-items: flex-start;
     }
 
     .kanban-stage {
-        flex: 0 0 300px;
-        margin-right: 1rem;
+        flex: 0 0 320px;
         background-color: var(--bg-base);
         border: 1px solid var(--border-color);
-        border-radius: 3px;
+        border-radius: 8px;
         padding: 1rem;
+        transition: box-shadow 0.2s;
+    }
+
+    /* Mobile view: Stack columns vertically */
+    @media (max-width: 768px) {
+        .kanban-board {
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .kanban-stage {
+            flex: 0 0 auto;
+            width: 100%;
+            margin-right: 0;
+        }
     }
 
     .kanban-stage h5 {

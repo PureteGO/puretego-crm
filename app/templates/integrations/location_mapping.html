@@ -61,6 +61,10 @@
                                     </div>
                                     <div>
                                         <strong>{{ loc.title }}</strong>
+                                        {% if loc.is_primary %}
+                                        <span class="badge bg-primary rounded-pill ms-1" style="font-size: 0.65rem;">{{
+                                            _('Principal') }}</span>
+                                        {% endif %}
                                         <br><small class="text-muted">{{ loc.account_name }}</small>
                                     </div>
                                 </div>
@@ -119,6 +123,17 @@
                                         class="btn btn-outline-primary" title="{{ _('Ver Cliente') }}">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    {% if not loc.is_primary %}
+                                    <form
+                                        action="{{ url_for('google_oauth.set_primary_location', connection_id=connection.id, link_id=loc.link_id) }}"
+                                        method="POST" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-success"
+                                            title="{{ _('Definir como Principal') }}">
+                                            <i class="bi bi-star"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
                                     <form
                                         action="{{ url_for('google_oauth.unlink_location', connection_id=connection.id, link_id=loc.link_id) }}"
                                         method="POST" class="d-inline"

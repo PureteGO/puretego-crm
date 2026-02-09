@@ -75,5 +75,22 @@ class GMBLocationLink(Base):
             'reviews_count': len(self.reviews) if self.reviews else 0
         }
     
+    def set_as_primary(self, db_session):
+        """Sets this location as primary and unsets all other locations for the same client."""
+        if not self.client_id:
+            return
+            
+        # Get all links for this client
+        other_links = db_session.query(GMBLocationLink).filter(
+            GMBLocationLink.client_id == self.client_id,
+            GMBLocationLink.id != self.id
+        ).all()
+        
+        for link in other_links:
+            link.is_primary = False
+            
+        self.is_primary = True
+        db_session.commit()
+
     def __repr__(self):
         return f'<GMBLocationLink Client:{self.client_id} -> {self.gmb_location_title}>'

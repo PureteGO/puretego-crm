@@ -19,8 +19,8 @@
     }
 
     .score-card-premium {
-        background: linear-gradient(135deg, #059669 0%, #10B981 100%);
-        color: white;
+        background: linear-gradient(135deg, #d3e239 0%, #a8c125 100%);
+        color: #1a2e05;
         border-top: none;
     }
 
@@ -87,20 +87,25 @@
         <div class="col-md-4">
             <div class="card-premium score-card-premium d-flex flex-column justify-content-between">
                 <div>
-                    <h3 class="h5 font-bold mb-2">{{ _('Puntaje Real') }}: {{ health_check.score }}/100</h3>
-                    <p class="text-white text-opacity-75 small mb-4">
+                    <h3 class="h5 font-bold mb-2">{{ _('Puntaje Real') }}</h3>
+                    <p class="text-dark text-opacity-75 small mb-3">
                         {% if health_check.score > 90 %}
                         {{ _('Tu perfil está en el Top 1%. Todas as ferramentas críticas estão configuradas.') }}
                         {% elif health_check.score > 70 %}
                         {{ _('Excelente desempenho. Poucos ajustes para chegar ao topo do mercado.') }}
                         {% else %}
-                        {{ _('Há oportunidades de crescimento. Siga as recomendações abaixo.') }}
+                        <strong class="text-danger">{{ _('¡ALERTA CRÍTICA! Tu perfil de Google no está convirtiendo.
+                            Estás perdiendo clientes valiosos frente a tu competencia ahora mismo.') }}</strong>
                         {% endif %}
                     </p>
                 </div>
                 <div id="gaugeChart" style="width: 100%; height: 250px;"></div>
-                <div class="mt-4 text-center">
-                    <span class="bg-white bg-opacity-20 px-4 py-1 rounded text-sm font-bold">
+                <div class="mt-2 text-center">
+                    <h2 class="display-1 fw-bold mb-0" id="scoreDisplay"
+                        style="text-shadow: 0 1px 3px rgba(0,0,0,0.1); letter-spacing: -2px;">
+                        {{ health_check.score }}
+                    </h2>
+                    <span class="bg-black bg-opacity-10 px-4 py-1 rounded text-sm font-bold text-uppercase">
                         {{ _('Estado') }}: {{ health_check.get_score_status() }}
                     </span>
                 </div>
@@ -112,7 +117,8 @@
             <div class="card-premium" style="border-top-color: #3B82F6;">
                 <h3 class="h5 font-bold text-dark mb-4">{{ _('Métricas de Excelencia Logradas') }}</h3>
                 <div class="row g-3">
-                    {% set report = health_check.get_report_data() %}
+                    {% set report = health_check.report_data %}
+                    {% if report and report.criteria %}
                     {% for item in report.criteria[:4] %}
                     <div class="col-sm-6">
                         <div
@@ -127,6 +133,14 @@
                         </div>
                     </div>
                     {% endfor %}
+                    {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info py-2 small">
+                            <i class="bi bi-info-circle me-1"></i> {{ _('Detalles del criterio no disponíveis para este
+                            histórico.') }}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="mt-4">
                     <div class="chart-container-premium" style="height: 180px;">
@@ -247,31 +261,48 @@
 
 <script>
     window.onload = function () {
-        // Gauge Chart
-        Plotly.newPlot('gaugeChart', [{
-            type: "indicator",
-            mode: "gauge+number",
-            value: {{ health_check.score }},
-        number: { suffix: "/100", font: { color: "white", size: 35 } },
-    gauge: {
-        axis: { range: [null, 100], tickcolor: "white" },
-        bar: { color: "#ffffff" },
-        bgcolor: "rgba(255,255,255,0.2)",
-            steps: [
-                { range: [0, 50], color: "rgba(0,0,0,0.1)" },
-                { range: [50, 90], color: "rgba(0,0,0,0.2)" },
-                { range: [90, 100], color: "#047857" }
-            ]
+        const score = {{ health_check.score }
+    };
+    let barColor = "#EF4444"; // Red
+    if (score >= 75) {
+        barColor = "#10B981"; // Green
+    } else if (score >= 60) {
+        barColor = "#F59E0B"; // Yellow
     }
-        }], {
+
+    // Update display color
+    document.getElementById('scoreDisplay').style.color = barColor;
+
+    // Gauge Chart
+    Plotly.newPlot('gaugeChart', [{
+        type: "indicator",
+        mode: "gauge+number",
+        value: score,
+        number: {
+            suffix: "/100",
+            font: { color: barColor, size: 40, weight: "bold" },
+            valueformat: "f"
+        },
+        gauge: {
+            axis: { range: [null, 100], tickcolor: "white" },
+            bar: { color: barColor },
+            bgcolor: "rgba(255,255,255,0.25)",
+            steps: [
+                { range: [0, 60], color: "rgba(239, 68, 68, 0.3)" },
+                { range: [60, 75], color: "rgba(245, 158, 11, 0.3)" },
+                { range: [75, 100], color: "rgba(16, 185, 129, 0.3)" }
+            ]
+        }
+    }], {
         width: null,
-            height: 250,
-                margin: { t: 30, b: 0, l: 30, r: 30 },
+        height: 250,
+        margin: { t: 30, b: 0, l: 30, r: 30 },
         paper_bgcolor: "rgba(0,0,0,0)",
-            font: { color: "white", family: "Inter, sans-serif" }
+        font: { color: "white", family: "Inter, sans-serif" }
     }, { responsive: true, displayModeBar: false });
 
     // Bar Chart (Achieved metrics)
+    {% if report.criteria %}
     const criteriaNames = {{ report.criteria| map(attribute = 'name') | list | tojson }};
     const criteriaScores = {{ report.criteria| map(attribute = 'score') | list | tojson }};
 
@@ -334,6 +365,7 @@
             }
         }
     });
+    {% endif %}
     };
 
     function runAITask(type) {

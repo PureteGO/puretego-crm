@@ -42,26 +42,35 @@ def create(client_id):
             return redirect(url_for('clients.index'))
 
         if request.method == 'POST':
-            name = request.form.get('name')
-            description = request.form.get('description')
-            start_date_str = request.form.get('start_date')
-            monthly_value = request.form.get('monthly_value', 0)
-            
-            project = Project(
-                client_id=client_id,
-                company_id=session.get('company_id'),
-                name=name,
-                description=description,
-                start_date=datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None,
-                monthly_value=float(monthly_value) if monthly_value else 0,
-                status='active'
-            )
-            
-            from flask_babel import gettext as _
-            db.add(project)
-            db.commit()
-            flash(_('Projeto "%(name)s" iniciado com sucesso!', name=name), 'success')
-            return redirect(url_for('projects.view', project_id=project.id))
+            try:
+                name = request.form.get('name')
+                description = request.form.get('description')
+                start_date_str = request.form.get('start_date')
+                monthly_value = request.form.get('monthly_value', 0)
+                
+                logging.info(f"Creating project for client {client_id}: {name}")
+                
+                project = Project(
+                    client_id=client_id,
+                    company_id=session.get('company_id'),
+                    name=name,
+                    description=description,
+                    start_date=datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None,
+                    monthly_value=float(monthly_value) if monthly_value else 0,
+                    status='active'
+                )
+                
+                from flask_babel import gettext as _
+                db.add(project)
+                db.commit()
+                
+                logging.info(f"Project created successfully: {project.id}")
+                flash(_('Projeto "%(name)s" iniciado com sucesso!', name=name), 'success')
+                return redirect(url_for('projects.view', project_id=project.id))
+            except Exception as e:
+                logging.error(f"Error creating project: {str(e)}", exc_info=True)
+                flash(_('Erro ao criar projeto: %(error)s', error=str(e)), 'error')
+                return redirect(url_for('projects.create', client_id=client_id))
 
     return render_template(
         'projects/create.html', 

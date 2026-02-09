@@ -70,7 +70,12 @@ def create():
         email = request.form.get('email')
         password = request.form.get('password')
         role_id = request.form.get('role_id')
-        base_salary = float(request.form.get('base_salary') or 0)
+        try:
+            base_salary_raw = request.form.get('base_salary', '0').replace(',', '.')
+            base_salary = float(base_salary_raw) if base_salary_raw else 0.0
+        except (ValueError, TypeError):
+            base_salary = 0.0
+        
         receives_commission = request.form.get('receives_commission') == 'on'
         
         with get_db() as db:
