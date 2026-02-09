@@ -230,6 +230,28 @@ class GoogleBusinessService:
             return response.json()
         except Exception as e:
             return {'hasVoiceOfMerchant': False, 'error': str(e)}
+
+    def list_verifications(self, location_name: str) -> List[Dict]:
+        """
+        List verification attempts for a location.
+        GET https://mybusinessverifications.googleapis.com/v1/{locationName}/verifications
+        """
+        if '/locations/' in location_name:
+            try:
+                real_name = 'locations/' + location_name.split('/locations/')[1]
+            except:
+                real_name = location_name
+        else:
+            real_name = location_name
+
+        url = f"https://mybusinessverifications.googleapis.com/v1/{real_name}/verifications"
+        
+        try:
+            response = requests.get(url, headers=self._get_headers(), timeout=30)
+            response.raise_for_status()
+            return response.json().get('verifications', [])
+        except Exception:
+            return []
     
     def list_reviews(self, location_name: str, page_size: int = 50) -> List[Dict]:
         """

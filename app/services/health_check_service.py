@@ -200,6 +200,7 @@ class HealthCheckService:
             reviews = service.list_reviews(location_name, page_size=50)
             media_items = service.list_media(location_name)
             vcom_state = service.get_voice_of_merchant_state(location_name)
+            verifications = service.list_verifications(location_name)
         except Exception as e:
              return {'success': False, 'error': f'Erro de API Google: {str(e)}'}
 
@@ -216,12 +217,30 @@ class HealthCheckService:
             positive_points += 1
             
         # Status de Verificação (Voice of Merchant)
-        if vcom_state.get('hasVoiceOfMerchant'):
+        is_verified = vcom_state.get('hasVoiceOfMerchant', False)
+        gain_vcom = vcom_state.get('gainVoiceOfMerchant', {})
+        
+        if is_verified:
             score += 10
             positive_points += 1
             details.append("Perfil Verificado e Gerenciado (Confirmado via Google)")
         else:
-            details.append("Perfil não verificado ou requer ação no Google Business Profile.")
+            # Analisar motivo da não-verificação
+            if 'resolveOwnershipConflict' in gain_vcom:
+                msg = "Conflito de Propriedade: Outra pessoa já verificou este local no Google."
+            elif 'complyWithGuidelines' in gain_vcom:
+                 msg = "Perfil Suspenso ou Fora das Diretrizes: Requer regularização imediata com o suporte do Google."
+            elif 'verify' in gain_vcom:
+                 # Verificar se já existe algo em andamento
+                 has_pending = any(v.get('state') != 'COMPLETED' for v in verifications)
+                 if has_pending:
+                     msg = "Verificação em Andamento: O processo foi iniciado mas ainda não foi concluído no Google."
+                 else:
+                     msg = "Perfil não Verificado: Requer iniciar o processo de verificação oficial."
+            else:
+                 msg = "Perfil não verificado ou requer ação manual no Google Business Profile."
+            
+            details.append(msg)
             critical_issues += 1
         
         # Categoria (Metadata ou Profile)
