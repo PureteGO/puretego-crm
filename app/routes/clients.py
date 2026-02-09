@@ -340,39 +340,50 @@ def delete(client_id):
 @login_required
 def move_stage(client_id):
     """Mover cliente para outra etapa do Kanban (API)"""
-    data = request.get_json()
-    new_stage_id = data.get('stage_id')
-    
-    with get_db() as db:
-        client = db.query(Client).filter(Client.id == client_id).first()
+    try:
+        data = request.get_json()
+        new_stage_id = data.get('stage_id')
         
-        if not client:
-            return jsonify({'success': False, 'message': 'Cliente não encontrado'}), 404
-        
-        # Get old stage name for workflow trigger
-        old_stage = client.kanban_stage.name if client.kanban_stage else None
-        
-        # Update stage
-        client.kanban_stage_id = int(new_stage_id) if new_stage_id else None
-        
-        # Find associated Deal
-        from app.models import Deal, KanbanStage
-        deal = db.query(Deal).filter(Deal.client_id == client.id, Deal.status == 'open').first()
-        if deal:
-            deal.kanban_stage_id = client.kanban_stage_id
+        with get_db() as db:
+            client = db.query(Client).filter(Client.id == client_id).first()
             
-        # --- SOP Automation: Trigger Workflow ---
-        if new_stage_id:
-            new_stage = db.query(KanbanStage).get(int(new_stage_id))
-            if new_stage:
-                from app.services.workflow import WorkflowService
-                # Pass context to service
-                WorkflowService.on_deal_stage_changed(db, session.get('company_id'), deal or client, old_stage, new_stage.name)
-        # ---------------------------------------------
-
-        db.commit()
-        
-        return jsonify({'success': True, 'message': 'Cliente movido com sucesso'})
+            if not client:
+                return jsonify({'success': False, 'message': 'Cliente não encontrado'}), 404
+            
+            # Get old stage name for workflow trigger
+            old_stage = client.kanban_stage.name if client.kanban_stage else None
+            
+            # Update stage
+            client.kanban_stage_id = int(new_stage_id) if new_stage_id else None
+            
+            # Find associated Deal
+            from app.models import Deal, KanbanStage
+            deal = db.query(Deal).filter(Deal.client_id == client.id, Deal.status == 'open').first()
+            if deal:
+                deal.kanban_stage_id = client.kanban_stage_id
+                
+            # --- SOP Automation: Trigger Workflow ---
+            if new_stage_id:
+                new_stage = db.query(KanbanStage).get(int(new_stage_id))
+                if new_stage:
+                    from app.services.workflow import WorkflowService
+                    try:
+                        # Pass context to service
+                        WorkflowService.on_deal_stage_changed(db, session.get('company_id'), deal or client, old_stage, new_stage.name)
+                    except Exception as wf_error:
+                        print(f"Workflow error (non-fatal): {str(wf_error)}")
+                        # Log error but don't stop movement if workflow fails? Or stop?
+                        # Usually better to allow movement and log error.
+            # ---------------------------------------------
+    
+            db.commit()
+            
+            return jsonify({'success': True, 'message': 'Cliente movido com sucesso'})
+            
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Erro ao mover: {str(e)}'}), 200
 
 
 @bp.route('/stages', methods=['GET'])

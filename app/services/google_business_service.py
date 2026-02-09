@@ -186,7 +186,7 @@ class GoogleBusinessService:
 
         url = f"{self.LOCATIONS_API_BASE}/{real_name}"
         params = {
-            'readMask': 'name,title,storefrontAddress,phoneNumbers,websiteUri,regularHours,profile,metadata,categories,locationState,latlng,serviceArea'
+            'readMask': 'name,title,storefrontAddress,phoneNumbers,websiteUri,regularHours,profile,metadata,categories,latlng,serviceArea'
         }
         
         try:
