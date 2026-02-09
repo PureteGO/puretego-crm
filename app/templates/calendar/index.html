@@ -277,11 +277,16 @@
             new_client_phone: newClientPhone
         };
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         const url = editEventId ? `/calendar/update/${editEventType}/${editEventId}` : '/calendar/save';
 
         fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify(payload)
         })
             .then(res => res.json())
@@ -304,8 +309,13 @@
     function deleteEvent() {
         if (!confirm(calTranslations.confirmDelete)) return;
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         fetch(`/calendar/delete/${editEventType}/${editEventId}`, {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            }
         })
             .then(res => res.json())
             .then(data => {

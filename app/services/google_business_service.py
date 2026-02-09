@@ -141,8 +141,14 @@ class GoogleBusinessService:
                 address = loc.get('storefrontAddress', {})
                 address_lines = address.get('addressLines', [])
                 
+                # Ensure we have the full resource name (accounts/X/locations/Y) for v4 API compatibility
+                name = loc.get('name', '')
+                if not name.startswith('accounts/'):
+                   # account_name is like "accounts/123"
+                   name = f"{account_name}/{name}"
+
                 result.append({
-                    'name': loc.get('name', ''),  # accounts/123/locations/456
+                    'name': name,
                     'title': loc.get('title', ''),
                     'address': ', '.join(address_lines) if address_lines else '',
                     'city': address.get('locality', ''),
@@ -172,13 +178,25 @@ class GoogleBusinessService:
         """
         url = f"{self.LOCATIONS_API_BASE}/{location_name}"
         params = {
-            'readMask': 'name,title,storefrontAddress,phoneNumbers,websiteUri,regularHours,profile,metadata'
+            'readMask': 'name,title,storefrontAddress,phoneNumbers,websiteUri,regularHours,profile,metadata,categories,locationState,latlng,serviceArea'
         }
         
         try:
             response = requests.get(url, headers=self._get_headers(), params=params, timeout=30)
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+            
+            # Compatibility helpers for template
+            if 'categories' in data:
+                data['primaryCategory'] = data['categories'].get('primaryCategory')
+            
+            if 'metadata' in data:
+                data['locationState'] = {
+                    'isPublished': bool(data['metadata'].get('mapsUri')),
+                    'isClean': True # Placeholder
+                }
+            
+            return data
             
         except requests.exceptions.RequestException as e:
             raise Exception(f"Error getting location details: {str(e)}")

@@ -95,28 +95,28 @@
                         <div class="list-group-item px-0 py-3">
                             <div class="d-flex w-100 justify-content-between mb-1">
                                 <div>
-                                    <h6 class="mb-1">{{ review.reviewer.displayName }}</h6>
+                                    <h6 class="mb-1">{{ review.reviewerName }}</h6>
                                     <div class="text-warning small mb-2">
-                                        {% for i in range(5) %}
-                                        {% if i < ["ONE", "TWO" , "THREE" , "FOUR" , "FIVE" ].index(review.starRating) +
-                                            1 %} <i class="bi bi-star-fill"></i>
-                                            {% else %}
-                                            <i class="bi bi-star"></i>
-                                            {% endif %}
-                                            {% endfor %}
+                                        {% for i in range(review.starRating) %}
+                                        <i class="bi bi-star-fill"></i>
+                                        {% endfor %}
+                                        {% for i in range(5 - review.starRating) %}
+                                        <i class="bi bi-star"></i>
+                                        {% endfor %}
                                     </div>
                                 </div>
                                 <small class="text-muted">{{ review.createTime[:10] }}</small>
                             </div>
                             <p class="mb-1">{{ review.comment }}</p>
 
-                            {% if review.reviewReply %}
+                            {% if review.replyComment %}
                             <div class="bg-light p-3 rounded mt-2 ms-4">
                                 <small class="fw-bold d-block mb-1">{{ _('Tu respuesta:') }}</small>
-                                <p class="mb-0 fs-7 italic">{{ review.reviewReply.comment }}</p>
-                                <small class="text-muted">{{ review.reviewReply.updateTime[:10] }}</small>
+                                <p class="mb-0 fs-7 italic">{{ review.replyComment }}</p>
+                                <small class="text-muted">{{ review.replyTime[:10] if review.replyTime else '' }}</small>
                             </div>
                             {% else %}
+                            <div class="mt-2">
                             <div class="mt-2">
                                 <button class="btn btn-sm btn-outline-primary" disabled title="Coming soon">{{
                                     _('Responder') }}</button>
