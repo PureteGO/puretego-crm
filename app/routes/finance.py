@@ -170,18 +170,39 @@ def list_payables():
     with get_db() as db:
         if request.method == 'POST':
             # Criar novo pagamento
-            new_payable = Payable(
-                company_id=session.get('company_id'),
-                description=request.form.get('description'),
-                amount=float(request.form.get('amount', 0)),
-                due_date=datetime.strptime(request.form.get('due_date'), '%Y-%m-%d').date(),
-                category=request.form.get('category', 'other'),
-                notes=request.form.get('notes')
-            )
-            db.add(new_payable)
-            db.commit()
-            flash(_('Conta a pagar registrada!'), 'success')
-            return redirect(url_for('finance.list_payables'))
+            # Criar novo pagamento
+            try:
+                company_id = session.get('company_id')
+                if not company_id:
+                    raise ValueError("Sessão inválida (Company ID missing)")
+
+                amount_val = request.form.get('amount')
+                amount = float(amount_val) if amount_val else 0.0
+                
+                due_date_val = request.form.get('due_date')
+                if not due_date_val:
+                    raise ValueError("Data de vencimento obrigatória")
+                
+                due_date = datetime.strptime(due_date_val, '%Y-%m-%d').date()
+
+                new_payable = Payable(
+                    company_id=company_id,
+                    description=request.form.get('description'),
+                    amount=amount,
+                    due_date=due_date,
+                    category=request.form.get('category', 'other'),
+                    notes=request.form.get('notes')
+                )
+                db.add(new_payable)
+                db.commit()
+                flash(_('Conta a pagar registrada!'), 'success')
+                return redirect(url_for('finance.list_payables'))
+            except ValueError as e:
+                db.rollback()
+                flash(f'Erro de validação: {str(e)}', 'error')
+            except Exception as e:
+                db.rollback()
+                flash(f'Erro ao registrar conta: {str(e)}', 'error')
 
         query = filter_by_company(db.query(Payable), Payable)
         payables = query.order_by(Payable.due_date.asc()).all()
