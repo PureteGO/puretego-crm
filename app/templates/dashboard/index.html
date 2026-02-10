@@ -861,7 +861,7 @@
                                 </div>
                                 <div id="gaugeChart" style="width: 100%; height: 220px;"></div>
                                 <div class="mt-2 text-center">
-                                    <span class="bg-white bg-opacity-20 px-4 py-1 rounded-pill text-sm font-bold">${scoreStatus}</span>
+                                    <span class="badge bg-white bg-opacity-25 px-4 py-2 rounded-pill fw-bold text-white shadow-sm" style="font-size: 0.9rem;">${scoreStatus}</span>
                                 </div>
                             </div>
                         </div>
@@ -900,6 +900,15 @@
                     setTimeout(() => {
                         if (typeof Plotly === 'undefined') {
                             console.error('Plotly not loaded!');
+                            // Fallback loading Plotly dynamically if missing
+                            const script = document.createElement('script');
+                            script.src = "https://cdn.plot.ly/plotly-2.27.0.min.js";
+                            script.onload = () => {
+                                // Retry rendering
+                                window.dispatchEvent(new Event('resize'));
+                            };
+                            document.head.appendChild(script);
+
                             document.getElementById('gaugeChart').innerHTML = `
                                 <div class="h-100 d-flex align-items-center justify-content-center border border-white border-opacity-25 rounded">
                                     <div class="text-center">
@@ -918,14 +927,21 @@
                             number: { suffix: "/100", font: { color: "white", size: 30 } },
                             gauge: {
                                 axis: { range: [null, 100], tickcolor: "white" },
-                                bar: { color: "#ffffff" },
-                                bgcolor: "rgba(255,255,255,0.2)",
+                                bar: { color: "white", thickness: 1 },
+                                bgcolor: "rgba(0,0,0,0)",
+                                borderwidth: 2,
+                                bordercolor: "white",
                                 steps: [
-                                    { range: [0, 40], color: "rgba(239, 68, 68, 0.4)" },
-                                    { range: [40, 70], color: "rgba(245, 158, 11, 0.4)" },
-                                    { range: [70, 90], color: "rgba(16, 185, 129, 0.4)" },
-                                    { range: [90, 100], color: "#065f46" }
-                                ]
+                                    { range: [0, 40], color: "#dc3545" }, // Red
+                                    { range: [40, 70], color: "#ffc107" }, // Yellow
+                                    { range: [70, 90], color: "#198754" }, // Green
+                                    { range: [90, 100], color: "#065f46" } // Dark Green
+                                ],
+                                threshold: {
+                                    line: { color: "white", width: 4 },
+                                    thickness: 0.75,
+                                    value: data.score
+                                }
                             }
                         }], {
                             width: null,
