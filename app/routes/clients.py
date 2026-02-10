@@ -167,109 +167,125 @@ def create():
 @login_required
 def view(client_id):
     """Visualizar detalhes do cliente"""
-    with get_db() as db:
-        from sqlalchemy.orm import joinedload
-        from app.models import GoogleConnection
-        client = db.query(Client).options(
-            joinedload(Client.kanban_stage),
-            joinedload(Client.interested_package),
-            joinedload(Client.gmb_location_links),
-            joinedload(Client.projects),
-            joinedload(Client.owner),
-            joinedload(Client.rankings)
-        ).filter(Client.id == client_id, Client.is_active.is_(True)).first()
-        
-        connections = db.query(GoogleConnection).filter(
-            GoogleConnection.company_id == session.get('company_id'),
-            GoogleConnection.is_active == True
-        ).all()
-        
-        if not client:
-            flash('Cliente não encontrado.', 'error')
-            return redirect(url_for('clients.index'))
+    try:
+        with get_db() as db:
+            from sqlalchemy.orm import joinedload
+            from app.models import GoogleConnection, GMBInsight, GMBLocationLink, Project, KeywordRanking 
             
-        # Buscar visitas, health checks e propostas com eager loading para evitar DetachedInstanceError no template
-        visits = db.query(Visit).options(joinedload(Visit.user))\
-            .filter(Visit.client_id == client_id)\
-            .order_by(Visit.visit_date.desc()).all()
-        
-        health_checks = db.query(HealthCheck).filter(HealthCheck.client_id == client_id)\
-            .order_by(HealthCheck.created_at.desc()).all()
-        
-        proposals = db.query(Proposal).options(joinedload(Proposal.user))\
-            .filter(Proposal.client_id == client_id)\
-            .order_by(Proposal.created_at.desc()).all()
-        
-        stages = db.query(KanbanStage).order_by(KanbanStage.order).all()
-        
-        interactions = db.query(Interaction).options(joinedload(Interaction.type), joinedload(Interaction.user))\
-            .filter(Interaction.client_id == client_id)\
-            .order_by(Interaction.date.desc()).all()
+            client = db.query(Client).options(
+                joinedload(Client.kanban_stage),
+                joinedload(Client.interested_package),
+                joinedload(Client.gmb_location_links),
+                joinedload(Client.projects),
+                joinedload(Client.owner),
+                joinedload(Client.rankings)
+            ).filter(Client.id == client_id, Client.is_active.is_(True)).first()
+            
+            connections = db.query(GoogleConnection).filter(
+                GoogleConnection.company_id == session.get('company_id'),
+                GoogleConnection.is_active == True
+            ).all()
+            
+            if not client:
+                flash('Cliente não encontrado.', 'error')
+                return redirect(url_for('clients.index'))
+                
+            # Buscar visitas, health checks e propostas com eager loading para evitar DetachedInstanceError no template
+            visits = db.query(Visit).options(joinedload(Visit.user))\
+                .filter(Visit.client_id == client_id)\
+                .order_by(Visit.visit_date.desc()).all()
+            
+            health_checks = db.query(HealthCheck).filter(HealthCheck.client_id == client_id)\
+                .order_by(HealthCheck.created_at.desc()).all()
+            
+            proposals = db.query(Proposal).options(joinedload(Proposal.user))\
+                .filter(Proposal.client_id == client_id)\
+                .order_by(Proposal.created_at.desc()).all()
+            
+            stages = db.query(KanbanStage).order_by(KanbanStage.order).all()
+            
+            interactions = db.query(Interaction).options(joinedload(Interaction.type), joinedload(Interaction.user))\
+                .filter(Interaction.client_id == client_id)\
+                .order_by(Interaction.date.desc()).all()
 
-        # Fetch Insights if linked
-        from app.models import GMBInsight, GMBLocationLink
-        insights_data = []
-        is_linked = False
-        
-        # Support selecting a specific profile for insights
-        selected_link_id = request.args.get('gmb_link_id')
-        if selected_link_id and selected_link_id.isdigit():
-            selected_link = db.query(GMBLocationLink).filter(
-                GMBLocationLink.id == int(selected_link_id),
-                GMBLocationLink.client_id == client_id
-            ).first()
-        else:
-            selected_link = db.query(GMBLocationLink).filter(
-                GMBLocationLink.client_id == client_id,
-                GMBLocationLink.is_primary == True
-            ).first()
-            if not selected_link:
+            # Fetch Insights if linked
+            insights_data = []
+            is_linked = False
+            
+            # Support selecting a specific profile for insights
+            selected_link_id = request.args.get('gmb_link_id')
+            if selected_link_id and selected_link_id.isdigit():
                 selected_link = db.query(GMBLocationLink).filter(
+                    GMBLocationLink.id == int(selected_link_id),
                     GMBLocationLink.client_id == client_id
                 ).first()
-        
-        selected_link_id = selected_link.id if selected_link else None
+            else:
+                selected_link = db.query(GMBLocationLink).filter(
+                    GMBLocationLink.client_id == client_id,
+                    GMBLocationLink.is_primary == True
+                ).first()
+                if not selected_link:
+                    selected_link = db.query(GMBLocationLink).filter(
+                        GMBLocationLink.client_id == client_id
+                    ).first()
+            
+            selected_link_id = selected_link.id if selected_link else None
 
-        if selected_link:
-            is_linked = True
-            # Get last 30 days of metrics
-            start_date = datetime.utcnow() - timedelta(days=31)
-            raw_insights = db.query(GMBInsight).filter(
-                GMBInsight.location_link_id == selected_link.id,
-                GMBInsight.date >= start_date
-            ).order_by(GMBInsight.date.asc()).all()
-            
-            # Format for Chart.js
-            # { 'date': '2023-01-01', 'impressions': 10, 'calls': 2 }
-            temp_dict = {}
-            for row in raw_insights:
-                dt_str = row.date.strftime('%Y-%m-%d')
-                if dt_str not in temp_dict:
-                    temp_dict[dt_str] = {'date': dt_str, 'impressions': 0, 'calls': 0, 'website': 0}
+            if selected_link:
+                is_linked = True
+                # Get last 30 days of metrics
+                start_date = datetime.utcnow() - timedelta(days=31)
+                raw_insights = db.query(GMBInsight).filter(
+                    GMBInsight.location_link_id == selected_link.id,
+                    GMBInsight.date >= start_date
+                ).order_by(GMBInsight.date.asc()).all()
                 
-                if 'IMPRESSIONS' in row.metric:
-                    temp_dict[dt_str]['impressions'] += row.value
-                elif 'CALL' in row.metric:
-                    temp_dict[dt_str]['calls'] += row.value
-                elif 'WEBSITE' in row.metric:
-                    temp_dict[dt_str]['website'] += row.value
-            
-            insights_data = sorted(temp_dict.values(), key=lambda x: x['date'])
-    
-        return render_template(
-            'clients/view.html',
-            client=client,
-            visits=visits,
-            health_checks=health_checks,
-            proposals=proposals,
-            stages=stages,
-            interactions=interactions,
-            connections=connections,
-            insights=insights_data,
-            is_linked=is_linked,
-            selected_link_id=selected_link_id,
-            selected_link=selected_link
-        )
+                # Format for Chart.js
+                # { 'date': '2023-01-01', 'impressions': 10, 'calls': 2 }
+                temp_dict = {}
+                for row in raw_insights:
+                    # Robust date handling
+                    if not row.date:
+                        continue
+                        
+                    if isinstance(row.date, str):
+                        dt_str = row.date[:10]
+                    else:
+                        dt_str = row.date.strftime('%Y-%m-%d')
+                        
+                    if dt_str not in temp_dict:
+                        temp_dict[dt_str] = {'date': dt_str, 'impressions': 0, 'calls': 0, 'website': 0}
+                    
+                    if not row.metric:
+                        continue
+                        
+                    if 'IMPRESSIONS' in row.metric:
+                        temp_dict[dt_str]['impressions'] += (row.value or 0)
+                    elif 'CALL' in row.metric:
+                        temp_dict[dt_str]['calls'] += (row.value or 0)
+                    elif 'WEBSITE' in row.metric:
+                        temp_dict[dt_str]['website'] += (row.value or 0)
+                
+                insights_data = sorted(temp_dict.values(), key=lambda x: x['date'])
+        
+            return render_template(
+                'clients/view.html',
+                client=client,
+                visits=visits,
+                health_checks=health_checks,
+                proposals=proposals,
+                stages=stages,
+                interactions=interactions,
+                connections=connections,
+                insights=insights_data,
+                is_linked=is_linked,
+                selected_link_id=selected_link_id,
+                selected_link=selected_link
+            )
+    except Exception as e:
+        print(f"ERROR in clients.view: {str(e)}") # Log for server
+        flash(f'Erro ao carregar detalhes do cliente: {str(e)}', 'error')
+        return redirect(url_for('clients.index'))
 
 
 @bp.route('/<int:client_id>/edit', methods=['GET', 'POST'])
