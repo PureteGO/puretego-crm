@@ -196,66 +196,66 @@ def locations(connection_id):
                     if link.gmb_location_name
                 }
         
-        # Get clients for dropdown
-        from app.models import Client
-        from app.utils.decorators import get_current_user
-        user = get_current_user()
-        
-        query = db.query(Client).filter(
-            Client.company_id == company_id,
-            Client.is_active == True
-        )
-        
-        # RBAC Filtering
-        if user and user.role:
-            role_name = getattr(user.role, 'name', None)
-            can_edit_all = getattr(user.role, 'can_edit_all_clients', False)
-            if role_name == 'gmb_manager' and not can_edit_all:
-                query = query.filter(Client.owner_id == user.id)
+            # Get clients for dropdown
+            from app.models import Client
+            from app.utils.decorators import get_current_user
+            user = get_current_user()
             
-        clients = query.order_by(Client.name).all()
-        
-        # Fetch locations from Google API
-        locations_data = []
-        error_message = None
-        
-        try:
-            from app.services.google_business_service import GoogleBusinessService
-            service = GoogleBusinessService(connection)
+            query = db.query(Client).filter(
+                Client.company_id == company_id,
+                Client.is_active == True
+            )
             
-            # List accounts first
-            accounts = service.list_accounts()
+            # RBAC Filtering
+            if user and user.role:
+                role_name = getattr(user.role, 'name', None)
+                can_edit_all = getattr(user.role, 'can_edit_all_clients', False)
+                if role_name == 'gmb_manager' and not can_edit_all:
+                    query = query.filter(Client.owner_id == user.id)
+                
+            clients = query.order_by(Client.name).all()
             
-            # For each account, get locations
-            for account in accounts:
-                try:
-                    account_locations = service.list_locations(account['name'])
-                    for loc in account_locations:
-                        loc['account_name'] = account['accountName']
-                        loc['is_linked'] = loc['name'] in linked_locations
-                        loc['linked_client_id'] = None
-                        loc['linked_client_name'] = None
-                        loc['link_id'] = None
+            # Fetch locations from Google API
+            locations_data = []
+            error_message = None
+            
+            try:
+                from app.services.google_business_service import GoogleBusinessService
+                service = GoogleBusinessService(connection)
+                
+                # List accounts first
+                accounts = service.list_accounts()
+                
+                # For each account, get locations
+                for account in accounts:
+                    try:
+                        account_locations = service.list_locations(account['name'])
+                        for loc in account_locations:
+                            loc['account_name'] = account['accountName']
+                            loc['is_linked'] = loc['name'] in linked_locations
+                            loc['linked_client_id'] = None
+                            loc['linked_client_name'] = None
+                            loc['link_id'] = None
+                            
+                            if loc['is_linked']:
+                                link = linked_locations[loc['name']]
+                                loc['linked_client_id'] = link.client_id
+                                loc['linked_client_name'] = link.client.name if link.client else None
+                                loc['link_id'] = link.id
+                                loc['is_primary'] = link.is_primary
+                            locations_data.append(loc)
+                    except Exception as e:
+                        current_app.logger.warning(f"Error fetching locations for {account['name']}: {e}")
                         
-                        if loc['is_linked']:
-                            link = linked_locations[loc['name']]
-                            loc['linked_client_id'] = link.client_id
-                            loc['linked_client_name'] = link.client.name if link.client else None
-                            loc['link_id'] = link.id
-                            loc['is_primary'] = link.is_primary
-                        locations_data.append(loc)
-                except Exception as e:
-                    current_app.logger.warning(f"Error fetching locations for {account['name']}: {e}")
-                    
-        except Exception as e:
-            error_message = str(e)
-            current_app.logger.error(f"Error fetching Google locations: {e}")
-    
-        return render_template('integrations/location_mapping.html',
-                               connection=connection,
-                               locations=locations_data,
-                               clients=clients,
-                               error_message=error_message)
+            except Exception as e:
+                error_message = str(e)
+                current_app.logger.error(f"Error fetching Google locations: {e}")
+        
+            return render_template('integrations/location_mapping.html',
+                                   connection=connection,
+                                   locations=locations_data,
+                                   clients=clients,
+                                   error_message=error_message)
     except Exception as e:
         import traceback
         error_details = f"{str(e)}\n{traceback.format_exc()}"

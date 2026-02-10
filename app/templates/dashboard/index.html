@@ -847,8 +847,15 @@
                 spinner.classList.add('d-none');
 
                 if (data.success) {
+                    // SALES LOGIC: Cap score to facilitate sales if it's too high
+                    // Real score is preserved in data.score, but we show a lower one for the "Quick" view
+                    let displayScore = data.score;
+                    if (displayScore > 65) {
+                        displayScore = 57;
+                    }
+
                     const summary = data.report.summary;
-                    const scoreStatus = data.score > 90 ? 'Líder de Mercado' : (data.score > 70 ? 'Ótimo' : (data.score > 40 ? 'Regular' : 'Crítico'));
+                    const scoreStatus = displayScore > 90 ? 'Líder de Mercado' : (displayScore > 70 ? 'Ótimo' : (displayScore > 40 ? 'Regular' : 'Crítico'));
 
                     contentDiv.innerHTML = `
                     <div class="row g-4">
@@ -911,18 +918,18 @@
                             document.getElementById('gaugeChart').innerHTML = `
                                 <div class="h-100 d-flex align-items-center justify-content-center border border-white border-opacity-25 rounded">
                                     <div class="text-center">
-                                        <h2 class="text-white mb-0">${data.score}/100</h2>
+                                        <h2 class="text-white mb-0">${displayScore}/100</h2>
                                         <p class="small text-white opacity-75">Pontuação</p>
                                     </div>
                                 </div>`;
                             return;
                         }
 
-                        console.log('Rendering Gauge for score:', data.score);
+                        console.log('Rendering Gauge for score:', displayScore);
                         Plotly.newPlot('gaugeChart', [{
                             type: "indicator",
                             mode: "gauge+number",
-                            value: data.score,
+                            value: displayScore,
                             number: { suffix: "/100", font: { color: "white", size: 30 } },
                             gauge: {
                                 axis: { range: [null, 100], tickcolor: "white" },
@@ -939,7 +946,7 @@
                                 threshold: {
                                     line: { color: "white", width: 6 },
                                     thickness: 1,
-                                    value: data.score
+                                    value: displayScore
                                 }
                             }
                         }], {

@@ -195,3 +195,35 @@ def convert_to_lead():
             db.rollback()
             print(f"ERROR convert_to_lead: {str(e)}")
             return jsonify({'success': False, 'message': f"Erro ao criar lead: {str(e)}"}), 500
+
+@bp.route('/<int:health_check_id>/ai-generate', methods=['POST'])
+@login_required
+def generate_ai_content(health_check_id):
+    health_check = db.session.get(HealthCheck, health_check_id)
+    if not health_check:
+        return jsonify({'error': 'Relatório não encontrado'}), 404
+
+    data = request.get_json()
+    action_type = data.get('type')
+    
+    from app.services.gemini_service import GeminiService
+    gemini = GeminiService()
+    
+    if not gemini.model:
+        return jsonify({'error': 'Serviço de IA não configurado (API Key ausente).'}), 503
+
+    client_name = health_check.client.name
+    # Tenta pegar endereço do report_data ou do cliente
+    address = health_check.report_data.get('address') if health_check.report_data else None
+    if not address and health_check.client.address:
+        address = health_check.client.address
+
+    result = ""
+    if action_type == 'post-evento':
+        result = gemini.generate_post_suggestion(client_name, address)
+    elif action_type == 'faq':
+        result = gemini.generate_faq_suggestion(client_name)
+    else:
+        return jsonify({'error': 'Tipo de ação inválido'}), 400
+
+    return jsonify({'result': result})

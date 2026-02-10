@@ -57,6 +57,7 @@ class Client(Base):
     observations = Column(Text)
     
     # New Package Relationship
+    # New Package Relationship
     interested_package_id = Column(Integer, ForeignKey('service_packages.id', ondelete='SET NULL'), nullable=True)
     interested_package = relationship("ServicePackage", back_populates="clients")
     

@@ -1,0 +1,22 @@
+{
+    "search_metadata": {
+        "id": "698b66092efef875eb5ccc23",
+        "status": "Success",
+        "json_endpoint": "https://serpapi.com/searches/bMliIm3YVeIHyEG2EKXxfA/698b66092efef875eb5ccc23.json",
+        "created_at": "2026-02-10 17:08:25 UTC",
+        "processed_at": "2026-02-10 17:08:25 UTC",
+        "google_maps_photos_url": "https://www.google.com/maps/rpc/photo/listentityphotos?hl=es&pb=!1e2!3m3!1s0x945daf5a06b11cf5:0x7fb17b5c6fab1021!9e0!11s!5m58!2m2!1i203!2i100!3m2!2i20!5b1!7m50!1m3!1e1!2b0!3e3!1m3!1e2!2b1!3e2!1m3!1e2!2b0!3e3!1m3!1e3!2b0!3e3!1m3!1e8!2b0!3e3!1m3!1e3!2b1!3e2!1m3!1e10!2b0!3e3!1m3!1e10!2b1!3e2!1m3!1e9!2b1!3e2!1m3!1e10!2b0!3e3!1m3!1e10!2b1!3e2!1m3!1e10!2b0!3e4!2b1!4b1!9b0!6m3!1s!2z!7e81!16m4!1m1!1BCgIgAQ!2b1!4e1",
+        "raw_html_file": "https://serpapi.com/searches/bMliIm3YVeIHyEG2EKXxfA/698b66092efef875eb5ccc23.html",
+        "prettify_html_file": "https://serpapi.com/searches/bMliIm3YVeIHyEG2EKXxfA/698b66092efef875eb5ccc23.prettify",
+        "total_time_taken": 0.7
+    },
+    "search_parameters": {
+        "engine": "google_maps_photos",
+        "data_id": "0x945daf5a06b11cf5:0x7fb17b5c6fab1021",
+        "hl": "es"
+    },
+    "search_information": {
+        "photos_state": "Fully empty"
+    },
+    "error": "Google Maps Photos hasn't returned any results for this query."
+}

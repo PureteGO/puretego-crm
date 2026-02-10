@@ -48,6 +48,50 @@ class SerpApiService:
         }
         return self._execute_request(params)
 
+    def get_place_reviews(self, data_id, gl="py", hl="es"):
+        """Fetch reviews for a place using data_id"""
+        params = {
+            "engine": "google_maps_reviews",
+            "data_id": data_id,
+            "gl": gl,
+            "hl": hl,
+            "api_key": self.api_key
+        }
+        return self._execute_request(params)
+
+    def get_place_photos(self, data_id, gl="py", hl="es"):
+        """Fetch photos for a place using data_id"""
+        params = {
+            "engine": "google_maps_photos",
+            "data_id": data_id,
+            "gl": gl,
+            "hl": hl,
+            "api_key": self.api_key
+        }
+        return self._execute_request(params)
+
+    def get_photo_meta(self, data_id, gl="py", hl="es"):
+        """Fetch metadata for a specific photo using data_id (from photos response)"""
+        params = {
+            "engine": "google_maps_photo_meta",
+            "data_id": data_id,
+            "gl": gl,
+            "hl": hl,
+            "api_key": self.api_key
+        }
+        return self._execute_request(params)
+
+    def get_place_posts(self, data_id, gl="py", hl="es"):
+        """Fetch posts/updates for a place using data_id"""
+        params = {
+            "engine": "google_maps_posts",
+            "data_id": data_id,
+            "gl": gl,
+            "hl": hl,
+            "api_key": self.api_key
+        }
+        return self._execute_request(params)
+
     def analyze_gmb_profile(self, business_name, location=None):
         raw_response = self.search_business(business_name, location)
         
