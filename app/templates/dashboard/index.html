@@ -244,6 +244,61 @@
         {% else %}
         <!-- Original Executive Metrics for Owner/Admin -->
         {% if role in ['owner', 'admin', 'manager', 'superadmin'] %}
+        <!-- Expanded Metrics for Owner/Admin -->
+        <div class="row g-4 mb-4">
+            <!-- New Leads (7d) -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-info fw-bold">
+                            <i class="bi bi-person-plus"></i> {{ _('NEW LEADS (7d)') }}
+                        </h6>
+                        <h2 class="card-title fw-bold mb-0">{{ new_leads_7d }}</h2>
+                        <span class="text-muted small">{{ _('Last 7 Days') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Leads (15d) -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-primary fw-bold">
+                            <i class="bi bi-people"></i> {{ _('NEW LEADS (15d)') }}
+                        </h6>
+                        <h2 class="card-title fw-bold mb-0">{{ new_leads_15d }}</h2>
+                        <span class="text-muted small">{{ _('Last 15 Days') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Closed Sales -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-success fw-bold">
+                            <i class="bi bi-trophy"></i> {{ _('CLOSED SALES') }}
+                        </h6>
+                        <h2 class="card-title fw-bold mb-0">Gs {{ "{:,.0f}".format(won_amount).replace(',', '.') }}</h2>
+                        <span class="text-muted small">{{ _('This Month') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avg Ticket -->
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-warning fw-bold">
+                            <i class="bi bi-tag"></i> {{ _('AVG TICKET') }}
+                        </h6>
+                        <h2 class="card-title fw-bold mb-0">Gs {{ "{:,.0f}".format(avg_ticket).replace(',', '.') }}</h2>
+                        <span class="text-muted small">{{ _('Average Value Won') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row mb-4">
             <div class="col-md-3 mb-3">
                 <div class="card shadow-sm border-success border-start border-5 h-100">

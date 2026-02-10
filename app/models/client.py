@@ -26,6 +26,10 @@ class Client(Base):
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     is_active = Column(Boolean, default=True, index=True, nullable=False, server_default=text('1'))
+    
+    # New Fields for v1.5
+    funnel_start_date = Column(DateTime, server_default=func.now())
+    status = Column(String(50), default='lead') # lead, active_client, churned, archived
 
     # Multi-tenant fields
     company_id = Column(Integer, ForeignKey('companies.id'), nullable=True, index=True)  # nullable for migration

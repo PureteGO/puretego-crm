@@ -138,11 +138,20 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="decision_factors" class="form-label">{{ _('Decision Factors')
-                                        }}</label>
+                                    <label for="decision_factors" class="form-label">{{ _('Decision Factors') }}</label>
                                     <textarea class="form-control" id="decision_factors" name="decision_factors"
                                         rows="3"
                                         placeholder="{{ _('What is important to them? (Price, Quality, Speed, Trust...)') }}">{{ client.decision_factors or '' }}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="funnel_start_date" class="form-label">{{ _('Funnel Start Date')
+                                        }}</label>
+                                    <input type="date" class="form-control" id="funnel_start_date"
+                                        name="funnel_start_date"
+                                        value="{{ client.funnel_start_date.strftime('%Y-%m-%d') if client.funnel_start_date else '' }}">
+                                    <div class="form-text">{{ _('Date when the client entered the sales funnel.') }}
+                                    </div>
                                 </div>
 
                                 <div class="row">

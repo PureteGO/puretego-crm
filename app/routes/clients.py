@@ -312,6 +312,14 @@ def edit(client_id):
             client.website = request.form.get('website')
             client.address = request.form.get('address')
             
+            # v1.5 Fields
+            funnel_start_date = request.form.get('funnel_start_date')
+            if funnel_start_date:
+                try:
+                    client.funnel_start_date = datetime.strptime(funnel_start_date, '%Y-%m-%d')
+                except ValueError:
+                    flash('Data de entrada no funil inválida.', 'warning')
+            
             # New Fields
             client.receptionist_name = request.form.get('receptionist_name')
             client.decision_maker_name = request.form.get('decision_maker_name')
