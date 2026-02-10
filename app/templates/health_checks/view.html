@@ -436,6 +436,7 @@
 
         loading.classList.remove('collapse');
         output.classList.add('collapse');
+        content.innerText = ""; // Clear previous content
 
         // Call real API
         fetch(`/health-checks/{{ health_check.id }}/ai-generate`, {
@@ -446,7 +447,13 @@
             },
             body: JSON.stringify({ type: type })
         })
-            .then(response => response.json())
+            .then(async response => {
+                const data = await response.json().catch(() => ({})); // Handle non-JSON response
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || `Server Error ${response.status}`);
+                }
+                return data;
+            })
             .then(data => {
                 if (data.error) {
                     content.innerText = "Erro: " + data.error;
@@ -462,7 +469,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                content.innerText = "{{ _('Ocorreu um erro ao gerar o conteúdo. Tente novamente.') }}";
+                content.innerText = `Erro: ${error.message}`;
             })
             .finally(() => {
                 loading.classList.add('collapse');

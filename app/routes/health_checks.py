@@ -199,31 +199,50 @@ def convert_to_lead():
 @bp.route('/<int:health_check_id>/ai-generate', methods=['POST'])
 @login_required
 def generate_ai_content(health_check_id):
-    health_check = db.session.get(HealthCheck, health_check_id)
-    if not health_check:
-        return jsonify({'error': 'Relatório não encontrado'}), 404
+    try:
+        health_check = db.session.get(HealthCheck, health_check_id)
+        if not health_check:
+            return jsonify({'error': 'Relatório não encontrado'}), 404
 
-    data = request.get_json()
-    action_type = data.get('type')
-    
-    from app.services.gemini_service import GeminiService
-    gemini = GeminiService()
-    
-    if not gemini.model:
-        return jsonify({'error': 'Serviço de IA não configurado (API Key ausente).'}), 503
+        data = request.get_json()
+        action_type = data.get('type')
+        
+        # DEBUG: Log initiation
+        print(f"AI Request: Type={action_type}, HealthCheck={health_check_id}")
 
-    client_name = health_check.client.name
-    # Tenta pegar endereço do report_data ou do cliente
-    address = health_check.report_data.get('address') if health_check.report_data else None
-    if not address and health_check.client.address:
-        address = health_check.client.address
+        try:
+            from app.services.gemini_service import GeminiService
+            gemini = GeminiService()
+        except ImportError as e:
+            print(f"AI Error: Dependency missing - {str(e)}")
+            return jsonify({'error': 'Biblioteca de IA não instalada. Execute pip install.'}), 500
+        except Exception as e:
+            print(f"AI Error: Service init failed - {str(e)}")
+            return jsonify({'error': f'Erro ao iniciar serviço de IA: {str(e)}'}), 500
+        
+        if not gemini.model:
+            print("AI Error: Google API Key missing")
+            return jsonify({'error': 'Chave de API do Google não configurada (GOOGLE_API_KEY).'}), 503
 
-    result = ""
-    if action_type == 'post-evento':
-        result = gemini.generate_post_suggestion(client_name, address)
-    elif action_type == 'faq':
-        result = gemini.generate_faq_suggestion(client_name)
-    else:
-        return jsonify({'error': 'Tipo de ação inválido'}), 400
+        client_name = health_check.client.name
+        address = health_check.report_data.get('address') if health_check.report_data else None
+        if not address and health_check.client.address:
+            address = health_check.client.address
 
-    return jsonify({'result': result})
+        result = ""
+        try:
+            if action_type == 'post-evento':
+                result = gemini.generate_post_suggestion(client_name, address)
+            elif action_type == 'faq':
+                result = gemini.generate_faq_suggestion(client_name)
+            else:
+                return jsonify({'error': 'Tipo de ação inválido'}), 400
+        except Exception as e:
+            print(f"AI Error: Generation failed - {str(e)}")
+            return jsonify({'error': f'Erro na geração do conteúdo: {str(e)}'}), 500
+
+        return jsonify({'result': result})
+
+    except Exception as e:
+        print(f"CRITICAL AI Error: {str(e)}")
+        return jsonify({'error': f"Erro interno: {str(e)}"}), 500
