@@ -141,29 +141,57 @@ def convert_to_lead():
     if not business_name or not report_data:
          return jsonify({'success': False, 'message': 'Dados incompletos'}), 400
 
+    user_id = session.get('user_id')
+    company_id = session.get('company_id')
+    
+    if not user_id:
+         return jsonify({'success': False, 'message': 'Sessão expirada. Faça login novamente.'}), 401
+
     with get_db() as db:
         try:
             from app.models import KanbanStage
-            first_stage = db.query(KanbanStage).order_by(KanbanStage.order).first()
+            # Tentar pegar o primeiro estágio do Kanban da empresa
+            first_stage = db.query(KanbanStage).filter(
+                KanbanStage.company_id == company_id
+            ).order_by(KanbanStage.order).first()
+            
+            # Fallback se não tiver estágios da empresa (usa global ou id 1)
+            if not first_stage:
+                first_stage = db.query(KanbanStage).order_by(KanbanStage.order).first()
+                
             stage_id = first_stage.id if first_stage else 1
-        except:
-            stage_id = 1
-        
-        new_client = Client(
-            name=business_name,
-            gmb_profile_name=business_name,
-            address=report_data.get('address', None),
-            kanban_stage_id=stage_id
-        )
-        db.add(new_client)
-        db.flush() 
-        
-        health_check = HealthCheck(
-            client_id=new_client.id,
-            score=score,
-            report_data=report_data
-        )
-        db.add(health_check)
-        db.commit()
-        
-        return jsonify({'success': True, 'client_id': new_client.id, 'message': 'Lead criado!'})
+            
+            # Extrair endereço corretamente do report_data (que vem do Serper)
+            address = report_data.get('address')
+            if not address and 'source_data' in report_data:
+                address = report_data['source_data'].get('address')
+            
+            new_client = Client(
+                name=business_name,
+                gmb_profile_name=business_name,
+                address=address,
+                kanban_stage_id=stage_id,
+                company_id=company_id,
+                owner_id=user_id
+            )
+            db.add(new_client)
+            db.commit() # Commit para gerar ID
+            
+            health_check = HealthCheck(
+                client_id=new_client.id,
+                score=score,
+                report_data=report_data
+            )
+            # Definir source como 'public' já que veio do Quick Check
+            health_check.source = 'public'
+            if 'source_data' in report_data:
+                health_check.origin_id = report_data['source_data'].get('cid') or report_data['source_data'].get('placeId')
+                
+            db.add(health_check)
+            db.commit()
+            
+            return jsonify({'success': True, 'client_id': new_client.id, 'message': 'Lead criado!'})
+        except Exception as e:
+            db.rollback()
+            print(f"ERROR convert_to_lead: {str(e)}")
+            return jsonify({'success': False, 'message': f"Erro ao criar lead: {str(e)}"}), 500
