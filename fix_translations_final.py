@@ -73,7 +73,17 @@ def main():
         "Verify Now": "Verificar Ahora",
         "Analyzing...": "Analizando...",
         "Company name (e.g., AGR Equipamientos)...": "Nombre de la empresa (p. ej., AGR Equipamientos)...",
-        "Loading...": "Cargando..."
+        "Loading...": "Cargando...",
+        "Log Interaction": "Registrar Interacción",
+        "Edit Interaction": "Editar Interacción",
+        "Type": "Tipo",
+        "Manage Types": "Gestionar Tipos",
+        "Date/Time": "Fecha/Hora",
+        "Notes": "Notas",
+        "Already done (mark as completed)": "Ya realizado (marcar como completado)",
+        "Next Step Suggestion": "Sugerencia de Siguiente Paso",
+        "Schedule": "Agendar",
+        "No scheduling": "Sin agendamiento"
     }
     
     en_map = {
@@ -111,7 +121,17 @@ def main():
         "Verify Now": "Verify Now",
         "Analyzing...": "Analyzing...",
         "Company name (e.g., AGR Equipamientos)...": "Company name (e.g., AGR Equipamientos)...",
-        "Loading...": "Loading..."
+        "Loading...": "Loading...",
+        "Log Interaction": "Log Interaction",
+        "Edit Interaction": "Edit Interaction",
+        "Type": "Type",
+        "Manage Types": "Manage Types",
+        "Date/Time": "Date/Time",
+        "Notes": "Notes",
+        "Already done (mark as completed)": "Already done (mark as completed)",
+        "Next Step Suggestion": "Next Step Suggestion",
+        "Schedule": "Schedule",
+        "No scheduling": "No scheduling"
     }
 
     es_path = os.path.join(base_dir, 'app', 'translations', 'es', 'LC_MESSAGES', 'messages.po')

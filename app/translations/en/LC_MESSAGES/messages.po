@@ -504,7 +504,7 @@ msgstr ""
 
 #: app/templates/base.html:326 app/templates/interactions/log_modal.html:72
 msgid "Schedule"
-msgstr ""
+msgstr "Schedule"
 
 #: app/templates/base.html:342 app/templates/clients/index.html:13
 #: app/templates/dashboard/index.html:17
@@ -606,7 +606,7 @@ msgstr ""
 #: app/templates/interactions/log_modal.html:19
 #: app/templates/interactions/manage_types_modal.html:57
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 #: app/templates/calendar/index.html:42
 msgid "On-site Visit"
@@ -1158,7 +1158,7 @@ msgstr ""
 #: app/templates/interactions/log_modal.html:36
 #: app/templates/visits/index.html:21
 msgid "Notes"
-msgstr ""
+msgstr "Notes"
 
 #: app/templates/clients/view.html:200 app/templates/visits/index.html:22
 #: app/templates/visits/view.html:36
@@ -3217,31 +3217,31 @@ msgstr ""
 #: app/templates/interactions/log_modal.html:9
 #: app/templates/interactions/log_modal.html:82
 msgid "Log Interaction"
-msgstr ""
+msgstr "Log Interaction"
 
 #: app/templates/interactions/log_modal.html:22
 msgid "Manage Types"
-msgstr ""
+msgstr "Manage Types"
 
 #: app/templates/interactions/log_modal.html:31
 msgid "Date/Time"
-msgstr ""
+msgstr "Date/Time"
 
 #: app/templates/interactions/log_modal.html:44
 msgid "Already done (mark as completed)"
-msgstr ""
+msgstr "Already done (mark as completed)"
 
 #: app/templates/interactions/log_modal.html:62
 msgid "Next Step Suggestion"
-msgstr ""
+msgstr "Next Step Suggestion"
 
 #: app/templates/interactions/log_modal.html:73
 msgid "No scheduling"
-msgstr ""
+msgstr "No scheduling"
 
 #: app/templates/interactions/log_modal.html:83
 msgid "Edit Interaction"
-msgstr ""
+msgstr "Edit Interaction"
 
 #: app/templates/interactions/log_modal.html:84
 msgid "Scheduled via automatic suggestion."
