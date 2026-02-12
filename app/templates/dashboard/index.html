@@ -619,10 +619,19 @@
     // Carregar Agenda e Inicializar Dashboard Reativo
     document.addEventListener('DOMContentLoaded', function () {
         fetch('/interactions/agenda')
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error('Server returned ' + r.status);
+                return r.json();
+            })
             .then(data => {
-                renderList('todayList', 'todayCount', data.today, translations.noTasksToday);
-                renderList('upcomingList', 'upcomingCount', data.upcoming, translations.noUpcomingTasks);
+                if (!data) throw new Error('Empty data');
+                renderList('todayList', 'todayCount', data.today || [], translations.noTasksToday);
+                renderList('upcomingList', 'upcomingCount', data.upcoming || [], translations.noUpcomingTasks);
+            })
+            .catch(err => {
+                console.error("Error loading agenda:", err);
+                document.getElementById('todayList').innerHTML = `<p class="text-danger text-center my-3">${translations.error}: ${err.message}</p>`;
+                document.getElementById('upcomingList').innerHTML = `<p class="text-danger text-center my-3">${translations.error}: ${err.message}</p>`;
             });
 
         // Initialize reactive features

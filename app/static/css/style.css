@@ -1202,11 +1202,28 @@ code {
 }
 
 /* Stats Number */
-.stat-number {
-  font-size: 2.5rem;
+.stat-number, .card-title h2, h2.card-title, .h2.card-title {
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
+}
+
+[data-theme="dark"] .stat-number,
+[data-theme="dark"] .card-title,
+[data-theme="dark"] .card-subtitle,
+[data-theme="dark"] .h2,
+[data-theme="dark"] h2,
+[data-theme="dark"] .h4,
+[data-theme="dark"] h4 {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .text-muted {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .card {
+  background-color: var(--bg-card) !important;
 }
 
 .stat-label {
