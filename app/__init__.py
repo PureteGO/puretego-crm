@@ -40,7 +40,8 @@ def create_app(config_object=None):
     # Babel configuration
     app.config['BABEL_DEFAULT_LOCALE'] = 'es'
     app.config['BABEL_SUPPORTED_LOCALES'] = ['pt_BR', 'es', 'en']
-    app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+    # Use absolute path to ensure translations are found in production
+    app.config['BABEL_TRANSLATION_DIRECTORIES'] = os.path.join(app.root_path, 'translations')
     
     # Initialize Babel
     babel.init_app(app, locale_selector=get_locale)

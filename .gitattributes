@@ -1,0 +1,6 @@
+
+# Force binary treatment for compiled message catalogs
+*.mo binary
+*.po text
+*.pot text
+*.py text diff=python
