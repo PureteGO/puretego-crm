@@ -327,7 +327,7 @@ msgstr ""
 
 #: app/services/workflow.py:63
 msgid "Cliente Desconhecido"
-msgstr "Cliente eliminado correctamente"
+msgstr "Cliente Desconocido"
 
 #: app/services/workflow.py:67
 msgid "Reunião agendada com"
@@ -718,19 +718,19 @@ msgstr "Volver"
 
 #: app/templates/clients/create.html:23 app/templates/clients/edit.html:43
 msgid "Business Information"
-msgstr "Cliente eliminado correctamente"
+msgstr "Información del Negocio"
 
 #: app/templates/clients/create.html:25 app/templates/clients/edit.html:45
 msgid "Business Name / Client"
-msgstr "Sin clientes"
+msgstr "Nombre del Negocio / Cliente"
 
 #: app/templates/clients/create.html:30 app/templates/clients/edit.html:51
 msgid "Google Maps Name (GMB)"
-msgstr ""
+msgstr "Nombre en Google Maps (GMB)"
 
 #: app/templates/clients/create.html:35 app/templates/clients/edit.html:57
 msgid "Primary Contact"
-msgstr "Contacto"
+msgstr "Contacto Principal"
 
 #: app/templates/clients/create.html:38 app/templates/clients/edit.html:60
 #: app/templates/clients/kanban.html:216
@@ -1816,7 +1816,7 @@ msgstr ""
 
 #: app/templates/company/settings.html:100
 msgid "Basic Information"
-msgstr "Cliente eliminado correctamente"
+msgstr "Información Básica"
 
 #: app/templates/company/settings.html:108
 msgid "Símbolo de Moeda"
@@ -2288,7 +2288,7 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:176
 msgid "Company name (e.g., AGR Equipamientos)..."
-msgstr "Nombre de la empresa (ej: AGR Equipamientos)..."
+msgstr "Nombre de la empresa (p. ej., AGR Equipamientos)..."
 
 #: app/templates/dashboard/index.html:177
 msgid "Verify Now"
@@ -2345,15 +2345,15 @@ msgstr "Valor Promedio Ganado"
 
 #: app/templates/dashboard/index.html:314
 msgid "Awaiting Payment"
-msgstr "Esperando Pago"
+msgstr "Pendiente de Pago"
 
 #: app/templates/dashboard/index.html:332
 msgid "Total Clients"
-msgstr "Total de Clientes"
+msgstr "Total Clientes"
 
 #: app/templates/dashboard/index.html:341
 msgid "Total Proposals"
-msgstr "Total de Propuestas"
+msgstr "Total Propuestas"
 
 #: app/templates/dashboard/index.html:356
 msgid "Renewal Alerts (Next 30 Days)"
@@ -2377,7 +2377,7 @@ msgstr "Valor"
 
 #: app/templates/dashboard/index.html:393
 msgid "Operational Task Queue (Pending)"
-msgstr "Cola de Tareas Operativas (Pendiente)"
+msgstr "Cola de Tareas Operativas (Pendientes)"
 
 #: app/templates/dashboard/index.html:407
 msgid "No pending tasks."
@@ -2393,7 +2393,7 @@ msgstr "Distribución del Pipeline"
 
 #: app/templates/dashboard/index.html:441
 msgid "Recent Activity"
-msgstr "Actividad Reciente"
+msgstr "Actividade Reciente"
 
 #: app/templates/dashboard/index.html:446
 msgid ""
@@ -3635,7 +3635,7 @@ msgstr ""
 
 #: app/templates/saas/packages/edit.html:61
 msgid "Client Limit"
-msgstr "Cliente eliminado correctamente"
+msgstr "Límite de Clientes"
 
 #: app/templates/saas/packages/edit.html:64
 msgid "Maximum clients registered."

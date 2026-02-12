@@ -328,7 +328,7 @@ msgstr ""
 
 #: app/services/workflow.py:63
 msgid "Cliente Desconhecido"
-msgstr ""
+msgstr "Unknown Client"
 
 #: app/services/workflow.py:67
 msgid "Reunião agendada com"
@@ -509,12 +509,12 @@ msgstr ""
 #: app/templates/base.html:342 app/templates/clients/index.html:13
 #: app/templates/dashboard/index.html:17
 msgid "New Visit"
-msgstr ""
+msgstr "New Visit"
 
 #: app/templates/base.html:345 app/templates/clients/index.html:17
 #: app/templates/dashboard/index.html:21
 msgid "New Call"
-msgstr ""
+msgstr "New Call"
 
 #: app/templates/base.html:398 app/templates/calendar/index.html:126
 #: app/templates/clients/index.html:226
@@ -715,23 +715,23 @@ msgstr ""
 #: app/templates/services/edit_package.html:13
 #: app/templates/services/edit_service.html:13
 msgid "Back"
-msgstr ""
+msgstr "Back"
 
 #: app/templates/clients/create.html:23 app/templates/clients/edit.html:43
 msgid "Business Information"
-msgstr ""
+msgstr "Business Information"
 
 #: app/templates/clients/create.html:25 app/templates/clients/edit.html:45
 msgid "Business Name / Client"
-msgstr ""
+msgstr "Business Name / Client"
 
 #: app/templates/clients/create.html:30 app/templates/clients/edit.html:51
 msgid "Google Maps Name (GMB)"
-msgstr ""
+msgstr "Google Maps Name (GMB)"
 
 #: app/templates/clients/create.html:35 app/templates/clients/edit.html:57
 msgid "Primary Contact"
-msgstr ""
+msgstr "Primary Contact"
 
 #: app/templates/clients/create.html:38 app/templates/clients/edit.html:60
 #: app/templates/clients/kanban.html:216
@@ -1817,7 +1817,7 @@ msgstr ""
 
 #: app/templates/company/settings.html:100
 msgid "Basic Information"
-msgstr ""
+msgstr "Basic Information"
 
 #: app/templates/company/settings.html:108
 msgid "Símbolo de Moeda"
@@ -2010,7 +2010,7 @@ msgstr ""
 #: app/templates/dashboard/_finance.html:16
 #: app/templates/dashboard/index.html:323
 msgid "Pending Contracts"
-msgstr ""
+msgstr "Pending Contracts"
 
 #: app/templates/dashboard/_finance.html:18
 msgid "Projects without signed contract"
@@ -2289,24 +2289,24 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:176
 msgid "Company name (e.g., AGR Equipamientos)..."
-msgstr ""
+msgstr "Company name (e.g., AGR Equipamientos)..."
 
 #: app/templates/dashboard/index.html:177
 msgid "Verify Now"
-msgstr ""
+msgstr "Verify Now"
 
 #: app/templates/dashboard/index.html:186
 #: app/templates/dashboard/index.html:215
 #: app/templates/dashboard/index.html:230
 #: app/templates/interactions/manage_types_modal.html:80
 msgid "Loading..."
-msgstr ""
+msgstr "Loading..."
 
 #: app/templates/dashboard/index.html:188
 #: app/templates/dashboard/index.html:570
 #: app/templates/health_checks/create.html:42
 msgid "Analyzing..."
-msgstr ""
+msgstr "Analyzing..."
 
 #: app/templates/dashboard/index.html:225
 msgid "Next 7 Days"
@@ -2314,7 +2314,7 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:256
 msgid "NEW LEADS (7d)"
-msgstr ""
+msgstr "NEW LEADS (7d)"
 
 #: app/templates/dashboard/index.html:259
 msgid "Last 7 Days"
@@ -2322,7 +2322,7 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:269
 msgid "NEW LEADS (15d)"
-msgstr ""
+msgstr "NEW LEADS (15d)"
 
 #: app/templates/dashboard/index.html:272
 msgid "Last 15 Days"
@@ -2330,7 +2330,7 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:282
 msgid "CLOSED SALES"
-msgstr ""
+msgstr "CLOSED SALES"
 
 #: app/templates/dashboard/index.html:286
 msgid "This Month"
@@ -2338,7 +2338,7 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:296
 msgid "AVG TICKET"
-msgstr ""
+msgstr "AVG TICKET"
 
 #: app/templates/dashboard/index.html:300
 msgid "Average Value Won"
@@ -2346,19 +2346,19 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:314
 msgid "Awaiting Payment"
-msgstr ""
+msgstr "Awaiting Payment"
 
 #: app/templates/dashboard/index.html:332
 msgid "Total Clients"
-msgstr ""
+msgstr "Total Clients"
 
 #: app/templates/dashboard/index.html:341
 msgid "Total Proposals"
-msgstr ""
+msgstr "Total Proposals"
 
 #: app/templates/dashboard/index.html:356
 msgid "Renewal Alerts (Next 30 Days)"
-msgstr ""
+msgstr "Renewal Alerts (Next 30 Days)"
 
 #: app/templates/dashboard/index.html:363
 msgid "Project"
@@ -2378,7 +2378,7 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:393
 msgid "Operational Task Queue (Pending)"
-msgstr ""
+msgstr "Operational Task Queue (Pending)"
 
 #: app/templates/dashboard/index.html:407
 msgid "No pending tasks."
@@ -2394,7 +2394,7 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:441
 msgid "Recent Activity"
-msgstr ""
+msgstr "Recent Activity"
 
 #: app/templates/dashboard/index.html:446
 msgid ""
@@ -2408,7 +2408,7 @@ msgstr ""
 
 #: app/templates/dashboard/index.html:464
 msgid "Latest Visits"
-msgstr ""
+msgstr "Latest Visits"
 
 #: app/templates/dashboard/index.html:474
 msgid ""
@@ -3634,7 +3634,7 @@ msgstr ""
 
 #: app/templates/saas/packages/edit.html:61
 msgid "Client Limit"
-msgstr ""
+msgstr "Client Limit"
 
 #: app/templates/saas/packages/edit.html:64
 msgid "Maximum clients registered."
