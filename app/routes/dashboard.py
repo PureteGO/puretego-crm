@@ -168,6 +168,10 @@ def index():
             ).filter(Client.owner_id == user_id).group_by(KanbanStage.id, KanbanStage.name).order_by(KanbanStage.order).all()
 
         # Shared: Activity history
+        data['recent_leads'] = filter_by_company(
+            db.query(Client).order_by(Client.created_at.desc()).limit(10), Client
+        ).all()
+
         data['recent_visits'] = filter_by_company(
             db.query(Visit).join(Client).options(joinedload(Visit.client)), Client
         ).order_by(Visit.visit_date.desc()).limit(5).all()

@@ -799,11 +799,11 @@ msgstr "Editar Cliente"
 
 #: app/templates/clients/edit.html:29
 msgid "TAB_BASIC_INFORMATION"
-msgstr "Cliente eliminado correctamente"
+msgstr "Información Básica"
 
 #: app/templates/clients/edit.html:34
 msgid "TAB_DETAILED_INFORMATION"
-msgstr "Cliente eliminado correctamente"
+msgstr "Información Detallada"
 
 #: app/templates/clients/edit.html:88
 msgid "Current Stage"

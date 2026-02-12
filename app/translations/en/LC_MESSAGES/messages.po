@@ -796,15 +796,15 @@ msgstr ""
 
 #: app/templates/clients/edit.html:3 app/templates/clients/edit.html:9
 msgid "EDIT_CLIENT_HEADER"
-msgstr ""
+msgstr "Edit Client"
 
 #: app/templates/clients/edit.html:29
 msgid "TAB_BASIC_INFORMATION"
-msgstr ""
+msgstr "Basic Information"
 
 #: app/templates/clients/edit.html:34
 msgid "TAB_DETAILED_INFORMATION"
-msgstr ""
+msgstr "Detailed Information"
 
 #: app/templates/clients/edit.html:88
 msgid "Current Stage"

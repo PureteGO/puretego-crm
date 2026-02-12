@@ -320,7 +320,8 @@
     <div class="col-md-3 mb-3">
         <div class="card text-white bg-warning h-100 shadow-sm">
             <div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-lock"></i> {{ _('Pending Contracts') }}</h6>
+                <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-lock"></i> {{ _('Pending
+                    Contracts') }}</h6>
                 <h3 class="card-text fw-bold mb-0 text-end" id="stat-pending-contracts">{{ pending_contracts }}
                 </h3>
             </div>
@@ -338,7 +339,8 @@
     <div class="col-md-3 mb-3">
         <div class="card text-white bg-info h-100 shadow-sm">
             <div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-text"></i> {{ _('Total Proposals') }}</h6>
+                <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-text"></i> {{ _('Total
+                    Proposals') }}</h6>
                 <h3 class="card-text fw-bold mb-0 text-end" id="stat-total-proposals">{{ total_proposals }}</h3>
             </div>
         </div>
@@ -442,7 +444,28 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <!-- Recent Leads -->
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <h6 class="fw-bold mb-3"><i class="bi bi-person-plus text-primary"></i> {{ _('Latest Leads') }}
+                        </h6>
+                        <div class="list-group list-group-flush">
+                            {% for lead in recent_leads %}
+                            <a href="{{ url_for('clients.view', client_id=lead.id) }}"
+                                class="list-group-item list-group-item-action px-0 border-0">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <small class="fw-bold text-truncate" style="max-width: 70%;">{{ lead.name }}</small>
+                                    <small class="text-muted">{{ lead.created_at|format_date }}</small>
+                                </div>
+                                <p class="mb-1 small text-muted">{{ lead.status|default('New', true) }}</p>
+                            </a>
+                            {% else %}
+                            <p class="text-muted small">{{ _('No recent leads.') }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Interactions -->
+                    <div class="col-md-6 col-lg-3 mb-3">
                         <h6 class="fw-bold mb-3"><i class="bi bi-telephone-inbound text-primary"></i> {{ _('Latest
                             Interactions') }}</h6>
                         <div class="list-group list-group-flush">
@@ -450,7 +473,8 @@
                             <a href="{{ url_for('clients.view', client_id=interaction.client.id) }}"
                                 class="list-group-item list-group-item-action px-0 border-0">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <small class="fw-bold text-truncate">{{ interaction.client.name }}</small>
+                                    <small class="fw-bold text-truncate" style="max-width: 70%;">{{
+                                        interaction.client.name }}</small>
                                     <small class="text-muted">{{ interaction.date|format_date }}</small>
                                 </div>
                                 <p class="mb-1 small">{{ interaction.type.name }}</p>
@@ -460,7 +484,9 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="col-md-4">
+
+                    <!-- Visits -->
+                    <div class="col-md-6 col-lg-3 mb-3">
                         <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt text-success"></i> {{ _('Latest Visits') }}
                         </h6>
                         <div class="list-group list-group-flush">
@@ -468,7 +494,8 @@
                             <a href="{{ url_for('clients.view', client_id=visit.client.id) }}"
                                 class="list-group-item list-group-item-action px-0 border-0">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <small class="fw-bold text-truncate">{{ visit.client.name }}</small>
+                                    <small class="fw-bold text-truncate" style="max-width: 70%;">{{ visit.client.name
+                                        }}</small>
                                     <small class="text-muted">{{ visit.visit_date|format_date }}</small>
                                 </div>
                                 <p class="mb-1 small text-muted text-truncate">{{ visit.observations or _('No
@@ -479,7 +506,9 @@
                             {% endfor %}
                         </div>
                     </div>
-                    <div class="col-md-4">
+
+                    <!-- Health Checks -->
+                    <div class="col-md-6 col-lg-3 mb-3">
                         <h6 class="fw-bold mb-3"><i class="bi bi-shield-check text-info"></i> {{ _('Latest Health
                             Checks') }}</h6>
                         <div class="list-group list-group-flush">
@@ -487,7 +516,8 @@
                             <a href="{{ url_for('clients.view', client_id=check.client.id) }}"
                                 class="list-group-item list-group-item-action px-0 border-0">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <small class="fw-bold text-truncate">{{ check.client.name }}</small>
+                                    <small class="fw-bold text-truncate" style="max-width: 70%;">{{ check.client.name
+                                        }}</small>
                                     <small class="text-muted">{{ check.created_at|format_date }}</small>
                                 </div>
                                 <p class="mb-1 small">
@@ -769,7 +799,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: '{{ _('Sales Closed') }}',
+                    label: "{{ _('Sales Closed') }}",
                     data: values,
                     fill: true,
                     backgroundColor: 'rgba(54, 162, 235, 0.1)',
