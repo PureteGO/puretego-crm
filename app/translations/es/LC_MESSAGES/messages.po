@@ -623,7 +623,7 @@ msgstr "Interacciones"
 #: app/templates/proposals/create.html:111 app/templates/proposals/edit.html:89
 #: app/templates/proposals/edit.html:142
 msgid "Select..."
-msgstr ""
+msgstr "Seleccionar..."
 
 #: app/templates/calendar/index.html:75
 msgid "Quick New Client"
@@ -817,23 +817,23 @@ msgstr ""
 
 #: app/templates/clients/edit.html:120
 msgid "Contact and Decision Details"
-msgstr ""
+msgstr "Detalles de Contacto y Decisión"
 
 #: app/templates/clients/edit.html:124
 msgid "Receptionist Name"
-msgstr "Recepcionista"
+msgstr "Nombre del Recepcionista"
 
 #: app/templates/clients/edit.html:128
 msgid "Who receives/answers first"
-msgstr ""
+msgstr "Quién recibe/responde primero"
 
 #: app/templates/clients/edit.html:131
 msgid "Decision Maker Name"
-msgstr "Precio"
+msgstr "Nombre del Tomador de Decisiones"
 
 #: app/templates/clients/edit.html:135
 msgid "Who signs the check"
-msgstr ""
+msgstr "Quién firma el cheque"
 
 #: app/templates/clients/edit.html:140 app/templates/clients/view.html:78
 msgid "Decision Factors"
@@ -845,19 +845,19 @@ msgstr ""
 
 #: app/templates/clients/edit.html:147
 msgid "Funnel Start Date"
-msgstr ""
+msgstr "Fecha de Inicio del Embudo"
 
 #: app/templates/clients/edit.html:152
 msgid "Date when the client entered the sales funnel."
-msgstr ""
+msgstr "Fecha en que el cliente entró en el embudo de ventas."
 
 #: app/templates/clients/edit.html:158
 msgid "Best Contact Time"
-msgstr "Contacto"
+msgstr "Mejor Horário de Contacto"
 
 #: app/templates/clients/edit.html:162
 msgid "Ex: Tuesday afternoon"
-msgstr ""
+msgstr "Ej: Martes por la tarde"
 
 #: app/templates/clients/edit.html:165
 msgid ""
@@ -872,7 +872,7 @@ msgstr "Llamada"
 
 #: app/templates/clients/edit.html:178
 msgid "In-person Visit"
-msgstr "Nueva Visita"
+msgstr "Visita Presencial"
 
 #: app/templates/clients/edit.html:184
 msgid ""
@@ -882,7 +882,7 @@ msgstr ""
 
 #: app/templates/clients/edit.html:187
 msgid "Any other relevant detail..."
-msgstr ""
+msgstr "Cualquier otro detalle relevante..."
 
 #: app/templates/clients/index.html:23
 msgid "View Kanban"
@@ -3272,7 +3272,7 @@ msgstr "Nombre"
 
 #: app/templates/interactions/manage_types_modal.html:56
 msgid "Icon"
-msgstr "Contacto"
+msgstr "Icono"
 
 #: app/templates/interactions/manage_types_modal.html:93
 msgid "Visit/Other"

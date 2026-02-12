@@ -500,7 +500,7 @@ msgstr ""
 #: app/templates/saas/packages/edit.html:75 app/templates/users/create.html:66
 #: app/templates/users/edit.html:78 app/templates/visits/create.html:68
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel"
 
 #: app/templates/base.html:326 app/templates/interactions/log_modal.html:72
 msgid "Schedule"
@@ -624,7 +624,7 @@ msgstr ""
 #: app/templates/proposals/create.html:111 app/templates/proposals/edit.html:89
 #: app/templates/proposals/edit.html:142
 msgid "Select..."
-msgstr ""
+msgstr "Select..."
 
 #: app/templates/calendar/index.html:75
 msgid "Quick New Client"
@@ -792,7 +792,7 @@ msgstr ""
 #: app/templates/interactions/manage_types_modal.html:43
 #: app/templates/users/create.html:63 app/templates/users/edit.html:75
 msgid "Save"
-msgstr ""
+msgstr "Save"
 
 #: app/templates/clients/edit.html:3 app/templates/clients/edit.html:9
 msgid "EDIT_CLIENT_HEADER"
@@ -818,27 +818,27 @@ msgstr ""
 
 #: app/templates/clients/edit.html:120
 msgid "Contact and Decision Details"
-msgstr ""
+msgstr "Contact and Decision Details"
 
 #: app/templates/clients/edit.html:124
 msgid "Receptionist Name"
-msgstr ""
+msgstr "Receptionist Name"
 
 #: app/templates/clients/edit.html:128
 msgid "Who receives/answers first"
-msgstr ""
+msgstr "Who receives/answers first"
 
 #: app/templates/clients/edit.html:131
 msgid "Decision Maker Name"
-msgstr ""
+msgstr "Decision Maker Name"
 
 #: app/templates/clients/edit.html:135
 msgid "Who signs the check"
-msgstr ""
+msgstr "Who signs the check"
 
 #: app/templates/clients/edit.html:140 app/templates/clients/view.html:78
 msgid "Decision Factors"
-msgstr ""
+msgstr "Decision Factors"
 
 #: app/templates/clients/edit.html:143
 msgid "What is important to them? (Price, Quality, Speed, Trust...)"
@@ -846,19 +846,19 @@ msgstr ""
 
 #: app/templates/clients/edit.html:147
 msgid "Funnel Start Date"
-msgstr ""
+msgstr "Funnel Start Date"
 
 #: app/templates/clients/edit.html:152
 msgid "Date when the client entered the sales funnel."
-msgstr ""
+msgstr "Date when the client entered the sales funnel."
 
 #: app/templates/clients/edit.html:158
 msgid "Best Contact Time"
-msgstr ""
+msgstr "Best Contact Time"
 
 #: app/templates/clients/edit.html:162
 msgid "Ex: Tuesday afternoon"
-msgstr ""
+msgstr "Ex: Tuesday afternoon"
 
 #: app/templates/clients/edit.html:165
 msgid ""
@@ -873,7 +873,7 @@ msgstr "Call"
 
 #: app/templates/clients/edit.html:178
 msgid "In-person Visit"
-msgstr ""
+msgstr "In-person Visit"
 
 #: app/templates/clients/edit.html:184
 msgid ""
@@ -883,7 +883,7 @@ msgstr ""
 
 #: app/templates/clients/edit.html:187
 msgid "Any other relevant detail..."
-msgstr ""
+msgstr "Any other relevant detail..."
 
 #: app/templates/clients/index.html:23
 msgid "View Kanban"
@@ -935,7 +935,7 @@ msgstr ""
 #: app/templates/services/index.html:32 app/templates/services/index.html:77
 #: app/templates/users/index.html:28 app/templates/visits/index.html:23
 msgid "Actions"
-msgstr ""
+msgstr "Actions"
 
 #: app/templates/clients/index.html:86 app/templates/clients/index.html:90
 msgid "Change Stage"
@@ -3267,11 +3267,11 @@ msgstr "Is call"
 #: app/templates/users/create.html:16 app/templates/users/edit.html:16
 #: app/templates/users/index.html:19
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: app/templates/interactions/manage_types_modal.html:56
 msgid "Icon"
-msgstr ""
+msgstr "Icon"
 
 #: app/templates/interactions/manage_types_modal.html:93
 msgid "Visit/Other"

@@ -93,43 +93,50 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    {% if session.get('is_superadmin') %}
-                    <li class="nav-item">
-                        <a class="nav-link text-warning fw-bold" href="{{ url_for('saas.dashboard') }}">
-                            <i class="bi bi-speedometer2"></i> {{ _('SaaS Admin') }}
-                        </a>
-                    </li>
-                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('dashboard.index') }}"><i class="bi bi-house-door"></i>
                             {{ _('Dashboard') }}</a>
                     </li>
-                    {% if session.get('workflow_mode') != 'solo' %}
-                    <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center" href="{{ url_for('calendar.index') }}">
-                            <i class="bi bi-calendar3 me-1"></i>
-                            {{ _('Agenda') }}
-                            {% if overdue_count > 0 %}
-                            <span class="badge rounded-pill bg-danger ms-1" id="overdue-tasks-count"
-                                title="{{ _('Overdue tasks') }}">
-                                {{ overdue_count }}
-                            </span>
-                            {% endif %}
+
+                    <!-- Sales & CRM Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="crmDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-bounding-box"></i> CRM
                         </a>
+                        <ul class="dropdown-menu" aria-labelledby="crmDropdown">
+                            {% if session.get('workflow_mode') != 'solo' %}
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ url_for('calendar.index') }}">
+                                    <i class="bi bi-calendar3 me-2"></i>
+                                    {{ _('Agenda') }}
+                                    {% if overdue_count > 0 %}
+                                    <span class="badge rounded-pill bg-danger ms-auto" id="overdue-tasks-count">
+                                        {{ overdue_count }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('clients.kanban') }}">
+                                    <i class="bi bi-kanban me-2"></i> {{ _('Kanban') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('clients.index') }}">
+                                    <i class="bi bi-people me-2"></i> {{ _('Clients') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('proposals.index') }}">
+                                    <i class="bi bi-file-earmark-text me-2"></i> {{ _("Proposals") }}
+                                </a>
+                            </li>
+                        </ul>
                     </li>
-                    {% endif %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('clients.kanban') }}"><i class="bi bi-kanban"></i>
-                            {{ _('Kanban') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('clients.index') }}"><i class="bi bi-people"></i>
-                            {{ _('Clients') }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('proposals.index') }}"><i
-                                class="bi bi-file-earmark-text"></i> {{ _("Proposals") }}</a>
-                    </li>
+
                     {% if session.get('permissions', {}).get('can_manage_company', False) or session.get('role') in
                     ['owner', 'admin'] %}
                     <li class="nav-item">
@@ -137,6 +144,7 @@
                             _("Services & Packages") }}</a>
                     </li>
                     {% endif %}
+
                     {% if session.get('permissions', {}).get('can_manage_finance', False) or session.get('role') in
                     ['owner', 'admin', 'finance'] %}
                     <li class="nav-item dropdown">
@@ -154,6 +162,7 @@
                         </ul>
                     </li>
                     {% endif %}
+
                     {% if session.get('workflow_mode') == 'structured' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('projects.index') }}"><i class="bi bi-briefcase"></i> {{
@@ -204,6 +213,10 @@
                             {% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            {% if session.get('is_superadmin') %}
+                            <li><a class="dropdown-item text-warning fw-bold" href="{{ url_for('saas.dashboard') }}"><i
+                                        class="bi bi-speedometer2 me-1"></i>{{ _('SaaS Admin') }}</a></li>
+                            {% endif %}
                             {% if session.get('company_name') %}
                             <li><span class="dropdown-item-text text-muted"><i class="bi bi-building me-1"></i>{{
                                     session['company_name'] }}</span></li>

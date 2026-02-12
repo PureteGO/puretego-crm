@@ -136,8 +136,8 @@ def agenda():
             today_list.append({
                 'id': f"v_{v.id}",
                 'client_id': v.client_id,
-                'client_name': v.client.name,
-                'type_name': 'Visita Presencial',
+                'client_name': v.client.name if v.client else _('Unknown Client'),
+                'type_name': _('In-person Visit'),
                 'is_call': False,
                 'date': v.visit_date.isoformat(),
                 'status': 'scheduled'
@@ -148,8 +148,8 @@ def agenda():
             upcoming_list.append({
                 'id': f"v_{v.id}",
                 'client_id': v.client_id,
-                'client_name': v.client.name,
-                'type_name': 'Visita Presencial',
+                'client_name': v.client.name if v.client else _('Unknown Client'),
+                'type_name': _('In-person Visit'),
                 'is_call': False,
                 'date': v.visit_date.isoformat(),
                 'status': 'scheduled'
