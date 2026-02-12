@@ -114,7 +114,10 @@ def main():
         "Ex: Tuesday afternoon": "Ej: Martes por la tarde",
         "Select...": "Seleccionar...",
         "CRM": "CRM",
-        "Sales": "Ventas"
+        "Sales": "Ventas",
+        "Attention: Follow-up required": "Atención: Seguimiento pendiente",
+        "The following leads were worked on today but have no next step scheduled. Define a next step before the day ends to maintain the sales process.": "Los siguientes leads fueron atendidos hoy pero no tienen un próximo paso programado. Defina una acción antes del final del día para mantener el proceso de ventas.",
+        "Back to Client": "Volver al Cliente"
     }
     
     en_map = {
@@ -193,7 +196,10 @@ def main():
         "Ex: Tuesday afternoon": "Ex: Tuesday afternoon",
         "Select...": "Select...",
         "CRM": "CRM",
-        "Sales": "Sales"
+        "Sales": "Sales",
+        "Attention: Follow-up required": "Attention: Follow-up required",
+        "The following leads were worked on today but have no next step scheduled. Define a next step before the day ends to maintain the sales process.": "The following leads were worked on today but have no next step scheduled. Define a next step before the day ends to maintain the sales process.",
+        "Back to Client": "Back to Client"
     }
     
     pt_map = {
@@ -237,7 +243,10 @@ def main():
         "Ex: Tuesday afternoon": "Ex: Terça à tarde",
         "Select...": "Selecionar...",
         "CRM": "CRM",
-        "Sales": "Vendas"
+        "Sales": "Vendas",
+        "Attention: Follow-up required": "Atenção: Seguimento pendente",
+        "The following leads were worked on today but have no next step scheduled. Define a next step before the day ends to maintain the sales process.": "Os seguintes leads foram atendidos hoje, mas não possuem um próximo passo agendado. Defina uma ação antes do fim do dia para manter o processo de vendas.",
+        "Back to Client": "Voltar para o Cliente"
     }
 
     es_path = os.path.join(base_dir, 'app', 'translations', 'es', 'LC_MESSAGES', 'messages.po')

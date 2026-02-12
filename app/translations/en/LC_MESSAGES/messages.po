@@ -3873,7 +3873,7 @@ msgstr ""
 
 #: app/templates/visits/view.html:46
 msgid "Back to Client"
-msgstr ""
+msgstr "Back to Client"
 
 #: app/templates/visits/view.html:55
 msgid "Are you sure you want to delete this visit record?"

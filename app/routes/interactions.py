@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from flask_babel import _
 from app.routes.auth import login_required
 from app.models import Interaction, InteractionType, CadenceRule, Client, Visit
 from config.database import get_db

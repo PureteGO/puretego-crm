@@ -23,6 +23,32 @@
         </div>
     </div>
 
+    {% if leads_pending_followup %}
+    <div class="alert alert-warning border-start-5 border-warning shadow-sm mb-4"
+        style="background-color: rgba(245, 158, 11, 0.05);">
+        <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+                <i class="bi bi-exclamation-triangle-fill fs-3 text-warning me-3"></i>
+            </div>
+            <div class="flex-grow-1">
+                <h6 class="alert-heading fw-bold mb-1">{{ _('Attention: Follow-up required') }}</h6>
+                <p class="mb-0 small text-muted">
+                    {{ _('The following leads were worked on today but have no next step scheduled. Define a next step
+                    before the day ends to maintain the sales process.') }}
+                </p>
+            </div>
+        </div>
+        <div class="mt-3 d-flex flex-wrap gap-2">
+            {% for lead in leads_pending_followup %}
+            <a href="{{ url_for('clients.view', client_id=lead.id) }}"
+                class="btn btn-sm btn-outline-warning d-flex align-items-center bg-white bg-opacity-10">
+                <i class="bi bi-person-fill me-2"></i> {{ lead.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <style>
         .score-card {
             background: linear-gradient(135deg, #059669 0%, #10B981 100%);

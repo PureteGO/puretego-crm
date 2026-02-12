@@ -182,7 +182,29 @@ def index():
         
         data['recent_interactions'] = filter_by_company(
             db.query(Interaction).join(Client).options(joinedload(Interaction.client), joinedload(Interaction.type)), Client
-        ).filter(Interaction.status == 'done').order_by(Interaction.date.desc()).limit(5).all()
+        ).filter(Interaction.status == 'done', Interaction.date <= datetime.now()).order_by(Interaction.date.desc()).limit(5).all()
+
+        # --- Lead Follow-up Rule (v1.6) ---
+        # "não permita leads que nao tenham seguimento no processo de vendas passar para o outro dia sem ter indicado o próximo passo"
+        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # 1. Clients with interactions done today
+        clients_treated_today_sub = db.query(Interaction.client_id).filter(
+            Interaction.status == 'done',
+            Interaction.date >= today_start
+        ).distinct().subquery()
+        
+        # 2. Clients with future interactions scheduled
+        clients_with_future_sub = db.query(Interaction.client_id).filter(
+            Interaction.status == 'scheduled',
+            Interaction.date > datetime.now()
+        ).distinct().subquery()
+        
+        # 3. Find clients in (1) but NOT in (2)
+        data['leads_pending_followup'] = filter_by_company(db.query(Client), Client).filter(
+            Client.id.in_(clients_treated_today_sub),
+            ~Client.id.in_(clients_with_future_sub)
+        ).all()
 
         # --- Additional Metrics for Deploy v1 ---
         
