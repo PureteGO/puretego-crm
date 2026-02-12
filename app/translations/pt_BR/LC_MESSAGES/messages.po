@@ -606,7 +606,7 @@ msgstr "Novo Agendamento"
 #: app/templates/interactions/log_modal.html:19
 #: app/templates/interactions/manage_types_modal.html:57
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: app/templates/calendar/index.html:42
 msgid "On-site Visit"
@@ -3219,31 +3219,31 @@ msgstr "Não há tarefas próximas."
 #: app/templates/interactions/log_modal.html:9
 #: app/templates/interactions/log_modal.html:82
 msgid "Log Interaction"
-msgstr "Interações"
+msgstr "Registrar Interação"
 
 #: app/templates/interactions/log_modal.html:22
 msgid "Manage Types"
-msgstr ""
+msgstr "Gerenciar Tipos"
 
 #: app/templates/interactions/log_modal.html:31
 msgid "Date/Time"
-msgstr "# de Clientes"
+msgstr "Data/Hora"
 
 #: app/templates/interactions/log_modal.html:44
 msgid "Already done (mark as completed)"
-msgstr ""
+msgstr "Já realizado (marcar como concluído)"
 
 #: app/templates/interactions/log_modal.html:62
 msgid "Next Step Suggestion"
-msgstr ""
+msgstr "Sugestão de Próximo Passo"
 
 #: app/templates/interactions/log_modal.html:73
 msgid "No scheduling"
-msgstr ""
+msgstr "Não agendar"
 
 #: app/templates/interactions/log_modal.html:83
 msgid "Edit Interaction"
-msgstr "Registrar Interação"
+msgstr "Editar Interação"
 
 #: app/templates/interactions/log_modal.html:84
 msgid "Scheduled via automatic suggestion."

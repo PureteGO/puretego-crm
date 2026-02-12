@@ -133,12 +133,27 @@ def main():
         "Schedule": "Schedule",
         "No scheduling": "No scheduling"
     }
+    
+    pt_map = {
+        "Log Interaction": "Registrar Interação",
+        "Edit Interaction": "Editar Interação",
+        "Type": "Tipo",
+        "Manage Types": "Gerenciar Tipos",
+        "Date/Time": "Data/Hora",
+        "Notes": "Observações",
+        "Already done (mark as completed)": "Já realizado (marcar como concluído)",
+        "Next Step Suggestion": "Sugestão de Próximo Passo",
+        "Schedule": "Agendar",
+        "No scheduling": "Não agendar"
+    }
 
     es_path = os.path.join(base_dir, 'app', 'translations', 'es', 'LC_MESSAGES', 'messages.po')
     en_path = os.path.join(base_dir, 'app', 'translations', 'en', 'LC_MESSAGES', 'messages.po')
+    pt_path = os.path.join(base_dir, 'app', 'translations', 'pt_BR', 'LC_MESSAGES', 'messages.po')
     
     fix_catalog_final(es_path, es_map)
     fix_catalog_final(en_path, en_map)
+    fix_catalog_final(pt_path, pt_map)
 
 if __name__ == "__main__":
     main()
