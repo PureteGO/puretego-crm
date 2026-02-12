@@ -85,6 +85,9 @@
                 tbody.innerHTML = '';
                 types.forEach(t => {
                     const tr = document.createElement('tr');
+                    // Store data in attributes to avoid quoting issues in onclick
+                    tr.dataset.type = JSON.stringify(t);
+
                     tr.innerHTML = `
                         <td>${t.name}</td>
                         <td><i class="${t.icon}"></i> ${t.icon}</td>
@@ -94,7 +97,7 @@
                             </span>
                         </td>
                         <td class="text-end">
-                            <button class="btn btn-sm btn-link text-primary" onclick="editType(${t.id}, '${t.name}', '${t.icon}', ${t.is_call})">
+                            <button class="btn btn-sm btn-link text-primary btn-edit-type">
                                 <i class="bi bi-pencil"></i>
                             </button>
                             <button class="btn btn-sm btn-link text-danger" onclick="deleteType(${t.id})">
@@ -102,6 +105,13 @@
                             </button>
                         </td>
                     `;
+
+                    // Add event listener for edit button
+                    tr.querySelector('.btn-edit-type').addEventListener('click', () => {
+                        const typeData = JSON.parse(tr.dataset.type);
+                        editType(typeData.id, typeData.name, typeData.icon, typeData.is_call);
+                    });
+
                     tbody.appendChild(tr);
                 });
             });
@@ -115,10 +125,14 @@
         const isCall = document.getElementById('typeIsCall').checked;
 
         const url = id ? `/interactions/types/${id}/update` : '/interactions/types/create';
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         fetch(url, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
             body: JSON.stringify({ name, icon, is_call: isCall })
         })
             .then(r => r.json())
@@ -126,7 +140,7 @@
                 if (data.success) {
                     resetTypeForm();
                     loadTypesTable();
-                    refreshMainSelect(); // Function to update the main log modal dropdown
+                    refreshMainSelect();
                 } else {
                     alert('Error: ' + data.message);
                 }
@@ -139,12 +153,21 @@
         document.getElementById('typeIcon').value = icon;
         document.getElementById('typeIsCall').checked = isCall;
         document.getElementById('cancelEditType').style.display = 'inline-block';
+
+        // Update Title
+        document.querySelector('#manageTypesModal .card-title').innerHTML =
+            `<i class="bi bi-pencil-square"></i> {{ _('Edit Type') }}`;
     }
 
     function deleteType(id) {
         if (!confirm('{{ _("Delete this type?") }}')) return;
 
-        fetch(`/interactions/types/${id}/delete`, { method: 'POST' })
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch(`/interactions/types/${id}/delete`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrfToken }
+        })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
@@ -160,6 +183,10 @@
         document.getElementById('typeForm').reset();
         document.getElementById('typeId').value = '';
         document.getElementById('cancelEditType').style.display = 'none';
+
+        // Reset Title
+        document.querySelector('#manageTypesModal .card-title').innerHTML =
+            `<i class="bi bi-plus-circle"></i> {{ _('New Type') }}`;
     }
 
     // Helper to refresh the dropdown in the main modal

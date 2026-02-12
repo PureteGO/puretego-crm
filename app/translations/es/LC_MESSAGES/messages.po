@@ -868,7 +868,7 @@ msgstr ""
 #: app/templates/clients/edit.html:173
 #: app/templates/interactions/manage_types_modal.html:93
 msgid "Call"
-msgstr "Cancelar"
+msgstr "Llamada"
 
 #: app/templates/clients/edit.html:178
 msgid "In-person Visit"
@@ -3250,19 +3250,19 @@ msgstr ""
 
 #: app/templates/interactions/manage_types_modal.html:6
 msgid "Manage Interaction Types"
-msgstr "Interacciones"
+msgstr "Gestionar Tipos de Interacción"
 
 #: app/templates/interactions/manage_types_modal.html:13
 msgid "New Type"
-msgstr "Nueva Visita"
+msgstr "Nuevo Tipo"
 
 #: app/templates/interactions/manage_types_modal.html:19
 msgid "Name (ex: Technical Visit)"
-msgstr ""
+msgstr "Nombre (ej: Visita Técnica)"
 
 #: app/templates/interactions/manage_types_modal.html:36
 msgid "Is call"
-msgstr ""
+msgstr "Es una llamada"
 
 #: app/templates/interactions/manage_types_modal.html:55
 #: app/templates/users/create.html:16 app/templates/users/edit.html:16
@@ -3276,11 +3276,11 @@ msgstr "Contacto"
 
 #: app/templates/interactions/manage_types_modal.html:93
 msgid "Visit/Other"
-msgstr "Visitas"
+msgstr "Visita/Otro"
 
 #: app/templates/interactions/manage_types_modal.html:145
 msgid "Delete this type?"
-msgstr "# de Clientes"
+msgstr "¿Eliminar este tipo?"
 
 #: app/templates/interactions/timeline.html:12
 msgid "Interaction"

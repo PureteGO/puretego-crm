@@ -83,7 +83,15 @@ def main():
         "Already done (mark as completed)": "Ya realizado (marcar como completado)",
         "Next Step Suggestion": "Sugerencia de Siguiente Paso",
         "Schedule": "Agendar",
-        "No scheduling": "Sin agendamiento"
+        "No scheduling": "Sin agendamiento",
+        "Manage Interaction Types": "Gestionar Tipos de Interacción",
+        "New Type": "Nuevo Tipo",
+        "Name (ex: Technical Visit)": "Nombre (ej: Visita Técnica)",
+        "Is call": "Es una llamada",
+        "Call": "Llamada",
+        "Visit/Other": "Visita/Otro",
+        "Delete this type?": "¿Eliminar este tipo?",
+        "Edit Type": "Editar Tipo"
     }
     
     en_map = {
@@ -131,7 +139,15 @@ def main():
         "Already done (mark as completed)": "Already done (mark as completed)",
         "Next Step Suggestion": "Next Step Suggestion",
         "Schedule": "Schedule",
-        "No scheduling": "No scheduling"
+        "No scheduling": "No scheduling",
+        "Manage Interaction Types": "Manage Interaction Types",
+        "New Type": "New Type",
+        "Name (ex: Technical Visit)": "Name (ex: Technical Visit)",
+        "Is call": "Is call",
+        "Call": "Call",
+        "Visit/Other": "Visit/Other",
+        "Delete this type?": "Delete this type?",
+        "Edit Type": "Edit Type"
     }
     
     pt_map = {
@@ -144,7 +160,15 @@ def main():
         "Already done (mark as completed)": "Já realizado (marcar como concluído)",
         "Next Step Suggestion": "Sugestão de Próximo Passo",
         "Schedule": "Agendar",
-        "No scheduling": "Não agendar"
+        "No scheduling": "Não agendar",
+        "Manage Interaction Types": "Gerenciar Tipos de Interação",
+        "New Type": "Novo Tipo",
+        "Name (ex: Technical Visit)": "Nome (ex: Visita Técnica)",
+        "Is call": "É uma chamada",
+        "Call": "Chamada",
+        "Visit/Other": "Visita/Outro",
+        "Delete this type?": "Excluir este tipo?",
+        "Edit Type": "Editar Tipo"
     }
 
     es_path = os.path.join(base_dir, 'app', 'translations', 'es', 'LC_MESSAGES', 'messages.po')
