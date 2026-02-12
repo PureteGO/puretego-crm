@@ -223,346 +223,357 @@
                 </div>
             </div>
         </div>
-</div>
-
-
-
-<!-- Agenda / Tareas -->
-<div class="row mb-4">
-    <!-- Hoy -->
-    <div class="col-md-6 mb-3">
-        <div class="card h-100 shadow-sm" style="overflow: hidden;">
-            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-calendar-event"></i> {{ _('Agenda') }} - {{ _('Today') }}</h5>
-                <span class="badge bg-primary" id="todayCount">0</span>
-            </div>
-            <div class="card-body p-0">
-                <div id="todayList" class="list-group list-group-flush">
-                    <p class="text-muted text-center my-3">{{ _('Loading...') }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Próximos -->
-    <div class="col-md-6 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-calendar-next"></i> {{ _('Next 7 Days') }}</h5>
-                <span class="badge bg-light text-info" id="upcomingCount">0</span>
-            </div>
-            <div class="card-body p-0">
-                <div id="upcomingList" class="list-group list-group-flush">
-                    <p class="text-muted text-center my-3">{{ _('Loading...') }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Dynamic Dashboard Content by Role -->
-{% if role == 'sdr' %}
-{% include 'dashboard/_sdr.html' %}
-{% elif role == 'sales' %}
-{% include 'dashboard/_sales.html' %}
-{% elif role == 'finance' %}
-{% include 'dashboard/_finance.html' %}
-{% elif role == 'gmb_manager' %}
-{% include 'dashboard/_production.html' %}
-{% else %}
-<!-- Original Executive Metrics for Owner/Admin -->
-{% if role in ['owner', 'admin', 'manager', 'superadmin'] %}
-<!-- Expanded Metrics for Owner/Admin -->
-<div class="row g-4 mb-4">
-    <!-- New Leads (7d) -->
-    <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-info fw-bold small text-truncate">
-                    <i class="bi bi-person-plus"></i> {{ _('NEW LEADS (7d)') }}
-                </h6>
-                <h2 class="card-title fw-bold mb-0">{{ new_leads_7d }}</h2>
-                <span class="text-muted small d-none d-sm-inline">{{ _('Last 7 Days') }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- New Leads (15d) -->
-    <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-primary fw-bold small text-truncate">
-                    <i class="bi bi-people"></i> {{ _('NEW LEADS (15d)') }}
-                </h6>
-                <h2 class="card-title fw-bold mb-0">{{ new_leads_15d }}</h2>
-                <span class="text-muted small d-none d-sm-inline">{{ _('Last 15 Days') }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Closed Sales -->
-    <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-success fw-bold small text-truncate">
-                    <i class="bi bi-trophy"></i> {{ _('CLOSED SALES') }}
-                </h6>
-                <h2 class="card-title fw-bold mb-0 fs-4">Gs {{ "{:,.0f}".format(won_amount).replace(',', '.') }}
-                </h2>
-                <span class="text-muted small d-none d-sm-inline">{{ _('This Month') }}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Avg Ticket -->
-    <div class="col-6 col-md-3">
-        <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
-            <div class="card-body">
-                <h6 class="card-subtitle mb-2 text-warning fw-bold small text-truncate">
-                    <i class="bi bi-tag"></i> {{ _('AVG TICKET') }}
-                </h6>
-                <h2 class="card-title fw-bold mb-0 fs-4">Gs {{ "{:,.0f}".format(avg_ticket).replace(',', '.') }}
-                </h2>
-                <span class="text-muted small d-none d-sm-inline">{{ _('Average Value Won') }}</span>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 
 
-<div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-danger h-100 shadow-sm">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-wallet2"></i> {{
-                    _('Awaiting Payment') }}</h6>
-                <h3 class="card-text fw-bold mb-0 text-end" id="stat-awaiting-payment">{{
-                    awaiting_payment|format_currency }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-warning h-100 shadow-sm">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-lock"></i> {{ _('Pending
-                    Contracts') }}</h6>
-                <h3 class="card-text fw-bold mb-0 text-end" id="stat-pending-contracts">{{ pending_contracts }}
-                </h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-primary h-100 shadow-sm">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-people"></i> {{ _('Total Clients') }}
-                </h6>
-                <h3 class="card-text fw-bold mb-0 text-end" id="stat-total-clients">{{ total_clients }}</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card text-white bg-info h-100 shadow-sm">
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-text"></i> {{ _('Total
-                    Proposals') }}</h6>
-                <h3 class="card-text fw-bold mb-0 text-end" id="stat-total-proposals">{{ total_proposals }}</h3>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-{% endif %}
-
-<!-- Specialized Lists -->
-<div class="row mb-4">
-    {% if role in ['owner', 'admin', 'manager', 'superadmin'] and expiring_projects %}
-    <div class="col-12 mb-4">
-        <div class="card border-warning shadow-sm">
-            <div class="card-header bg-warning text-dark fw-bold">
-                <i class="bi bi-exclamation-triangle"></i> {{ _('Renewal Alerts (Next 30 Days)') }}
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0 small">
-                        <thead>
-                            <tr>
-                                <th>{{ _('Project') }}</th>
-                                <th>{{ _('Client') }}</th>
-                                <th>{{ _('End Date') }}</th>
-                                <th>{{ _('Value') }}</th>
-                                <th>{{ _('Actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for project in expiring_projects %}
-                            <tr>
-                                <td><strong>{{ project.name }}</strong></td>
-                                <td>{{ project.client.name }}</td>
-                                <td class="text-danger fw-bold">{{ project.end_date|format_date }}</td>
-                                <td>{{ project.monthly_value|format_currency }}</td>
-                                <td><a href="{{ url_for('projects.view', project_id=project.id) }}"
-                                        class="btn btn-xs btn-outline-primary py-0">{{ _('View') }}</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
-    {% if role == 'production' %}
-    <div class="col-12 mb-4">
-        <div class="card border-info shadow-sm">
-            <div class="card-header bg-info text-white fw-bold">
-                <i class="bi bi-list-task"></i> {{ _('Operational Task Queue (Pending)') }}
-            </div>
-            <div class="list-group list-group-flush small">
-                {% for ticket in pending_tickets %}
-                <a href="{{ url_for('projects.view', project_id=ticket.project_id) }}"
-                    class="list-group-item list-group-item-action">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h6 class="mb-1 text-primary">{{ ticket.title }}</h6>
-                        <span class="badge bg-{{ 'danger' if ticket.priority == 'urgent' else 'warning' }}">{{
-                            ticket.priority }}</span>
+        <!-- Agenda / Tareas -->
+        <div class="row mb-4">
+            <!-- Hoy -->
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm" style="overflow: hidden;">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar-event"></i> {{ _('Agenda') }} - {{ _('Today') }}</h5>
+                        <span class="badge bg-primary" id="todayCount">0</span>
                     </div>
-                    <p class="mb-1 text-muted">{{ ticket.project.name }} | {{ ticket.project.client.name }}</p>
-                </a>
-                {% else %}
-                <div class="p-3 text-center text-muted">{{ _('No pending tasks.') }}</div>
-                {% endfor %}
+                    <div class="card-body p-0">
+                        <div id="todayList" class="list-group list-group-flush">
+                            <p class="text-muted text-center my-3">{{ _('Loading...') }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
 
-<!-- Pipeline Charts -->
-<div class="row">
-    <div class="col-md-6 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-header fw-bold">{{ _('Client Pipeline') }}</div>
-            <div class="card-body">
-                <canvas id="clientsByStageChart" data-labels='{{ clients_by_stage|map(attribute=0)|list|tojson }}'
-                    data-values='{{ clients_by_stage|map(attribute=1)|list|tojson }}'></canvas>
+            <!-- Próximos -->
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar-next"></i> {{ _('Next 7 Days') }}</h5>
+                        <span class="badge bg-light text-info" id="upcomingCount">0</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="upcomingList" class="list-group list-group-flush">
+                            <p class="text-muted text-center my-3">{{ _('Loading...') }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-6 mb-3">
-        <div class="card h-100 shadow-sm">
-            <div class="card-header fw-bold">{{ _('Pipeline Distribution') }}</div>
-            <div class="card-body">
-                <canvas id="proposalsByStatusChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row">
-    <!-- Atividade Recente -->
-    <div class="col-md-12">
-        <div class="card shadow-sm">
-            <div class="card-header fw-bold">
-                <i class="bi bi-clock-history"></i> {{ _('Recent Activity') }}
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <!-- Recent Leads -->
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-person-plus text-primary"></i> {{ _('Latest Leads') }}
+        <!-- Dynamic Dashboard Content by Role -->
+        {% if role == 'sdr' %}
+        {% include 'dashboard/_sdr.html' %}
+        {% elif role == 'sales' %}
+        {% include 'dashboard/_sales.html' %}
+        {% elif role == 'finance' %}
+        {% include 'dashboard/_finance.html' %}
+        {% elif role == 'gmb_manager' %}
+        {% include 'dashboard/_production.html' %}
+        {% else %}
+        <!-- Original Executive Metrics for Owner/Admin -->
+        {% if role in ['owner', 'admin', 'manager', 'superadmin'] %}
+        <!-- Expanded Metrics for Owner/Admin -->
+        <div class="row g-4 mb-4">
+            <!-- New Leads (7d) -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-info">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-info fw-bold small text-truncate">
+                            <i class="bi bi-person-plus"></i> {{ _('NEW LEADS (7d)') }}
                         </h6>
-                        <div class="list-group list-group-flush">
-                            {% for lead in recent_leads %}
-                            <a href="{{ url_for('clients.view', client_id=lead.id) }}"
-                                class="list-group-item list-group-item-action px-0 border-0">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <small class="fw-bold text-truncate" style="max-width: 70%;">{{ lead.name }}</small>
-                                    <small class="text-muted">{{ lead.created_at|format_date }}</small>
-                                </div>
-                                <p class="mb-1 small text-muted">{{ lead.status|default('New', true) }}</p>
-                            </a>
-                            {% else %}
-                            <p class="text-muted small">{{ _('No recent leads.') }}</p>
-                            {% endfor %}
-                        </div>
+                        <h2 class="card-title fw-bold mb-0">{{ new_leads_7d }}</h2>
+                        <span class="text-muted small d-none d-sm-inline">{{ _('Last 7 Days') }}</span>
                     </div>
+                </div>
+            </div>
 
-                    <!-- Interactions -->
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-telephone-inbound text-primary"></i> {{ _('Latest
-                            Interactions') }}</h6>
-                        <div class="list-group list-group-flush">
-                            {% for interaction in recent_interactions %}
-                            <a href="{{ url_for('clients.view', client_id=interaction.client.id) }}"
-                                class="list-group-item list-group-item-action px-0 border-0">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <small class="fw-bold text-truncate" style="max-width: 70%;">{{
-                                        interaction.client.name }}</small>
-                                    <small class="text-muted">{{ interaction.date|format_date }}</small>
-                                </div>
-                                <p class="mb-1 small">{{ interaction.type.name }}</p>
-                            </a>
-                            {% else %}
-                            <p class="text-muted small">{{ _('No recent interactions.') }}</p>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Visits -->
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt text-success"></i> {{ _('Latest Visits') }}
+            <!-- New Leads (15d) -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-primary">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-primary fw-bold small text-truncate">
+                            <i class="bi bi-people"></i> {{ _('NEW LEADS (15d)') }}
                         </h6>
-                        <div class="list-group list-group-flush">
-                            {% for visit in recent_visits %}
-                            <a href="{{ url_for('clients.view', client_id=visit.client.id) }}"
-                                class="list-group-item list-group-item-action px-0 border-0">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <small class="fw-bold text-truncate" style="max-width: 70%;">{{ visit.client.name
-                                        }}</small>
-                                    <small class="text-muted">{{ visit.visit_date|format_date }}</small>
-                                </div>
-                                <p class="mb-1 small text-muted text-truncate">{{ visit.observations or _('No
-                                    observations') }}</p>
-                            </a>
-                            {% else %}
-                            <p class="text-muted small">{{ _('No recent visits.') }}</p>
-                            {% endfor %}
+                        <h2 class="card-title fw-bold mb-0">{{ new_leads_15d }}</h2>
+                        <span class="text-muted small d-none d-sm-inline">{{ _('Last 15 Days') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Closed Sales -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-success fw-bold small text-truncate">
+                            <i class="bi bi-trophy"></i> {{ _('CLOSED SALES') }}
+                        </h6>
+                        <h2 class="card-title fw-bold mb-0 fs-4">Gs {{ "{:,.0f}".format(won_amount).replace(',', '.') }}
+                        </h2>
+                        <span class="text-muted small d-none d-sm-inline">{{ _('This Month') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avg Ticket -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-warning fw-bold small text-truncate">
+                            <i class="bi bi-tag"></i> {{ _('AVG TICKET') }}
+                        </h6>
+                        <h2 class="card-title fw-bold mb-0 fs-4">Gs {{ "{:,.0f}".format(avg_ticket).replace(',', '.') }}
+                        </h2>
+                        <span class="text-muted small d-none d-sm-inline">{{ _('Average Value Won') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-danger h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-wallet2"></i> {{
+                            _('Awaiting Payment') }}</h6>
+                        <h3 class="card-text fw-bold mb-0 text-end" id="stat-awaiting-payment">{{
+                            awaiting_payment|format_currency }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-warning h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-lock"></i> {{
+                            _('Pending
+                            Contracts') }}</h6>
+                        <h3 class="card-text fw-bold mb-0 text-end" id="stat-pending-contracts">{{ pending_contracts }}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-primary h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-people"></i> {{ _('Total
+                            Clients') }}
+                        </h6>
+                        <h3 class="card-text fw-bold mb-0 text-end" id="stat-total-clients">{{ total_clients }}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="card text-white bg-info h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-text"></i> {{
+                            _('Total
+                            Proposals') }}</h6>
+                        <h3 class="card-text fw-bold mb-0 text-end" id="stat-total-proposals">{{ total_proposals }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <!-- Specialized Lists -->
+        <div class="row mb-4">
+            {% if role in ['owner', 'admin', 'manager', 'superadmin'] and expiring_projects %}
+            <div class="col-12 mb-4">
+                <div class="card border-warning shadow-sm">
+                    <div class="card-header bg-warning text-dark fw-bold">
+                        <i class="bi bi-exclamation-triangle"></i> {{ _('Renewal Alerts (Next 30 Days)') }}
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 small">
+                                <thead>
+                                    <tr>
+                                        <th>{{ _('Project') }}</th>
+                                        <th>{{ _('Client') }}</th>
+                                        <th>{{ _('End Date') }}</th>
+                                        <th>{{ _('Value') }}</th>
+                                        <th>{{ _('Actions') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for project in expiring_projects %}
+                                    <tr>
+                                        <td><strong>{{ project.name }}</strong></td>
+                                        <td>{{ project.client.name }}</td>
+                                        <td class="text-danger fw-bold">{{ project.end_date|format_date }}</td>
+                                        <td>{{ project.monthly_value|format_currency }}</td>
+                                        <td><a href="{{ url_for('projects.view', project_id=project.id) }}"
+                                                class="btn btn-xs btn-outline-primary py-0">{{ _('View') }}</a></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
+                </div>
+            </div>
+            {% endif %}
 
-                    <!-- Health Checks -->
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-shield-check text-info"></i> {{ _('Latest Health
-                            Checks') }}</h6>
-                        <div class="list-group list-group-flush">
-                            {% for check in recent_health_checks %}
-                            <a href="{{ url_for('clients.view', client_id=check.client.id) }}"
-                                class="list-group-item list-group-item-action px-0 border-0">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <small class="fw-bold text-truncate" style="max-width: 70%;">{{ check.client.name
-                                        }}</small>
-                                    <small class="text-muted">{{ check.created_at|format_date }}</small>
+            {% if role == 'production' %}
+            <div class="col-12 mb-4">
+                <div class="card border-info shadow-sm">
+                    <div class="card-header bg-info text-white fw-bold">
+                        <i class="bi bi-list-task"></i> {{ _('Operational Task Queue (Pending)') }}
+                    </div>
+                    <div class="list-group list-group-flush small">
+                        {% for ticket in pending_tickets %}
+                        <a href="{{ url_for('projects.view', project_id=ticket.project_id) }}"
+                            class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 text-primary">{{ ticket.title }}</h6>
+                                <span class="badge bg-{{ 'danger' if ticket.priority == 'urgent' else 'warning' }}">{{
+                                    ticket.priority }}</span>
+                            </div>
+                            <p class="mb-1 text-muted">{{ ticket.project.name }} | {{ ticket.project.client.name }}</p>
+                        </a>
+                        {% else %}
+                        <div class="p-3 text-center text-muted">{{ _('No pending tasks.') }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Pipeline Charts -->
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header fw-bold">{{ _('Client Pipeline') }}</div>
+                    <div class="card-body">
+                        <canvas id="clientsByStageChart"
+                            data-labels='{{ clients_by_stage|map(attribute=0)|list|tojson }}'
+                            data-values='{{ clients_by_stage|map(attribute=1)|list|tojson }}'></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header fw-bold">{{ _('Pipeline Distribution') }}</div>
+                    <div class="card-body">
+                        <canvas id="proposalsByStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Atividade Recente -->
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header fw-bold">
+                        <i class="bi bi-clock-history"></i> {{ _('Recent Activity') }}
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Recent Leads -->
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-person-plus text-primary"></i> {{ _('Latest
+                                    Leads') }}
+                                </h6>
+                                <div class="list-group list-group-flush">
+                                    {% for lead in recent_leads %}
+                                    <a href="{{ url_for('clients.view', client_id=lead.id) }}"
+                                        class="list-group-item list-group-item-action px-0 border-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <small class="fw-bold text-truncate" style="max-width: 70%;">{{ lead.name
+                                                }}</small>
+                                            <small class="text-muted">{{ lead.created_at|format_date }}</small>
+                                        </div>
+                                        <p class="mb-1 small text-muted">{{ lead.status|default('New', true) }}</p>
+                                    </a>
+                                    {% else %}
+                                    <p class="text-muted small">{{ _('No recent leads.') }}</p>
+                                    {% endfor %}
                                 </div>
-                                <p class="mb-1 small">
-                                    <span
-                                        class="badge {% if check.score > 70 %}bg-success{% elif check.score > 40 %}bg-warning{% else %}bg-danger{% endif %}">
-                                        {{ check.score }}/100
-                                    </span>
-                                </p>
-                            </a>
-                            {% else %}
-                            <p class="text-muted small">{{ _('No recent health checks.') }}</p>
-                            {% endfor %}
+                            </div>
+
+                            <!-- Interactions -->
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-telephone-inbound text-primary"></i> {{
+                                    _('Latest
+                                    Interactions') }}</h6>
+                                <div class="list-group list-group-flush">
+                                    {% for interaction in recent_interactions %}
+                                    <a href="{{ url_for('clients.view', client_id=interaction.client.id) }}"
+                                        class="list-group-item list-group-item-action px-0 border-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <small class="fw-bold text-truncate" style="max-width: 70%;">{{
+                                                interaction.client.name }}</small>
+                                            <small class="text-muted">{{ interaction.date|format_date }}</small>
+                                        </div>
+                                        <p class="mb-1 small">{{ interaction.type.name }}</p>
+                                    </a>
+                                    {% else %}
+                                    <p class="text-muted small">{{ _('No recent interactions.') }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Visits -->
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-geo-alt text-success"></i> {{ _('Latest
+                                    Visits') }}
+                                </h6>
+                                <div class="list-group list-group-flush">
+                                    {% for visit in recent_visits %}
+                                    <a href="{{ url_for('clients.view', client_id=visit.client.id) }}"
+                                        class="list-group-item list-group-item-action px-0 border-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <small class="fw-bold text-truncate" style="max-width: 70%;">{{
+                                                visit.client.name
+                                                }}</small>
+                                            <small class="text-muted">{{ visit.visit_date|format_date }}</small>
+                                        </div>
+                                        <p class="mb-1 small text-muted text-truncate">{{ visit.observations or _('No
+                                            observations') }}</p>
+                                    </a>
+                                    {% else %}
+                                    <p class="text-muted small">{{ _('No recent visits.') }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Health Checks -->
+                            <div class="col-md-6 col-lg-3 mb-3">
+                                <h6 class="fw-bold mb-3"><i class="bi bi-shield-check text-info"></i> {{ _('Latest
+                                    Health
+                                    Checks') }}</h6>
+                                <div class="list-group list-group-flush">
+                                    {% for check in recent_health_checks %}
+                                    <a href="{{ url_for('clients.view', client_id=check.client.id) }}"
+                                        class="list-group-item list-group-item-action px-0 border-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <small class="fw-bold text-truncate" style="max-width: 70%;">{{
+                                                check.client.name
+                                                }}</small>
+                                            <small class="text-muted">{{ check.created_at|format_date }}</small>
+                                        </div>
+                                        <p class="mb-1 small">
+                                            <span
+                                                class="badge {% if check.score > 70 %}bg-success{% elif check.score > 40 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {{ check.score }}/100
+                                            </span>
+                                        </p>
+                                    </a>
+                                    {% else %}
+                                    <p class="text-muted small">{{ _('No recent health checks.') }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 </div>
 
 <!-- Overdue Items Modal -->
@@ -672,7 +683,7 @@
         const list = document.getElementById(listId);
         const countBadge = document.getElementById(countId);
         list.innerHTML = '';
-        countBadge.textContent = tasks.length;
+        if (countBadge) countBadge.textContent = tasks.length;
 
         if (tasks.length === 0) {
             list.innerHTML = `<p class="text-muted text-center my-3">${emptyMsg}</p>`;
@@ -686,7 +697,7 @@
 
             const icon = task.is_call ? '<i class="bi bi-telephone"></i>' : '<i class="bi bi-geo-alt"></i>';
             const d = new Date(task.date);
-            const dateStr = d.toLocaleDateString('{{ current_language }}', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const dateStr = d.toLocaleDateString('{{ current_language|replace("_", "-") }}', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             item.innerHTML = `
                 <div>
