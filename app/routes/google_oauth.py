@@ -586,7 +586,10 @@ def link_location(connection_id):
             flash(_('Conexión no encontrada.'), 'error')
             return redirect(url_for('google_oauth.dashboard'))
 
+        from app.models import Client
         client = db.query(Client).get(int(client_id))
+        
+        from app.utils.decorators import get_current_user
         user = get_current_user()
         if not client or not user.can_manage_gmb_for(client):
             flash(_('Você não tem permissão para vincular este cliente.'), 'error')
@@ -803,6 +806,7 @@ def review_reply():
 def sync_insights(connection_id, link_id):
     """Route to manually sync GMB Insights for a client."""
     from app.services.google_business_service import get_service_for_connection
+    from app.models import GMBLocationLink
     company_id = session.get('company_id')
     
     with get_db() as db:
@@ -821,11 +825,18 @@ def sync_insights(connection_id, link_id):
             return redirect(request.referrer or url_for('clients.index'))
             
         try:
-            service = get_service_for_connection(connection_id)
+            # We don't need service via get_service_for_connection since sync_insights_to_cache
+            # is a method on GoogleBusinessService instance initialized with connection.
+            from app.services.google_business_service import GoogleBusinessService
+            service = GoogleBusinessService(connection)
+            
             # Sync last 30 days
+            # actually sync_insights_to_cache takes link_id, so it re-queries.
             count = service.sync_insights_to_cache(link_id, days=30)
             flash(_('Métricas sincronizadas com sucesso: %(count)s registros.', count=count), 'success')
         except Exception as e:
             flash(_('Erro ao sincronizar métricas: %(error)s', error=str(e)), 'error')
             
-    return redirect(request.referrer or url_for('clients.view', client_id=link.client_id))
+        client_id = link.client_id
+            
+    return redirect(url_for('clients.view', client_id=client_id, _anchor='insights'))

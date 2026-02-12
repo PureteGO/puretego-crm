@@ -4,10 +4,9 @@
     <div class="col-md-3 mb-3">
         <div class="card shadow-sm border-0 bg-primary text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-funnel"></i> {{ _('Leads em
-                    Prospecção') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-funnel"></i> {{ _('Leads in Prospecting') }}</h6>
                 <div class="h2 mb-0 fw-bold text-end">{{ my_clients_count }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Total de leads sob sua gestão') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Total leads under your management') }}</p>
             </div>
         </div>
     </div>
@@ -15,10 +14,9 @@
     <div class="col-md-3 mb-3">
         <div class="card shadow-sm border-0 bg-info text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-calendar-event"></i> {{ _('Reuniões
-                    Agendadas') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-calendar-event"></i> {{ _('Scheduled Meetings') }}</h6>
                 <div class="h2 mb-0 fw-bold text-end" id="sdr-scheduled-meetings">0</div>
-                <p class="mb-0 small opacity-75">{{ _('Convertidos para reunião este mês') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Converted to meeting this month') }}</p>
             </div>
         </div>
     </div>
@@ -26,10 +24,9 @@
     <div class="col-md-3 mb-3">
         <div class="card shadow-sm border-0 bg-warning text-dark h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-check2-circle"></i> {{ _('Health Checks
-                    Feitos') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-check2-circle"></i> {{ _('Health Checks Done') }}</h6>
                 <div class="h2 mb-0 fw-bold text-end">{{ recent_health_checks|length }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Análises recentes para prospecção') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Recent analysis for prospecting') }}</p>
             </div>
         </div>
     </div>
@@ -38,10 +35,9 @@
         <div
             class="card shadow-sm border-0 {% if critical_leads_count > 0 %}bg-danger text-white animate__animated animate__pulse animate__infinite{% else %}bg-light text-muted{% endif %} h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-clock-history"></i> {{ _('Leads
-                    Críticos') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-clock-history"></i> {{ _('Critical Leads') }}</h6>
                 <div class="h2 mb-0 fw-bold text-end">{{ critical_leads_count }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Sem contato há mais de 48h') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('No contact for more than 48h') }}</p>
             </div>
         </div>
     </div>
@@ -52,14 +48,14 @@
     <div class="col-md-8 mb-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header py-3">
-                <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-list-task"></i> {{ _('Minhas Tarefas de
-                    Prospecção') }}</h5>
+                <h5 class="mb-0 fw-bold text-primary"><i class="bi bi-list-task"></i> {{ _('My Prospecting Tasks') }}
+                </h5>
             </div>
             <div class="card-body p-0" id="workflow-tasks-container">
                 <!-- Reactive Tasks will be rendered here by JS -->
                 <div class="p-4 text-center">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Carregando tarefas...</span>
+                        <span class="visually-hidden">{{ _('Loading tasks...') }}</span>
                     </div>
                 </div>
             </div>
@@ -70,25 +66,24 @@
     <div class="col-md-4 mb-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header py-3">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-lightning"></i> {{ _('Ações Rápidas') }}</h5>
+                <h5 class="mb-0 fw-bold"><i class="bi bi-lightning"></i> {{ _('Quick Actions') }}</h5>
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
                     <a href="{{ url_for('clients.kanban') }}" class="btn btn-outline-primary text-start">
-                        <i class="bi bi-kanban"></i> Ver Pipeline Kanban
+                        <i class="bi bi-kanban"></i> {{ _('View Kanban Pipeline') }}
                     </a>
                     <a href="{{ url_for('clients.create') }}" class="btn btn-outline-primary text-start">
-                        <i class="bi bi-person-plus"></i> Novo Lead Manual
+                        <i class="bi bi-person-plus"></i> {{ _('New Manual Lead') }}
                     </a>
                     <button class="btn btn-outline-primary text-start"
                         onclick="document.getElementById('quickCheckInput').focus()">
-                        <i class="bi bi-search"></i> Novo Health Check GMB
+                        <i class="bi bi-search"></i> {{ _('New GMB Health Check') }}
                     </button>
                 </div>
                 <hr>
                 <div class="alert alert-info small mb-0">
-                    <i class="bi bi-info-circle"></i> {{ _('Ao mover um card para "Agendado", uma tarefa será criada
-                    automaticamente para o Vendedor.') }}
+                    <i class="bi bi-info-circle"></i> {{ _('When moving a card to "Scheduled", a task will be created automatically for the Salesperson.') }}
                 </div>
             </div>
         </div>

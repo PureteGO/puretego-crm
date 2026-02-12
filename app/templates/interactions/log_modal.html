@@ -29,7 +29,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">{{ _('Date/Time') }}</label>
-                        <input type="datetime-local" class="form-control" id="interactionDate" name="date" required>
+                        <input type="text" class="form-control flatpickr" id="interactionDate" name="date" required>
                     </div>
 
                     <div class="mb-3">
@@ -88,7 +88,8 @@
         // Set default date to now
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        document.getElementById('interactionDate').value = now.toISOString().slice(0, 16);
+        // Flatpickr format: Y-m-d H:i
+        document.getElementById('interactionDate').value = now.toISOString().slice(0, 16).replace('T', ' ');
 
         // Load Types
         fetch('/interactions/types')
@@ -112,7 +113,7 @@
             // Reset date
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            document.getElementById('interactionDate').value = now.toISOString().slice(0, 16);
+            document.getElementById('interactionDate').value = now.toISOString().slice(0, 16).replace('T', ' ');
         });
     });
 
@@ -125,8 +126,9 @@
 
         // Format date for datetime-local (yyyy-MM-ddThh:mm)
         const date = new Date(dateStr);
-        date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
-        document.getElementById('interactionDate').value = date.toISOString().slice(0, 16);
+        date.setMinutes(date.getMinutes() - date.getTimezoneOffset()); // Adjust timezone
+        // Flatpickr format: Y-m-d H:i
+        document.getElementById('interactionDate').value = date.toISOString().slice(0, 16).replace('T', ' ');
 
         const modal = new bootstrap.Modal(document.getElementById('logInteractionModal'));
         modal.show();

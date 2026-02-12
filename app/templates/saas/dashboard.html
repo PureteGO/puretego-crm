@@ -4,32 +4,33 @@
 
 {% block content %}
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="bi bi-clouds-fill me-2"></i>{{ _('SaaS Administration') }}</h1>
-        <div>
-            <a href="{{ url_for('saas.packages_list') }}" class="btn btn-outline-info me-2">
-                <i class="bi bi-box-seam"></i> {{ _('Manage Packages') }}
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h1 class="mb-0"><i class="bi bi-clouds-fill me-2"></i>{{ _('SaaS Administration') }}</h1>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('saas.packages_list') }}" class="btn btn-outline-info">
+                <i class="bi bi-box-seam me-1"></i> <span class="d-none d-sm-inline">{{ _('Manage Packages')
+                    }}</span><span class="d-sm-none">{{ _('Packs') }}</span>
             </a>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newCompanyModal">
-                <i class="bi bi-plus-lg"></i> {{ _('New Company') }}
+                <i class="bi bi-plus-lg me-1"></i> {{ _('New Company') }}
             </button>
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-dark text-white">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
             <h5 class="mb-0">{{ _('Registered Companies (Tenants)') }}</h5>
+            <span class="badge bg-primary rounded-pill">{{ companies|length }}</span>
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
+                <thead class="table-light d-none d-md-table-header-group">
                     <tr>
-                        <th>ID</th>
+                        <th style="width: 50px;">ID</th>
                         <th>{{ _('Company') }}</th>
                         <th>{{ _('Slug') }}</th>
                         <th>{{ _('Status') }}</th>
-                        <th>{{ _('Users') }}</th>
-                        <th>{{ _('Clients') }}</th>
+                        <th class="text-center">{{ _('Stats') }}</th>
                         <th>{{ _('Created at') }}</th>
                         <th class="text-end">{{ _('Actions') }}</th>
                     </tr>
@@ -37,31 +38,53 @@
                 <tbody>
                     {% for company in companies %}
                     <tr>
-                        <td>{{ company.id }}</td>
+                        <td class="d-none d-md-table-cell text-muted small">#{{ company.id }}</td>
                         <td>
-                            <div class="fw-bold">{{ company.name }}</div>
-                            <small class="text-muted">{{ company.email or _('No email') }}</small>
+                            <div class="fw-bold fs-5 fs-md-6">{{ company.name }}</div>
+                            <div class="d-flex align-items-center gap-2 mt-1">
+                                <small class="text-muted d-block">{{ company.email or _('No email') }}</small>
+                                <span
+                                    class="d-md-none badge {% if company.is_active %}bg-success{% else %}bg-danger{% endif %} py-1">
+                                    {{ _('Active') if company.is_active else _('Inactive') }}
+                                </span>
+                            </div>
+                            <div class="d-md-none mt-2 small">
+                                <span class="me-2"><i class="bi bi-people me-1"></i>{{ company.users_count }}</span>
+                                <span><i class="bi bi-person-badge me-1"></i>{{ company.clients_count }}</span>
+                            </div>
                         </td>
-                        <td><code>{{ company.slug }}</code></td>
-                        <td>
+                        <td class="d-none d-md-table-cell">
+                            <span class="badge bg-light text-dark border font-monospace">{{ company.slug }}</span>
+                        </td>
+                        <td class="d-none d-md-table-cell">
                             {% if company.is_active %}
-                            <span class="badge bg-success">{{ _('Active') }}</span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle">{{
+                                _('Active') }}</span>
                             {% else %}
-                            <span class="badge bg-danger">{{ _('Inactive') }}</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{
+                                _('Inactive') }}</span>
                             {% endif %}
                         </td>
-                        <td><span class="badge bg-secondary">{{ company.users_count }}</span></td>
-                        <td><span class="badge bg-info">{{ company.clients_count }}</span></td>
-                        <td>{{ company.created_at|format_date }}</td>
+                        <td class="d-none d-md-table-cell text-center">
+                            <span class="badge bg-info-subtle text-info border" title="{{ _('Clients') }}">{{
+                                company.clients_count }} <i class="bi bi-person-badge"></i></span>
+                        </td>
+                        <td class="d-none d-md-table-cell small text-muted">
+                            {{ company.created_at|format_date }}
+                        </td>
                         <td class="text-end">
-                            <a href="{{ url_for('saas.impersonate', company_id=company.id) }}"
-                                class="btn btn-sm btn-outline-warning" title="{{ _('Access as this company') }}">
-                                <i class="bi bi-box-arrow-in-right"></i>
-                            </a>
-                            <a href="{{ url_for('saas.edit_company', company_id=company.id) }}"
-                                class="btn btn-sm btn-outline-primary" title="{{ _('Edit Settings') }}">
-                                <i class="bi bi-gear"></i>
-                            </a>
+                            <div class="btn-group">
+                                <a href="{{ url_for('saas.impersonate', company_id=company.id) }}"
+                                    class="btn btn-sm btn-outline-warning" title="{{ _('Access as this company') }}">
+                                    <i class="bi bi-box-arrow-in-right"></i> <span class="d-none d-lg-inline ms-1">{{
+                                        _('Access') }}</span>
+                                </a>
+                                <a href="{{ url_for('saas.edit_company', company_id=company.id) }}"
+                                    class="btn btn-sm btn-outline-primary" title="{{ _('Edit Settings') }}">
+                                    <i class="bi bi-gear"></i> <span class="d-none d-lg-inline ms-1">{{ _('Settings')
+                                        }}</span>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% else %}

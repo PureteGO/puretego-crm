@@ -28,9 +28,13 @@ def index():
             joinedload(User.company)
         )
         
-        # Superadmins veem todos os usuários
-        if not session.get('is_superadmin'):
+        # Filtro de segurança: Se tem empresa na sessão, VÊ APENAS DA EMPRESA
+        # Isso previne que Tenant Owners (mesmo com flag errada de superadmin) vejam outros users
+        if company_id:
             users_query = users_query.filter(User.company_id == company_id)
+        elif not session.get('is_superadmin'):
+            # Sem empresa e não é superadmin? (Caso raro, mostra nada ou só ele mesmo)
+            users_query = users_query.filter(User.id == session.get('user_id'))
         
         users = users_query.order_by(User.name).all()
         

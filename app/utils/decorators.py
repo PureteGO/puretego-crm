@@ -5,6 +5,7 @@ Decorators para autenticação e controle de acesso
 
 from functools import wraps
 from flask import session, redirect, url_for, flash, g
+from flask_babel import _ as gettext
 from config.database import get_db
 from app.models import User
 
@@ -45,24 +46,24 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            flash('Você precisa estar logado para acessar esta página.', 'warning')
+            flash(gettext('You must be logged in to access this page.'), 'warning')
             return redirect(url_for('auth.login'))
         
         user = get_current_user()
         
         if not user:
             session.clear()
-            flash('Sessão expirada. Faça login novamente.', 'warning')
+            flash(gettext('Session expired. Please log in again.'), 'warning')
             return redirect(url_for('auth.login'))
         
         if not user.is_active:
             session.clear()
-            flash('Sua conta está inativa. Entre em contato com o administrador.', 'error')
+            flash(gettext('Your account is inactive. Contact the administrator.'), 'error')
             return redirect(url_for('auth.login'))
         
         if user.company and not user.company.is_active:
             session.clear()
-            flash('Sua empresa está inativa. Entre em contato com o suporte.', 'error')
+            flash(gettext('Your company is inactive. Contact support.'), 'error')
             return redirect(url_for('auth.login'))
         
         return f(*args, **kwargs)
@@ -89,7 +90,7 @@ def permission_required(permission):
                 # Double-check no banco
                 user = get_current_user()
                 if not user or not user.has_permission(permission):
-                    flash('Você não tem permissão para acessar esta funcionalidade.', 'error')
+                    flash(gettext('You do not have permission to access this feature.'), 'error')
                     return redirect(url_for('dashboard.index'))
             
             return f(*args, **kwargs)
@@ -116,7 +117,7 @@ def role_required(*allowed_roles):
                 if session.get('is_superadmin'):
                     return f(*args, **kwargs)
                 
-                flash('Você não tem permissão para acessar esta funcionalidade.', 'error')
+                flash(gettext('You do not have permission to access this feature.'), 'error')
                 return redirect(url_for('dashboard.index'))
             
             return f(*args, **kwargs)

@@ -1,23 +1,23 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Comissões') }} - Maps2GO{% endblock %}
+{% block title %}{{ _('Commissions') }} - Maps2GO{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{{ _('Financeiro') }}</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ _('Finance') }}</h1>
     </div>
 
     <!-- Navigation Tabs -->
     <ul class="nav nav-tabs mb-4">
         <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('finance.list_receivables') }}">{{ _('Recebíveis') }}</a>
+            <a class="nav-link" href="{{ url_for('finance.list_receivables') }}">{{ _('Receivables') }}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('finance.list_payables') }}">{{ _('Contas a Pagar') }}</a>
+            <a class="nav-link" href="{{ url_for('finance.list_payables') }}">{{ _('Accounts Payable') }}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="{{ url_for('finance.list_commissions') }}">{{ _('Comissões') }}</a>
+            <a class="nav-link active" href="{{ url_for('finance.list_commissions') }}">{{ _('Commissions') }}</a>
         </li>
     </ul>
 
@@ -45,8 +45,8 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ _('Comissões
-                                Pagas') }}</div>
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ _('Paid
+                                Commissions') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_paid | format_currency }}
                             </div>
                         </div>
@@ -62,20 +62,20 @@
     <!-- Commissions Table -->
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">{{ _('Lista de Comissões') }}</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ _('Commissions List') }}</h6>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead>
                         <tr>
-                            <th>{{ _('Colaborador') }}</th>
-                            <th>{{ _('Negócio') }}</th>
-                            <th>{{ _('Tipo') }}</th>
-                            <th>{{ _('Valor') }}</th>
+                            <th>{{ _('Collaborator') }}</th>
+                            <th>{{ _('Deal') }}</th>
+                            <th>{{ _('Type') }}</th>
+                            <th>{{ _('Value') }}</th>
                             <th>{{ _('Status') }}</th>
-                            <th>{{ _('Data Gerada') }}</th>
-                            <th>{{ _('Ações') }}</th>
+                            <th>{{ _('Date Generated') }}</th>
+                            <th>{{ _('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -92,16 +92,16 @@
                             <td>{{ c.amount | format_currency }}</td>
                             <td>
                                 {% if c.status == 'paid' %}
-                                <span class="badge bg-success">{{ _('Pago') }}</span>
+                                <span class="badge bg-success">{{ _('Paid') }}</span>
                                 {% else %}
-                                <span class="badge bg-warning text-dark">{{ _('Pendente') }}</span>
+                                <span class="badge bg-warning text-dark">{{ _('Pending') }}</span>
                                 {% endif %}
                             </td>
                             <td>{{ c.created_at | format_date }}</td>
                             <td>
                                 {% if c.status == 'pending' %}
                                 <button onclick="payCommission({{ c.id }})" class="btn btn-sm btn-success">
-                                    <i class="bi bi-cash"></i> {{ _('Pagar') }}
+                                    <i class="bi bi-cash"></i> {{ _('Pay') }}
                                 </button>
                                 {% else %}
                                 <small class="text-muted"><i class="bi bi-calendar-check text-success"></i> {{ c.paid_at
@@ -127,7 +127,7 @@
 {% block scripts %}
 <script>
     function payCommission(id) {
-        if (!confirm('{{ _("Confirmar pagamento desta comissão?") }}')) return;
+        if (!confirm('{{ _("Confirm payment for this commission?") }}')) return;
 
         fetch(`/finance/commissions/${id}/pay`, {
             method: 'POST',

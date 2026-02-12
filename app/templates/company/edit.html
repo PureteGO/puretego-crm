@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ _('Editar Empresa') }} - PURETEGO CRM{% endblock %}
+{% block title %}{{ _('Edit Company') }} - PURETEGO CRM{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -7,17 +7,17 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="mb-0"><i class="bi bi-building-gear me-2"></i>{{ _('Editar Empresa') }}</h4>
+                    <h4 class="mb-0"><i class="bi bi-building-gear me-2"></i>{{ _('Edit Company') }}</h4>
                 </div>
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="row">
                             <div class="col-md-4 text-center mb-4">
-                                <label class="form-label fw-bold">{{ _('Logo de la Empresa') }}</label>
+                                <label class="form-label fw-bold">{{ _('Company Logo') }}</label>
                                 <div class="mb-3">
                                     {% if company.logo_url %}
-                                    <img src="{{ company.logo_url }}" alt="{{ _('Logo actual') }}"
+                                    <img src="{{ company.logo_url }}" alt="{{ _('Current Logo') }}"
                                         class="img-fluid rounded mb-2" style="max-height: 120px;">
                                     {% else %}
                                     <div class="bg-light rounded d-flex align-items-center justify-content-center mb-2"
@@ -32,9 +32,9 @@
                                 {% if company.logo_url %}
                                 <div class="mt-2">
                                     <a href="{{ url_for('company.remove_logo') }}"
-                                        onclick="return confirm('{{ _('¿Está seguro de eliminar el logo?') }}');"
+                                        onclick="return confirm('{{ _('Are you sure you want to delete the logo?') }}');"
                                         class="btn btn-outline-danger btn-sm">
-                                        <i class="bi bi-trash me-1"></i>{{ _('Eliminar Logo') }}
+                                        <i class="bi bi-trash me-1"></i>{{ _('Delete Logo') }}
                                     </a>
                                 </div>
                                 {% endif %}
@@ -42,16 +42,16 @@
 
                             <div class="col-md-8">
                                 <div class="mb-3">
-                                    <label for="name" class="form-label">{{ _('Nombre de la Empresa') }} *</label>
+                                    <label for="name" class="form-label">{{ _('Company Name') }} *</label>
                                     <input type="text" class="form-control" id="name" name="name"
                                         value="{{ company.name }}" required>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="slug" class="form-label">{{ _('Slug (Identificador)') }}</label>
+                                    <label for="slug" class="form-label">{{ _('Slug (Identifier)') }}</label>
                                     <input type="text" class="form-control" id="slug" value="{{ company.slug }}"
                                         disabled>
-                                    <small class="text-muted">{{ _('El slug no puede ser modificado') }}</small>
+                                    <small class="text-muted">{{ _('Slug cannot be modified') }}</small>
                                 </div>
 
                                 <div class="mb-3">
@@ -61,13 +61,13 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="phone" class="form-label">{{ _('Teléfono') }}</label>
+                                    <label for="phone" class="form-label">{{ _('Phone') }}</label>
                                     <input type="tel" class="form-control" id="phone" name="phone"
                                         value="{{ company.phone or '' }}">
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="address" class="form-label">{{ _('Dirección') }}</label>
+                                    <label for="address" class="form-label">{{ _('Address') }}</label>
                                     <textarea class="form-control" id="address" name="address"
                                         rows="2">{{ company.address or '' }}</textarea>
                                 </div>
@@ -83,8 +83,8 @@
                                         <option value="USD">Dólar (EUA)</option>
                                         <option value="€">Euro</option>
                                     </datalist>
-                                    <small class="text-muted">{{ _('Este símbolo se usará en todos los valores
-                                        monetarios del sistema.') }}</small>
+                                    <small class="text-muted">{{ _('This symbol will be used for all monetary values in
+                                        the system.') }}</small>
                                 </div>
                             </div>
                         </div>
@@ -93,11 +93,11 @@
                         <div class="row mt-4">
                             <div class="col-12">
                                 <label class="form-label fw-bold">
-                                    <i class="bi bi-palette me-1"></i>{{ _('Estilo Visual de la Empresa') }}
+                                    <i class="bi bi-palette me-1"></i>{{ _('Company Visual Style') }}
                                 </label>
                                 <p class="text-muted small mb-3">
-                                    {{ _('Selecciona el tema de color que deseas para tu empresa. Este tema se aplicará
-                                    a todos los usuarios.') }}
+                                    {{ _('Select the color theme you want for your company. This theme will be applied
+                                    to all users.') }}
                                 </p>
                                 <div class="row g-3">
                                     {% for value, name, description in theme_choices %}
@@ -125,10 +125,10 @@
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg me-1"></i>{{ _('Guardar Cambios') }}
+                                <i class="bi bi-check-lg me-1"></i>{{ _('Save Changes') }}
                             </button>
                             <a href="{{ url_for('company.profile') }}" class="btn btn-secondary">
-                                <i class="bi bi-x-lg me-1"></i>{{ _('Cancelar') }}
+                                <i class="bi bi-x-lg me-1"></i>{{ _('Cancel') }}
                             </a>
                         </div>
                     </form>

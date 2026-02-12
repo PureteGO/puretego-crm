@@ -4,6 +4,7 @@ Service class for Google Business Profile API operations
 """
 
 import os
+import logging
 import requests
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
@@ -12,6 +13,8 @@ import google.auth.transport.requests
 
 from app.models import GoogleConnection, GMBLocationLink, GMBReview, GMBInsight
 from config.database import get_db
+
+logger = logging.getLogger(__name__)
 
 
 class GoogleBusinessService:
@@ -211,31 +214,50 @@ class GoogleBusinessService:
 
     def get_location_summary_v4(self, location_name: str) -> Dict:
         """
-        Get location summary from v4 API (includes ratings/reviews count).
-        GET https://mybusiness.googleapis.com/v4/{location_name}
+        Get location summary from API (includes ratings/reviews count if available).
+        Tries v4 first, then falls back to v1 if 404.
         """
-        # Ensure location_name is in the correct format for v4 (accounts/X/locations/Y)
-        url = f"https://mybusiness.googleapis.com/v4/{location_name}"
+        # Host for v4 My Business API
+        v4_url = f"https://mybusiness.googleapis.com/v4/{location_name}"
+        # Host for v1 Business Information API
+        v1_url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{location_name}"
+        
+        logger.debug(f"Attempting v4 Summary: {v4_url}")
+        from flask import current_app
+        
         try:
-            response = requests.get(url, headers=self._get_headers(), timeout=30)
+            # Try v4 first as it contains averageRating/totalReviewCount
+            response = requests.get(v4_url, headers=self._get_headers(), timeout=30)
             
-            from flask import current_app
-            if response.status_code != 200:
-                current_app.logger.error(f"GMB v4 Summary Error {response.status_code} for {location_name}: {response.text}")
-                # Try to return something even if error, to signal failure
-                return {'averageRating': 0, 'totalReviewCount': 0, 'error': response.status_code, 'raw_response': response.text}
-                
-            data = response.json()
-            # Log the full data for debugging rating issues
-            current_app.logger.info(f"GMB v4 Summary Data for {location_name}: {data}")
+            if response.status_code == 200:
+                data = response.json()
+                current_app.logger.info(f"GMB v4 Summary Data for {location_name}: {data}")
+                return {
+                    'averageRating': data.get('averageRating', 0),
+                    'totalReviewCount': data.get('totalReviewCount', 0)
+                }
             
-            return {
-                'averageRating': data.get('averageRating', 0),
-                'totalReviewCount': data.get('totalReviewCount', 0)
-            }
+            if response.status_code == 404:
+                logger.debug(f"v4 Summary 404. Trying v1 fallback: {v1_url}")
+                v1_resp = requests.get(v1_url, headers=self._get_headers(), timeout=30)
+                if v1_resp.status_code == 200:
+                    data = v1_resp.json()
+                    current_app.logger.info(f"GMB v1 Location Data for {location_name}: {data}")
+                    # v1 doesn't have ratings, but at least we confirmed the location exists
+                    return {
+                        'averageRating': 0,
+                        'totalReviewCount': 0,
+                        'v1_data': True,
+                        'title': data.get('title', '')
+                    }
+                else:
+                    logger.warning(f"v1 fallback also failed: {v1_resp.status_code}")
+            
+            current_app.logger.error(f"GMB Summary Error {response.status_code} for {location_name}: {response.text}")
+            return {'averageRating': 0, 'totalReviewCount': 0, 'error': response.status_code}
+            
         except Exception as e:
-            from flask import current_app
-            current_app.logger.error(f"Exception getting v4 summary for {location_name}: {e}")
+            current_app.logger.error(f"Exception getting summary for {location_name}: {e}")
             return {'averageRating': 0, 'totalReviewCount': 0, 'exception': str(e)}
 
 
@@ -295,19 +317,23 @@ class GoogleBusinessService:
         # The reviews endpoint uses a different base URL pattern
         # For v1 API: GET accounts/{accountId}/locations/{locationId}/reviews
         url = f"https://mybusiness.googleapis.com/v4/{location_name}/reviews"
+        logger.debug(f"v4 Reviews URL: {url}")
         params = {
             'pageSize': min(page_size, 50)
         }
         
         try:
             response = requests.get(url, headers=self._get_headers(), params=params, timeout=30)
+            logger.debug(f"v4 Reviews Status: {response.status_code}")
             
             from flask import current_app
             if response.status_code == 403:
+                 logger.error(f"v4 Reviews 403 Body: {response.text}")
                  current_app.logger.error(f"GMB Reviews 403 Forbidden for {location_name}. Check if API is enabled and scopes are correct.")
                  raise Exception("Acceso Denegado (403): La 'Google My Business API' podría no estar habilitada en su Google Cloud Console o su cuenta no tiene permisos suficientes para este perfil.")
             
             if response.status_code != 200:
+                 logger.error(f"v4 Reviews Error Body: {response.text}")
                  current_app.logger.error(f"GMB Reviews Error {response.status_code}: {response.text}")
             
             response.raise_for_status()
@@ -505,15 +531,23 @@ class GoogleBusinessService:
             location_name: Full location name (accounts/X/locations/Y)
             days: Number of days of history to fetch (max 90)
         """
+        if '/locations/' in location_name:
+             try:
+                real_name = 'locations/' + location_name.split('/locations/')[1]
+             except:
+                real_name = location_name
+        else:
+             real_name = location_name
+
         # The Performance API uses a specific endpoint for daily metrics
         # GET https://businessprofileperformance.googleapis.com/v1/{name}/fetchMultiDailyMetricsTimeSeries
-        url = f"https://businessprofileperformance.googleapis.com/v1/{location_name}:fetchMultiDailyMetricsTimeSeries"
+        url = f"https://businessprofileperformance.googleapis.com/v1/{real_name}:fetchMultiDailyMetricsTimeSeries"
         
         # Calculate time range
         end_date = datetime.utcnow().date()
         start_date = end_date - timedelta(days=days)
         
-        params = {
+        payload = {
             'dailyMetrics': [
                 'BUSINESS_IMPRESSIONS_DESKTOP_MAPS',
                 'BUSINESS_IMPRESSIONS_DESKTOP_SEARCH',
@@ -532,10 +566,30 @@ class GoogleBusinessService:
         }
         
         try:
-            response = requests.get(url, headers=self._get_headers(), params=params, timeout=30)
+            response = requests.post(url, headers=self._get_headers(), json=payload, timeout=30)
+            
+            # DEBUG: Print status and response for troubleshooting
+            logger.debug(f"Status Code: {response.status_code}, URL: {url}")
+            
+            if response.status_code == 403:
+                 body = response.json() if response.text else {}
+                 error_msg = body.get('error', {}).get('message', '')
+                 logger.error(f"403 detected: {error_msg}")
+                 
+                 if "Business Profile Performance API" in error_msg:
+                     raise Exception("API Desabilitada: Por favor, habilite a 'Business Profile Performance API' no seu Google Cloud Console para ver estes dados.")
+                 
+                 # Try with location_name (accounts/X/locations/Y)
+                 url_fallback = f"https://businessprofileperformance.googleapis.com/v1/{location_name}:fetchMultiDailyMetricsTimeSeries"
+                 logger.debug(f"Fallback URL: {url_fallback}")
+                 response = requests.post(url_fallback, headers=self._get_headers(), json=payload, timeout=30)
+                 logger.debug(f"Fallback Status: {response.status_code}")
+
             response.raise_for_status()
             
             data = response.json()
+            logger.debug(f"Response Data: {data}")
+            
             time_series_list = data.get('multiDailyMetricTimeSeries', [])
             
             # Reformat data for easier storage
@@ -558,51 +612,58 @@ class GoogleBusinessService:
             return results
             
         except Exception as e:
-            print(f"Error fetching GMB performance data: {str(e)}")
+            logger.error(f"Error fetching GMB performance data: {str(e)}")
             return []
 
     def sync_insights_to_cache(self, location_link_id: int, days: int = 30) -> int:
         """
         Fetch insights from Google and sync to GMBInsight table.
         """
-        with get_db() as db:
-            link = db.query(GMBLocationLink).get(location_link_id)
-            if not link:
-                return 0
-                
-            insights_data = self.fetch_insights(link.gmb_location_name, days=days)
-            if not insights_data:
-                return 0
-                
-            synced_count = 0
-            for item in insights_data:
-                # Map Google metric names to our internal names
-                # Simplified categories for dashboard
-                metric_cat = 'impressions'
-                if 'IMPRESSIONS' in item['metric']:
+        import traceback
+        from app.models.ranking import GMBInsight
+        from app.models.gmb_location_link import GMBLocationLink
+        
+        try:
+            with get_db() as db:
+                link = db.query(GMBLocationLink).get(location_link_id)
+                if not link:
+                    logger.error(f"Link {location_link_id} not found.")
+                    return 0
+                    
+                insights_data = self.fetch_insights(link.gmb_location_name, days=days)
+                if not insights_data:
+                    logger.warning(f"No insights data returned for {link.gmb_location_name}")
+                    return 0
+                    
+                synced_count = 0
+                for item in insights_data:
+                    # Map Google metric names to our internal names
+                    # Simplified categories for dashboard
                     metric_cat = 'impressions'
-                elif 'CALL' in item['metric']:
-                    metric_cat = 'calls'
-                elif 'WEBSITE' in item['metric']:
-                    metric_cat = 'website_clicks'
-                elif 'DIRECTION' in item['metric']:
-                    metric_cat = 'directions'
-                
-                item_date = datetime.strptime(item['date'], '%Y-%m-%d')
-                
-                # Check for existing record for this link/date/metric
-                existing = db.query(GMBInsight).filter(
-                    GMBInsight.location_link_id == location_link_id,
-                    GMBInsight.date == item_date,
-                    GMBInsight.metric == item['metric']
-                ).first()
-                
-                if existing:
-                    existing.value = item['value']
-                    existing.synced_at = datetime.utcnow()
-                else:
-                    insight = GMBInsight(
-                        location_link_id=location_link_id,
+                    if 'IMPRESSIONS' in item['metric']:
+                        metric_cat = 'impressions'
+                    elif 'CALL' in item['metric']:
+                        metric_cat = 'calls'
+                    elif 'WEBSITE' in item['metric']:
+                        metric_cat = 'website_clicks'
+                    elif 'DIRECTION' in item['metric']:
+                        metric_cat = 'directions'
+                    
+                    item_date = datetime.strptime(item['date'], '%Y-%m-%d')
+                    
+                    # Check for existing record for this link/date/metric
+                    existing = db.query(GMBInsight).filter(
+                        GMBInsight.location_link_id == location_link_id,
+                        GMBInsight.date == item_date,
+                        GMBInsight.metric == item['metric']
+                    ).first()
+                    
+                    if existing:
+                        existing.value = item['value']
+                        existing.synced_at = datetime.utcnow()
+                    else:
+                        insight = GMBInsight(
+                            location_link_id=location_link_id,
                         date=item_date,
                         metric=item['metric'],
                         value=item['value']
@@ -612,6 +673,10 @@ class GoogleBusinessService:
             
             db.commit()
             return synced_count
+            
+        except Exception as e:
+            logger.exception(f"Sync insights failed: {str(e)}")
+            return 0
 
 
 def get_service_for_connection(connection_id: int) -> GoogleBusinessService:

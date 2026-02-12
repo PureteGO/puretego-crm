@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "C:\ProAG\puretego-crm\debug_clients_500.py", line 6, in <module>
+    app = create_app()
+  File "C:\ProAG\puretego-crm\app\__init__.py", line 69, in create_app
+    from app.routes import auth, dashboard, users, clients, interactions, visits, health_checks, proposals, google_oauth, saas, calendar, prospecting, company, projects, tasks, finance
+  File "C:\ProAG\puretego-crm\app\routes\__init__.py", line 5, in <module>
+    from . import auth, dashboard, clients, visits, health_checks, proposals
+  File "C:\ProAG\puretego-crm\app\routes\health_checks.py", line 102
+    try:
+    ^^^
+IndentationError: expected an indented block after 'try' statement on line 101

@@ -3,10 +3,9 @@
     <div class="col-md-4 mb-3">
         <div class="card shadow-sm border-0 bg-info text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-rocket-takeoff"></i> {{ _('Onboarding')
-                    }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-rocket-takeoff"></i> {{ _('Onboarding') }}</h6>
                 <div class="h2 mb-0 fw-bold">{{ onboarding_count }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Projetos em fase inicial') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Projects in initial phase') }}</p>
             </div>
         </div>
     </div>
@@ -14,10 +13,9 @@
     <div class="col-md-4 mb-3">
         <div class="card shadow-sm border-0 bg-primary text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-play-circle"></i> {{ _('Em Execução')
-                    }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-play-circle"></i> {{ _('In Execution') }}</h6>,
                 <div class="h2 mb-0 fw-bold">{{ execution_count }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Projetos ativos no momento') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Currently active projects') }}</p>
             </div>
         </div>
     </div>
@@ -25,10 +23,9 @@
     <div class="col-md-4 mb-3">
         <div class="card shadow-sm border-0 bg-warning text-dark h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-ticket-perforated"></i> {{ _('Tickets
-                    Pendentes') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-ticket-perforated"></i> {{ _('Pending Tickets') }}</h6>
                 <div class="h2 mb-0 fw-bold">{{ pending_tickets|length }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Ações operacionais aguardando') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Operational actions waiting') }}</p>
             </div>
         </div>
     </div>
@@ -39,14 +36,14 @@
     <div class="col-md-8 mb-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold text-info"><i class="bi bi-list-check"></i> {{ _('Fila de Produção & GMB') }}
+                <h5 class="mb-0 fw-bold text-info"><i class="bi bi-list-check"></i> {{ _('Production & GMB Queue') }}
                 </h5>
             </div>
             <div class="card-body p-0" id="workflow-tasks-container">
                 <!-- Reactive Tasks will be rendered here by JS -->
                 <div class="p-4 text-center">
                     <div class="spinner-border text-info" role="status">
-                        <span class="visually-hidden">Carregando fila...</span>
+                        <span class="visually-hidden">{{ _('Loading queue...') }}</span>
                     </div>
                 </div>
             </div>
@@ -57,24 +54,23 @@
     <div class="col-md-4 mb-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header py-3">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-tools"></i> {{ _('Ferramentas Ops') }}</h5>
+                <h5 class="mb-0 fw-bold"><i class="bi bi-tools"></i> {{ _('Ops Tools') }}</h5>
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
                     <a href="{{ url_for('projects.index') }}" class="btn btn-outline-info text-start">
-                        <i class="bi bi-briefcase"></i> Gerenciar Projetos
+                        <i class="bi bi-briefcase"></i> {{ _('Manage Projects') }}
                     </a>
                     <a href="#" class="btn btn-outline-info text-start">
-                        <i class="bi bi-google"></i> Google Business Profile
+                        <i class="bi bi-google"></i> {{ _('Google Business Profile') }}
                     </a>
                     <button class="btn btn-outline-info text-start" onclick="location.reload()">
-                        <i class="bi bi-arrow-clockwise"></i> Atualizar Status
+                        <i class="bi bi-arrow-clockwise"></i> {{ _('Update Status') }}
                     </button>
                 </div>
                 <hr>
                 <div class="alert alert-info small mb-0">
-                    <i class="bi bi-info-circle"></i> {{ _('Tarefas de onboarding são criadas automaticamente quando o
-                    comercial fecha uma venda.') }}
+                    <i class="bi bi-info-circle"></i> {{ _('Onboarding tasks are created automatically when sales closes a deal.') }}
                 </div>
             </div>
         </div>

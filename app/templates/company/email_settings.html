@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ _('Configuración de Email') }} - PURETEGO CRM{% endblock %}
+{% block title %}{{ _('Email Configuration') }} - PURETEGO CRM{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -7,7 +7,7 @@
         <div class="col-lg-8">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="mb-0"><i class="bi bi-envelope-at me-2"></i>{{ _('Configuración de Email') }} (SMTP)</h4>
+                    <h4 class="mb-0"><i class="bi bi-envelope-at me-2"></i>{{ _('Email Configuration') }} (SMTP)</h4>
                 </div>
                 <div class="card-body">
                     <div class="alert alert-info">
@@ -21,15 +21,15 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="mb-3">
-                                    <label for="smtp_server" class="form-label">{{ _('Servidor SMTP') }} *</label>
+                                    <label for="smtp_server" class="form-label">{{ _('SMTP Server') }} *</label>
                                     <input type="text" class="form-control" id="smtp_server" name="smtp_server"
                                         value="{{ smtp.smtp_server }}" placeholder="smtp.gmail.com">
-                                    <small class="text-muted">{{ _('Ej: smtp.gmail.com, smtp.office365.com') }}</small>
+                                    <small class="text-muted">{{ _('Ex: smtp.gmail.com, smtp.office365.com') }}</small>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="mb-3">
-                                    <label for="smtp_port" class="form-label">{{ _('Puerto') }}</label>
+                                    <label for="smtp_port" class="form-label">{{ _('Port') }}</label>
                                     <input type="number" class="form-control" id="smtp_port" name="smtp_port"
                                         value="{{ smtp.smtp_port }}" placeholder="587">
                                 </div>
@@ -40,8 +40,8 @@
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="smtp_use_tls" name="smtp_use_tls" {%
                                     if smtp.smtp_use_tls %}checked{% endif %}>
-                                <label class="form-check-label" for="smtp_use_tls">{{ _('Usar TLS') }} ({{
-                                    _('Recomendado') }})</label>
+                                <label class="form-check-label" for="smtp_use_tls">{{ _('Use TLS') }} ({{
+                                    _('Recommended') }})</label>
                             </div>
                         </div>
 
@@ -50,18 +50,18 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="smtp_username" class="form-label">{{ _('Usuario SMTP') }} *</label>
+                                    <label for="smtp_username" class="form-label">{{ _('SMTP User') }} *</label>
                                     <input type="text" class="form-control" id="smtp_username" name="smtp_username"
                                         value="{{ smtp.smtp_username }}" placeholder="usuario@empresa.com">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="smtp_password" class="form-label">{{ _('Contraseña SMTP') }} *</label>
+                                    <label for="smtp_password" class="form-label">{{ _('SMTP Password') }} *</label>
                                     <input type="password" class="form-control" id="smtp_password" name="smtp_password"
-                                        placeholder="{% if smtp.has_password %}••••••••{% else %}{{ _('Ingrese la contraseña') }}{% endif %}">
+                                        placeholder="{% if smtp.has_password %}••••••••{% else %}{{ _('Enter Password') }}{% endif %}">
                                     {% if smtp.has_password %}
-                                    <small class="text-muted">{{ _('Dejar en blanco para mantener la contraseña actual')
+                                    <small class="text-muted">{{ _('Leave blank to keep the current password')
                                         }}</small>
                                     {% endif %}
                                 </div>
@@ -69,25 +69,25 @@
                         </div>
 
                         <hr>
-                        <h6><i class="bi bi-person-badge me-1"></i>{{ _('Remitente') }}</h6>
+                        <h6><i class="bi bi-person-badge me-1"></i>{{ _('Sender') }}</h6>
 
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="smtp_from_email" class="form-label">{{ _('Email del Remitente')
+                                    <label for="smtp_from_email" class="form-label">{{ _('Sender Email')
                                         }}</label>
                                     <input type="email" class="form-control" id="smtp_from_email" name="smtp_from_email"
                                         value="{{ smtp.smtp_from_email }}" placeholder="contacto@empresa.com">
-                                    <small class="text-muted">{{ _('Si está vacío, se usará el usuario SMTP') }}</small>
+                                    <small class="text-muted">{{ _('If empty, SMTP user will be used') }}</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="smtp_from_name" class="form-label">{{ _('Nombre del Remitente')
+                                    <label for="smtp_from_name" class="form-label">{{ _('Sender Name')
                                         }}</label>
                                     <input type="text" class="form-control" id="smtp_from_name" name="smtp_from_name"
                                         value="{{ smtp.smtp_from_name }}" placeholder="{{ company_name }}">
-                                    <small class="text-muted">{{ _('Si está vacío, se usará el nombre de la empresa')
+                                    <small class="text-muted">{{ _('If empty, current company name will be used')
                                         }}</small>
                                 </div>
                             </div>
@@ -95,7 +95,7 @@
 
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-lg me-1"></i>{{ _('Guardar') }}
+                                <i class="bi bi-check-lg me-1"></i>{{ _('Save') }}
                             </button>
                             <a href="{{ url_for('company.profile') }}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left me-1"></i>{{ _('Volver') }}
@@ -109,14 +109,14 @@
         <div class="col-lg-4">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-send me-2"></i>{{ _('Probar Configuración') }}</h5>
+                    <h5 class="mb-0"><i class="bi bi-send me-2"></i>{{ _('Test Configuration') }}</h5>
                 </div>
                 <div class="card-body">
                     <p class="text-muted">{{ _('Envíe un email de prueba para verificar que la configuración funciona.')
                         }}</p>
                     <form action="{{ url_for('company.test_email') }}" method="POST">
                         <div class="mb-3">
-                            <label for="test_email" class="form-label">{{ _('Email de Destino') }}</label>
+                            <label for="test_email" class="form-label">{{ _('Target Email') }}</label>
                             <input type="email" class="form-control" id="test_email" name="test_email"
                                 value="{{ session.get('user_email', '') }}" placeholder="test@email.com">
                         </div>

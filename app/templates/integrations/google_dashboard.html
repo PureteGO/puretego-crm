@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Integraciones Google') }} - Maps2GO{% endblock %}
+{% block title %}{{ _('Google Integrations') }} - Maps2GO{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -10,15 +10,15 @@
             <h1 class="mb-1">
                 <i class="bi bi-google text-danger me-2"></i>{{ _('Google Business Profile') }}
             </h1>
-            <p class="text-muted mb-0">{{ _('Conecta tus cuentas de Google para sincronizar perfiles y reseñas') }}</p>
+            <p class="text-muted mb-0">{{ _('Connect your Google accounts to sync profiles and reviews') }}</p>
         </div>
         <div>
             <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary me-2">
-                <i class="bi bi-arrow-left"></i> {{ _('Volver') }}
+                <i class="bi bi-arrow-left"></i> {{ _('Back') }}
             </a>
             {% if gbp_enabled %}
             <a href="{{ url_for('google_oauth.connect') }}" class="btn btn-primary">
-                <i class="bi bi-plus-lg"></i> {{ _('Conectar Cuenta Google') }}
+                <i class="bi bi-plus-lg"></i> {{ _('Connect Google Account') }}
             </a>
             {% endif %}
         </div>
@@ -27,14 +27,14 @@
     {% if not gbp_enabled %}
     <div class="alert alert-warning">
         <i class="bi bi-exclamation-triangle me-2"></i>
-        {{ _('La integración con Google Business Profile está actualmente deshabilitada.') }}
+        {{ _('Google Business Profile integration is currently disabled.') }}
     </div>
     {% endif %}
 
     <!-- Connected Accounts -->
     <div class="card shadow-sm">
         <div class="card-header bg-transparent">
-            <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>{{ _('Cuentas Conectadas') }}</h5>
+            <h5 class="mb-0"><i class="bi bi-link-45deg me-2"></i>{{ _('Connected Accounts') }}</h5>
         </div>
         <div class="card-body">
             {% if connections %}
@@ -42,11 +42,11 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>{{ _('Cuenta Google') }}</th>
-                            <th class="text-center">{{ _('Perfiles Vinculados') }}</th>
-                            <th class="text-center">{{ _('Estado') }}</th>
-                            <th>{{ _('Conectado') }}</th>
-                            <th class="text-end">{{ _('Acciones') }}</th>
+                            <th>{{ _('Google Account') }}</th>
+                            <th class="text-center">{{ _('Linked Profiles') }}</th>
+                            <th class="text-center">{{ _('Status') }}</th>
+                            <th>{{ _('Connected') }}</th>
+                            <th class="text-end">{{ _('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,11 +73,11 @@
                             <td class="text-center">
                                 {% if conn.is_expired %}
                                 <span class="badge bg-warning text-dark">
-                                    <i class="bi bi-exclamation-circle me-1"></i>{{ _('Token Expirado') }}
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ _('Token Expired') }}
                                 </span>
                                 {% else %}
                                 <span class="badge bg-success">
-                                    <i class="bi bi-check-circle me-1"></i>{{ _('Activo') }}
+                                    <i class="bi bi-check-circle me-1"></i>{{ _('Active') }}
                                 </span>
                                 {% endif %}
                             </td>
@@ -87,21 +87,21 @@
                             <td class="text-end">
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ url_for('google_oauth.locations', connection_id=conn.id) }}"
-                                        class="btn btn-outline-primary" title="{{ _('Ver Perfiles') }}">
+                                        class="btn btn-outline-primary" title="{{ _('View Profiles') }}">
                                         <i class="bi bi-geo-alt"></i>
                                     </a>
                                     {% if conn.is_expired %}
                                     <a href="{{ url_for('google_oauth.connect') }}" class="btn btn-outline-warning"
-                                        title="{{ _('Reconectar') }}">
+                                        title="{{ _('Reconnect') }}">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </a>
                                     {% endif %}
                                     <form action="{{ url_for('google_oauth.disconnect', connection_id=conn.id) }}"
                                         method="POST" class="d-inline"
-                                        onsubmit="return confirm('{{ _('¿Desconectar esta cuenta?') }}');">
+                                        onsubmit="return confirm('{{ _('Disconnect this account?') }}');">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-outline-danger"
-                                            title="{{ _('Desconectar') }}">
+                                            title="{{ _('Disconnect') }}">
                                             <i class="bi bi-x-lg"></i>
                                         </button>
                                     </form>
@@ -115,12 +115,12 @@
             {% else %}
             <div class="text-center py-5">
                 <i class="bi bi-cloud-slash text-muted" style="font-size: 4rem;"></i>
-                <h5 class="mt-3 text-muted">{{ _('Sin cuentas conectadas') }}</h5>
-                <p class="text-muted">{{ _('Conecta tu primera cuenta de Google para comenzar a sincronizar perfiles de
-                    negocio.') }}</p>
+                <h5 class="mt-3 text-muted">{{ _('No connected accounts') }}</h5>
+                <p class="text-muted">{{ _('Connect your first Google account to start syncing business profiles.') }}
+                </p>
                 {% if gbp_enabled %}
                 <a href="{{ url_for('google_oauth.connect') }}" class="btn btn-primary btn-lg mt-2">
-                    <i class="bi bi-google me-2"></i>{{ _('Conectar con Google') }}
+                    <i class="bi bi-google me-2"></i>{{ _('Connect with Google') }}
                 </a>
                 {% endif %}
             </div>
@@ -132,24 +132,34 @@
     {% if all_locations %}
     <div class="card shadow-sm mt-4">
         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-            <h5 class="mb-0"><i class="bi bi-shop me-2"></i>{{ _('Perfiles Administrados') }}</h5>
-            <span class="badge bg-secondary">{{ all_locations|length }}</span>
+            <h5 class="mb-0"><i class="bi bi-shop me-2"></i>{{ _('Managed Profiles') }}</h5>
+            <div class="d-flex align-items-center">
+                <div class="input-group input-group-sm me-3" style="width: 250px;">
+                    <span class="input-group-text bg-transparent border-end-0">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" id="profileSearch" class="form-control border-start-0"
+                        placeholder="{{ _('Search profile...') }}">
+                </div>
+                <span class="badge bg-secondary" id="profileCount">{{ all_locations|length }}</span>
+            </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>{{ _('Nombre del Negocio') }}</th>
-                            <th>{{ _('Dirección') }}</th>
-                            <th>{{ _('Administrado por') }}</th>
-                            <th class="text-center">{{ _('Estado') }}</th>
-                            <th class="text-end">{{ _('Acciones') }}</th>
+                            <th>{{ _('Business Name') }}</th>
+                            <th>{{ _('Address') }}</th>
+                            <th>{{ _('Managed by') }}</th>
+                            <th class="text-center">{{ _('Status') }}</th>
+                            <th class="text-end">{{ _('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for loc in all_locations %}
-                        <tr>
+                        <tr class="profile-row"
+                            data-search="{{ loc.title|lower }} {{ loc.address|lower }} {{ loc.city|lower }}">
                             <td>
                                 <strong>{{ loc.title }}</strong>
                                 <br><small class="text-muted">{{ loc.account_name }}</small>
@@ -167,21 +177,21 @@
                             <td class="text-center">
                                 {% if loc.is_linked %}
                                 <span class="badge bg-success" title="{{ loc.linked_client_name }}">
-                                    <i class="bi bi-link-45deg me-1"></i>{{ _('Vinculado') }}
+                                    <i class="bi bi-link-45deg me-1"></i>{{ _('Linked') }}
                                 </span>
                                 {% else %}
                                 <span class="badge bg-secondary">
-                                    <i class="bi bi-dash-lg me-1"></i>{{ _('Sin vincular') }}
+                                    <i class="bi bi-dash-lg me-1"></i>{{ _('Unlinked') }}
                                 </span>
                                 {% endif %}
                             </td>
                             <td class="text-end">
                                 <a href="{{ loc.manage_url }}" class="btn btn-sm btn-primary">
-                                    <i class="bi bi-gear-fill"></i> {{ _('Administrar') }}
+                                    <i class="bi bi-gear-fill"></i> {{ _('Manage') }}
                                 </a>
                                 {% if not loc.is_linked %}
                                 <a href="{{ loc.link_url }}" class="btn btn-sm btn-outline-secondary ms-1"
-                                    title="{{ _('Vincular a Cliente CRM') }}">
+                                    title="{{ _('Link to CRM Client') }}">
                                     <i class="bi bi-link"></i>
                                 </a>
                                 {% endif %}
@@ -198,7 +208,7 @@
     <!-- Instructions Card -->
     <div class="card shadow-sm mt-4">
         <div class="card-header bg-transparent">
-            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>{{ _('Cómo funciona') }}</h5>
+            <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>{{ _('How it works') }}</h5>
         </div>
         <div class="card-body">
             <div class="row g-4">
@@ -208,9 +218,9 @@
                             <span class="fs-4 text-primary">1</span>
                         </div>
                         <div>
-                            <h6>{{ _('Conectar Cuenta') }}</h6>
-                            <p class="text-muted small mb-0">{{ _('Inicia sesión con tu cuenta Google que administra
-                                perfiles de negocio.') }}</p>
+                            <h6>{{ _('Connect Account') }}</h6>
+                            <p class="text-muted small mb-0">{{ _('Log in with your Google account that manages business
+                                profiles.') }}</p>
                         </div>
                     </div>
                 </div>
@@ -220,9 +230,9 @@
                             <span class="fs-4 text-primary">2</span>
                         </div>
                         <div>
-                            <h6>{{ _('Vincular Perfiles') }}</h6>
-                            <p class="text-muted small mb-0">{{ _('Asocia cada perfil de Google Business a un cliente en
-                                el CRM.') }}</p>
+                            <h6>{{ _('Link Profiles') }}</h6>
+                            <p class="text-muted small mb-0">{{ _('Associate each Google Business profile with a client
+                                in the CRM.') }}</p>
                         </div>
                     </div>
                 </div>
@@ -232,9 +242,9 @@
                             <span class="fs-4 text-primary">3</span>
                         </div>
                         <div>
-                            <h6>{{ _('Sincronizar Reseñas') }}</h6>
-                            <p class="text-muted small mb-0">{{ _('Las reseñas se sincronizarán automáticamente para
-                                seguimiento.') }}</p>
+                            <h6>{{ _('Sync Reviews') }}</h6>
+                            <p class="text-muted small mb-0">{{ _('Reviews will be automatically synced for tracking.')
+                                }}</p>
                         </div>
                     </div>
                 </div>
@@ -242,4 +252,31 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('profileSearch');
+        const rows = document.querySelectorAll('.profile-row');
+        const countBadge = document.getElementById('profileCount');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const term = this.value.toLowerCase().trim();
+                let visibleCount = 0;
+
+                rows.forEach(row => {
+                    const searchText = row.getAttribute('data-search');
+                    if (searchText.includes(term)) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                countBadge.textContent = visibleCount;
+            });
+        }
+    });
+</script>
 {% endblock %}

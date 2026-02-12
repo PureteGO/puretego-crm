@@ -353,6 +353,69 @@ class HealthCheckService:
             ]
         }
         
+        # --- Radar Metrics Integration (Real Data) ---
+        try:
+            from app.services.rank_tracker_service import RankTrackerService
+            from app.models.local_search import LocalMetricsAggregated
+            from datetime import datetime
+            from sqlalchemy import func
+            
+            # 1. Try to get existing metrics for today
+            today = datetime.now().date()
+            radar_metrics = None
+            
+            if client_id:
+                with get_db() as db:
+                    # Use func.date for safe comparison
+                    agg = db.query(LocalMetricsAggregated).filter(
+                        LocalMetricsAggregated.client_id == client_id,
+                        func.date(LocalMetricsAggregated.scan_date) == today
+                    ).first()
+                    
+                    if agg:
+                        radar_metrics = {
+                            'visibility': agg.visibility_score,
+                            'position': agg.avg_position_score,
+                            'reviews': agg.reviews_score,
+                            'authority': agg.local_authority_score,
+                            'market_avg': {
+                                'visibility': agg.market_avg_visibility,
+                                'position': agg.market_avg_position,
+                                'reviews': agg.market_avg_reviews,
+                                'authority': agg.market_avg_authority
+                            }
+                        }
+            
+            # 2. If no metrics, trigger a scan (Sync for now, could be Async)
+            if not radar_metrics and client_id:
+                current_app.logger.info(f"No existing metrics for client {client_id} today. Triggering scan.")
+                scan_result = RankTrackerService.perform_scan(client_id)
+                if scan_result.get('success') and scan_result.get('metrics'):
+                     agg = scan_result['metrics']
+                     radar_metrics = {
+                        'visibility': agg.visibility_score,
+                        'position': agg.avg_position_score,
+                        'reviews': agg.reviews_score,
+                        'authority': agg.local_authority_score,
+                        'market_avg': {
+                            'visibility': agg.market_avg_visibility,
+                            'position': agg.market_avg_position,
+                            'reviews': agg.market_avg_reviews,
+                            'authority': agg.market_avg_authority
+                        }
+                     }
+            
+            # 3. Add to report_data
+            if radar_metrics:
+                report_data['radar_metrics'] = radar_metrics
+                # Update score description if authority is low?
+                report_data['summary']['text'] += f" | Autoridade Local: {int(radar_metrics['authority'])}"
+                
+        except Exception as e:
+            current_app.logger.error(f"Failed to integrate RankTracker metrics: {str(e)}")
+            import traceback
+            current_app.logger.error(traceback.format_exc())
+
         check_id = None
         if client_id:
             with get_db() as db:
@@ -591,6 +654,12 @@ class HealthCheckService:
         # Relatório final formatado
         score = min(100, max(0, score))
         
+        # Prepare report data
+        # Ensure ID is available at root for header
+        if loc_details.get('metadata'):
+            loc_details['place_id'] = loc_details['metadata'].get('placeId')
+            loc_details['placeId'] = loc_details['metadata'].get('placeId')
+
         report_data = {
             'business_name': loc_details.get('title'),
             'source_data': loc_details,
@@ -611,6 +680,66 @@ class HealthCheckService:
                 } for d in details
             ]
         }
+        
+        # --- Radar Metrics Integration (Real Data) ---
+        try:
+            from app.services.rank_tracker_service import RankTrackerService
+            from app.models.local_search import LocalMetricsAggregated
+            from datetime import datetime
+            
+            # 1. Try to get existing metrics for today
+            today = datetime.now().date()
+            radar_metrics = None
+            
+            if client_id:
+                with get_db() as db:
+                    agg = db.query(LocalMetricsAggregated).filter_by(
+                        client_id=client_id, 
+                        scan_date=today
+                    ).first()
+                    
+                    if agg:
+                        radar_metrics = {
+                            'visibility': agg.visibility_score,
+                            'position': agg.avg_position_score,
+                            'reviews': agg.reviews_score,
+                            'authority': agg.local_authority_score,
+                            'market_avg': {
+                                'visibility': agg.market_avg_visibility,
+                                'position': agg.market_avg_position,
+                                'reviews': agg.market_avg_reviews,
+                                'authority': agg.market_avg_authority
+                            }
+                        }
+            
+            # 2. If no metrics, trigger a scan (Sync for now, could be Async)
+            if not radar_metrics and client_id:
+                scan_result = RankTrackerService.perform_scan(client_id)
+                if scan_result.get('success') and scan_result.get('metrics'):
+                     agg = scan_result['metrics']
+                     radar_metrics = {
+                        'visibility': agg.visibility_score,
+                        'position': agg.avg_position_score,
+                        'reviews': agg.reviews_score,
+                        'authority': agg.local_authority_score,
+                        'market_avg': {
+                            'visibility': agg.market_avg_visibility,
+                            'position': agg.market_avg_position,
+                            'reviews': agg.market_avg_reviews,
+                            'authority': agg.market_avg_authority
+                        }
+                     }
+            
+            # 3. Add to report_data
+            if radar_metrics:
+                report_data['radar_metrics'] = radar_metrics
+                # Update score description if authority is low?
+                report_data['summary']['text'] += f" | Autoridade Local: {int(radar_metrics['authority'])}"
+                
+        except Exception as e:
+            current_app.logger.error(f"Failed to integrate RankTracker metrics in Official Audit: {str(e)}")
+            # Fallback to mock/calculated structure if needed or just leave empty
+            pass
         
         # Salvar auditoria
         with get_db() as db:

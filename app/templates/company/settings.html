@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ _('Configurações da Empresa') }} - PURETEGO CRM{% endblock %}
+{% block title %}{{ _('Company Settings') }} - PURETEGO CRM{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -22,14 +22,14 @@
                             <button class="nav-link px-4 py-3 fw-bold" id="email-tab" data-bs-toggle="tab"
                                 data-bs-target="#email" type="button" role="tab" aria-controls="email"
                                 aria-selected="false">
-                                <i class="bi bi-envelope me-1"></i> {{ _('E-mail (SMTP)') }}
+                                <i class="bi bi-envelope me-1"></i> {{ _('Email (SMTP)') }}
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link px-4 py-3 fw-bold" id="workflow-tab" data-bs-toggle="tab"
                                 data-bs-target="#workflow" type="button" role="tab" aria-controls="workflow"
                                 aria-selected="false">
-                                <i class="bi bi-diagram-3 me-1"></i> {{ _('Modo de Trabalho') }}
+                                <i class="bi bi-diagram-3 me-1"></i> {{ _('Working Mode') }}
                             </button>
                         </li>
                     </ul>
@@ -44,8 +44,7 @@
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <div class="row">
                                     <div class="col-md-4 text-center border-end">
-                                        <label class="form-label fw-bold d-block mb-3">{{ _('Logo da Agência')
-                                            }}</label>
+                                        <label class="form-label fw-bold d-block mb-3">{{ _('Agency Logo') }}</label>
                                         <div class="mb-3 position-relative d-inline-block">
                                             {% if company.logo_url %}
                                             <img src="{{ company.logo_url }}" alt="Logo"
@@ -54,7 +53,7 @@
                                             <div class="mt-2">
                                                 <button type="button" class="btn btn-sm btn-outline-danger border-0"
                                                     onclick="confirmDeleteLogo()">
-                                                    <i class="bi bi-trash"></i> {{ _('Remover') }}
+                                                    <i class="bi bi-trash"></i> {{ _('Remove') }}
                                                 </button>
                                             </div>
                                             {% else %}
@@ -98,7 +97,7 @@
                                             </div>
                                         </div>
                                         <div class="mb-4">
-                                            <label class="form-label fw-bold">{{ _('Informações Básicas') }}</label>
+                                            <label class="form-label fw-bold">{{ _('Basic Information') }}</label>
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
                                                     <label class="form-label small">{{ _('Nome da Agência') }}</label>

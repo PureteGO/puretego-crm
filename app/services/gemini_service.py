@@ -1,6 +1,9 @@
+import logging
 import google.generativeai as genai
 from flask import current_app
 import os
+
+logger = logging.getLogger(__name__)
 
 class GeminiService:
     def __init__(self):
@@ -10,7 +13,7 @@ class GeminiService:
             self.model = genai.GenerativeModel('gemini-2.0-flash') # Using Flash as requested
         else:
             self.model = None
-            print("Warning: GOOGLE_API_KEY not found.")
+            logger.warning("GOOGLE_API_KEY not found. Gemini features disabled.")
 
     def generate_content(self, prompt):
         if not self.model:

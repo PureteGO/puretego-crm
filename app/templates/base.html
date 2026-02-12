@@ -25,6 +25,44 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Plotly for Charts -->
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+    <script>
+        // Global Flatpickr Configuration
+        function initGlobalFlatpickr() {
+            const currentLocale = "{{ current_language }}";
+            const localeStr = currentLocale.startsWith('pt') ? 'pt' : (currentLocale.startsWith('es') ? 'es' : 'default');
+
+            if (flatpickr.l10ns[localeStr]) {
+                flatpickr.localize(flatpickr.l10ns[localeStr]);
+            }
+
+            // Target both the explicit class and native date inputs
+            flatpickr(".flatpickr, input[type='date']", {
+                enableTime: false, // Default to date only for native inputs
+                dateFormat: "Y-m-d",
+                altInput: true,
+                altFormat: "d/m/Y",
+                time_24hr: true,
+                disableMobile: true
+            });
+
+            // Re-init for those that specifically need time
+            flatpickr(".flatpickr-datetime", {
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                altInput: true,
+                altFormat: "d/m/Y H:i",
+                time_24hr: true,
+                disableMobile: true
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initGlobalFlatpickr);
+    </script>
     <!-- Custom Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.5">
     {% block head %}{% endblock %}
@@ -32,7 +70,7 @@
 
 <body>
     {% if 'user_id' in session %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNavbar">
         <div class="container-fluid">
             <a class="navbar-brand d-flex align-items-center" href="{{ url_for('dashboard.index') }}">
                 {% if session.get('company_logo') and 'puretego' not in session.get('company_logo') %}
@@ -58,7 +96,7 @@
                     {% if session.get('is_superadmin') %}
                     <li class="nav-item">
                         <a class="nav-link text-warning fw-bold" href="{{ url_for('saas.dashboard') }}">
-                            <i class="bi bi-speedometer2"></i> SaaS Admin
+                            <i class="bi bi-speedometer2"></i> {{ _('SaaS Admin') }}
                         </a>
                     </li>
                     {% endif %}
@@ -92,6 +130,13 @@
                         <a class="nav-link" href="{{ url_for('proposals.index') }}"><i
                                 class="bi bi-file-earmark-text"></i> {{ _("Proposals") }}</a>
                     </li>
+                    {% if session.get('permissions', {}).get('can_manage_company', False) or session.get('role') in
+                    ['owner', 'admin'] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('services.index') }}"><i class="bi bi-box-seam"></i> {{
+                            _("Services & Packages") }}</a>
+                    </li>
+                    {% endif %}
                     {% if session.get('permissions', {}).get('can_manage_finance', False) or session.get('role') in
                     ['owner', 'admin', 'finance'] %}
                     <li class="nav-item dropdown">
@@ -205,6 +250,23 @@
     <script>
         (function () {
             const toggle = document.getElementById('themeToggle');
+            const navbar = document.getElementById('mainNavbar');
+
+            function updateNavbar(theme) {
+                if (!navbar) return;
+                if (theme === 'dark') {
+                    navbar.classList.add('navbar-dark', 'bg-dark');
+                    navbar.classList.remove('navbar-light', 'bg-light');
+                } else {
+                    navbar.classList.add('navbar-light', 'bg-light');
+                    navbar.classList.remove('navbar-dark', 'bg-dark');
+                }
+            }
+
+            // Initial State
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            updateNavbar(currentTheme);
+
             if (toggle) {
                 toggle.addEventListener('click', function () {
                     const html = document.documentElement;
@@ -213,6 +275,8 @@
 
                     html.setAttribute('data-theme', newTheme);
                     localStorage.setItem('maps2go-theme', newTheme);
+
+                    updateNavbar(newTheme);
                 });
             }
         })();
@@ -246,7 +310,7 @@
                         <!-- Date/Time -->
                         <div class="mb-3">
                             <label for="quickActionDate" class="form-label">{{ _('Date and Time') }}</label>
-                            <input type="datetime-local" class="form-control" name="date" id="quickActionDate" required>
+                            <input type="text" class="form-control flatpickr" name="date" id="quickActionDate" required>
                         </div>
 
                         <!-- Notes -->

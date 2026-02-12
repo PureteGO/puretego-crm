@@ -1,15 +1,46 @@
+# Virtual Environment
 venv/
 __pycache__/
 *.pyc
+
+# Secrets & Credentials
 .env
-.DS_Store
-*.zip
-*.sql
 client_secret*.json
+*.pem
+cpanel_key_backup.txt
+
+# Database
+*.db
+*.sql
+
+# Logs & Debug Output
+*.log
 debug_output*.txt
+debug_*.json
 verification_log.txt
+seed_log.txt
+static_check.txt
+test_echo.txt
+test_server.txt
+emergency_error.log
+
+# Build & Deploy Artifacts
+*.zip
+generated_pdfs/
+uploads/
+
+# IDE
 .idea/
 .vscode/
+
+# OS
+.DS_Store
 tmp/
 instance/
-seed_log.txt
+
+# Misc Temp Files
+recovery_my.ini
+export_*.json
+relatoriodossonhos.pdf
+htaccess_clean.txt
+htaccess_disable.txt

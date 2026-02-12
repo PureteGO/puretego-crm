@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Edit Visit') }} - {{ visit.client.name }}{% endblock %}
+{% block title %}{{ _('Edit Visit') }} - {{ visit.client.name }}{% block scripts %}
+<script>
+    flatpickr(".flatpickr", {
+        enableTime: true,
+        dateFormat: "Y-m-d H:i",
+        altInput: true,
+        altFormat: "d/m/y h:i a",
+        locale: "{{ current_language }}",
+        disableMobile: true
+    });
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -12,15 +23,16 @@
                 </div>
                 <div class="card-body">
                     <form action="{{ url_for('visits.edit', visit_id=visit.id) }}" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="mb-3">
                             <label class="form-label">{{ _('Client') }}</label>
                             <input type="text" class="form-control" value="{{ visit.client.name }}" readonly>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">{{ _('Visit Date and Time') }}</label>
-                            <input type="datetime-local" name="visit_date" class="form-control"
-                                value="{{ visit.visit_date.strftime('%Y-%m-%dT%H:%M') }}" required>
+                            <label class="form-label">{{ _('Visit Date & Time') }}</label>
+                            <input type="text" class="form-control flatpickr" name="visit_date"
+                                value="{{ visit.visit_date|format_date('%Y-%m-%d %H:%M') }}" required>
                         </div>
 
                         <div class="mb-3">

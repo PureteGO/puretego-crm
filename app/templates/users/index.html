@@ -23,8 +23,8 @@
                             <th>{{ _('Company') }}</th>
                             {% endif %}
                             <th>{{ _('Status') }}</th>
-                            <th>{{ _('Fixo') }}</th>
-                            <th>{{ _('Comiss.') }}</th>
+                            <th>{{ _('Salary') }}</th>
+                            <th>{{ _('Comm.') }}</th>
                             <th>{{ _('Actions') }}</th>
                         </tr>
                     </thead>
@@ -34,7 +34,7 @@
                             <td>
                                 {{ user.name }}
                                 {% if user.is_superadmin %}
-                                <span class="badge bg-danger ms-1">SuperAdmin</span>
+                                <span class="badge bg-danger ms-1">{{ _('SuperAdmin') }}</span>
                                 {% endif %}
                             </td>
                             <td>{{ user.email }}</td>

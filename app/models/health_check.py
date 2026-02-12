@@ -49,21 +49,25 @@ class HealthCheck(Base):
         """Retorna a cor baseada na pontuação"""
         if self.score is None:
             return 'secondary'
-        if self.score >= 70:
-            return 'success'
-        elif self.score >= 40:
-            return 'warning'
+        if self.score > 90:
+            return 'success' # Top
+        elif self.score >= 80:
+            return 'success' # Good
+        elif self.score >= 70:
+            return 'warning' # Improve
         else:
-            return 'danger'
+            return 'danger' # Critical
     
     def get_score_status(self):
         """Retorna o status baseado na pontuação"""
         if self.score is None:
             return 'N/A'
-        if self.score >= 70:
-            return 'Excelente'
-        elif self.score >= 40:
-            return 'Moderado'
+        if self.score > 90:
+            return 'Top 1%'
+        elif self.score >= 80:
+            return 'Muito Bom'
+        elif self.score >= 70:
+            return 'Pode Melhorar'
         else:
             return 'Crítico'
     

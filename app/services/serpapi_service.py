@@ -1,6 +1,9 @@
+import logging
 import requests
 from flask import current_app
 from config.settings import config as default_config
+
+logger = logging.getLogger(__name__)
 
 class SerpApiService:
     def __init__(self, api_key=None):
@@ -23,8 +26,9 @@ class SerpApiService:
                 response = requests.get(self.base_url, params=params, timeout=30, verify=False)
                 response.raise_for_status()
                 return response.json()
-            except:
-                return {'error': "Falha de conexão"}
+            except Exception as e:
+                logger.error(f"SerpApi Error: {str(e)}")
+                return {'error': f"Connection failed: {str(e)}"}
 
     def search_business(self, business_name, location=None):
         params = {
@@ -37,6 +41,29 @@ class SerpApiService:
             params["q"] += f", {location}"
         else:
             params["ll"] = "@-25.2637,57.5759,14z"
+        return self._execute_request(params)
+
+    def search_local_pack(self, query, location=None, gl="py", hl="es"):
+        """
+        Search Google Local Pack (engine=google).
+        Returns results containing 'local_results' block.
+        """
+        params = {
+            "engine": "google",
+            "q": query,
+            "gl": gl,
+            "hl": hl,
+            "api_key": self.api_key,
+            "num": 20 # Fetch enough to see if client is top 20
+        }
+        if location:
+            # If location is a specific coordinate string like "@-25..."
+            if location.startswith('@'):
+                params["mkt"] = location # This might not be right for 'google' engine, usually it uses 'location' parameter
+                # For engine=google, 'location' parameter is preferred for textual location
+            else:
+                params["location"] = location
+        
         return self._execute_request(params)
 
     def get_business_details(self, place_id):

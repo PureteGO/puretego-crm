@@ -66,7 +66,7 @@ def create_app(config_object=None):
         init_db()
     
     # Registrar blueprints (rotas)
-    from app.routes import auth, dashboard, users, clients, interactions, visits, health_checks, proposals, google_oauth, saas, calendar, prospecting, company, projects, tasks, finance
+    from app.routes import auth, dashboard, users, clients, interactions, visits, health_checks, proposals, google_oauth, saas, calendar, prospecting, company, projects, tasks, finance, services
     
     app.register_blueprint(auth.bp)
     app.register_blueprint(dashboard.bp)
@@ -86,8 +86,7 @@ def create_app(config_object=None):
     app.register_blueprint(tasks.bp)
     app.register_blueprint(tasks.api_bp)
     app.register_blueprint(finance.bp)
-    
-    # app.register_blueprint(google_oauth.bp)
+    app.register_blueprint(services.bp)
     
     # Language switching route
     @app.route('/set-language/<lang>')
@@ -128,7 +127,12 @@ def create_app(config_object=None):
     def format_date_filter(value, format='%d/%m/%Y'):
         """Formata datas"""
         if value:
-            return value.strftime(format)
+            # Check for %p and convert to lowercase if needed (for 'am/pm' vs 'AM/PM')
+            formatted = value.strftime(format)
+            if '%p' in format:
+                # Some users want lowercase AM/PM
+                return formatted.replace('AM', 'am').replace('PM', 'pm')
+            return formatted
         return ''
     
     # Context processor para variáveis globais

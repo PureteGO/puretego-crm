@@ -204,14 +204,24 @@
                                     <tbody>
                                         {% for visit in visits %}
                                         <tr>
-                                            <td>{{ visit.visit_date|format_date('%d/%m/%Y %H:%M') }}</td>
-                                            <td>{{ visit.notes|truncate(50) }}</td>
-                                            <td><span class="badge bg-light text-dark border">{{ visit.next_step
-                                                    }}</span></td>
                                             <td>
+                                                <div class="d-md-none fw-bold mb-1">{{ _('Date') }}:</div>
+                                                {{ visit.visit_date|format_date('%d/%m/%y %I:%M %p') }}
+                                            </td>
+                                            <td class="d-none d-md-table-cell">{{ visit.notes|truncate(50) }}</td>
+                                            <td class="d-none d-md-table-cell">
+                                                {% if visit.next_step %}
+                                                <span class="badge bg-light text-dark border">{{ visit.next_step
+                                                    }}</span>
+                                                {% else %}
+                                                -
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
                                                 <a href="{{ url_for('visits.view', visit_id=visit.id) }}"
-                                                    class="btn btn-sm btn-outline-info">
-                                                    <i class="bi bi-eye"></i>
+                                                    class="btn btn-sm btn-info text-white">
+                                                    <i class="bi bi-eye"></i> <span class="d-md-none">{{ _('Ver')
+                                                        }}</span>
                                                 </a>
                                             </td>
                                         </tr>

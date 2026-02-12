@@ -61,7 +61,7 @@
                     <!-- Date & Time -->
                     <div class="mb-3">
                         <label for="eventDate" class="form-label">{{ _('Date and Time') }}</label>
-                        <input type="datetime-local" class="form-control" id="eventDate" required>
+                        <input type="text" class="form-control flatpickr" id="eventDate" required>
                     </div>
 
                     <!-- Client Selection -->
@@ -112,6 +112,7 @@
 
 <!-- FullCalendar CSS/JS -->
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js'></script>
 
 <script>
     const calTranslations = {
@@ -155,7 +156,7 @@
                     titleFormat: { month: 'short', year: 'numeric', day: 'numeric' }
                 }
             },
-            locale: '{{ session.get("language", "pt_BR").split("_")[0] }}',
+            locale: '{{ current_language }}'.toLowerCase().replace('_', '-'),
             buttonText: {
                 today: calTranslations.today,
                 month: calTranslations.month,
@@ -172,7 +173,7 @@
             dateClick: function (info) {
                 resetModal();
                 const date = new Date(info.dateStr);
-                const localISOTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                const localISOTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16).replace('T', ' ');
                 document.getElementById('eventDate').value = localISOTime;
 
                 document.getElementById('addEventModalLabel').innerText = calTranslations.newEvent;
@@ -203,7 +204,7 @@
                 }
 
                 const date = event.start;
-                const localISOTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                const localISOTime = new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString().slice(0, 16).replace('T', ' ');
                 document.getElementById('eventDate').value = localISOTime;
 
                 document.getElementById('clientId').value = props.client_id;

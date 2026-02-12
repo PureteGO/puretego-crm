@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Services & Packages') }} - PURETEGO CRM{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between flex-wrap align-items-center mb-4 gap-3">
+        <h1><i class="bi bi-box-seam me-2"></i>{{ _('Services & Packages') }}</h1>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('services.create_service') }}" class="btn btn-primary flex-fill">
+                <i class="bi bi-plus-lg me-1"></i>{{ _('New Service') }}
+            </a>
+            <a href="{{ url_for('services.create_package') }}" class="btn btn-success flex-fill">
+                <i class="bi bi-gift me-1"></i>{{ _('New Package') }}
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Services Section -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-briefcase me-2"></i>{{ _('Services Catalog') }}</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{{ _('Service') }}</th>
+                                <th>{{ _('Price') }}</th>
+                                <th class="text-end">{{ _('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for service in services %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold">{{ service.name }}</div>
+                                    <small class="text-muted d-block text-truncate" style="max-width: 200px;">{{
+                                        service.description or '-' }}</small>
+                                </td>
+                                <td>{{ service.base_price|format_currency }}</td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('services.edit_service', service_id=service.id) }}"
+                                        class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    {{ _('No services registered.') }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Packages Section -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="mb-0"><i class="bi bi-gift me-2"></i>{{ _('Service Packages') }}</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{{ _('Package') }}</th>
+                                <th>{{ _('Price') }}</th>
+                                <th class="text-end">{{ _('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pkg in packages %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-success">{{ pkg.name }}</div>
+                                    <small class="text-muted d-block text-truncate" style="max-width: 200px;">{{
+                                        pkg.description or '-' }}</small>
+                                </td>
+                                <td>{{ pkg.price|format_currency }}</td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('services.edit_package', package_id=pkg.id) }}"
+                                        class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center py-4 text-muted">
+                                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                                    {{ _('No packages registered.') }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

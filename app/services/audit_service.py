@@ -1,14 +1,11 @@
-"""
-Audit Service - Maps2GO CRM
-
-Provides centralized logging for all auditable actions in the system.
-"""
-
+import logging
 from datetime import datetime
 from flask import request, session
 from sqlalchemy.exc import SQLAlchemyError
 from config.database import get_db
 from app.models.audit_log import AuditLog
+
+logger = logging.getLogger(__name__)
 
 
 class AuditService:
@@ -71,7 +68,7 @@ class AuditService:
             
         except SQLAlchemyError as e:
             # Don't let audit logging failures break the application
-            print(f"[AUDIT ERROR] Failed to log action: {e}")
+            logger.error(f"Failed to log audit action: {e}")
             return False
     
     @staticmethod

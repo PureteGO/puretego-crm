@@ -16,8 +16,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 class Config:
     """Configurações base da aplicação"""
     
-    # Secret key para sessões (ALTERAR EM PRODUÇÃO!)
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    # Secret key para sessões
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-fallback-only-for-local')
     
     # Configurações de sessão
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)
@@ -198,6 +198,15 @@ class ProductionConfig(Config):
     TESTING = False
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = 'Lax'
+    
+    def __init__(self):
+        super().__init__()
+        # Enforce a strong SECRET_KEY in production
+        if self.SECRET_KEY in (None, '', 'dev-fallback-only-for-local'):
+            raise RuntimeError(
+                "SECRET_KEY must be set to a strong, unique value in production! "
+                "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
+            )
 
 
 # Configuração ativa (alterar para ProductionConfig em produção)

@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Contas a Receber') }} - Maps2GO{% endblock %}
+{% block title %}{{ _('Accounts Receivable') }} - Maps2GO{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{{ _('Financeiro') }}</h1>
+        <h1 class="h3 mb-0 text-gray-800">{{ _('Finance') }}</h1>
         <div class="btn-group">
             <a href="{{ url_for('finance.list_receivables', status='open') }}"
                 class="btn btn-outline-primary btn-sm {% if request.args.get('status') == 'open' %}active{% endif %}">{{
-                _('Abertos') }}</a>
+                _('Open') }}</a>
             <a href="{{ url_for('finance.list_receivables', status='paid') }}"
                 class="btn btn-outline-success btn-sm {% if request.args.get('status') == 'paid' %}active{% endif %}">{{
-                _('Pagos') }}</a>
+                _('Paid') }}</a>
             <a href="{{ url_for('finance.list_receivables') }}"
                 class="btn btn-outline-secondary btn-sm {% if not request.args.get('status') %}active{% endif %}">{{
-                _('Todos') }}</a>
+                _('All') }}</a>
         </div>
     </div>
 
@@ -24,23 +24,23 @@
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-3 border-end border-secondary">
-                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ _('Lucro Líquido Estimado')
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ _('Estimated Net Profit')
                         }}</div>
                     <div class="h4 mb-0 font-weight-bold text-white" id="stat-net-profit">...</div>
-                    <small class="text-muted">{{ _('(Recebíveis - Comissões - Custos - Folha)') }}</small>
+                    <small class="text-muted">{{ _('(Receivables - Commissions - Costs - Payroll)') }}</small>
                 </div>
                 <div class="col-md-3 border-end border-secondary">
-                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ _('Folha de Pagamento
-                        (Fixo)') }}</div>
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ _('Payroll (Fixed)') }}
+                    </div>
                     <div class="h5 mb-0 font-weight-bold" id="stat-payroll">...</div>
                 </div>
                 <div class="col-md-3 border-end border-secondary">
-                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">{{ _('Comissões Pendentes') }}
+                    <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">{{ _('Pending Commissions') }}
                     </div>
                     <div class="h5 mb-0 font-weight-bold" id="stat-commissions">...</div>
                 </div>
                 <div class="col-md-3">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ _('Contas a Pagar') }}
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ _('Accounts Payable') }}
                     </div>
                     <div class="h5 mb-0 font-weight-bold" id="stat-payables">...</div>
                 </div>
@@ -51,13 +51,13 @@
     <!-- Navigation Tabs -->
     <ul class="nav nav-tabs mb-4">
         <li class="nav-item">
-            <a class="nav-link active" href="{{ url_for('finance.list_receivables') }}">{{ _('Recebíveis') }}</a>
+            <a class="nav-link active" href="{{ url_for('finance.list_receivables') }}">{{ _('Receivables') }}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('finance.list_payables') }}">{{ _('Contas a Pagar') }}</a>
+            <a class="nav-link" href="{{ url_for('finance.list_payables') }}">{{ _('Accounts Payable') }}</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('finance.list_commissions') }}">{{ _('Comissões') }}</a>
+            <a class="nav-link" href="{{ url_for('finance.list_commissions') }}">{{ _('Commissions') }}</a>
         </li>
     </ul>
 
@@ -118,19 +118,19 @@
     <!-- Receivables Table -->
     <div class="card shadow-sm mb-4">
         <div class="card-header py-3 d-flex justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">{{ _('Lista de Recebíveis') }}</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ _('Receivables List') }}</h6>
         </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover" id="receivablesTable">
                     <thead>
                         <tr>
-                            <th>{{ _('Cliente') }}</th>
-                            <th>{{ _('Descrição') }}</th>
-                            <th>{{ _('Vencimento') }}</th>
-                            <th>{{ _('Valor') }}</th>
+                            <th>{{ _('Client') }}</th>
+                            <th>{{ _('Description') }}</th>
+                            <th>{{ _('Due Date') }}</th>
+                            <th>{{ _('Value') }}</th>
                             <th>{{ _('Status') }}</th>
-                            <th>{{ _('Ações') }}</th>
+                            <th>{{ _('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -148,11 +148,11 @@
                             <td>{{ rec.amount | format_currency }}</td>
                             <td>
                                 {% if rec.status == 'paid' %}
-                                <span class="badge bg-success">{{ _('Pago') }}</span>
+                                <span class="badge bg-success">{{ _('Paid') }}</span>
                                 {% elif rec.due_date < datetime.utcnow().date() %} <span class="badge bg-danger">{{
-                                    _('Vencido') }}</span>
+                                    _('Overdue') }}</span>
                                     {% else %}
-                                    <span class="badge bg-warning text-dark">{{ _('Pendente') }}</span>
+                                    <span class="badge bg-warning text-dark">{{ _('Pending') }}</span>
                                     {% endif %}
                             </td>
                             <td>
@@ -161,7 +161,7 @@
                                     class="d-inline">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-success"
-                                        title="{{ _('Marcar como pago') }}">
+                                        title="{{ _('Mark as paid') }}">
                                         <i class="bi bi-check-circle"></i>
                                     </button>
                                 </form>
@@ -169,7 +169,7 @@
                                     class="d-inline">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-sm btn-outline-primary"
-                                        title="{{ _('Enviar Fatura por E-mail') }}">
+                                        title="{{ _('Send Invoice via Email') }}">
                                         <i class="bi bi-envelope-at"></i>
                                     </button>
                                 </form>

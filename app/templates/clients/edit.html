@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Edit Client') }}{% endblock %}
+{% block title %}{{ _('EDIT_CLIENT_HEADER') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{ _('Edit Client') }}</h1>
+        <h1 class="h2">{{ _('EDIT_CLIENT_HEADER') }}</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
             <a href="{{ url_for('clients.view', client_id=client.id) }}" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> {{ _('Back') }}
@@ -26,12 +26,12 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="basic-tab" data-bs-toggle="tab"
                                     data-bs-target="#basic" type="button" role="tab" aria-controls="basic"
-                                    aria-selected="true">{{ _('Basic Information') }}</button>
+                                    aria-selected="true">{{ _('TAB_BASIC_INFORMATION') }}</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="details-tab" data-bs-toggle="tab" data-bs-target="#details"
                                     type="button" role="tab" aria-controls="details" aria-selected="false">{{
-                                    _('Detailed Information') }}</button>
+                                    _('TAB_DETAILED_INFORMATION') }}</button>
                             </li>
                         </ul>
 
@@ -57,8 +57,7 @@
                                 <h4 class="mb-3 text-primary mt-4">{{ _('Primary Contact') }}</h4>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <label for="contact_name" class="form-label">{{ _('Contact Name')
-                                            }}</label>
+                                        <label for="contact_name" class="form-label">{{ _('Contact Name') }}</label>
                                         <input type="text" class="form-control" id="contact_name" name="contact_name"
                                             value="{{ client.contact_name or '' }}">
                                     </div>
@@ -147,7 +146,7 @@
                                 <div class="mb-3">
                                     <label for="funnel_start_date" class="form-label">{{ _('Funnel Start Date')
                                         }}</label>
-                                    <input type="date" class="form-control" id="funnel_start_date"
+                                    <input type="text" class="form-control flatpickr" id="funnel_start_date"
                                         name="funnel_start_date"
                                         value="{{ client.funnel_start_date.strftime('%Y-%m-%d') if client.funnel_start_date else '' }}">
                                     <div class="form-text">{{ _('Date when the client entered the sales funnel.') }}
@@ -164,8 +163,7 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="preferred_contact_method" class="form-label">{{ _('Preferred Contact
-                                            Method')
-                                            }}</label>
+                                            Method') }}</label>
                                         <select class="form-select" id="preferred_contact_method"
                                             name="preferred_contact_method">
                                             <option value="">{{ _('Select...') }}</option>

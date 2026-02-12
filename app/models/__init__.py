@@ -27,6 +27,7 @@ from .email_template import EmailTemplate
 from .email_log import EmailLog
 from .commission import Commission
 from .payable import Payable
+from .local_search import LocalSearchKeyword, LocalScanResult, LocalMetricsAggregated
 
 __all__ = [
     'Company',

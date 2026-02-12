@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app.routes.auth import login_required
 from app.models import HealthCheck, Client
@@ -5,6 +6,8 @@ from app.services import SerpApiService
 from config.database import get_db
 from app.services.health_check_service import HealthCheckService
 import json
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('health_checks', __name__, url_prefix='/health-checks')
 
@@ -103,15 +106,62 @@ def view(health_check_id):
             from sqlalchemy.orm import joinedload
             health_check = db.query(HealthCheck).options(joinedload(HealthCheck.client))\
                 .filter(HealthCheck.id == health_check_id).first()
+            
             if not health_check:
                 flash('Relatório não encontrado.', 'error')
                 return redirect(url_for('health_checks.index'))
+            
+            # --- Radar Metrics Backfill (Runtime) ---
+            # If report is missing radar data (e.g. from bug), try to fetch it from DB
+            report = health_check.report_data or {}
+            radar = report.get('radar_metrics')
+            
+            # Check if radar is missing or zeroed out (all 0s)
+            is_empty = not radar
+            if radar:
+                # If all main metrics are 0, likely a failed previous fetch
+                if radar.get('visibility') == 0 and radar.get('position') == 0 and radar.get('authority') == 0:
+                    is_empty = True
+            
+            if is_empty:
+                try:
+                    from app.models.local_search import LocalMetricsAggregated
+                    from sqlalchemy import func
+                    
+                    # Try to find metrics for the same date as the report creation
+                    if health_check.created_at:
+                        scan_date = health_check.created_at.date()
+                        
+                        agg = db.query(LocalMetricsAggregated).filter(
+                            LocalMetricsAggregated.client_id == health_check.client_id,
+                            func.date(LocalMetricsAggregated.scan_date) == scan_date
+                        ).first()
+                        
+                        if agg:
+                            report['radar_metrics'] = {
+                                'visibility': agg.visibility_score,
+                                'position': agg.avg_position_score,
+                                'reviews': agg.reviews_score,
+                            'authority': agg.local_authority_score,
+                            'market_avg': {
+                                'visibility': agg.market_avg_visibility,
+                                'position': agg.market_avg_position,
+                                'reviews': agg.market_avg_reviews,
+                                'authority': agg.market_avg_authority
+                            }
+                        }
+                        # Update in-memory object (and potentially save if we commit)
+                        health_check.report_data = report
+                        # Optional: Persist fixed data
+                        # db.commit() 
+                except Exception as e:
+                    logger.warning(f"Failed to backfill radar metrics: {e}")
+            
             return render_template('health_checks/view.html', health_check=health_check)
     except Exception as e:
-        import traceback
-        error_details = traceback.format_exc()
-        print(f"DEBUG ERROR HC VIEW: {error_details}")
-        return f"<h1>Erro ao carregar relatório</h1><pre>{error_details}</pre>", 500
+        logger.exception(f"Error loading health check report {health_check_id}")
+        flash('Erro ao carregar relatório.', 'error')
+        return redirect(url_for('health_checks.index'))
 
 @bp.route('/<int:health_check_id>/delete', methods=['POST'])
 @login_required
@@ -193,7 +243,7 @@ def convert_to_lead():
             return jsonify({'success': True, 'client_id': new_client.id, 'message': 'Lead criado!'})
         except Exception as e:
             db.rollback()
-            print(f"ERROR convert_to_lead: {str(e)}")
+            logger.error(f"Error in convert_to_lead: {str(e)}")
             return jsonify({'success': False, 'message': f"Erro ao criar lead: {str(e)}"}), 500
 
 @bp.route('/<int:health_check_id>/ai-generate', methods=['POST'])
@@ -207,21 +257,20 @@ def generate_ai_content(health_check_id):
         data = request.get_json()
         action_type = data.get('type')
         
-        # DEBUG: Log initiation
-        print(f"AI Request: Type={action_type}, HealthCheck={health_check_id}")
+        logger.debug(f"AI Request: Type={action_type}, HealthCheck={health_check_id}")
 
         try:
             from app.services.gemini_service import GeminiService
             gemini = GeminiService()
         except ImportError as e:
-            print(f"AI Error: Dependency missing - {str(e)}")
+            logger.error(f"AI Error: Dependency missing - {str(e)}")
             return jsonify({'error': 'Biblioteca de IA não instalada. Execute pip install.'}), 500
         except Exception as e:
-            print(f"AI Error: Service init failed - {str(e)}")
+            logger.error(f"AI Error: Service init failed - {str(e)}")
             return jsonify({'error': f'Erro ao iniciar serviço de IA: {str(e)}'}), 500
         
         if not gemini.model:
-            print("AI Error: Google API Key missing")
+            logger.error("AI Error: Google API Key missing")
             return jsonify({'error': 'Chave de API do Google não configurada (GOOGLE_API_KEY).'}), 503
 
         client_name = health_check.client.name
@@ -238,11 +287,11 @@ def generate_ai_content(health_check_id):
             else:
                 return jsonify({'error': 'Tipo de ação inválido'}), 400
         except Exception as e:
-            print(f"AI Error: Generation failed - {str(e)}")
+            logger.error(f"AI Error: Generation failed - {str(e)}")
             return jsonify({'error': f'Erro na geração do conteúdo: {str(e)}'}), 500
 
         return jsonify({'result': result})
 
     except Exception as e:
-        print(f"CRITICAL AI Error: {str(e)}")
+        logger.exception(f"Critical AI error in health check {health_check_id}")
         return jsonify({'error': f"Erro interno: {str(e)}"}), 500

@@ -3,6 +3,7 @@ PURETEGO CRM - Clients Routes
 Rotas de gestão de clientes e pipeline Kanban com suporte multi-tenant
 """
 
+import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app.routes.auth import login_required
 from app.models import Client, KanbanStage, Visit, HealthCheck, Proposal, Interaction, ServicePackage
@@ -10,6 +11,8 @@ from app.utils.tenant import filter_by_company, set_tenant_context
 from app.utils.decorators import get_current_user
 from config.database import get_db
 from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
 
 bp = Blueprint('clients', __name__, url_prefix='/clients')
 
@@ -283,7 +286,7 @@ def view(client_id):
                 selected_link=selected_link
             )
     except Exception as e:
-        print(f"ERROR in clients.view: {str(e)}") # Log for server
+        logger.error(f"Error in clients.view: {str(e)}")
         flash(f'Erro ao carregar detalhes do cliente: {str(e)}', 'error')
         return redirect(url_for('clients.index'))
 
@@ -414,7 +417,7 @@ def move_stage(client_id):
                         # Pass context to service
                         WorkflowService.on_deal_stage_changed(db, session.get('company_id'), deal or client, old_stage, new_stage.name)
                     except Exception as wf_error:
-                        print(f"Workflow error (non-fatal): {str(wf_error)}")
+                        logger.warning(f"Workflow error (non-fatal): {str(wf_error)}")
                         # Log error but don't stop movement if workflow fails? Or stop?
                         # Usually better to allow movement and log error.
             # ---------------------------------------------
@@ -424,8 +427,7 @@ def move_stage(client_id):
             return jsonify({'success': True, 'message': 'Cliente movido com sucesso'})
             
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.exception(f"Error moving client to new stage")
         return jsonify({'success': False, 'message': f'Erro ao mover: {str(e)}'}), 200
 
 
@@ -510,7 +512,7 @@ def delete_stage(stage_id):
             
         except Exception as e:
             db.rollback()
-            print(f"ERROR deleting stage: {str(e)}")
+            logger.error(f"Error deleting stage: {str(e)}")
             flash(f'Error al eliminar la etapa. Asegúrese de que no tenga datos vinculados.', 'error')
 
     return redirect(url_for('clients.kanban'))

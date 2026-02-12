@@ -3,10 +3,9 @@
     <div class="col-md-4 mb-3">
         <div class="card shadow-sm border-0 bg-danger text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-wallet2"></i> {{ _('A Receber (Total)')
-                    }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-wallet2"></i> {{ _('Accounts Receivable (Total)') }}</h6>
                 <div class="h2 mb-0 fw-bold">{{ awaiting_payment | format_currency }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Faturas pendentes em aberto') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Open pending invoices') }}</p>
             </div>
         </div>
     </div>
@@ -14,10 +13,9 @@
     <div class="col-md-4 mb-3">
         <div class="card shadow-sm border-0 bg-primary text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-file-earmark-lock"></i> {{ _('Contratos
-                    Pendentes') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-file-earmark-lock"></i> {{ _('Pending Contracts') }}</h6>
                 <div class="h2 mb-0 fw-bold">{{ pending_contracts }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Projetos sem contrato assinado') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Projects without signed contract') }}</p>
             </div>
         </div>
     </div>
@@ -25,10 +23,9 @@
     <div class="col-md-4 mb-3">
         <div class="card shadow-sm border-0 bg-success text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-cash-coin"></i> {{ _('Recebido (Mês)')
-                    }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-cash-coin"></i> {{ _('Received (Month)') }}</h6>
                 <div class="h2 mb-0 fw-bold">{{ won_amount | format_currency }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Valor total recebido este mês') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('Total value received this month') }}</p>
             </div>
         </div>
     </div>
@@ -39,16 +36,16 @@
     <div class="col-md-8 mb-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold text-danger"><i class="bi bi-receipt"></i> {{ _('Fila de Faturamento') }}</h5>
+                <h5 class="mb-0 fw-bold text-danger"><i class="bi bi-receipt"></i> {{ _('Billing Queue') }}</h5>
                 <a href="{{ url_for('finance.list_receivables') }}" class="btn btn-sm btn-danger shadow-sm">
-                    <i class="bi bi-list-task"></i> {{ _('Ver Todos os Recebíveis') }}
+                    <i class="bi bi-list-task"></i> {{ _('View All Receivables') }}
                 </a>
             </div>
             <div class="card-body p-0" id="workflow-tasks-container">
                 <!-- Reactive Tasks will be rendered here by JS -->
                 <div class="p-4 text-center">
                     <div class="spinner-border text-danger" role="status">
-                        <span class="visually-hidden">Carregando faturamento...</span>
+                        <span class="visually-hidden">{{ _('Loading billing...') }}</span>
                     </div>
                 </div>
             </div>
@@ -59,27 +56,26 @@
     <div class="col-md-4 mb-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header py-3">
-                <h5 class="mb-0 fw-bold"><i class="bi bi-gear-wide-connected"></i> {{ _('Gestão Financeira') }}</h5>
+                <h5 class="mb-0 fw-bold"><i class="bi bi-gear-wide-connected"></i> {{ _('Financial Management') }}</h5>
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
                     <a href="{{ url_for('finance.list_receivables') }}" class="btn btn-danger text-start">
-                        <i class="bi bi-cash-stack"></i> {{ _('Contas a Receber') }}
+                        <i class="bi bi-cash-stack"></i> {{ _('Accounts Receivable') }}
                     </a>
                     <a href="{{ url_for('projects.index') }}" class="btn btn-outline-danger text-start">
-                        <i class="bi bi-briefcase"></i> {{ _('Revisar Projetos') }}
+                        <i class="bi bi-briefcase"></i> {{ _('Review Projects') }}
                     </a>
                     <a href="{{ url_for('proposals.index') }}" class="btn btn-outline-danger text-start">
-                        <i class="bi bi-file-earmark-pdf"></i> {{ _('Ver Propostas') }}
+                        <i class="bi bi-file-earmark-pdf"></i> {{ _('View Proposals') }}
                     </a>
                     <button class="btn btn-outline-danger text-start" onclick="location.reload()">
-                        <i class="bi bi-arrow-clockwise"></i> Sincronizar Dados
+                        <i class="bi bi-arrow-clockwise"></i> {{ _('Sync Data') }}
                     </button>
                 </div>
                 <hr>
                 <div class="alert alert-danger small mb-0">
-                    <i class="bi bi-exclamation-triangle"></i> {{ _('Lembre-se de validar o comprovante de pagamento
-                    antes de liberar o onboarding da produção.') }}
+                    <i class="bi bi-exclamation-triangle"></i> {{ _('Remember to validate the payment receipt before releasing production onboarding.') }}
                 </div>
             </div>
         </div>
