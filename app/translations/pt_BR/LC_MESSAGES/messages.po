@@ -6806,3 +6806,25 @@ msgstr ""
 #~ msgid "Are you sure you want to delete this visit record?"
 #~ msgstr ""
 
+
+
+msgid "Edit Type"
+msgstr "Editar Tipo"
+
+msgid "Preferred Contact Method"
+msgstr "Método de Contato Preferido"
+
+msgid "Additional Information / Observations"
+msgstr "Informações Adicionais / Observações"
+
+msgid "CRM"
+msgstr "CRM"
+
+msgid "Sales"
+msgstr "Vendas"
+
+msgid "Attention: Follow-up required"
+msgstr "Atenção: Seguimento pendente"
+
+msgid "The following leads were worked on today but have no next step scheduled. Define a next step before the day ends to maintain the sales process."
+msgstr "Os seguintes leads foram atendidos hoje, mas não possuem um próximo passo agendado. Defina uma ação antes do fim do dia para manter o processo de vendas."

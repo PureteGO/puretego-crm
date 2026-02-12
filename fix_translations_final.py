@@ -16,11 +16,13 @@ def fix_catalog_final(filepath, corrections):
     parts = re.split(r'(\n\n)', content)
     updated_count = 0
     new_parts = []
+    found_keys = set()
     
     for part in parts:
         msgid_match = re.search(r'^msgid "(.*)"$', part, re.MULTILINE)
         if msgid_match:
             msgid = msgid_match.group(1)
+            found_keys.add(msgid)
             if msgid in corrections:
                 # Replace the msgstr line
                 new_part = re.sub(r'^msgstr ".*"$', f'msgstr "{corrections[msgid]}"', part, flags=re.MULTILINE)
@@ -29,10 +31,16 @@ def fix_catalog_final(filepath, corrections):
                     updated_count += 1
         new_parts.append(part)
 
+    # Append missing keys
+    for msgid, msgstr in corrections.items():
+        if msgid not in found_keys:
+            new_parts.append(f'\n\nmsgid "{msgid}"\nmsgstr "{msgstr}"')
+            updated_count += 1
+
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write("".join(new_parts))
     
-    print(f"Updated {filepath}: {updated_count} corrections applied.")
+    print(f"Updated {filepath}: {updated_count} mapping/appends applied.")
 
 def main():
     base_dir = os.path.dirname(os.path.abspath(__file__))

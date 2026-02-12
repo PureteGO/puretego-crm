@@ -9055,3 +9055,43 @@ msgstr ""
 #~ msgid "Are you sure you want to delete this visit record?"
 #~ msgstr ""
 
+
+
+msgid "Detailed Information"
+msgstr "Detailed Information"
+
+msgid "Phone / WhatsApp"
+msgstr "Phone / WhatsApp"
+
+msgid "Latest Leads"
+msgstr "Latest Leads"
+
+msgid "Latest Interactions"
+msgstr "Latest Interactions"
+
+msgid "Latest Health Checks"
+msgstr "Latest Health Checks"
+
+msgid "Quick Health Check (GMB)"
+msgstr "Quick Health Check (GMB)"
+
+msgid "Edit Type"
+msgstr "Edit Type"
+
+msgid "Preferred Contact Method"
+msgstr "Preferred Contact Method"
+
+msgid "Additional Information / Observations"
+msgstr "Additional Information / Observations"
+
+msgid "CRM"
+msgstr "CRM"
+
+msgid "Sales"
+msgstr "Sales"
+
+msgid "Attention: Follow-up required"
+msgstr "Attention: Follow-up required"
+
+msgid "The following leads were worked on today but have no next step scheduled. Define a next step before the day ends to maintain the sales process."
+msgstr "The following leads were worked on today but have no next step scheduled. Define a next step before the day ends to maintain the sales process."

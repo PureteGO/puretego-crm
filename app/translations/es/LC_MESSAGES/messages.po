@@ -6775,3 +6775,43 @@ msgstr ""
 #~ msgid "Are you sure you want to delete this visit record?"
 #~ msgstr ""
 
+
+
+msgid "Detailed Information"
+msgstr "Información Detallada"
+
+msgid "Phone / WhatsApp"
+msgstr "Teléfono / WhatsApp"
+
+msgid "Latest Leads"
+msgstr "Últimos Leads"
+
+msgid "Latest Interactions"
+msgstr "Últimas Interacciones"
+
+msgid "Latest Health Checks"
+msgstr "Últimos Health Checks"
+
+msgid "Quick Health Check (GMB)"
+msgstr "Chequeo Rápido de Salud (GMB)"
+
+msgid "Edit Type"
+msgstr "Editar Tipo"
+
+msgid "Preferred Contact Method"
+msgstr "Método de Contacto Preferido"
+
+msgid "Additional Information / Observations"
+msgstr "Información Adicional / Observaciones"
+
+msgid "CRM"
+msgstr "CRM"
+
+msgid "Sales"
+msgstr "Ventas"
+
+msgid "Attention: Follow-up required"
+msgstr "Atención: Seguimiento pendiente"
+
+msgid "The following leads were worked on today but have no next step scheduled. Define a next step before the day ends to maintain the sales process."
+msgstr "Los siguientes leads fueron atendidos hoy pero no tienen un próximo paso programado. Defina una acción antes del final del día para mantener el proceso de ventas."
