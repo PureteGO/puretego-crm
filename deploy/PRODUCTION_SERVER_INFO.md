@@ -5,28 +5,35 @@
 **Virtual Environment:** `/home2/app2maps2go/virtualenv/app2.maps2go.online/3.11/bin/activate`
 (Note: Python version is **3.11**)
 
-## Common Commands
+## Deployment Protocol (Updated 2026-02-13)
 
-### 1. Deploy Updates
-The code is automatically deployed via GitHub Actions (FTP).
-**DO NOT RUN GIT PULL**.
+**User Preference:**
+- **Code Deployment:** FTP (Manual or GitHub Actions if configured, but Manual preferred for small fixes without git overhead).
+- **Database Changes:** Manual SQL execution via **phpMyAdmin**. Avoid automated Python migration scripts unless necessary.
 
-### 2. Install Dependencies
-Connect via SSH and run:
-```bash
-cd /home2/app2maps2go/app2.maps2go.online
-source ../virtualenv/app2.maps2go.online/3.11/bin/activate
-pip install -r requirements.txt
-```
+### 1. Database Updates (phpMyAdmin)
+For any database schema change (new columns, tables):
+1.  Generate the SQL `ALTER TABLE` or `CREATE TABLE` command.
+2.  Log in to cPanel -> phpMyAdmin.
+3.  Select the database `app2maps2go_crm`.
+4.  Run the SQL command in the "SQL" tab.
 
-### 3. Restart Application
-```bash
-touch tmp/restart.txt
-```
+### 2. Code Updates (FTP)
+1.  Upload modified files to `/home2/app2maps2go/app2.maps2go.online` via FileZilla or cPanel File Manager.
+2.  **Avoid** uploading `node_modules` or `__pycache__`.
 
-### 4. Database Migrations (If needed)
-```bash
-flask db upgrade
-# OR
-python3 scripts/migrate_db.py
-```
+### 3. Restart Application (Required after ANY change)
+1.  Connect via SSH or use cPanel Terminal.
+2.  Run:
+    ```bash
+    touch tmp/restart.txt
+    ```
+
+### 4. Install Dependencies (Only if `requirements.txt` changed)
+1.  Connect via SSH.
+2.  Run:
+    ```bash
+    cd /home2/app2maps2go/app2.maps2go.online
+    source ../virtualenv/app2.maps2go.online/3.11/bin/activate
+    pip install -r requirements.txt
+    ```

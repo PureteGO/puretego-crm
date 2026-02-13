@@ -142,6 +142,33 @@ def mark_as_paid(id):
             db.rollback()
             return jsonify({'success': False, 'message': str(e)}), 400
 
+
+@bp.route('/receivables/<int:id>/update', methods=['POST'])
+@login_required
+@permission_required('can_manage_finance')
+def update_receivable(id):
+    """Editar um lançamento de conta a receber"""
+    data = request.get_json() if request.is_json else request.form
+    
+    with get_db() as db:
+        receivable = filter_by_company(db.query(Receivable), Receivable).filter(Receivable.id == id).first()
+        if not receivable:
+            return jsonify({'success': False, 'message': 'Recebível não encontrado'}), 404
+            
+        try:
+            if 'description' in data:
+                receivable.description = data.get('description')
+            if 'amount' in data:
+                receivable.amount = float(data.get('amount'))
+            if 'due_date' in data:
+                receivable.due_date = datetime.strptime(data.get('due_date'), '%Y-%m-%d').date()
+            
+            db.commit()
+            return jsonify({'success': True})
+        except Exception as e:
+            db.rollback()
+            return jsonify({'success': False, 'message': str(e)}), 400
+
 @bp.route('/receivables/<int:receivable_id>/send-invoice', methods=['POST'])
 @login_required
 @permission_required('can_manage_finance')

@@ -178,6 +178,11 @@
                                     title="{{ _('Register Payment') }}">
                                     <i class="bi bi-check-circle"></i>
                                 </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary ms-1"
+                                    onclick="openEditModal({{ rec.id }}, '{{ rec.description }}', {{ rec.amount }}, '{{ rec.due_date }}')"
+                                    title="{{ _('Edit') }}">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
                                 <form action="{{ url_for('finance.send_invoice', receivable_id=rec.id) }}" method="POST"
                                     class="d-inline">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -316,6 +321,47 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Receivable Modal -->
+<div class="modal fade" id="editReceivableModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content themed-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title font-weight-bold">{{ _('Edit Receivable') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body pt-4">
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">{{ _('Description') }}</label>
+                        <input type="text" name="description" id="editDescription" class="form-control" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label font-weight-bold">{{ _('Value') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">{{ session.get('company_currency', 'Gs') }}</span>
+                                <input type="number" step="0.01" name="amount" id="editAmount" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label font-weight-bold">{{ _('Due Date') }}</label>
+                            <input type="text" name="due_date" id="editDueDate" class="form-control flatpickr" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="button" onclick="submitEdit()" class="btn btn-primary px-4">{{ _('Save Changes')
+                        }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -333,6 +379,51 @@
         document.getElementById('amountToPay').max = balance.toFixed(2);
 
         new bootstrap.Modal(document.getElementById('paymentModal')).show();
+    }
+
+    let editModal;
+    function openEditModal(id, description, amount, dueDate) {
+        document.getElementById('editForm').dataset.id = id;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editAmount').value = parseFloat(amount).toFixed(2);
+
+        // Handle date provided by backend (YYYY-MM-DD or Python date object str)
+        document.getElementById('editDueDate').value = dueDate;
+
+        // Re-init flatpickr if needed or let the existing initialization handle it
+        if (window.flatpickr) {
+            flatpickr("#editDueDate", { defaultDate: dueDate });
+        }
+
+        editModal = new bootstrap.Modal(document.getElementById('editReceivableModal'));
+        editModal.show();
+    }
+
+    function submitEdit() {
+        const id = document.getElementById('editForm').dataset.id;
+        const formData = new FormData(document.getElementById('editForm'));
+        const data = Object.fromEntries(formData.entries());
+
+        fetch(`/finance/receivables/${id}/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating receivable');
+            });
     }
 </script>
 {% endblock %}

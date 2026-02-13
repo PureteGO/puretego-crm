@@ -2696,7 +2696,7 @@ msgstr "¿Confirmar pago de esta comisión?"
 
 #: app/templates/finance/payables.html:31
 msgid "Due (Open)"
-msgstr "Por Cobrar (Abierto)"
+msgstr "Por Pagar (Abierto)"
 
 #: app/templates/finance/payables.html:48
 msgid "Total Paid"

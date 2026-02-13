@@ -141,7 +141,8 @@ def agenda():
                 'type_name': _('In-person Visit'),
                 'is_call': False,
                 'date': v.visit_date.isoformat(),
-                'status': 'scheduled'
+                'status': 'scheduled',
+                'notes': v.notes
             })
             
         # Add Visits to Upcoming
@@ -153,7 +154,8 @@ def agenda():
                 'type_name': _('In-person Visit'),
                 'is_call': False,
                 'date': v.visit_date.isoformat(),
-                'status': 'scheduled'
+                'status': 'scheduled',
+                'notes': v.notes
             })
             
         # Sort lists by date
