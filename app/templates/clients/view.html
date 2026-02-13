@@ -26,8 +26,19 @@
                     <h5 class="card-title mb-0">{{ _('Client Information') }}</h5>
                 </div>
                 <div class="card-body">
-                    <p><strong><i class="bi bi-tag"></i> {{ _('Stage') }}:</strong> <span class="badge bg-info">{{
-                            client.kanban_stage.name if client.kanban_stage else _('No stage') }}</span></p>
+                    <p class="d-flex align-items-center mb-0">
+                        <strong class="me-2"><i class="bi bi-tag"></i> {{ _('Stage') }}:</strong>
+                        <select class="form-select form-select-sm w-auto" id="clientStageSelect"
+                            data-original-value="{{ client.kanban_stage_id }}"
+                            onchange="updateClientStage(this, {{ client.id }})">
+                            <option value="">{{ _('No stage') }}</option>
+                            {% for stage in stages %}
+                            <option value="{{ stage.id }}" {% if client.kanban_stage_id==stage.id %}selected{% endif %}>
+                                {{ stage.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <span id="stageUpdateStatus" class="ms-2"></span>
+                    </p>
                     <hr>
                     <p><strong><i class="bi bi-person"></i> {{ _('Contact') }}:</strong> {{ client.contact_name or '-'
                         }}</p>
@@ -779,6 +790,51 @@
     });
     }) ();
     {% endif %}
+
+    // Update Client Stage Logic
+    function updateClientStage(select, clientId) {
+        const newStageId = select.value;
+        const originalValue = select.getAttribute('data-original-value') || "{{ client.kanban_stage_id or '' }}";
+        const statusSpan = document.getElementById('stageUpdateStatus');
+
+        // UI Feedback
+        select.disabled = true;
+        statusSpan.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>';
+
+        fetch(`/clients/${clientId}/move`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ stage_id: newStageId })
+        })
+            .then(response => response.json())
+            .then(data => {
+                select.disabled = false;
+                if (data.success) {
+                    // Success feedback
+                    statusSpan.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+                    select.setAttribute('data-original-value', newStageId);
+
+                    // Clear success icon after 3 seconds
+                    setTimeout(() => {
+                        statusSpan.innerHTML = '';
+                    }, 3000);
+                } else {
+                    alert('{{ _("Error updating stage") }}: ' + data.message);
+                    select.value = originalValue; // Revert
+                    statusSpan.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                select.disabled = false;
+                alert('{{ _("Connection error") }}');
+                select.value = originalValue; // Revert
+                statusSpan.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
+            });
+    }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}

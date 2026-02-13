@@ -2292,7 +2292,6 @@ msgid "Attention: Follow-up required"
 msgstr "Atenção: Seguimento pendente"
 
 #: app/templates/dashboard/index.html:36
-#, fuzzy
 msgid ""
 "The following leads were worked on today but have no next step scheduled."
 " Define a next step\n"
