@@ -9,9 +9,27 @@ load_dotenv()
 
 # Get database URL from environment
 DATABASE_URL = os.getenv('DATABASE_URL')
+
 if not DATABASE_URL:
-    print("Error: DATABASE_URL not found in .env")
-    exit(1)
+    # Fallback to individual variables (common in cPanel/MySQL)
+    host = os.getenv('DB_HOST', 'localhost')
+    port = os.getenv('DB_PORT', '3306')
+    name = os.getenv('DB_NAME', 'puretego_crm')
+    user = os.getenv('DB_USER', 'root')
+    password = os.getenv('DB_PASS', '')
+    
+    if user and password and name:
+        DATABASE_URL = f"mysql+pymysql://{user}:{password}@{host}:{port}/{name}?charset=utf8mb4"
+        print(f"Using constructed DATABASE_URL for {host}")
+    else:
+        print("Error: DATABASE_URL not found and DB_* variables incomplete.")
+        print("Loaded variables (masked):")
+        print(f"DB_HOST={host}")
+        print(f"DB_USER={user}")
+        print(f"DB_NAME={name}")
+        exit(1)
+else:
+    print("Using provided DATABASE_URL")
 
 # Create engine
 engine = create_engine(DATABASE_URL)
