@@ -159,7 +159,8 @@ def update_receivable(id):
             if 'description' in data:
                 receivable.description = data.get('description')
             if 'amount' in data:
-                receivable.amount = float(data.get('amount'))
+                amount_str = str(data.get('amount')).replace(',', '').replace('Gs', '').replace('$', '').strip()
+                receivable.amount = float(amount_str)
             if 'due_date' in data:
                 receivable.due_date = datetime.strptime(data.get('due_date'), '%Y-%m-%d').date()
             
