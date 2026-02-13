@@ -38,7 +38,7 @@ def create(client_id):
         ).filter(Client.id == client_id).first()
         
         if not client:
-            flash('Cliente não encontrado.', 'error')
+            flash(_('Cliente não encontrado.'), 'error')
             return redirect(url_for('clients.index'))
 
         if request.method == 'POST':
@@ -139,12 +139,12 @@ def add_ticket(project_id):
 def upload_contract(project_id):
     """Upload signed contract for a project."""
     if 'contract' not in request.files:
-        flash('Nenhum arquivo enviado.', 'error')
+        flash(_('Nenhum arquivo enviado.'), 'error')
         return redirect(url_for('projects.view', project_id=project_id))
     
     file = request.files['contract']
     if file.filename == '':
-        flash('Nenhum arquivo selecionado.', 'error')
+        flash(_('Nenhum arquivo selecionado.'), 'error')
         return redirect(url_for('projects.view', project_id=project_id))
 
     from flask import current_app
