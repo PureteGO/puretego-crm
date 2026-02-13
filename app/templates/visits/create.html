@@ -2,18 +2,6 @@
 
 {% block title %}{{ _('Log Visit') }} - {{ selected_client.name if selected_client else _('New') }}{% endblock %}
 
-{% block scripts %}
-<script>
-    flatpickr(".flatpickr", {
-        enableTime: true,
-        dateFormat: "Y-m-d H:i",
-        altInput: true,
-        altFormat: "d/m/y h:i a",
-        locale: "{{ current_language }}",
-        disableMobile: true
-    });
-</script>
-{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -46,7 +34,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">{{ _('Visit Date & Time') }}</label>
-                            <input type="text" class="form-control flatpickr" name="visit_date"
+                            <input type="text" class="form-control flatpickr-datetime" name="visit_date"
                                 value="{{ now|format_date('%Y-%m-%d %H:%M') }}" required>
                         </div>
 

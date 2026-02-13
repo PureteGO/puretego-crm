@@ -59,6 +59,7 @@
                             <th>{{ _('Name / Business') }}</th>
                             <th>{{ _('Contact') }}</th>
                             <th>{{ _('Stage') }}</th>
+                            <th>{{ _('Lead Temperature') }}</th>
                             <th>{{ _('Registration Date') }}</th>
                             <th>{{ _('Actions') }}</th>
                         </tr>
@@ -92,6 +93,20 @@
                                             style="font-size: 0.7em;"></i></span>
                                     {% endif %}
                                 </div>
+                            </td>
+                            <td>
+                                {% if client.lead_temperature == 'hot' %}
+                                <span class="badge bg-danger rounded-pill"><i class="bi bi-fire"></i> {{ _('Hot')
+                                    }}</span>
+                                {% elif client.lead_temperature == 'warm' %}
+                                <span class="badge bg-warning text-dark rounded-pill"><i
+                                        class="bi bi-thermometer-half"></i> {{ _('Warm') }}</span>
+                                {% elif client.lead_temperature == 'cold' %}
+                                <span class="badge bg-info text-dark rounded-pill"><i class="bi bi-snow"></i> {{
+                                    _('Cold') }}</span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
                             </td>
                             <td>{{ client.created_at|format_date }}</td>
                             <td>

@@ -24,7 +24,7 @@
     <!-- Quick Stats -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <div class="card shadow-sm border-left-warning h-100 py-2">
+            <div class="card shadow-sm h-100 py-2 border-left-warning">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card shadow-sm border-left-success h-100 py-2">
+            <div class="card shadow-sm h-100 py-2 border-left-success">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
@@ -62,9 +62,13 @@
     <div class="row">
         <!-- New Payable Form -->
         <div class="col-xl-4 col-lg-5 mb-4">
-            <div class="card shadow-sm">
-                <div class="card-header py-3">
+            <div class="card shadow-sm themed-card">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">{{ _('New Payable') }}</h6>
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#categoriesModal">
+                        <i class="bi bi-tags"></i>
+                    </button>
                 </div>
                 <div class="card-body">
                     <form action="{{ url_for('finance.list_payables') }}" method="POST">
@@ -84,13 +88,19 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">{{ _('Category') }}</label>
-                            <select name="category" class="form-select">
-                                <option value="tools">{{ _('Tools') }}</option>
-                                <option value="ads">{{ _('Ads') }}</option>
-                                <option value="office">{{ _('Office') }}</option>
-                                <option value="payroll">{{ _('Payroll') }}</option>
-                                <option value="other" selected>{{ _('Others') }}</option>
+                            <select name="category_id" class="form-select">
+                                <option value="">{{ _('No category') }}</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                                {% endfor %}
                             </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">{{ _('Repeat for [N] months') }}</label>
+                            <input type="number" name="repeat_months" class="form-control" value="1" min="1" max="60"
+                                required>
+                            <small class="text-muted">{{ _('Use > 1 for recurring expenses like rent or electricity.')
+                                }}</small>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">{{ _('Register Payable') }}</button>
                     </form>
@@ -102,7 +112,32 @@
         <div class="col-xl-8 col-lg-7">
             <div class="card shadow-sm mb-4">
                 <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">{{ _('Entries') }}</h6>
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h6 class="m-0 font-weight-bold text-primary">{{ _('Entries') }}</h6>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-transparent border-end-0"><i
+                                        class="bi bi-search"></i></span>
+                                <input type="text" id="payableSearch" class="form-control border-start-0"
+                                    placeholder="{{ _('Search by description...') }}" onkeyup="filterPayables()">
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="btn-group">
+                                <a href="{{ url_for('finance.list_payables', status='open') }}"
+                                    class="btn btn-outline-warning btn-xs {% if request.args.get('status') == 'open' %}active{% endif %}">{{
+                                    _('Open') }}</a>
+                                <a href="{{ url_for('finance.list_payables', status='paid') }}"
+                                    class="btn btn-outline-success btn-xs {% if request.args.get('status') == 'paid' %}active{% endif %}">{{
+                                    _('Paid') }}</a>
+                                <a href="{{ url_for('finance.list_payables') }}"
+                                    class="btn btn-outline-secondary btn-xs {% if not request.args.get('status') %}active{% endif %}">{{
+                                    _('All') }}</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -110,8 +145,18 @@
                             <thead>
                                 <tr>
                                     <th>{{ _('Description') }}</th>
-                                    <th>{{ _('Due Date') }}</th>
-                                    <th>{{ _('Value') }}</th>
+                                    <th>
+                                        <a href="{{ url_for('finance.list_payables', sort='due_date', order='desc' if request.args.get('order') == 'asc' else 'asc', status=request.args.get('status')) }}"
+                                            class="text-decoration-none">
+                                            {{ _('Due Date') }} <i class="bi bi-arrow-down-up small"></i>
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ url_for('finance.list_payables', sort='amount', order='desc' if request.args.get('order') == 'asc' else 'asc', status=request.args.get('status')) }}"
+                                            class="text-decoration-none">
+                                            {{ _('Value') }} <i class="bi bi-arrow-down-up small"></i>
+                                        </a>
+                                    </th>
                                     <th>{{ _('Category') }}</th>
                                     <th>{{ _('Status') }}</th>
                                     <th>{{ _('Actions') }}</th>
@@ -123,11 +168,30 @@
                                 <tr>
                                     <td><strong>{{ p.description }}</strong></td>
                                     <td>{{ p.due_date | format_date }}</td>
-                                    <td>{{ p.amount | format_currency }}</td>
-                                    <td><span class="badge bg-light text-dark border">{{ p.category }}</span></td>
+                                    <td>
+                                        {{ p.amount | format_currency }}
+                                        {% if p.paid_amount > 0 and p.status != 'paid' %}
+                                        <div class="small text-danger mt-1">
+                                            {{ _('Paid') }}: {{ p.paid_amount | format_currency }}<br>
+                                            {{ _('Balance') }}: {{ (p.amount - p.paid_amount) | format_currency }}
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if p.category_obj %}
+                                        <span class="badge border"
+                                            style="background-color: {{ p.category_color }}22; color: {{ p.category_color }}; border-color: {{ p.category_color }}44 !important;">
+                                            {{ p.category_obj.name }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge border">{{ _('Other') }}</span>
+                                        {% endif %}
+                                    </td>
                                     <td>
                                         {% if p.status == 'paid' %}
                                         <span class="badge bg-success">{{ _('Paid') }}</span>
+                                        {% elif p.status == 'partial' %}
+                                        <span class="badge bg-info text-dark">{{ _('Partial') }}</span>
                                         {% elif p.due_date < datetime.utcnow().date() %} <span class="badge bg-danger">
                                             {{ _('Overdue') }}</span>
                                             {% else %}
@@ -135,13 +199,29 @@
                                             {% endif %}
                                     </td>
                                     <td>
-                                        {% if p.status == 'open' %}
-                                        <button onclick="markPayablePaid({{ p.id }})" class="btn btn-sm btn-success">
-                                            <i class="bi bi-check-circle"></i> {{ _('Pay') }}
-                                        </button>
-                                        {% else %}
-                                        <small class="text-muted"><i class="bi bi-calendar-check text-success"></i> {{
-                                            p.paid_at | format_date }}</small>
+                                        <div class="btn-group">
+                                            {% if p.status != 'paid' %}
+                                            <button
+                                                onclick="openPaymentModal({{ p.id }}, '{{ p.description }}', {{ p.amount }}, {{ p.paid_amount or 0 }})"
+                                                class="btn btn-sm btn-success" title="{{ _('Pay') }}">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                            {% endif %}
+                                            <button
+                                                onclick="openEditPayable({{ p.id }}, '{{ p.description }}', {{ p.amount }}, '{{ p.due_date }}', {{ p.category_id or 'null' }})"
+                                                class="btn btn-sm btn-outline-primary" title="{{ _('Edit') }}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button onclick="deletePayable({{ p.id }})"
+                                                class="btn btn-sm btn-outline-danger" title="{{ _('Delete') }}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                        {% if p.status == 'paid' %}
+                                        <div class="mt-1 small text-muted">
+                                            <i class="bi bi-calendar-check text-success"></i> {{ p.paid_at | format_date
+                                            }}
+                                        </div>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -160,24 +240,246 @@
         </div>
     </div>
 </div>
+
+<!-- Edit Payable Modal -->
+<div class="modal fade" id="editPayableModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content themed-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title font-weight-bold">{{ _('Edit Payable') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editPayableForm">
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="editPayId">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Description') }}</label>
+                        <input type="text" name="description" id="editPayDescription" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Value') }}</label>
+                        <input type="number" step="0.01" name="amount" id="editPayAmount" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Due Date') }}</label>
+                        <input type="text" name="due_date" id="editPayDueDate" class="form-control flatpickr" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Category') }}</label>
+                        <select name="category_id" id="editPayCategory" class="form-select">
+                            <option value="">{{ _('No category') }}</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Update entry') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Category Modal -->
+<div class="modal fade" id="categoriesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content themed-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title font-weight-bold">{{ _('Manage Categories') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="categoryForm" class="mb-4">
+                    <input type="hidden" name="id" id="catId">
+                    <div class="row g-2 align-items-end">
+                        <div class="col">
+                            <label class="form-label small">{{ _('Name') }}</label>
+                            <input type="text" name="name" id="catName" class="form-control" required>
+                        </div>
+                        <div class="col-auto">
+                            <label class="form-label small">{{ _('Color') }}</label>
+                            <input type="color" name="color" id="catColor" class="form-control form-control-color"
+                                value="#6c757d">
+                        </div>
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="list-group" id="categoriesList">
+                    {% for cat in categories %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <span class="rounded-circle me-2"
+                                style="width: 12px; height: 12px; background-color: {{ cat.color }};"></span>
+                            {{ cat.name }}
+                        </div>
+                        <div class="btn-group">
+                            <button onclick="editCategory({{ cat.id }}, '{{ cat.name }}', '{{ cat.color }}')"
+                                class="btn btn-sm btn-link"><i class="bi bi-pencil"></i></button>
+                            <button onclick="deleteCategory({{ cat.id }})" class="btn btn-sm btn-link text-danger"><i
+                                    class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content themed-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title font-weight-bold">{{ _('Register Payment') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="paymentForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body pt-4">
+                    <p class="text-muted small mb-3" id="paymentDescription"></p>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label small text-muted mb-0">{{ _('Total Value') }}</label>
+                            <div class="h6 mb-0" id="paymentTotal"></div>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small text-muted mb-0">{{ _('Already Paid') }}</label>
+                            <div class="h6 mb-0 text-success" id="paymentAlreadyPaid"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">{{ _('Amount to Pay Now') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">{{ session.get('company_currency', 'Gs') }}</span>
+                            <input type="number" step="0.01" name="amount_paid" id="amountToPay" class="form-control"
+                                required>
+                        </div>
+                        <small class="text-muted">{{ _('Remaining balance:') }} <span
+                                id="paymentBalance"></span></small>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-success px-4">{{ _('Confirm Account Payment') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    function markPayablePaid(id) {
-        if (!confirm('{{ _("Mark this payable as paid?") }}')) return;
+    function filterPayables() {
+        const input = document.getElementById('payableSearch');
+        const filter = input.value.toLowerCase();
+        const tr = document.querySelectorAll('tbody tr');
 
-        fetch(`/finance/payables/${id}/pay`, {
+        tr.forEach(row => {
+            const descTd = row.getElementsByTagName('td')[0];
+            if (descTd) {
+                const text = descTd.textContent || descTd.innerText;
+                row.style.display = text.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        });
+    }
+
+    function openEditPayable(id, desc, amount, dueDate, catId) {
+        document.getElementById('editPayId').value = id;
+        document.getElementById('editPayDescription').value = desc;
+        document.getElementById('editPayAmount').value = amount;
+        document.getElementById('editPayDueDate')._flatpickr.setDate(dueDate);
+        document.getElementById('editPayCategory').value = catId || "";
+
+        new bootstrap.Modal(document.getElementById('editPayableModal')).show();
+    }
+
+    document.getElementById('editPayableForm').onsubmit = function (e) {
+        e.preventDefault();
+        const id = document.getElementById('editPayId').value;
+        fetch(`/finance/payables/${id}/update`, {
             method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token() }}'
-            }
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
+            body: new FormData(this)
         }).then(r => r.json()).then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert(data.message);
-            }
+            if (data.success) location.reload();
+            else alert(data.message);
+        });
+    };
+
+    function deletePayable(id) {
+        if (!confirm('{{ _("Deseja realmente excluir este lançamento?") }}')) return;
+        fetch(`/finance/payables/${id}/delete`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+        }).then(r => r.json()).then(data => {
+            if (data.success) location.reload();
+            else alert(data.message);
+        });
+    }
+
+    function openPaymentModal(id, description, total, alreadyPaid) {
+        document.getElementById('paymentForm').action = `/finance/payables/${id}/pay`;
+        document.getElementById('paymentDescription').innerText = description;
+        document.getElementById('paymentTotal').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'PYG' }).format(total).replace('PYG', '{{ session.get("company_currency", "Gs") }}');
+        document.getElementById('paymentAlreadyPaid').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'PYG' }).format(alreadyPaid).replace('PYG', '{{ session.get("company_currency", "Gs") }}');
+
+        const balance = total - alreadyPaid;
+        document.getElementById('paymentBalance').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'PYG' }).format(balance).replace('PYG', '{{ session.get("company_currency", "Gs") }}');
+
+        document.getElementById('amountToPay').value = balance.toFixed(2);
+        document.getElementById('amountToPay').max = balance.toFixed(2);
+
+        new bootstrap.Modal(document.getElementById('paymentModal')).show();
+    }
+
+    document.getElementById('paymentForm').onsubmit = function (e) {
+        e.preventDefault();
+        const action = this.action;
+        fetch(action, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
+            body: new FormData(this)
+        }).then(r => r.json()).then(data => {
+            if (data.success) location.reload();
+            else alert(data.message);
+        });
+    };
+
+    document.getElementById('categoryForm').onsubmit = function (e) {
+        e.preventDefault();
+        fetch('/finance/categories', {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' },
+            body: new FormData(this)
+        }).then(r => r.json()).then(data => {
+            if (data.success) location.reload();
+            else alert(data.message);
+        });
+    };
+
+    function editCategory(id, name, color) {
+        document.getElementById('catId').value = id;
+        document.getElementById('catName').value = name;
+        document.getElementById('catColor').value = color;
+    }
+
+    function deleteCategory(id) {
+        if (!confirm('{{ _("Delete category?") }}')) return;
+        fetch(`/finance/categories/${id}/delete`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token() }}' }
+        }).then(r => r.json()).then(data => {
+            if (data.success) location.reload();
+            else alert(data.message);
         });
     }
 </script>

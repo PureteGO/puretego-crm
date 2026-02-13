@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Novo Projeto') }}{% endblock %}
+{% block title %}{{ _('New Project') }}{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -10,51 +10,96 @@
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ url_for('clients.view', client_id=client.id) }}">{{
                             client.name }}</a></li>
-                    <li class="breadcrumb-item active">{{ _('Novo Projeto') }}</li>
+                    <li class="breadcrumb-item active">{{ _('New Project') }}</li>
                 </ol>
             </nav>
 
             <div class="card shadow-sm border-0">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-plus-lg"></i> {{ _('Iniciar Novo Projeto') }}</h5>
+                    <h5 class="mb-0"><i class="bi bi-plus-lg"></i> {{ _('Start New Project') }}</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">{{ _('Nome do Projeto') }}</label>
+                            <label class="form-label fw-bold">{{ _('Project Name') }}</label>
                             <input type="text" name="name" class="form-control"
-                                placeholder="{{ _('Ex: Gestão GMB + SEO Local') }}" required>
+                                placeholder="{{ _('Ex: GMB Management + Local SEO') }}" required>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">{{ _('Descrição') }}</label>
+                            <label class="form-label fw-bold">{{ _('Description') }}</label>
                             <textarea name="description" class="form-control" rows="3"
-                                placeholder="{{ _('O que está incluso neste contrato?') }}"></textarea>
+                                placeholder="{{ _('What is included in this contract?') }}"></textarea>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">{{ _('Data de Início') }}</label>
+                                <label class="form-label fw-bold">{{ _('Start Date') }}</label>
                                 <input type="date" name="start_date" class="form-control" value="{{ now_date }}"
                                     required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label fw-bold">{{ _('Valor Mensal') }}</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">{{ session.get('company_currency', 'Gs') }}</span>
-                                    <input type="number" name="monthly_value" class="form-control" step="0.01"
-                                        value="{{ client.interested_package.price if client.interested_package else 0 }}">
+                                <label class="form-label fw-bold">{{ _('Billing Type') }}</label>
+                                <select name="billing_type" class="form-select" id="billingTypeSelect"
+                                    onchange="toggleBillingFields()">
+                                    <option value="recurring" selected>{{ _('Recurring (Monthly)') }}</option>
+                                    <option value="fixed">{{ _('Fixed Term (Total Value)') }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="recurringFields">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">{{ _('Monthly Value') }}</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">{{ session.get('company_currency', 'Gs')
+                                            }}</span>
+                                        <input type="number" name="monthly_value" class="form-control" step="0.01"
+                                            value="{{ client.interested_package.price if client.interested_package else 0 }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">{{ _('Billing Day') }}</label>
+                                    <input type="number" name="billing_base_day" class="form-control" value="10" min="1"
+                                        max="31">
                                 </div>
                             </div>
                         </div>
 
+                        <div id="fixedFields" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">{{ _('Total Contract Value') }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">{{ session.get('company_currency', 'Gs') }}</span>
+                                    <input type="number" name="total_amount" class="form-control" step="0.01"
+                                        placeholder="0.00">
+                                </div>
+                                <small class="text-muted">{{ _('This is the total amount to be billed over the project
+                                    duration.') }}</small>
+                            </div>
+                        </div>
+
+                        <script>
+                            function toggleBillingFields() {
+                                const type = document.getElementById('billingTypeSelect').value;
+                                if (type === 'recurring') {
+                                    document.getElementById('recurringFields').style.display = 'block';
+                                    document.getElementById('fixedFields').style.display = 'none';
+                                } else {
+                                    document.getElementById('recurringFields').style.display = 'none';
+                                    document.getElementById('fixedFields').style.display = 'block';
+                                }
+                            }
+                        </script>
+
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
                             <a href="{{ url_for('clients.view', client_id=client.id) }}"
-                                class="btn btn-outline-secondary me-md-2">{{ _('Cancelar') }}</a>
+                                class="btn btn-outline-secondary me-md-2">{{ _('Cancel') }}</a>
                             <button type="submit" class="btn btn-primary px-4">
-                                <i class="bi bi-check-lg"></i> {{ _('Criar Projeto') }}
+                                <i class="bi bi-rocket-takeoff"></i> {{ _('Launch Project') }}
                             </button>
                         </div>
                     </form>

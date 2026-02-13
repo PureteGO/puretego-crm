@@ -85,8 +85,7 @@
 {% block content %}
 <div class="container py-4">
     <div class="mb-3">
-        <a href="{{ url_for('clients.view', client_id=health_check.client_id) }}"
-            class="btn btn-sm btn-outline-secondary text-white">
+        <a href="{{ url_for('clients.view', client_id=health_check.client_id) }}" class="btn btn-sm btn-secondary">
             <i class="bi bi-arrow-left"></i> {{ _('Back to Client') }}
         </a>
     </div>

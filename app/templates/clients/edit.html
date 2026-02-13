@@ -96,6 +96,31 @@
                                     </select>
                                 </div>
 
+                                <h4 class="mb-3 text-primary mt-4">{{ _('Lead Temperature') }}</h4>
+                                <div class="mb-3">
+                                    <label class="form-label d-block">{{ _('Closing Probability') }}</label>
+                                    <div class="btn-group" role="group" aria-label="Lead Temperature">
+                                        <input type="radio" class="btn-check" name="lead_temperature" id="temp_cold"
+                                            value="cold" {% if client.lead_temperature=='cold' or not
+                                            client.lead_temperature %}checked{% endif %}>
+                                        <label class="btn btn-outline-info" for="temp_cold">
+                                            <i class="bi bi-snow"></i> {{ _('Cold') }}
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="lead_temperature" id="temp_warm"
+                                            value="warm" {% if client.lead_temperature=='warm' %}checked{% endif %}>
+                                        <label class="btn btn-outline-warning" for="temp_warm">
+                                            <i class="bi bi-thermometer-half"></i> {{ _('Warm') }}
+                                        </label>
+
+                                        <input type="radio" class="btn-check" name="lead_temperature" id="temp_hot"
+                                            value="hot" {% if client.lead_temperature=='hot' %}checked{% endif %}>
+                                        <label class="btn btn-outline-danger" for="temp_hot">
+                                            <i class="bi bi-fire"></i> {{ _('Hot') }}
+                                        </label>
+                                    </div>
+                                </div>
+
                                 <h4 class="mb-3 text-primary mt-4">{{ _('Interest') }}</h4>
                                 <div class="mb-3">
                                     <label for="interested_package_id" class="form-label">{{ _('Interested Package')

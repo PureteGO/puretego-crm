@@ -9,33 +9,33 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{ _('Renovar Contrato') }}</h5>
+                <h5 class="modal-title">{{ _('Renew Contract') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ url_for('projects.renew', project_id=project.id) }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <p class="small text-muted mb-4">
-                        {{ _('Estenda o prazo do contrato e atualize o valor mensal se necessário.') }}
+                        {{ _('Extend the contract term and update the monthly value if necessary.') }}
                     </p>
                     <div class="mb-3">
-                        <label class="form-label">{{ _('Nova Data de Término') }}</label>
+                        <label class="form-label">{{ _('New End Date') }}</label>
                         <input type="date" name="end_date" class="form-control" value="{{ project.end_date }}">
-                        <small class="text-muted">{{ _('Deixe em branco para contrato sem termo (recorrente).')
+                        <small class="text-muted">{{ _('Leave blank for non-term contract (recurring).')
                             }}</small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">{{ _('Novo Valor Mensal') }}</label>
+                        <label class="form-label">{{ _('New Monthly Value') }}</label>
                         <div class="input-group">
-                            <span class="input-group-text">Gs</span>
+                            <span class="input-group-text">{{ session.get('company_currency', 'Gs') }}</span>
                             <input type="number" name="monthly_value" class="form-control"
                                 value="{{ project.monthly_value }}" step="0.01">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancelar') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ _('Confirmar Renovação') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Confirm Renewal') }}</button>
                 </div>
             </form>
         </div>
@@ -48,33 +48,37 @@
         <div class="col-md-3">
             <div class="card shadow-sm border-0 mb-4 overflow-hidden">
                 <div class="card-header bg-primary text-white py-3">
-                    <h5 class="mb-0">{{ _('Detalhes do Projeto') }}</h5>
+                    <h5 class="mb-0">{{ _('Project Details') }}</h5>
                 </div>
                 <div class="card-body">
                     <h4 class="mb-1">{{ project.name }}</h4>
-                    <p class="text-muted mb-4 small"><i class="bi bi-calendar-event"></i> {{ _('Início') }}: {{
+                    <p class="text-muted mb-4 small"><i class="bi bi-calendar-event"></i> {{ _('Start') }}: {{
                         project.start_date|format_date }}</p>
 
                     <div class="mb-4">
-                        <label class="small text-muted d-block">{{ _('Fase Atual') }}</label>
+                        <label class="small text-muted d-block">{{ _('Current Phase') }}</label>
                         {% set phase_colors = {'vendas': 'secondary', 'financeiro': 'warning', 'onboarding': 'info',
                         'execucao': 'primary', 'manutencao': 'success'} %}
+                        {% set phase_names = {'vendas': _('Sales'), 'financeiro': _('Finance Phase'), 'onboarding':
+                        _('Onboarding'), 'execucao': _('Execution'), 'manutencao': _('Maintenance')} %}
                         <span class="badge bg-{{ phase_colors.get(project.phase, 'dark') }} fs-6">
-                            {{ project.phase|capitalize }}
+                            {{ phase_names.get(project.phase, project.phase|capitalize) }}
                         </span>
                     </div>
 
                     <div class="mb-4">
-                        <label class="small text-muted d-block">{{ _('Status Financeiro') }}</label>
+                        <label class="small text-muted d-block">{{ _('Financial Status') }}</label>
                         {% set fin_colors = {'pending': 'danger', 'awaiting_finance': 'warning', 'paid': 'success',
                         'approved': 'info'} %}
+                        {% set fin_names = {'pending': _('Pending'), 'awaiting_finance': _('Awaiting Finance'), 'paid':
+                        _('Paid'), 'approved': _('Approved')} %}
                         <span class="badge bg-{{ fin_colors.get(project.financial_status, 'dark') }}">
-                            {{ project.financial_status|replace('_', ' ')|capitalize }}
+                            {{ fin_names.get(project.financial_status, project.financial_status|capitalize) }}
                         </span>
                     </div>
 
                     <div class="mb-4">
-                        <label class="small text-muted d-block">{{ _('Cliente') }}</label>
+                        <label class="small text-muted d-block">{{ _('Client') }}</label>
                         <a href="{{ url_for('clients.view', client_id=project.client_id) }}"
                             class="text-info text-decoration-none fw-bold">
                             <i class="bi bi-building"></i> {{ project.client.name }}
@@ -82,29 +86,35 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="small text-muted d-block">{{ _('Valor Mensal') }}</label>
+                        {% if project.billing_type == 'fixed' %}
+                        <label class="small text-muted d-block">{{ _('Total Contract Value') }}</label>
+                        <h5 class="text-primary">{{ project.total_amount|format_currency }}</h5>
+                        {% else %}
+                        <label class="small text-muted d-block">{{ _('Monthly Value') }}</label>
                         <h5 class="text-primary">{{ project.monthly_value|format_currency }}</h5>
+                        <small class="text-muted">{{ _('Billing Day') }}: {{ project.billing_base_day }}</small>
+                        {% endif %}
                     </div>
 
                     <hr>
 
                     {% if not project.contract_file_path %}
                     <div class="mb-3">
-                        <label class="small text-muted d-block mb-1">{{ _('Contrato Assinado') }}</label>
+                        <label class="small text-muted d-block mb-1">{{ _('Signed Contract') }}</label>
                         <form action="{{ url_for('projects.upload_contract', project_id=project.id) }}" method="POST"
                             enctype="multipart/form-data">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input type="file" name="contract" class="form-control form-control-sm mb-2" required>
                             <button type="submit" class="btn btn-sm btn-success w-100">
-                                <i class="bi bi-upload"></i> {{ _('Enviar Contrato') }}
+                                <i class="bi bi-upload"></i> {{ _('Upload Contract') }}
                             </button>
                         </form>
                     </div>
                     {% else %}
                     <div class="mb-3">
-                        <label class="small text-muted d-block mb-1">{{ _('Contrato') }}</label>
+                        <label class="small text-muted d-block mb-1">{{ _('Contract') }}</label>
                         <div class="alert alert-success py-2 px-3 small">
-                            <i class="bi bi-check-circle-fill"></i> {{ _('Assinado em') }}:<br>
+                            <i class="bi bi-check-circle-fill"></i> {{ _('Signed on') }}:<br>
                             {{ project.signed_at|format_date }}
                         </div>
                     </div>
@@ -114,7 +124,7 @@
 
             <div class="card shadow-sm border-0 mb-4 bg-light">
                 <div class="card-body">
-                    <h6 class="fw-bold mb-3">{{ _('Controle de Fluxo') }}</h6>
+                    <h6 class="fw-bold mb-3">{{ _('Workflow Control') }}</h6>
 
                     {% if project.phase == 'financeiro' %}
                     {% if project.financial_status == 'paid' and project.contract_file_path %}
@@ -122,12 +132,12 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="phase" value="onboarding">
                         <button type="submit" class="btn btn-primary w-100 mb-2">
-                            <i class="bi bi-rocket-takeoff"></i> {{ _('Liberar Execução') }}
+                            <i class="bi bi-rocket-takeoff"></i> {{ _('Release to Execution') }}
                         </button>
                     </form>
                     {% else %}
                     <div class="alert alert-warning p-2 small mb-2">
-                        {{ _('Aguardando Contrato e Pagamento para liberar execução.') }}
+                        {{ _('Awaiting Contract and Payment to release execution.') }}
                     </div>
                     {% endif %}
                     {% endif %}
@@ -137,25 +147,27 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="phase" value="execucao">
                         <button type="submit" class="btn btn-primary w-100">
-                            <i class="bi bi-play-circle"></i> {{ _('Iniciar Execução') }}
+                            <i class="bi bi-play-circle"></i> {{ _('Start Execution') }}
                         </button>
                     </form>
+                    {% endif %}
+
                     {% if session.get('is_superadmin') or session.get('role') in ['owner', 'admin'] %}
                     <div class="mt-3 pt-3 border-top">
-                        <label class="small text-muted d-block mb-2">{{ _('Ações Administrativas') }}</label>
+                        <label class="small text-muted d-block mb-2">{{ _('Administrative Actions') }}</label>
                         <form action="{{ url_for('projects.update_status', project_id=project.id) }}" method="POST"
                             class="row gx-1">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div class="col-8">
                                 <select name="financial_status" class="form-select form-select-sm">
                                     <option value="pending" {% if project.financial_status=='pending' %}selected{% endif
-                                        %}>{{ _('Pendente') }}</option>
+                                        %}>{{ _('Pending') }}</option>
                                     <option value="awaiting_finance" {% if project.financial_status=='awaiting_finance'
-                                        %}selected{% endif %}>{{ _('Envio de Fatura') }}</option>
+                                        %}selected{% endif %}>{{ _('Invoice Sent') }}</option>
                                     <option value="paid" {% if project.financial_status=='paid' %}selected{% endif %}>{{
-                                        _('Pago / Confirmado') }}</option>
+                                        _('Paid / Confirmed') }}</option>
                                     <option value="approved" {% if project.financial_status=='approved' %}selected{%
-                                        endif %}>{{ _('Aprovado Financeiro') }}</option>
+                                        endif %}>{{ _('Financial Approved') }}</option>
                                 </select>
                             </div>
                             <div class="col-4">
@@ -170,11 +182,11 @@
 
             <div class="d-grid gap-2">
                 <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addTicketModal">
-                    <i class="bi bi-plus-circle"></i> {{ _('Nova Tarefa') }}
+                    <i class="bi bi-plus-circle"></i> {{ _('New Task') }}
                 </button>
                 {% if session.get('role') in ['owner', 'admin'] or session.get('is_superadmin') %}
                 <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#renewModal">
-                    <i class="bi bi-arrow-repeat"></i> {{ _('Renovar Contrato') }}
+                    <i class="bi bi-arrow-repeat"></i> {{ _('Renew Contract') }}
                 </button>
                 {% endif %}
             </div>
@@ -185,11 +197,15 @@
             <ul class="nav nav-tabs mb-4 px-3" id="projectTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="tickets-tab" data-bs-toggle="tab" data-bs-target="#tickets"
-                        type="button" role="tab">{{ _('Tarefas e Entregas') }}</button>
+                        type="button" role="tab">{{ _('Tasks and Deliveries') }}</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="context-tab" data-bs-toggle="tab" data-bs-target="#context"
-                        type="button" role="tab">{{ _('Contexto de Vendas') }}</button>
+                        type="button" role="tab">{{ _('Sales Context') }}</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="finance-tab" data-bs-toggle="tab" data-bs-target="#finance"
+                        type="button" role="tab">{{ _('Finance') }}</button>
                 </li>
             </ul>
 
@@ -198,9 +214,9 @@
                 <div class="tab-pane fade show active" id="tickets" role="tabpanel">
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">{{ _('Fila de Execução') }}</h5>
+                            <h5 class="mb-0">{{ _('Execution Queue') }}</h5>
                             <div class="badge bg-light text-dark">
-                                {{ project.tickets|length }} {{ _('registradas') }}
+                                {{ project.tickets|length }} {{ _('registered') }}
                             </div>
                         </div>
                         <div class="card-body p-0">
@@ -208,11 +224,11 @@
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="bg-light">
                                         <tr>
-                                            <th class="ps-4">{{ _('Tarefa') }}</th>
+                                            <th class="ps-4">{{ _('Task') }}</th>
                                             <th>{{ _('Status') }}</th>
-                                            <th>{{ _('Prioridade') }}</th>
-                                            <th>{{ _('Prazo') }}</th>
-                                            <th class="pe-4">{{ _('Ações') }}</th>
+                                            <th>{{ _('Priority') }}</th>
+                                            <th>{{ _('Deadline') }}</th>
+                                            <th class="pe-4">{{ _('Actions') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -227,18 +243,18 @@
                                             </td>
                                             <td>
                                                 {% if ticket.status == 'pending' %}
-                                                <span class="badge bg-warning text-dark">{{ _('Pendente') }}</span>
+                                                <span class="badge bg-warning text-dark">{{ _('Pending') }}</span>
                                                 {% elif ticket.status == 'in_progress' %}
-                                                <span class="badge bg-info">{{ _('Em Andamento') }}</span>
+                                                <span class="badge bg-info">{{ _('In Progress') }}</span>
                                                 {% elif ticket.status == 'done' %}
-                                                <span class="badge bg-success">{{ _('Concluído') }}</span>
+                                                <span class="badge bg-success">{{ _('Done') }}</span>
                                                 {% endif %}
                                             </td>
                                             <td>
                                                 {% if ticket.priority == 'high' or ticket.priority == 'urgent' %}
                                                 <i class="bi bi-lightning-fill text-danger"></i>
                                                 {% endif %}
-                                                {{ ticket.priority|capitalize }}
+                                                {{ _(ticket.priority|capitalize if ticket.priority else 'Medium') }}
                                             </td>
                                             <td>{{ ticket.due_date|format_date if ticket.due_date else '-' }}</td>
                                             <td class="pe-4">
@@ -251,7 +267,7 @@
                                             <td colspan="5" class="text-center py-5">
                                                 <div class="text-muted">
                                                     <i class="bi bi-list-task display-4"></i>
-                                                    <p class="mt-2">{{ _('Ainda não há tarefas para este projeto.') }}
+                                                    <p class="mt-2">{{ _('There are no tasks for this project yet.') }}
                                                     </p>
                                                 </div>
                                             </td>
@@ -271,8 +287,8 @@
                         <div class="col-md-6 mb-4">
                             <div class="card shadow-sm border-0">
                                 <div class="card-header bg-white py-3">
-                                    <h6 class="mb-0 fw-bold"><i class="bi bi-file-earmark-text"></i> {{ _('Últimas
-                                        Propostas') }}</h6>
+                                    <h6 class="mb-0 fw-bold"><i class="bi bi-file-earmark-text"></i> {{ _('Latest
+                                        Proposals') }}</h6>
                                 </div>
                                 <div class="list-group list-group-flush">
                                     {% for proposal in proposals %}
@@ -292,7 +308,7 @@
                                     </div>
                                     {% else %}
                                     <div class="text-center py-4 text-muted small">
-                                        {{ _('Nenhuma proposta enviada.') }}
+                                        {{ _('No proposals sent.') }}
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -303,7 +319,7 @@
                         <div class="col-md-6 mb-4">
                             <div class="card shadow-sm border-0">
                                 <div class="card-header bg-white py-3">
-                                    <h6 class="mb-0 fw-bold"><i class="bi bi-clipboard-pulse"></i> {{ _('Diagnósticos
+                                    <h6 class="mb-0 fw-bold"><i class="bi bi-clipboard-pulse"></i> {{ _('Diagnostics
                                         (Health Checks)') }}</h6>
                                 </div>
                                 <div class="list-group list-group-flush">
@@ -319,7 +335,7 @@
                                     </div>
                                     {% else %}
                                     <div class="text-center py-4 text-muted small">
-                                        {{ _('Nenhuma auditoria realizada.') }}
+                                        {{ _('No audits performed.') }}
                                     </div>
                                     {% endfor %}
                                 </div>
@@ -327,6 +343,58 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Finance Tab -->
+                <div class="tab-pane fade" id="finance" role="tabpanel">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">{{ _('Project Payments') }}</h5>
+                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#launchInstallmentsModal">
+                                <i class="bi bi-calendar-plus"></i> {{ _('Launch Installments') }}
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="ps-4">{{ _('Description') }}</th>
+                                            <th>{{ _('Due Date') }}</th>
+                                            <th>{{ _('Amount') }}</th>
+                                            <th>{{ _('Status') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for rec in project.receivables %}
+                                        <tr>
+                                            <td class="ps-4">{{ rec.description }}</td>
+                                            <td>{{ rec.due_date|format_date }}</td>
+                                            <td>{{ rec.amount|format_currency }}</td>
+                                            <td>
+                                                {% if rec.status == 'paid' %}
+                                                <span class="badge bg-success">{{ _('Paid') }}</span>
+                                                {% elif rec.status == 'overdue' %}
+                                                <span class="badge bg-danger">{{ _('Overdue') }}</span>
+                                                {% else %}
+                                                <span class="badge bg-warning text-dark">{{ _('Awaiting') }}</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-5 text-muted">
+                                                {{ _('No payments registered for this project.') }}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -337,40 +405,85 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">{{ _('Nova Tarefa Operacional') }}</h5>
+                <h5 class="modal-title">{{ _('New Operational Task') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ url_for('projects.add_ticket', project_id=project.id) }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">{{ _('Título da Tarefa') }}</label>
+                        <label class="form-label">{{ _('Task Title') }}</label>
                         <input type="text" name="title" class="form-control"
-                            placeholder="{{ _('Ex: Otimizar Fotos GMB') }}" required>
+                            placeholder="{{ _('Ex: Optimize GMB Photos') }}" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">{{ _('Descrição/Instruções') }}</label>
+                        <label class="form-label">{{ _('Description/Instructions') }}</label>
                         <textarea name="description" class="form-control" rows="3"></textarea>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ _('Prioridade') }}</label>
+                            <label class="form-label">{{ _('Priority') }}</label>
                             <select name="priority" class="form-select">
-                                <option value="low">{{ _('Baixa') }}</option>
-                                <option value="medium" selected>{{ _('Média') }}</option>
-                                <option value="high">{{ _('Alta') }}</option>
-                                <option value="urgent">{{ _('Urgente') }}</option>
+                                <option value="low">{{ _('Low') }}</option>
+                                <option value="medium" selected>{{ _('Medium') }}</option>
+                                <option value="high">{{ _('High') }}</option>
+                                <option value="urgent">{{ _('Urgent') }}</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ _('Prazo') }}</label>
+                            <label class="form-label">{{ _('Deadline') }}</label>
                             <input type="date" name="due_date" class="form-control">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancelar') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ _('Salvar Tarefa') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Save Task') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal: Launch Installments -->
+<div class="modal fade" id="launchInstallmentsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content themed-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title font-weight-bold">{{ _('Launch Installments') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('projects.launch_installments', project_id=project.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Base Description') }}</label>
+                        <input type="text" name="description" class="form-control"
+                            value="{{ _('Project Payment') }}: {{ project.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Total Amount') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">{{ session.get('company_currency', 'Gs') }}</span>
+                            <input type="number" name="total_amount" class="form-control"
+                                value="{{ project.total_amount if project.billing_type == 'fixed' else '' }}"
+                                placeholder="0.00" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ _('No. of Installments') }}</label>
+                            <input type="number" name="installments" class="form-control" value="1" min="1" max="12"
+                                required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ _('First Due Date') }}</label>
+                            <input type="date" name="first_due_date" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Launch Payments') }}</button>
                 </div>
             </form>
         </div>

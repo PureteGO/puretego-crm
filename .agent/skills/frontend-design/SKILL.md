@@ -172,6 +172,7 @@ Use when appropriate:
 ### Code Requirements
 
 * Clean, readable, and modular
+* **Multi-Language Support**: All UIs must support and reflect content in Portuguese, Spanish, and English
 * No dead styles
 * No unused animations
 * Semantic HTML

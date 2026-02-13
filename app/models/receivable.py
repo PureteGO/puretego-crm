@@ -23,8 +23,9 @@ class Receivable(Base):
     due_date = Column(Date, nullable=False, index=True)
     paid_at = Column(DateTime, nullable=True) # Actual payment date
     
-    # Status: open, paid, overdue, cancelled
+    # Status: open, paid, partial, overdue, cancelled
     status = Column(String(50), default='open', index=True)
+    paid_amount = Column(Numeric(12, 2), default=0)
     
     # Payment method used (for reference after paid)
     payment_method = Column(String(50), nullable=True) # boleto, transfer, card, cash
@@ -43,7 +44,7 @@ class Receivable(Base):
     deal = relationship('Deal', backref='receivables')
     project = relationship('Project', backref='receivables')
 
-    def __init__(self, company_id, client_id, description, amount, due_date, deal_id=None, project_id=None, status='open'):
+    def __init__(self, company_id, client_id, description, amount, due_date, deal_id=None, project_id=None, status='open', paid_amount=0):
         self.company_id = company_id
         self.client_id = client_id
         self.description = description
@@ -52,6 +53,7 @@ class Receivable(Base):
         self.deal_id = deal_id
         self.project_id = project_id
         self.status = status
+        self.paid_amount = paid_amount
 
     def to_dict(self):
         """Converts object to dictionary for API responses"""
@@ -60,6 +62,8 @@ class Receivable(Base):
             'client_name': self.client.name if self.client else 'N/A',
             'description': self.description,
             'amount': float(self.amount),
+            'paid_amount': float(self.paid_amount or 0),
+            'balance': float(self.amount) - float(self.paid_amount or 0),
             'due_date': self.due_date.isoformat() if self.due_date else None,
             'paid_at': self.paid_at.isoformat() if self.paid_at else None,
             'status': self.status,

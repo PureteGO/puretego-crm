@@ -12,6 +12,7 @@ cd ~/app2.maps2go.online && source ../virtualenv/app2.maps2go.online/3.11/bin/ac
 ```
 
 ## Internationalization
+- **Mandatory Requirement**: ALL changes, implementations, and new features MUST support and be correctly reflected in **Portuguese, Spanish, and English**.
 - **Source Language**: English (keys are often used as IDs).
 - **Catalogs**: `pt_BR`, `es`, `en`.
 - **Compilation**: Must use `recompile_translations.py` (which wraps `pybabel compile`).

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Perfiles de Google') }} - {{ connection.google_account_email }}{% endblock %}
+{% block title %}{{ _('Google Profiles') }} - {{ connection.google_account_email }}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -9,24 +9,24 @@
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ url_for('google_oauth.dashboard') }}">{{ _('Integraciones
-                            Google') }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('google_oauth.dashboard') }}">{{ _('Google
+                            Integrations') }}</a></li>
                     <li class="breadcrumb-item active">{{ connection.google_account_email }}</li>
                 </ol>
             </nav>
             <h1 class="mb-0">
-                <i class="bi bi-geo-alt text-primary me-2"></i>{{ _('Perfiles de Negocio') }}
+                <i class="bi bi-geo-alt text-primary me-2"></i>{{ _('Business Profiles') }}
             </h1>
         </div>
         <a href="{{ url_for('google_oauth.dashboard') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> {{ _('Volver') }}
+            <i class="bi bi-arrow-left"></i> {{ _('Back') }}
         </a>
     </div>
 
     {% if error_message %}
     <div class="alert alert-danger">
         <i class="bi bi-exclamation-triangle me-2"></i>
-        <strong>{{ _('Error al cargar perfiles:') }}</strong> {{ error_message }}
+        <strong>{{ _('Error loading profiles:') }}</strong> {{ error_message }}
     </div>
     {% endif %}
 
@@ -34,7 +34,7 @@
     <div class="card shadow-sm">
         <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
             <h5 class="mb-0">
-                <i class="bi bi-building me-2"></i>{{ _('Perfiles disponibles') }}
+                <i class="bi bi-building me-2"></i>{{ _('Available Profiles') }}
                 <span class="badge bg-primary ms-2">{{ locations|length }}</span>
             </h5>
         </div>
@@ -44,11 +44,11 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>{{ _('Perfil de Negocio') }}</th>
-                            <th>{{ _('Dirección') }}</th>
-                            <th class="text-center">{{ _('Estado') }}</th>
-                            <th>{{ _('Cliente Vinculado') }}</th>
-                            <th class="text-end">{{ _('Acciones') }}</th>
+                            <th>{{ _('Business Profile') }}</th>
+                            <th>{{ _('Address') }}</th>
+                            <th class="text-center">{{ _('Status') }}</th>
+                            <th>{{ _('Linked Client') }}</th>
+                            <th class="text-end">{{ _('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -63,7 +63,7 @@
                                         <strong>{{ loc.title }}</strong>
                                         {% if loc.is_primary %}
                                         <span class="badge bg-primary rounded-pill ms-1" style="font-size: 0.65rem;">{{
-                                            _('Principal') }}</span>
+                                            _('Primary') }}</span>
                                         {% endif %}
                                         <br><small class="text-muted">{{ loc.account_name }}</small>
                                     </div>
@@ -78,11 +78,11 @@
                             <td class="text-center">
                                 {% if loc.is_linked %}
                                 <span class="badge bg-success">
-                                    <i class="bi bi-link-45deg me-1"></i>{{ _('Vinculado') }}
+                                    <i class="bi bi-link-45deg me-1"></i>{{ _('Linked') }}
                                 </span>
                                 {% else %}
                                 <span class="badge bg-secondary">
-                                    <i class="bi bi-dash-circle me-1"></i>{{ _('Sin vincular') }}
+                                    <i class="bi bi-dash-circle me-1"></i>{{ _('Unlinked') }}
                                 </span>
                                 {% endif %}
                             </td>
@@ -90,7 +90,7 @@
                                 {% if loc.is_linked and loc.linked_client_id %}
                                 <a href="{{ url_for('clients.view', client_id=loc.linked_client_id) }}"
                                     class="text-decoration-none">
-                                    <i class="bi bi-person me-1"></i>{{ loc.linked_client_name or _('Cliente') }}
+                                    <i class="bi bi-person me-1"></i>{{ loc.linked_client_name or _('Client') }}
                                 </a>
                                 {% elif loc.is_linked %}
                                 <span class="text-muted"><i class="bi bi-exclamation-circle me-1"></i>{{ _('Vínculo
@@ -105,13 +105,13 @@
                                     <input type="hidden" name="location_address" value="{{ loc.address }}">
                                     <select name="client_id" class="form-select form-select-sm" style="width: 200px;"
                                         required>
-                                        <option value="">{{ _('Seleccionar cliente...') }}</option>
+                                        <option value="">{{ _('Select client...') }}</option>
                                         {% for client in clients %}
                                         <option value="{{ client.id }}">{{ client.name }}</option>
                                         {% endfor %}
                                     </select>
                                     <button type="submit" class="btn btn-sm btn-primary">
-                                        <i class="bi bi-link"></i> {{ _('Vincular') }}
+                                        <i class="bi bi-link"></i> {{ _('Link') }}
                                     </button>
                                 </form>
                                 {% endif %}
@@ -120,7 +120,7 @@
                                 {% if loc.is_linked %}
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ url_for('clients.view', client_id=loc.linked_client_id) }}"
-                                        class="btn btn-outline-primary" title="{{ _('Ver Cliente') }}">
+                                        class="btn btn-outline-primary" title="{{ _('View Client') }}">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                     {% if not loc.is_primary %}
@@ -129,7 +129,7 @@
                                         method="POST" class="d-inline">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="btn btn-outline-success"
-                                            title="{{ _('Definir como Principal') }}">
+                                            title="{{ _('Set as Primary') }}">
                                             <i class="bi bi-star"></i>
                                         </button>
                                     </form>
@@ -137,10 +137,9 @@
                                     <form
                                         action="{{ url_for('google_oauth.unlink_location', connection_id=connection.id, link_id=loc.link_id) }}"
                                         method="POST" class="d-inline"
-                                        onsubmit="return confirm('{{ _('Remover este vínculo?') }}');">
+                                        onsubmit="return confirm('{{ _('Remove this link?') }}');">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-outline-danger"
-                                            title="{{ _('Desvincular') }}">
+                                        <button type="submit" class="btn btn-outline-danger" title="{{ _('Unlink') }}">
                                             <i class="bi bi-x-lg"></i>
                                         </button>
                                     </form>
@@ -155,7 +154,7 @@
             {% else %}
             <div class="text-center py-5">
                 <i class="bi bi-geo-alt-slash text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-3">{{ _('No se encontraron perfiles de negocio en esta cuenta.') }}</p>
+                <p class="text-muted mt-3">{{ _('No business profiles found in this account.') }}</p>
             </div>
             {% endif %}
         </div>
@@ -167,12 +166,11 @@
             <div class="d-flex">
                 <i class="bi bi-lightbulb text-warning fs-4 me-3"></i>
                 <div>
-                    <h6>{{ _('Cómo vincular perfiles') }}</h6>
+                    <h6>{{ _('How to link profiles') }}</h6>
                     <p class="text-muted small mb-0">
-                        {{ _('Selecciona un cliente del dropdown y haz clic en "Vincular" para asociar el perfil de
-                        Google Business con ese cliente.
-                        Una vez vinculado, podrás ver las reseñas y métricas del perfil directamente en la ficha del
-                        cliente.') }}
+                        {{ _('Select a client from the dropdown and click "Link" to associate the Google Business
+                        profile with that client. Once linked, you will be able to see the reviews and metrics of the
+                        profile directly in the client record.') }}
                     </p>
                 </div>
             </div>

@@ -24,12 +24,12 @@
     <!-- Quick Stats -->
     <div class="row mb-4">
         <div class="col-md-6">
-            <div class="card shadow-sm border-left-info h-100 py-2">
+            <div class="card shadow-sm h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ _('Comissões
-                                Pendentes') }}</div>
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ _('Pending
+                                Commissions') }}</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_pending | format_currency
                                 }}</div>
                         </div>
@@ -41,7 +41,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card shadow-sm border-left-success h-100 py-2">
+            <div class="card shadow-sm h-100 py-2">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
@@ -85,7 +85,7 @@
                             <td><strong>{{ c.user.name }}</strong></td>
                             <td>{{ c.deal.title }}</td>
                             <td>
-                                <span class="badge bg-light text-dark border">
+                                <span class="badge border">
                                     {{ _('Closer') if c.commission_type == 'closer' else _('SDR/Opener') }}
                                 </span>
                             </td>

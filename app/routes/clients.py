@@ -107,7 +107,9 @@ def kanban():
                     'contact_name': client.contact_name,
                     'package_name': client.interested_package.name if client.interested_package else None,
                     'owner_name': client.owner.name if client.owner else None,
-                    'is_mine': client.owner_id == session.get('user_id')
+                    'owner_name': client.owner.name if client.owner else None,
+                    'is_mine': client.owner_id == session.get('user_id'),
+                    'lead_temperature': client.lead_temperature or 'cold'
                 })
 
             kanban_data.append({
@@ -142,7 +144,8 @@ def create():
                 email=email,
                 website=website,
                 address=address,
-                kanban_stage_id=int(kanban_stage_id) if kanban_stage_id else None
+                kanban_stage_id=int(kanban_stage_id) if kanban_stage_id else None,
+                lead_temperature=request.form.get('lead_temperature', 'cold')
             )
             if package_id:
                 client.interested_package_id = int(package_id)
@@ -329,7 +332,9 @@ def edit(client_id):
             client.decision_factors = request.form.get('decision_factors')
             client.best_contact_time = request.form.get('best_contact_time')
             client.preferred_contact_method = request.form.get('preferred_contact_method')
+            client.preferred_contact_method = request.form.get('preferred_contact_method')
             client.observations = request.form.get('observations')
+            client.lead_temperature = request.form.get('lead_temperature', 'cold')
             
             kanban_stage_id = request.form.get('kanban_stage_id')
             client.kanban_stage_id = int(kanban_stage_id) if kanban_stage_id else None

@@ -25,6 +25,10 @@ class Project(Base):
     start_date = Column(Date)
     end_date = Column(Date) # Null for recurring
     
+    billing_type = Column(String(20), default='recurring') # recurring, fixed
+    billing_base_day = Column(Integer, default=10) # Day of the month for billing
+    total_amount = Column(Numeric(12, 2), default=0) # Total value for fixed projects
+    
     monthly_value = Column(Numeric(12, 2), default=0)
     
     created_at = Column(DateTime, server_default=func.now())

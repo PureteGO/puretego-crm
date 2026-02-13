@@ -25,7 +25,7 @@ def index():
             
         projects = query.order_by(Project.created_at.desc()).all()
         
-    return render_template('projects/index.html', projects=projects, current_status=status)
+        return render_template('projects/index.html', projects=projects, current_status=status)
 
 @bp.route('/create/<int:client_id>', methods=['GET', 'POST'])
 @login_required
@@ -46,6 +46,9 @@ def create(client_id):
                 name = request.form.get('name')
                 description = request.form.get('description')
                 start_date_str = request.form.get('start_date')
+                billing_type = request.form.get('billing_type', 'recurring')
+                billing_base_day = request.form.get('billing_base_day', 10)
+                total_amount = request.form.get('total_amount', 0)
                 monthly_value = request.form.get('monthly_value', 0)
                 
                 logging.info(f"Creating project for client {client_id}: {name}")
@@ -56,6 +59,9 @@ def create(client_id):
                     name=name,
                     description=description,
                     start_date=datetime.strptime(start_date_str, '%Y-%m-%d').date() if start_date_str else None,
+                    billing_type=billing_type,
+                    billing_base_day=int(billing_base_day) if billing_base_day else 10,
+                    total_amount=float(total_amount) if total_amount else 0,
                     monthly_value=float(monthly_value) if monthly_value else 0,
                     status='active'
                 )
@@ -65,18 +71,18 @@ def create(client_id):
                 db.commit()
                 
                 logging.info(f"Project created successfully: {project.id}")
-                flash(_('Projeto "%(name)s" iniciado com sucesso!', name=name), 'success')
+                flash(_('Project "%(name)s" launched successfully!', name=name), 'success')
                 return redirect(url_for('projects.view', project_id=project.id))
             except Exception as e:
                 logging.error(f"Error creating project: {str(e)}", exc_info=True)
-                flash(_('Erro ao criar projeto: %(error)s', error=str(e)), 'error')
+                flash(_('Error creating project: %(error)s', error=str(e)), 'error')
                 return redirect(url_for('projects.create', client_id=client_id))
 
-    return render_template(
-        'projects/create.html', 
-        client=client, 
-        now_date=datetime.now().strftime('%Y-%m-%d')
-    )
+        return render_template(
+            'projects/create.html', 
+            client=client, 
+            now_date=datetime.now().strftime('%Y-%m-%d')
+        )
 
 @bp.route('/<int:project_id>')
 @login_required
@@ -91,7 +97,7 @@ def view(project_id):
             ).filter(Project.id == project_id).first()
             
             if not project:
-                flash(_('Projeto não encontrado.'), 'error')
+                flash(_('Project not found.'), 'error')
                 return redirect(url_for('projects.index'))
                 
             # Fetch related history for context
@@ -99,10 +105,10 @@ def view(project_id):
             health_checks = db.query(HealthCheck).filter_by(client_id=project.client_id).order_by(HealthCheck.created_at.desc()).limit(5).all()
             proposals = db.query(Proposal).filter_by(client_id=project.client_id).order_by(Proposal.created_at.desc()).limit(5).all()
                 
-        return render_template('projects/view.html', project=project, health_checks=health_checks, proposals=proposals)
+            return render_template('projects/view.html', project=project, health_checks=health_checks, proposals=proposals)
     except Exception as e:
         logging.error(f"Error in projects.view: {str(e)}", exc_info=True)
-        flash(_('Erro ao carregar projeto: %(error)s', error=str(e)), 'error')
+        flash(_('Error loading project: %(error)s', error=str(e)), 'error')
         return redirect(url_for('projects.index'))
 
 @bp.route('/<int:project_id>/ticket/add', methods=['POST'])
@@ -148,7 +154,7 @@ def upload_contract(project_id):
     with get_db() as db:
         project = db.query(Project).get(project_id)
         if not project:
-            flash('Projeto não encontrado.', 'error')
+            flash(_('Project not found.'), 'error')
             return redirect(url_for('projects.index'))
 
         # Create company folder
@@ -164,7 +170,7 @@ def upload_contract(project_id):
         project.signed_at = datetime.utcnow()
         db.commit()
         
-        flash('Contrato enviado com sucesso!', 'success')
+        flash(_('Contract uploaded successfully!'), 'success')
         
     return redirect(url_for('projects.view', project_id=project_id))
 
@@ -178,7 +184,7 @@ def update_status(project_id):
     with get_db() as db:
         project = db.query(Project).get(project_id)
         if not project:
-            flash('Projeto não encontrado.', 'error')
+            flash(_('Project not found.'), 'error')
             return redirect(url_for('projects.index'))
             
         if phase:
@@ -189,9 +195,9 @@ def update_status(project_id):
                 exists = db.query(ProjectTicket).filter_by(project_id=project_id, is_onboarding=True).count()
                 if exists == 0:
                     onboarding_tasks = [
-                        ('Reunião de Kickoff', 'Agendar e realizar kickoff com o cliente.'),
-                        ('Coleta de Acessos', 'Solicitar e validar acessos ao GMB, Site e Redes Sociais.'),
-                        ('Planejamento Editorial', 'Definir linha editorial e cronograma inicial.')
+                        (_('Kickoff Meeting'), _('Schedule and perform kickoff with the client.')),
+                        (_('Access Collection'), _('Request and validate accesses to GMB, Website and Social Media.')),
+                        (_('Editorial Planning'), _('Define editorial line and initial schedule.'))
                     ]
                     for title, desc in onboarding_tasks:
                         db.add(ProjectTicket(
@@ -207,7 +213,7 @@ def update_status(project_id):
             project.financial_status = financial_status
             
         db.commit()
-        flash('Status do projeto atualizado.', 'success')
+        flash(_('Project status updated.'), 'success')
         
     return redirect(url_for('projects.view', project_id=project_id))
 
@@ -233,5 +239,48 @@ def renew(project_id):
             
         db.commit()
         flash(_('Projeto renovado com sucesso!'), 'success')
+        
+    return redirect(url_for('projects.view', project_id=project_id))
+
+@bp.route('/<int:project_id>/launch-installments', methods=['POST'])
+@login_required
+def launch_installments(project_id):
+    """Lançar parcelas de pagamento para um projeto."""
+    from app.models import Receivable
+    from datetime import timedelta
+    
+    amount_total = float(request.form.get('total_amount', 0))
+    installments = int(request.form.get('installments', 1))
+    first_due_date_str = request.form.get('first_due_date')
+    description = request.form.get('description', 'Pagamento de Projeto')
+    
+    if amount_total <= 0 or not first_due_date_str:
+        flash(_('Invalid data for installments.'), 'error')
+        return redirect(url_for('projects.view', project_id=project_id))
+        
+    with get_db() as db:
+        project = db.query(Project).get(project_id)
+        if not project:
+            flash(_('Project not found.'), 'error')
+            return redirect(url_for('projects.index'))
+            
+        first_due_date = datetime.strptime(first_due_date_str, '%Y-%m-%d').date()
+        installment_amount = amount_total / installments
+        
+        for i in range(1, installments + 1):
+            due_date = first_due_date + timedelta(days=30 * (i - 1))
+            new_receivable = Receivable(
+                company_id=project.company_id,
+                client_id=project.client_id,
+                project_id=project_id,
+                description=f"{description} ({i}/{installments})",
+                amount=installment_amount,
+                due_date=due_date,
+                status='open'
+            )
+            db.add(new_receivable)
+        
+        db.commit()
+        flash(_('%(count)d installments launched successfully!', count=installments), 'success')
         
     return redirect(url_for('projects.view', project_id=project_id))

@@ -30,6 +30,7 @@ class Client(Base):
     # New Fields for v1.5
     funnel_start_date = Column(DateTime, server_default=func.now())
     status = Column(String(50), default='lead') # lead, active_client, churned, archived
+    lead_temperature = Column(String(20), default='cold') # cold, warm, hot
 
     # Multi-tenant fields
     company_id = Column(Integer, ForeignKey('companies.id'), nullable=True, index=True)  # nullable for migration
@@ -65,7 +66,8 @@ class Client(Base):
                  phone=None, email=None, website=None, address=None, kanban_stage_id=None,
                  receptionist_name=None, decision_maker_name=None,
                  decision_factors=None, best_contact_time=None,
-                 preferred_contact_method=None, observations=None):
+                 preferred_contact_method=None, observations=None,
+                 lead_temperature='cold'):
         self.name = name
         self.company_id = company_id
         self.owner_id = owner_id
@@ -84,6 +86,7 @@ class Client(Base):
         self.best_contact_time = best_contact_time
         self.preferred_contact_method = preferred_contact_method
         self.observations = observations
+        self.lead_temperature = lead_temperature
     
     def to_dict(self, include_relations=False):
         """Converte o objeto para dicionário"""
@@ -107,7 +110,8 @@ class Client(Base):
             'decision_factors': self.decision_factors,
             'best_contact_time': self.best_contact_time,
             'preferred_contact_method': self.preferred_contact_method,
-            'observations': self.observations
+            'observations': self.observations,
+            'lead_temperature': self.lead_temperature
         }
         
         if include_relations:

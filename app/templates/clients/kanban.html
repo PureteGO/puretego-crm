@@ -113,6 +113,13 @@
                     <a href="{{ url_for('clients.view', client_id=client.id) }}" class="d-block">
                         <div class="d-flex justify-content-between">
                             <h6 class="mb-1">{{ client.name }}</h6>
+                            {% if client.lead_temperature == 'hot' %}
+                            <i class="bi bi-fire text-danger" title="{{ _('Hot') }}"></i>
+                            {% elif client.lead_temperature == 'warm' %}
+                            <i class="bi bi-thermometer-half text-warning" title="{{ _('Warm') }}"></i>
+                            {% elif client.lead_temperature == 'cold' %}
+                            <i class="bi bi-snow text-info" title="{{ _('Cold') }}"></i>
+                            {% endif %}
                         </div>
                         <div class="small text-muted mb-1">{{ client.contact_name or '' }}</div>
                         {% if client.package_name %}

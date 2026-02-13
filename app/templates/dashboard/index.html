@@ -232,7 +232,7 @@
             <!-- Hoy -->
             <div class="col-md-6 mb-3">
                 <div class="card h-100 shadow-sm" style="overflow: hidden;">
-                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <h5 class="mb-0"><i class="bi bi-calendar-event"></i> {{ _('Agenda') }} - {{ _('Today') }}</h5>
                         <span class="badge bg-primary" id="todayCount">0</span>
                     </div>
@@ -334,10 +334,10 @@
 
         <div class="row mb-4">
             <div class="col-md-3 mb-3">
-                <div class="card text-white bg-danger h-100 shadow-sm">
+                <div class="card text-white bg-success h-100 shadow-sm">
                     <div class="card-body d-flex flex-column justify-content-between">
                         <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-wallet2"></i> {{
-                            _('Awaiting Payment') }}</h6>
+                            _('Future Receivables / Total Closed') }}</h6>
                         <h3 class="card-text fw-bold mb-0 text-end" id="stat-awaiting-payment">{{
                             awaiting_payment|format_currency }}</h3>
                     </div>
@@ -347,8 +347,7 @@
                 <div class="card text-white bg-warning h-100 shadow-sm">
                     <div class="card-body d-flex flex-column justify-content-between">
                         <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-lock"></i> {{
-                            _('Pending
-                            Contracts') }}</h6>
+                            _('Pending Contracts') }}</h6>
                         <h3 class="card-text fw-bold mb-0 text-end" id="stat-pending-contracts">{{ pending_contracts }}
                         </h3>
                     </div>
@@ -368,8 +367,7 @@
                 <div class="card text-white bg-info h-100 shadow-sm">
                     <div class="card-body d-flex flex-column justify-content-between">
                         <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-file-earmark-text"></i> {{
-                            _('Total
-                            Proposals') }}</h6>
+                            _('Total Proposals') }}</h6>
                         <h3 class="card-text fw-bold mb-0 text-end" id="stat-total-proposals">{{ total_proposals }}</h3>
                     </div>
                 </div>
@@ -488,7 +486,7 @@
                                                 }}</small>
                                             <small class="text-muted">{{ lead.created_at|format_date }}</small>
                                         </div>
-                                        <p class="mb-1 small text-muted">{{ lead.status|default('New', true) }}</p>
+                                        <p class="mb-1 small text-muted">{{ _(lead.status|default('New', true)) }}</p>
                                     </a>
                                     {% else %}
                                     <p class="text-muted small">{{ _('No recent leads.') }}</p>
@@ -499,8 +497,7 @@
                             <!-- Interactions -->
                             <div class="col-md-6 col-lg-3 mb-3">
                                 <h6 class="fw-bold mb-3"><i class="bi bi-telephone-inbound text-primary"></i> {{
-                                    _('Latest
-                                    Interactions') }}</h6>
+                                    _('Latest Interactions') }}</h6>
                                 <div class="list-group list-group-flush">
                                     {% for interaction in recent_interactions %}
                                     <a href="{{ url_for('clients.view', client_id=interaction.client.id) }}"
@@ -545,8 +542,7 @@
                             <!-- Health Checks -->
                             <div class="col-md-6 col-lg-3 mb-3">
                                 <h6 class="fw-bold mb-3"><i class="bi bi-shield-check text-info"></i> {{ _('Latest
-                                    Health
-                                    Checks') }}</h6>
+                                    Health Checks') }}</h6>
                                 <div class="list-group list-group-flush">
                                     {% for check in recent_health_checks %}
                                     <a href="{{ url_for('clients.view', client_id=check.client.id) }}"

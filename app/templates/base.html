@@ -47,7 +47,8 @@
                 altInput: true,
                 altFormat: "d/m/Y",
                 time_24hr: true,
-                disableMobile: true
+                disableMobile: true,
+                static: true // Prevents positioning issues in modals
             });
 
             // Re-init for those that specifically need time
@@ -57,14 +58,22 @@
                 altInput: true,
                 altFormat: "d/m/Y H:i",
                 time_24hr: true,
-                disableMobile: true
+                disableMobile: true,
+                static: true // Prevents positioning issues in modals
             });
         }
 
         document.addEventListener('DOMContentLoaded', initGlobalFlatpickr);
     </script>
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.5">
+    <!-- Custom Modular Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/variables.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/base.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/layout.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/components.css') }}?v=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modules/pages.css') }}?v=1.0">
+    <!-- Legacy fallback (deprecated) -->
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.5"> -->
     {% block head %}{% endblock %}
 </head>
 
@@ -96,6 +105,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('dashboard.index') }}"><i class="bi bi-house-door"></i>
                             {{ _('Dashboard') }}</a>
+                    </li>
+
+                    <!-- Projects Link (Top Level) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('projects.index') }}"><i class="bi bi-briefcase"></i>
+                            {{ _('Projects') }}</a>
                     </li>
 
                     <!-- Sales & CRM Dropdown -->
@@ -163,12 +178,8 @@
                     </li>
                     {% endif %}
 
-                    {% if session.get('workflow_mode') == 'structured' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('projects.index') }}"><i class="bi bi-briefcase"></i> {{
-                            _("Projects") }}</a>
-                    </li>
-                    {% endif %}
+
+
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if session.get('permissions', {}).get('can_manage_users', False) %}

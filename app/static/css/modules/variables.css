@@ -1,0 +1,274 @@
+/* =====================================================
+   PURETEGO CRM - Variables & Themes
+   ===================================================== */
+
+:root {
+    /* Primary Colors - Teal/Cyan accent */
+    --primary: #14b8a6;
+    --primary-hover: #0d9488;
+    --primary-light: rgba(20, 184, 166, 0.15);
+
+    /* Semantic Colors */
+    --success: #22c55e;
+    --success-light: rgba(34, 197, 94, 0.15);
+    --warning: #f59e0b;
+    --warning-light: rgba(245, 158, 11, 0.15);
+    --danger: #ef4444;
+    --danger-light: rgba(239, 68, 68, 0.15);
+    --info: #3b82f6;
+    --info-light: rgba(59, 130, 246, 0.15);
+
+    /* Dark Theme Palette (Default) */
+    --bg-base: #0f172a;
+    --bg-elevated: #1e293b;
+    --bg-card: #1e293b;
+    --bg-hover: #334155;
+    --bg-input: #0f172a;
+
+    /* Text Colors */
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* Border & Divider */
+    --border-color: #334155;
+    --border-color-light: rgba(148, 163, 184, 0.1);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 20px rgba(20, 184, 166, 0.15);
+
+    /* Navbar */
+    --navbar-bg: rgba(15, 23, 42, 0.85);
+    --navbar-text: #94a3b8;
+
+    /* Spacing Scale */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+
+    /* Border Radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-full: 9999px;
+
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 200ms ease;
+    --transition-slow: 300ms ease;
+
+    /* Typography */
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Roboto Mono', monospace;
+}
+
+/* Light Theme Override */
+[data-theme="light"] {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-light: rgba(37, 99, 235, 0.1);
+
+    --success: #16a34a;
+    --success-light: rgba(22, 163, 74, 0.1);
+    --warning: #d97706;
+    --warning-light: rgba(217, 119, 6, 0.1);
+    --danger: #dc2626;
+    --danger-light: rgba(220, 38, 38, 0.1);
+    --info: #0284c7;
+    --info-light: rgba(2, 132, 199, 0.1);
+
+    --bg-base: #f8fafc;
+    --bg-elevated: #ffffff;
+    --bg-card: #ffffff;
+    --bg-hover: #f1f5f9;
+    --bg-input: #ffffff;
+
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+
+    --border-color: #e2e8f0;
+    --border-color-light: rgba(148, 163, 184, 0.2);
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.1);
+
+    --navbar-bg: rgba(255, 255, 255, 0.9);
+    --navbar-text: #475569;
+}
+
+/* Company Theme Variations */
+[data-company-theme="tech-teal"] {
+    --primary: #14b8a6;
+    --primary-hover: #0d9488;
+    --primary-light: rgba(20, 184, 166, 0.15);
+    --shadow-glow: 0 0 20px rgba(20, 184, 166, 0.15);
+}
+
+[data-theme="light"][data-company-theme="tech-teal"] {
+    --primary: #0d9488;
+    --primary-hover: #0f766e;
+    --primary-light: rgba(13, 148, 136, 0.1);
+    --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.1);
+}
+
+[data-company-theme="corporate-blue"] {
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --primary-light: rgba(59, 130, 246, 0.15);
+    --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="light"][data-company-theme="corporate-blue"] {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-light: rgba(37, 99, 235, 0.1);
+    --shadow-glow: 0 0 20px rgba(37, 99, 235, 0.1);
+}
+
+[data-company-theme="innovation-purple"] {
+    --primary: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --primary-light: rgba(139, 92, 246, 0.15);
+    --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.15);
+}
+
+[data-theme="light"][data-company-theme="innovation-purple"] {
+    --primary: #7c3aed;
+    --primary-hover: #6d28d9;
+    --primary-light: rgba(124, 58, 237, 0.1);
+    --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.1);
+}
+
+[data-company-theme="energetic-orange"] {
+    --primary: #f97316;
+    --primary-hover: #ea580c;
+    --primary-light: rgba(249, 115, 22, 0.15);
+    --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.15);
+}
+
+[data-theme="light"][data-company-theme="energetic-orange"] {
+    --primary: #ea580c;
+    --primary-hover: #c2410c;
+    --primary-light: rgba(234, 88, 12, 0.1);
+    --shadow-glow: 0 0 20px rgba(234, 88, 12, 0.1);
+}
+
+[data-company-theme="premium-red"] {
+    --primary: #ef4444;
+    --primary-hover: #dc2626;
+    --primary-light: rgba(239, 68, 68, 0.15);
+    --shadow-glow: 0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="light"][data-company-theme="premium-red"] {
+    --primary: #dc2626;
+    --primary-hover: #b91c1c;
+    --primary-light: rgba(220, 38, 38, 0.1);
+    --shadow-glow: 0 0 20px rgba(220, 38, 38, 0.1);
+}
+
+[data-company-theme="nature-green"] {
+    --primary: #22c55e;
+    --primary-hover: #16a34a;
+    --primary-light: rgba(34, 197, 94, 0.15);
+    --shadow-glow: 0 0 20px rgba(34, 197, 94, 0.15);
+}
+
+[data-theme="light"][data-company-theme="nature-green"] {
+    --primary: #16a34a;
+    --primary-hover: #15803d;
+    --primary-light: rgba(22, 163, 74, 0.1);
+    --shadow-glow: 0 0 20px rgba(22, 163, 74, 0.1);
+}
+
+[data-company-theme="maps2go-official"] {
+    --primary: #14b8a6;
+    --primary-hover: #0d9488;
+    --primary-light: rgba(20, 184, 166, 0.15);
+    --shadow-glow: 0 0 20px rgba(20, 184, 166, 0.2);
+    --navbar-bg: #08202f;
+}
+
+[data-theme="light"][data-company-theme="maps2go-official"] {
+    --primary: #0d9488;
+    --primary-hover: #0f766e;
+    --primary-light: rgba(13, 148, 136, 0.1);
+    --shadow-glow: 0 0 20px rgba(13, 148, 136, 0.1);
+    --navbar-bg: rgba(255, 255, 255, 0.95);
+}
+
+/* Theme Selector Styles */
+.theme-option {
+    padding: var(--space-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.theme-option:hover {
+    border-color: var(--primary);
+    background: var(--bg-hover);
+}
+
+.theme-option label {
+    cursor: pointer;
+}
+
+.theme-option label strong {
+    color: var(--text-primary);
+    display: block;
+}
+
+.theme-option label small {
+    color: var(--text-secondary);
+}
+
+.theme-option input:checked+label strong {
+    color: var(--primary);
+}
+
+.theme-color-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 2px solid var(--border-color);
+}
+
+.theme-dot-tech-teal {
+    background: #14b8a6;
+}
+
+.theme-dot-corporate-blue {
+    background: #3b82f6;
+}
+
+.theme-dot-innovation-purple {
+    background: #8b5cf6;
+}
+
+.theme-dot-energetic-orange {
+    background: #f97316;
+}
+
+.theme-dot-premium-red {
+    background: #ef4444;
+}
+
+.theme-dot-nature-green {
+    background: #22c55e;
+}
+
+.theme-dot-maps2go-official {
+    background: #14b8a6;
+}

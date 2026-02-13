@@ -81,63 +81,77 @@ def index():
             proposals_value_query = filter_by_company(db.query(func.sum(Proposal.total_amount)).join(Client), Client)
             data['total_pipeline_value'] = proposals_value_query.filter(Proposal.status != 'rejected').scalar() or 0
             
-            # --- Sales Calculation (Deals + Proposals) ---
+            # Unified Sales Metrics (v1.6) - Corrected for Finance/Project integration
             first_day_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
             
-            # 1. Won Deals Value
-            won_deals_amount = filter_by_company(db.query(func.sum(Deal.value)), Deal).filter(
-                Deal.status == 'won',
-                Deal.updated_at >= first_day_month
+            # 1. Sum Won Values from Projects (Current month)
+            # Use total_amount (fixed) + monthly_value (recurring)
+            # 1. Sum Won Values from Projects (Current month)
+            # Use total_amount (fixed) + monthly_value (recurring)
+            projects_val = filter_by_company(db.query(
+                func.sum(func.coalesce(Project.total_amount, 0) + func.coalesce(Project.monthly_value, 0))
+            ), Project).filter(
+                Project.status != 'cancelled',
+                Project.created_at >= first_day_month
             ).scalar() or 0
             
-            # 2. Accepted Proposals (only if not linked to a Deal to avoid double counting, OR just sum all for now)
-            # Strategy: If we use Deals primarily, we should rely on them. 
-            # However, legacy data might be in Proposals. Let's sum both but be careful.
-            # Ideally, a Proposal creates a Deal.
-            # Simplified approach: Use DEALS as the source of truth for Sales. If 0, check proposals?
-            # User wants "Closed Sales".
+            # 2. Sum Won Values from Deals that DON'T have a Project yet
+            # Avoid double counting by checking for unlinked deals
+            deals_val = filter_by_company(db.query(func.sum(Deal.value)), Deal).filter(
+                Deal.status == 'won',
+                Deal.updated_at >= first_day_month,
+                ~Deal.id.in_(db.query(Project.deal_id).filter(Project.deal_id != None))
+            ).scalar() or 0
             
-            # Let's take the MAX of (Deals Won, Proposals Accepted) to avoid double counting if they map 1-to-1,
-            # or SUM if they are distinct. 
-            # Safest: Sum Deals. If Deals are not used yet, Sum Proposals.
+            data['won_amount'] = float(projects_val) + float(deals_val)
             
-            if won_deals_amount > 0:
-                data['won_amount'] = won_deals_amount
-                won_count = filter_by_company(db.query(func.count(Deal.id)), Deal).filter(Deal.status == 'won', Deal.updated_at >= first_day_month).scalar() or 0
-            else:
-                # Fallback to Proposals
-                data['won_amount'] = filter_by_company(db.query(func.sum(Proposal.total_amount)).join(Client), Client).filter(
-                    Proposal.status == 'accepted',
-                    Proposal.updated_at >= first_day_month
-                ).scalar() or 0
-                won_count = filter_by_company(db.query(func.count(Proposal.id)).join(Client), Client).filter(Proposal.status == 'accepted').scalar() or 0
+            # 3. Won Count (Total unique sales)
+            proj_count = filter_by_company(db.query(func.count(Project.id)), Project).filter(
+                Project.created_at >= first_day_month,
+                Project.status != 'cancelled'
+            ).scalar() or 0
             
-            data['avg_ticket'] = (float(data['won_amount']) / won_count) if won_count > 0 else 0
+            deal_count = filter_by_company(db.query(func.count(Deal.id)), Deal).filter(
+                Deal.status == 'won',
+                Deal.updated_at >= first_day_month,
+                Deal.value > 0, # Only count if it adds value or has no project yet
+                ~Deal.id.in_(db.query(Project.deal_id).filter(Project.deal_id != None))
+            ).scalar() or 0
             
-            # Sales Performance Chart (Deals Won by Month - Last 6 months)
+            total_wins = proj_count + deal_count
+            data['avg_ticket'] = (float(data['won_amount']) / total_wins) if total_wins > 0 else 0
+            
+            # 4. Unified Sales Performance Chart (Last 6 months)
             six_months_ago = datetime.now() - timedelta(days=180)
             
-            # Try Deals first
-            sales_performance = filter_by_company(
+            # Projects history
+            proj_sales = filter_by_company(
+                db.query(
+                    func.date_format(Project.created_at, '%Y-%m').label('month'),
+                    func.sum(func.coalesce(Project.total_amount, 0) + func.coalesce(Project.monthly_value, 0)).label('total')
+                ), Project
+            ).filter(Project.created_at >= six_months_ago, Project.status != 'cancelled')\
+             .group_by('month').all()
+
+            # Deals history (not linked to projects)
+            deal_sales = filter_by_company(
                 db.query(
                     func.date_format(Deal.updated_at, '%Y-%m').label('month'),
                     func.sum(Deal.value).label('total')
                 ), Deal
-            ).filter(Deal.status == 'won', Deal.updated_at >= six_months_ago)\
-             .group_by('month').order_by('month').all()
-             
-            if not sales_performance:
-                # Fallback to Proposals
-                sales_performance = filter_by_company(
-                    db.query(
-                        func.date_format(Proposal.created_at, '%Y-%m').label('month'),
-                        func.sum(Proposal.total_amount).label('total')
-                    ).join(Client), Client
-                ).filter(Proposal.status == 'accepted', Proposal.created_at >= six_months_ago)\
-                 .group_by('month').order_by('month').all()
+            ).filter(Deal.status == 'won', Deal.updated_at >= six_months_ago, 
+                     ~Deal.id.in_(db.query(Project.deal_id).filter(Project.deal_id != None)))\
+             .group_by('month').all()
+
+            # Combine and sort months
+            performance_map = {}
+            for s in proj_sales:
+                performance_map[s.month] = float(s.total or 0)
+            for s in deal_sales:
+                performance_map[s.month] = performance_map.get(s.month, 0) + float(s.total or 0)
             
-            data['sales_performance'] = [{'month': s.month, 'total': float(s.total or 0)} for s in sales_performance]
-            
+            data['sales_performance'] = [{'month': m, 'total': t} for m, t in sorted(performance_map.items())]
+           
         elif user_role in ['gmb_manager', 'traffic', 'creative']:
             # Production/Ops View
             data['onboarding_count'] = filter_by_company(db.query(func.count(Project.id)), Project).filter(Project.phase == 'onboarding').scalar() or 0

@@ -1,0 +1,188 @@
+/* =====================================================
+   PURETEGO CRM - Components & UI Elements
+   ===================================================== */
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--space-md) var(--space-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.card-body {
+    padding: var(--space-lg);
+}
+
+/* KPI Cards */
+.card.bg-primary {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+    border: none;
+}
+
+.card.bg-success {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+    border: none;
+}
+
+.card.bg-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border: none;
+}
+
+.bg-maps2go-official {
+    background: linear-gradient(135deg, #14b8a6 0%, #0c2331 100%) !important;
+}
+
+/* Tables */
+.table {
+    color: var(--text-primary) !important;
+    margin-bottom: 0;
+    background-color: transparent !important;
+}
+
+.table> :not(caption)>*>* {
+    background-color: transparent !important;
+    color: var(--text-primary) !important;
+    border-bottom: 1px solid var(--border-color-light);
+}
+
+.table>thead {
+    background: var(--bg-elevated) !important;
+}
+
+.table>thead>tr>th {
+    color: var(--text-secondary) !important;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.table>tbody>tr>td {
+    padding: var(--space-md);
+    vertical-align: middle;
+}
+
+.table>tbody>tr:hover {
+    background: var(--bg-hover) !important;
+}
+
+/* Buttons */
+.btn {
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #0d9488 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4);
+}
+
+/* Forms */
+.form-control,
+.form-select {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+    transition: all var(--transition-fast);
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: var(--radius-full);
+}
+
+.badge.bg-primary {
+    background: var(--primary-light) !important;
+    color: var(--primary);
+}
+
+/* Utilities */
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.glass {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color-light);
+}
+
+.glow {
+    box-shadow: var(--shadow-glow);
+}
+
+/* Summary Banner */
+.summary-banner {
+    background: var(--bg-elevated) !important;
+    border-left: 4px solid var(--primary) !important;
+    border-radius: var(--radius-lg) !important;
+}
+
+[data-theme="dark"] .summary-banner {
+    background: #0f172a !important;
+    /* Slightly darker than bg-card */
+}
+
+.summary-banner .text-white,
+.summary-banner .h1,
+.summary-banner .h2,
+.summary-banner .h3,
+.summary-banner .h4,
+.summary-banner .h5 {
+    color: var(--text-primary) !important;
+}
+
+.summary-banner .text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+.summary-banner .border-end {
+    border-color: var(--border-color) !important;
+}
+
+/* Themed Card / Box */
+.themed-card {
+    background: var(--bg-elevated) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.themed-card label {
+    color: var(--text-secondary) !important;
+}

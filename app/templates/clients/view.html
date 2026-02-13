@@ -51,7 +51,10 @@
                         {% for link in client.gmb_location_links %}
                         <li class="mb-1">
                             <i class="bi bi-geo-alt-fill text-primary"></i>
-                            {{ link.gmb_location_title }}
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ link.gmb_location_title|urlencode }}+{{ link.gmb_location_address|urlencode if link.gmb_location_address else (client.address|urlencode if client.address else '') }}"
+                                target="_blank" class="text-decoration-none">
+                                {{ link.gmb_location_title }}
+                            </a>
                             {% if link.is_primary %}
                             <span class="badge bg-primary rounded-pill ms-1" style="font-size: 0.65rem;">{{ _('Primary')
                                 }}</span>
@@ -61,7 +64,12 @@
                     </ul>
                     {% elif client.gmb_profile_name %}
                     <hr>
-                    <p><strong><i class="bi bi-google"></i> Google Maps:</strong> {{ client.gmb_profile_name }}</p>
+                    <p><strong><i class="bi bi-google"></i> Google Maps:</strong>
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ client.gmb_profile_name|urlencode }}{% if client.address %}+{{ client.address|urlencode }}{% endif %}"
+                            target="_blank" class="text-decoration-none">
+                            {{ client.gmb_profile_name }}
+                        </a>
+                    </p>
                     {% endif %}
                 </div>
             </div>

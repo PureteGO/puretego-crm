@@ -146,6 +146,7 @@ Follow the patterns and practices documented in:
 ## Best Practices Summary
 
 ### Code Quality
+- Reflect all changes in Portuguese, Spanish, and English
 - Follow established patterns
 - Write comprehensive tests
 - Document decisions

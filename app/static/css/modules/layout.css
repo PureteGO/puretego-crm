@@ -1,0 +1,130 @@
+/* =====================================================
+   PURETEGO CRM - Layout & Navigation
+   ===================================================== */
+
+/* Navbar - Glass Effect */
+.navbar {
+    background: var(--navbar-bg) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color-light);
+    padding: var(--space-sm) var(--space-lg);
+    height: 64px;
+    transition: background var(--transition-normal);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--primary) 0%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--bg-hover);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.theme-toggle:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+    transform: scale(1.05);
+}
+
+.theme-toggle .bi-sun-fill {
+    display: none;
+}
+
+.theme-toggle .bi-moon-fill {
+    display: inline-block;
+}
+
+[data-theme="light"] .theme-toggle .bi-sun-fill {
+    display: inline-block;
+}
+
+[data-theme="light"] .theme-toggle .bi-moon-fill {
+    display: none;
+}
+
+/* Dropdown Menus */
+.dropdown-menu {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-sm);
+    min-width: 200px;
+}
+
+.dropdown-item {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+}
+
+.dropdown-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.dropdown-item.active {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: var(--space-lg);
+}
+
+.breadcrumb-item {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.breadcrumb-item a {
+    color: var(--text-secondary);
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary);
+}
+
+.breadcrumb-item.active {
+    color: var(--text-primary);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    body {
+        padding-top: 56px;
+    }
+
+    .navbar {
+        height: auto;
+        padding: var(--space-sm);
+    }
+
+    main.container-fluid {
+        padding: var(--space-md);
+    }
+}

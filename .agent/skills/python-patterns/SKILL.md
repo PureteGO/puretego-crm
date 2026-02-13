@@ -415,6 +415,7 @@ Before implementing:
 - [ ] **Planned type hint strategy?**
 - [ ] **Defined project structure?**
 - [ ] **Planned error handling?**
+- [ ] **All features support Portuguese, Spanish, and English?**
 - [ ] **Considered background tasks?**
 
 ---
@@ -428,6 +429,7 @@ Before implementing:
 - Put business logic in routes/views
 - Ignore N+1 queries
 - Mix async and sync carelessly
+- **Forget to implement translations for all 3 supported languages (PT, ES, EN)**
 
 ### ✅ DO:
 - Choose framework based on context
