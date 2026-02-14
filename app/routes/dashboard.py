@@ -98,7 +98,12 @@ def index():
                 .join(Client, Client.kanban_stage_id == KanbanStage.id, isouter=True), Client
             ).group_by(KanbanStage.id, KanbanStage.name).order_by(KanbanStage.order).all()
             
-            data['clients_by_stage'] = pipeline_query
+            # Defensive mapping to ensure labels are strings and data is consistent for JS charts
+            from flask_babel import _
+            data['clients_by_stage'] = [
+                {'name': str(name or _('Unknown')), 'count': int(count or 0)} 
+                for name, count in pipeline_query
+            ]
             
             # Executive Metrics
             won_stage_name = 'Fechado - Ganho'
@@ -168,11 +173,21 @@ def index():
             # Combine and sort months
             performance_map = {}
             for s in proj_sales:
-                performance_map[s.month] = float(s.total or 0)
-            for s in deal_sales:
-                performance_map[s.month] = performance_map.get(s.month, 0) + float(s.total or 0)
+                m = s.month
+                if m:
+                    performance_map[m] = performance_map.get(m, 0) + float(s.total or 0)
             
-            data['sales_performance'] = [{'month': m, 'total': t} for m, t in sorted(performance_map.items())]
+            for s in deal_sales:
+                m = s.month
+                if m:
+                    performance_map[m] = performance_map.get(m, 0) + float(s.total or 0)
+            
+            # Sort by month key (filter out None just in case)
+            sorted_months = sorted([item for item in performance_map.items() if item[0] is not None])
+            
+            data['sales_performance'] = [
+                {'month': m, 'total': t} for m, t in sorted_months
+            ]
            
         elif user_role in ['gmb_manager', 'traffic', 'creative']:
             # Production/Ops View
@@ -198,10 +213,16 @@ def index():
             # Shared: Activity history (already done below in shared section)
             
             # Personal Pipeline
-            data['clients_by_stage'] = filter_by_company(
+            pipeline_query = filter_by_company(
                 db.query(KanbanStage.name, func.count(Client.id))\
                 .join(Client, Client.kanban_stage_id == KanbanStage.id, isouter=True), Client
             ).filter(Client.owner_id == user_id).group_by(KanbanStage.id, KanbanStage.name).order_by(KanbanStage.order).all()
+
+            from flask_babel import _
+            data['clients_by_stage'] = [
+                {'name': str(name or _('Unknown')), 'count': int(count or 0)} 
+                for name, count in pipeline_query
+            ]
 
         # Shared: Activity history
         data['recent_leads'] = filter_by_company(
@@ -311,9 +332,12 @@ def index():
             })
             
         # Sort by date (oldest first)
-        overdue_items.sort(key=lambda x: x['date'])
-        data['overdue_items'] = overdue_items
-        data['overdue_count'] = len(overdue_items)
+        # Filter out items with None dates to avoid TypeError during sorting
+        overdue_items_to_sort = [x for x in overdue_items if x.get('date') is not None]
+        overdue_items_to_sort.sort(key=lambda x: x['date'])
+        
+        data['overdue_items'] = overdue_items_to_sort
+        data['overdue_count'] = len(overdue_items_to_sort)
 
         return render_template('dashboard/index.html', **data)
 

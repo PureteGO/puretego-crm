@@ -155,25 +155,30 @@ def create_app(config_object=None):
         overdue_count = 0
         
         if user:
-            from config.database import db_session
-            # Count overdue scheduled interactions
-            overdue_count = db_session.query(func.count(Interaction.id)).filter(
-                Interaction.user_id == session.get('user_id'),
-                Interaction.status == 'scheduled',
-                Interaction.date < datetime.now()
-            ).scalar() or 0
-            
-            # Add overdue Tasks for this user/role
-            from sqlalchemy import or_
-            task_overdue = db_session.query(func.count(Task.id)).filter(
-                Task.company_id == session.get('company_id'),
-                Task.status == 'pending',
-                Task.due_date < datetime.now(),
-                or_(Task.user_id == user.id, (Task.user_id == None) & (Task.role_target == (user.role.name if user.role else 'sales')))
-            ).scalar() or 0
-            
-            overdue_count += task_overdue
-            
+            try:
+                from config.database import db_session
+                # Count overdue scheduled interactions
+                overdue_count = db_session.query(func.count(Interaction.id)).filter(
+                    Interaction.user_id == session.get('user_id'),
+                    Interaction.status == 'scheduled',
+                    Interaction.date < datetime.now()
+                ).scalar() or 0
+                
+                # Add overdue Tasks for this user/role
+                from sqlalchemy import or_
+                task_overdue = db_session.query(func.count(Task.id)).filter(
+                    Task.company_id == session.get('company_id'),
+                    Task.status == 'pending',
+                    Task.due_date < datetime.now(),
+                    or_(Task.user_id == user.id, (Task.user_id == None) & (Task.role_target == (user.role.name if user.role else 'sales')))
+                ).scalar() or 0
+                
+                overdue_count += task_overdue
+            except Exception as e:
+                # Log error or print to console in dev
+                print(f"Error in inject_globals DB query: {e}")
+                overdue_count = 0
+
             # Optionally add visits too if they have a status
             # For now, let's stick to Interactions which are the main "Tasks"
             

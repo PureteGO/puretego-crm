@@ -463,8 +463,8 @@
                     <div class="card-header fw-bold">{{ _('Client Pipeline') }}</div>
                     <div class="card-body">
                         <canvas id="clientsByStageChart"
-                            data-labels='{{ clients_by_stage|map(attribute=0)|list|tojson }}'
-                            data-values='{{ clients_by_stage|map(attribute=1)|list|tojson }}'></canvas>
+                            data-labels='{{ clients_by_stage|map(attribute="name")|list|tojson }}'
+                            data-values='{{ clients_by_stage|map(attribute="count")|list|tojson }}'></canvas>
                     </div>
                 </div>
             </div>
