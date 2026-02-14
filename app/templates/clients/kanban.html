@@ -114,7 +114,8 @@
 
             <div class="kanban-cards-container" data-stage-id="{{ data.stage.id }}">
                 {% for client in data.clients %}
-                <div class="kanban-card" data-client-id="{{ client.id }}">
+                <div class="kanban-card" data-client-id="{{ client.id }}"
+                    ondblclick="window.location.href='{{ url_for('clients.view', client_id=client.id) }}'">
                     <a href="{{ url_for('clients.view', client_id=client.id) }}" class="d-block">
                         <div class="dropdown">
                             <a href="#" class="text-decoration-none dropdown-toggle no-caret" data-bs-toggle="dropdown">
