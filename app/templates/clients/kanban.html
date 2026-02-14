@@ -61,6 +61,11 @@
     .kanban-card a:hover {
         color: var(--primary);
     }
+
+    /* Custom caret for dropdown */
+    .no-caret::after {
+        display: none !important;
+    }
 </style>
 {% endblock %}
 
@@ -111,15 +116,35 @@
                 {% for client in data.clients %}
                 <div class="kanban-card" data-client-id="{{ client.id }}">
                     <a href="{{ url_for('clients.view', client_id=client.id) }}" class="d-block">
-                        <div class="d-flex justify-content-between">
-                            <h6 class="mb-1">{{ client.name }}</h6>
-                            {% if client.lead_temperature == 'hot' %}
-                            <i class="bi bi-fire text-danger" title="{{ _('Hot') }}"></i>
-                            {% elif client.lead_temperature == 'warm' %}
-                            <i class="bi bi-thermometer-half text-warning" title="{{ _('Warm') }}"></i>
-                            {% elif client.lead_temperature == 'cold' %}
-                            <i class="bi bi-snow text-info" title="{{ _('Cold') }}"></i>
-                            {% endif %}
+                        <div class="dropdown">
+                            <a href="#" class="text-decoration-none dropdown-toggle no-caret" data-bs-toggle="dropdown">
+                                {% if client.lead_temperature == 'hot' %}
+                                <i class="bi bi-fire text-danger" title="{{ _('Hot') }}"></i>
+                                {% elif client.lead_temperature == 'warm' %}
+                                <i class="bi bi-thermometer-half text-warning" title="{{ _('Warm') }}"></i>
+                                {% elif client.lead_temperature == 'cold' %}
+                                <i class="bi bi-snow text-info" title="{{ _('Cold') }}"></i>
+                                {% else %}
+                                <i class="bi bi-thermometer-low text-muted" title="{{ _('Probability') }}"></i>
+                                {% endif %}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li>
+                                    <h6 class="dropdown-header">{{ _('Probability of Closure') }}</h6>
+                                </li>
+                                <li><a class="dropdown-item" href="#"
+                                        onclick="updateTemperature({{ client.id }}, 'hot')">
+                                        <i class="bi bi-fire text-danger me-2"></i> {{ _('Hot') }}
+                                    </a></li>
+                                <li><a class="dropdown-item" href="#"
+                                        onclick="updateTemperature({{ client.id }}, 'warm')">
+                                        <i class="bi bi-thermometer-half text-warning me-2"></i> {{ _('Warm') }}
+                                    </a></li>
+                                <li><a class="dropdown-item" href="#"
+                                        onclick="updateTemperature({{ client.id }}, 'cold')">
+                                        <i class="bi bi-snow text-info me-2"></i> {{ _('Cold') }}
+                                    </a></li>
+                            </ul>
                         </div>
                         <div class="small text-muted mb-1">{{ client.contact_name or '' }}</div>
                         {% if client.package_name %}
@@ -261,6 +286,27 @@
     function openQuickClientModal(stageId) {
         document.getElementById('quickStageId').value = stageId;
         new bootstrap.Modal(document.getElementById('quickAddClientModal')).show();
+    }
+
+    function updateTemperature(clientId, temperature) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        fetch(`/clients/${clientId}/update_temperature`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ temperature: temperature })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
     }
 
     function editStage(id, name, order) {

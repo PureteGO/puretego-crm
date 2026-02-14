@@ -37,6 +37,15 @@
                                 {{ stage.name }}</option>
                             {% endfor %}
                         </select>
+                        <select class="form-select form-select-sm w-auto ms-2" id="clientTemperatureSelect"
+                            onchange="updateClientTemperature(this, {{ client.id }})">
+                            <option value="cold" {% if client.lead_temperature=='cold' %}selected{% endif %}>❄️ {{
+                                _('Cold') }}</option>
+                            <option value="warm" {% if client.lead_temperature=='warm' %}selected{% endif %}>🌡️ {{
+                                _('Warm') }}</option>
+                            <option value="hot" {% if client.lead_temperature=='hot' %}selected{% endif %}>🔥 {{
+                                _('Hot') }}</option>
+                        </select>
                         <span id="stageUpdateStatus" class="ms-2"></span>
                     </p>
                     <hr>
@@ -832,6 +841,42 @@
                 select.disabled = false;
                 alert('{{ _("Connection error") }}');
                 select.value = originalValue; // Revert
+                statusSpan.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
+            });
+    }
+
+    function updateClientTemperature(select, clientId) {
+        const newTemperature = select.value;
+        const statusSpan = document.getElementById('stageUpdateStatus');
+
+        select.disabled = true;
+        statusSpan.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>';
+
+        fetch(`/clients/${clientId}/update_temperature`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({ temperature: newTemperature })
+        })
+            .then(response => response.json())
+            .then(data => {
+                select.disabled = false;
+                if (data.success) {
+                    statusSpan.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i>';
+                    setTimeout(() => {
+                        statusSpan.innerHTML = '';
+                    }, 3000);
+                } else {
+                    alert('{{ _("Error updating probability") }}: ' + data.message);
+                    statusSpan.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                select.disabled = false;
+                alert('{{ _("Connection error") }}');
                 statusSpan.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
             });
     }
