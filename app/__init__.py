@@ -151,12 +151,14 @@ def create_app(config_object=None):
         from sqlalchemy import func
         from datetime import datetime
         
-        user = get_current_user()
+        user = None
         overdue_count = 0
         
-        if user:
-            try:
+        try:
+            user = get_current_user()
+            if user:
                 from config.database import db_session
+                from sqlalchemy import or_
                 # Count overdue scheduled interactions
                 overdue_count = db_session.query(func.count(Interaction.id)).filter(
                     Interaction.user_id == session.get('user_id'),
@@ -165,19 +167,19 @@ def create_app(config_object=None):
                 ).scalar() or 0
                 
                 # Add overdue Tasks for this user/role
-                from sqlalchemy import or_
                 task_overdue = db_session.query(func.count(Task.id)).filter(
                     Task.company_id == session.get('company_id'),
                     Task.status == 'pending',
                     Task.due_date < datetime.now(),
-                    or_(Task.user_id == user.id, (Task.user_id == None) & (Task.role_target == (user.role.name if user.role else 'sales')))
+                    or_(Task.user_id == user.id, (Task.user_id.is_(None)) & (Task.role_target == (user.role.name if user.role else 'sales')))
                 ).scalar() or 0
                 
                 overdue_count += task_overdue
-            except Exception as e:
-                # Log error or print to console in dev
-                print(f"Error in inject_globals DB query: {e}")
-                overdue_count = 0
+        except Exception as e:
+            # Log error - in production it goes to stderr/logs
+            import logging
+            logging.error(f"Error in inject_globals: {e}")
+            overdue_count = 0
 
             # Optionally add visits too if they have a status
             # For now, let's stick to Interactions which are the main "Tasks"

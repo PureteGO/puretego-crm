@@ -27,15 +27,20 @@ def get_current_user():
     from config.database import db_session
     from sqlalchemy.orm import joinedload
     
-    user = db_session.query(User).options(
-        joinedload(User.company),
-        joinedload(User.role)
-    ).filter(User.id == user_id).first()
-    
-    if user:
-        g.current_user = user
+    try:
+        user = db_session.query(User).options(
+            joinedload(User.company),
+            joinedload(User.role)
+        ).filter(User.id == user_id).first()
         
-    return user
+        if user:
+            g.current_user = user
+            
+        return user
+    except Exception as e:
+        import logging
+        logging.error(f"Error in get_current_user: {e}")
+        return None
 
 
 def login_required(f):
