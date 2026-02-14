@@ -25,22 +25,37 @@ def index():
         # --- Shared Data ---
         total_clients = filter_by_company(db.query(func.count(Client.id)), Client).scalar() or 0
         
-        # --- Role-Based context ---
-        data = {
-            'role': user_role,
-            'total_clients': total_clients,
-            'is_superadmin': is_superadmin
-        }
-        
-        # Expanded view for Owners, Managers, Finance or Superadmins
-        if user_role in ['owner', 'admin', 'manager', 'finance'] or is_superadmin:
-            # Admin/Finance View
-            data['total_proposals'] = filter_by_company(db.query(func.count(Proposal.id)).join(Client), Client).scalar() or 0
-            
-            # --- New Leads Metrics (v1.5) ---
+    # --- Metrics Initialization (Avoids 500 errors for roles with less data) ---
+    data = {
+        'role': user_role,
+        'total_clients': total_clients,
+        'is_superadmin': is_superadmin,
+        'new_leads_7d': 0,
+        'new_leads_15d': 0,
+        'won_amount': 0.0,
+        'monthly_revenue': 0.0,
+        'avg_ticket': 0.0,
+        'total_wins': 0,
+        'total_pipeline_value': 0.0,
+        'total_proposals': 0, # Initialize here as it's used in multiple branches
+        'awaiting_payment': 0,
+        'pending_contracts': 0,
+        'expiring_projects': [],
+        'clients_by_stage': [],
+        'win_rate': 0,
+        'sales_performance': [],
+        'month_name': datetime.now().strftime('%B') # Initialize for consistency
+    }
+
+    with get_db() as db:
+        # --- Common Calculations for Owners/Admins/Finance ---
+        if user_role in ['owner', 'admin', 'manager', 'superadmin', 'finance'] or is_superadmin:
+            # Timeframes
             seven_days_ago = datetime.utcnow() - timedelta(days=7)
             fifteen_days_ago = datetime.utcnow() - timedelta(days=15)
+            first_day_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
             
+            # Lead Velocity
             # Count clients created/entered funnel in last 7/15 days
             # Use funnel_start_date if available, else created_at
             data['new_leads_7d'] = filter_by_company(db.query(func.count(Client.id)), Client).filter(
@@ -51,10 +66,13 @@ def index():
                 func.coalesce(Client.funnel_start_date, Client.created_at) >= fifteen_days_ago
             ).scalar() or 0
 
-            # REAL FINANCIAL METRICS (Receivable Model)
-            data['awaiting_payment'] = filter_by_company(db.query(func.sum(Receivable.amount)), Receivable).filter(Receivable.status == 'open').scalar() or 0
-            data['pending_contracts'] = filter_by_company(db.query(func.count(Project.id)), Project).filter(Project.contract_file_path == None).scalar() or 0
-            
+            # Finance/Sales data (Shared by Owner, Admin, Manager, Superadmin, Finance)
+            data['total_proposals'] = filter_by_company(db.query(func.count(Proposal.id)).join(Client), Client).scalar() or 0
+
+            if user_role == 'finance' or is_superadmin: # Finance specific metrics
+                data['awaiting_payment'] = filter_by_company(db.query(func.sum(Receivable.amount)), Receivable).filter(Receivable.status == 'open').scalar() or 0
+                data['pending_contracts'] = filter_by_company(db.query(func.count(Project.id)), Project).filter(Project.contract_file_path == None).scalar() or 0
+
             # Renewal Alerts (Expiring in 30 days)
             thirty_days_ahead = (datetime.now() + timedelta(days=30)).date()
             data['expiring_projects'] = filter_by_company(db.query(Project).options(joinedload(Project.client)), Project)\
@@ -77,78 +95,50 @@ def index():
             
             data['win_rate'] = (won_leads / total_active_leads * 100) if total_active_leads > 0 else 0
             
-            # Proposal Values
-            proposals_value_query = filter_by_company(db.query(func.sum(Proposal.total_amount)).join(Client), Client)
-            data['total_pipeline_value'] = proposals_value_query.filter(Proposal.status != 'rejected').scalar() or 0
+            # Proposals value
+            data['total_pipeline_value'] = filter_by_company(db.query(func.sum(Proposal.total_amount)).join(Client), Client).filter(Proposal.status != 'rejected').scalar() or 0
             
-            # Unified Sales Metrics (v1.6) - Corrected for Finance/Project integration
-            first_day_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-            
-            # 1. Sum Won Values from Projects (Current month)
-            # Use total_amount (fixed) + monthly_value (recurring)
-            # 1. Sum Won Values from Projects (Current month)
-            # Use total_amount (fixed) + monthly_value (recurring)
-            projects_val = filter_by_company(db.query(
-                func.sum(func.coalesce(Project.total_amount, 0))
-            ), Project).filter(
-                Project.status != 'cancelled',
-                Project.created_at >= first_day_month
+            # Closed Sales (Monthly)
+            projects_val = filter_by_company(db.query(func.sum(func.coalesce(Project.total_amount, 0))), Project).filter(
+                Project.status != 'cancelled', Project.created_at >= first_day_month
             ).scalar() or 0
             
-            # 2. Sum Won Values from Deals that DON'T have a Project yet
-            # Avoid double counting by checking for unlinked deals
             deals_val = filter_by_company(db.query(func.sum(Deal.value)), Deal).filter(
-                Deal.status == 'won',
-                Deal.updated_at >= first_day_month,
+                Deal.status == 'won', Deal.updated_at >= first_day_month,
                 ~Deal.id.in_(db.query(Project.deal_id).filter(Project.deal_id != None))
             ).scalar() or 0
             
             data['won_amount'] = float(projects_val) + float(deals_val)
-
-            # --- NOVO: Faturamento Mensal (Monthly Revenue) ---
-            # Soma de todos os Receivables com vencimento neste mês
-            from app.models import Receivable
-            from sqlalchemy import extract
             
-            monthly_revenue = filter_by_company(db.query(
-                func.sum(Receivable.amount)
-            ), Receivable).filter(
+            # Monthly Revenue (Receivables)
+            monthly_rev = filter_by_company(db.query(func.sum(Receivable.amount)), Receivable).filter(
                 extract('month', Receivable.due_date) == datetime.now().month,
                 extract('year', Receivable.due_date) == datetime.now().year,
                 Receivable.status != 'cancelled'
             ).scalar() or 0
-            
-            data['monthly_revenue'] = float(monthly_revenue)
-            
-            # Metadata for the dashboard
-            data['month_name'] = datetime.now().strftime('%B')
-            
-            # 3. Won Count (Total unique sales)
+            data['monthly_revenue'] = float(monthly_rev)
+
+            # Avg Ticket calculations
             proj_count = filter_by_company(db.query(func.count(Project.id)), Project).filter(
-                Project.created_at >= first_day_month,
-                Project.status != 'cancelled'
+                Project.created_at >= first_day_month, Project.status != 'cancelled'
             ).scalar() or 0
             
             deal_count = filter_by_company(db.query(func.count(Deal.id)), Deal).filter(
-                Deal.status == 'won',
-                Deal.updated_at >= first_day_month,
-                Deal.value > 0, # Only count if it adds value or has no project yet
+                Deal.status == 'won', Deal.updated_at >= first_day_month,
                 ~Deal.id.in_(db.query(Project.deal_id).filter(Project.deal_id != None))
             ).scalar() or 0
             
             total_wins = proj_count + deal_count
-            data['avg_ticket'] = (float(data['won_amount']) / total_wins) if total_wins > 0 else 0
+            data['total_wins'] = total_wins
+            data['avg_ticket'] = (data['won_amount'] / total_wins) if total_wins > 0 else 0
             
-            # 4. Unified Sales Performance Chart (Last 6 months)
+            # Performance History Chart (Last 6 months)
             six_months_ago = datetime.now() - timedelta(days=180)
             
-            # Projects history
-            proj_sales = filter_by_company(
-                db.query(
-                    func.date_format(Project.created_at, '%Y-%m').label('month'),
-                    func.sum(func.coalesce(Project.total_amount, 0)).label('total')
-                ), Project
-            ).filter(Project.created_at >= six_months_ago, Project.status != 'cancelled')\
+            proj_sales = filter_by_company(db.query(
+                func.date_format(Project.created_at, '%Y-%m').label('month'),
+                func.sum(func.coalesce(Project.total_amount, 0)).label('total')
+            ), Project).filter(Project.created_at >= six_months_ago, Project.status != 'cancelled')\
              .group_by('month').all()
 
             # Deals history (not linked to projects)
