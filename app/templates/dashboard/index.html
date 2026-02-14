@@ -300,30 +300,45 @@
                 </div>
             </div>
 
-            <!-- Closed Sales -->
+            <!-- Closed Sales (Contract Volume) -->
             <div class="col-6 col-md-3">
                 <div class="card border-0 shadow-sm h-100 border-start border-4 border-success">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2 text-success fw-bold small text-truncate">
-                            <i class="bi bi-trophy"></i> {{ _('CLOSED SALES') }}
+                            <i class="bi bi-trophy"></i> {{ _('CLOSED SALES (VOL)') }}
                         </h6>
                         <h2 class="card-title fw-bold mb-0 fs-4">Gs {{ "{:,.0f}".format(won_amount).replace(',', '.') }}
                         </h2>
-                        <span class="text-muted small d-none d-sm-inline">{{ _('This Month') }}</span>
+                        <span class="text-muted small d-none d-sm-inline">{{ _('New Contracts (Setup)') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Billing (Real Billing) -->
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm h-100 border-start border-4 border-dark">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-dark fw-bold small text-truncate">
+                            <i class="bi bi-cash-stack"></i> {{ _('MONTHLY BILLING') }}
+                        </h6>
+                        <h2 class="card-title fw-bold mb-0 fs-4">Gs {{ "{:,.0f}".format(monthly_revenue).replace(',',
+                            '.') }}
+                        </h2>
+                        <span class="text-muted small d-none d-sm-inline">{{ _('Installments + Recurring') }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Avg Ticket -->
-            <div class="col-6 col-md-3">
+            <div class="col-6 col-md-2">
                 <div class="card border-0 shadow-sm h-100 border-start border-4 border-warning">
                     <div class="card-body">
                         <h6 class="card-subtitle mb-2 text-warning fw-bold small text-truncate">
                             <i class="bi bi-tag"></i> {{ _('AVG TICKET') }}
                         </h6>
-                        <h2 class="card-title fw-bold mb-0 fs-4">Gs {{ "{:,.0f}".format(avg_ticket).replace(',', '.') }}
+                        <h2 class="card-title fw-bold mb-0 fs-5">Gs {{ "{:,.0f}".format(avg_ticket).replace(',', '.') }}
                         </h2>
-                        <span class="text-muted small d-none d-sm-inline">{{ _('Average Value Won') }}</span>
+                        <span class="text-muted small d-none d-sm-inline">{{ _('Avg. Value Won') }}</span>
                     </div>
                 </div>
             </div>

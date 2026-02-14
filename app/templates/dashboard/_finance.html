@@ -1,31 +1,45 @@
 <!-- Finance Specialized Dashboard Partial -->
 <div class="row mb-4">
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card shadow-sm border-0 bg-danger text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-wallet2"></i> {{ _('Accounts Receivable (Total)') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-wallet2"></i> {{ _('Accounts Receivable
+                    (Total)') }}</h6>
                 <div class="h2 mb-0 fw-bold">{{ awaiting_payment | format_currency }}</div>
                 <p class="mb-0 small opacity-75">{{ _('Open pending invoices') }}</p>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card shadow-sm border-0 bg-primary text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-file-earmark-lock"></i> {{ _('Pending Contracts') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-file-earmark-lock"></i> {{ _('Pending
+                    Contracts') }}</h6>
                 <div class="h2 mb-0 fw-bold">{{ pending_contracts }}</div>
                 <p class="mb-0 small opacity-75">{{ _('Projects without signed contract') }}</p>
             </div>
         </div>
     </div>
 
-    <div class="col-md-4 mb-3">
+    <div class="col-md-3 mb-3">
         <div class="card shadow-sm border-0 bg-success text-white h-100">
             <div class="card-body">
-                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-cash-coin"></i> {{ _('Received (Month)') }}</h6>
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-cash-coin"></i> {{ _('Monthly Billing')
+                    }}</h6>
+                <div class="h2 mb-0 fw-bold">{{ monthly_revenue | format_currency }}</div>
+                <p class="mb-0 small opacity-75">{{ _('Total expected for this month') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0 bg-dark text-white h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase small mb-2 opacity-75"><i class="bi bi-trophy"></i> {{ _('Closed Sales
+                    (Contract)') }}</h6>
                 <div class="h2 mb-0 fw-bold">{{ won_amount | format_currency }}</div>
-                <p class="mb-0 small opacity-75">{{ _('Total value received this month') }}</p>
+                <p class="mb-0 small opacity-75">{{ _('New contract volume this month') }}</p>
             </div>
         </div>
     </div>
@@ -75,7 +89,8 @@
                 </div>
                 <hr>
                 <div class="alert alert-danger small mb-0">
-                    <i class="bi bi-exclamation-triangle"></i> {{ _('Remember to validate the payment receipt before releasing production onboarding.') }}
+                    <i class="bi bi-exclamation-triangle"></i> {{ _('Remember to validate the payment receipt before
+                    releasing production onboarding.') }}
                 </div>
             </div>
         </div>

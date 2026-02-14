@@ -104,6 +104,24 @@ def index():
             ).scalar() or 0
             
             data['won_amount'] = float(projects_val) + float(deals_val)
+
+            # --- NOVO: Faturamento Mensal (Monthly Revenue) ---
+            # Soma de todos os Receivables com vencimento neste mês
+            from app.models import Receivable
+            from sqlalchemy import extract
+            
+            monthly_revenue = filter_by_company(db.query(
+                func.sum(Receivable.amount)
+            ), Receivable).filter(
+                extract('month', Receivable.due_date) == datetime.now().month,
+                extract('year', Receivable.due_date) == datetime.now().year,
+                Receivable.status != 'cancelled'
+            ).scalar() or 0
+            
+            data['monthly_revenue'] = float(monthly_revenue)
+            
+            # Metadata for the dashboard
+            data['month_name'] = datetime.now().strftime('%B')
             
             # 3. Won Count (Total unique sales)
             proj_count = filter_by_company(db.query(func.count(Project.id)), Project).filter(
