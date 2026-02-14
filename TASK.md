@@ -4,6 +4,8 @@
 - [x] Fix `DetachedInstanceError` across all routes via exhaustive `joinedload`. <!-- id: 0 -->
 - [x] Implement safety checks for null values in models and templates. <!-- id: 1 -->
 - [x] Resolved missing routes (health_checks.create/delete) causing render failures. <!-- id: 7 -->
+- [x] Hardened dashboard/context logic against production data discrepancies.
+- [x] Implemented global try-except safety net for dashboard routes.
 
 ## 2. Health Check Optimization (DONE)
 - [x] Intelligent recommendations generation in Spanish. <!-- id: 8 -->
@@ -17,6 +19,8 @@
 ## 4. Dashboard & Agenda (DONE)
 - [x] Unified agenda showing both visits and scheduled interactions. <!-- id: 13 -->
 - [x] Real-time statistics and status charts. <!-- id: 14 -->
+- [x] Display business name prominently on Kanban cards.
+- [x] Add double-click shortcut to Kanban cards to open client view.
 
 ## 5. Brainstorming & Design (IN PROGRESS)
 - [ ] **Step 3: Design Proposals** <!-- id: 4 -->
