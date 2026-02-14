@@ -230,7 +230,7 @@ def renew(project_id):
             flash(_('Projeto não encontrado'), 'danger')
             return redirect(url_for('projects.index'))
             
-        if new_end_date:
+        if new_end_date and new_end_date.strip():
             from datetime import datetime
             project.end_date = datetime.strptime(new_end_date, '%Y-%m-%d').date()
         
@@ -282,5 +282,47 @@ def launch_installments(project_id):
         
         db.commit()
         flash(_('%(count)d installments launched successfully!', count=installments), 'success')
+        
+    return redirect(url_for('projects.view', project_id=project_id))
+@bp.route('/<int:project_id>/launch-recurring', methods=['POST'])
+@login_required
+def launch_recurring(project_id):
+    """Lançar mensalidades recorrentes para um projeto."""
+    from app.models import Receivable
+    from datetime import timedelta
+    
+    amount = float(request.form.get('monthly_amount', 0))
+    count = int(request.form.get('count', 1))
+    first_due_date_str = request.form.get('first_due_date')
+    description = request.form.get('description', _('Recurring Payment'))
+    
+    if amount <= 0 or not first_due_date_str:
+        flash(_('Invalid data for recurring payments.'), 'error')
+        return redirect(url_for('projects.view', project_id=project_id))
+        
+    with get_db() as db:
+        project = db.query(Project).get(project_id)
+        if not project:
+            flash(_('Project not found.'), 'error')
+            return redirect(url_for('projects.index'))
+            
+        first_due_date = datetime.strptime(first_due_date_str, '%Y-%m-%d').date()
+        
+        for i in range(1, count + 1):
+            # 30 days logic for simplicity and consistency with launch_installments
+            due_date = first_due_date + timedelta(days=30 * (i - 1))
+            new_receivable = Receivable(
+                company_id=project.company_id,
+                client_id=project.client_id,
+                project_id=project_id,
+                description=f"{description} ({i}/{count})",
+                amount=amount,
+                due_date=due_date,
+                status='open'
+            )
+            db.add(new_receivable)
+        
+        db.commit()
+        flash(_('%(count)d recurring payments launched successfully!', count=count), 'success')
         
     return redirect(url_for('projects.view', project_id=project_id))

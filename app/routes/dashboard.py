@@ -89,7 +89,7 @@ def index():
             # 1. Sum Won Values from Projects (Current month)
             # Use total_amount (fixed) + monthly_value (recurring)
             projects_val = filter_by_company(db.query(
-                func.sum(func.coalesce(Project.total_amount, 0) + func.coalesce(Project.monthly_value, 0))
+                func.sum(func.coalesce(Project.total_amount, 0))
             ), Project).filter(
                 Project.status != 'cancelled',
                 Project.created_at >= first_day_month
@@ -128,7 +128,7 @@ def index():
             proj_sales = filter_by_company(
                 db.query(
                     func.date_format(Project.created_at, '%Y-%m').label('month'),
-                    func.sum(func.coalesce(Project.total_amount, 0) + func.coalesce(Project.monthly_value, 0)).label('total')
+                    func.sum(func.coalesce(Project.total_amount, 0)).label('total')
                 ), Project
             ).filter(Project.created_at >= six_months_ago, Project.status != 'cancelled')\
              .group_by('month').all()
