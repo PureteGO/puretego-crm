@@ -101,11 +101,14 @@ def view(project_id):
                 return redirect(url_for('projects.index'))
                 
             # Fetch related history for context
-            from app.models import HealthCheck, Proposal
+            from app.models import HealthCheck, Proposal, User
             health_checks = db.query(HealthCheck).filter_by(client_id=project.client_id).order_by(HealthCheck.created_at.desc()).limit(5).all()
             proposals = db.query(Proposal).filter_by(client_id=project.client_id).order_by(Proposal.created_at.desc()).limit(5).all()
+            
+            # Fetch company users for assignment
+            users = db.query(User).filter_by(company_id=project.company_id).all()
                 
-            return render_template('projects/view.html', project=project, health_checks=health_checks, proposals=proposals)
+            return render_template('projects/view.html', project=project, health_checks=health_checks, proposals=proposals, users=users)
     except Exception as e:
         logging.error(f"Error in projects.view: {str(e)}", exc_info=True)
         flash(_('Error loading project: %(error)s', error=str(e)), 'error')
@@ -119,6 +122,7 @@ def add_ticket(project_id):
     description = request.form.get('description')
     priority = request.form.get('priority', 'medium')
     due_date_str = request.form.get('due_date')
+    assigned_to = request.form.get('assigned_to')
     
     with get_db() as db:
         ticket = ProjectTicket(
@@ -127,6 +131,7 @@ def add_ticket(project_id):
             description=description,
             priority=priority,
             due_date=datetime.strptime(due_date_str, '%Y-%m-%d').date() if due_date_str else None,
+            assigned_to=int(assigned_to) if assigned_to and assigned_to != "" else None,
             status='pending'
         )
         db.add(ticket)

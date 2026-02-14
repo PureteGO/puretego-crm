@@ -181,9 +181,6 @@
             </div>
 
             <div class="d-grid gap-2">
-                <button class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#addTicketModal">
-                    <i class="bi bi-plus-circle"></i> {{ _('New Task') }}
-                </button>
                 {% if session.get('role') in ['owner', 'admin'] or session.get('is_superadmin') %}
                 <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#renewModal">
                     <i class="bi bi-arrow-repeat"></i> {{ _('Renew Contract') }}
@@ -215,8 +212,14 @@
                     <div class="card shadow-sm border-0">
                         <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">{{ _('Execution Queue') }}</h5>
-                            <div class="badge bg-light text-dark">
-                                {{ project.tickets|length }} {{ _('registered') }}
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="badge bg-light text-dark">
+                                    {{ project.tickets|length }} {{ _('registered') }}
+                                </div>
+                                <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
+                                    data-bs-target="#addTicketModal">
+                                    <i class="bi bi-plus-circle"></i> {{ _('New Task') }}
+                                </button>
                             </div>
                         </div>
                         <div class="card-body p-0">
@@ -227,6 +230,7 @@
                                             <th class="ps-4">{{ _('Task') }}</th>
                                             <th>{{ _('Status') }}</th>
                                             <th>{{ _('Priority') }}</th>
+                                            <th>{{ _('Responsible') }}</th>
                                             <th>{{ _('Deadline') }}</th>
                                             <th class="pe-4">{{ _('Actions') }}</th>
                                         </tr>
@@ -256,6 +260,21 @@
                                                 {% endif %}
                                                 {{ _(ticket.priority|capitalize if ticket.priority else 'Medium') }}
                                             </td>
+                                            <td>
+                                                {% if ticket.assignee %}
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-xs me-2">
+                                                        <span
+                                                            class="avatar-title rounded-circle bg-soft-primary text-primary small">
+                                                            {{ ticket.assignee.name[0]|upper }}
+                                                        </span>
+                                                    </div>
+                                                    <small>{{ ticket.assignee.name }}</small>
+                                                </div>
+                                                {% else %}
+                                                <span class="text-muted small">-</span>
+                                                {% endif %}
+                                            </td>
                                             <td>{{ ticket.due_date|format_date if ticket.due_date else '-' }}</td>
                                             <td class="pe-4">
                                                 <button class="btn btn-sm btn-light text-primary"><i
@@ -264,7 +283,7 @@
                                         </tr>
                                         {% else %}
                                         <tr>
-                                            <td colspan="5" class="text-center py-5">
+                                            <td colspan="6" class="text-center py-5">
                                                 <div class="text-muted">
                                                     <i class="bi bi-list-task display-4"></i>
                                                     <p class="mt-2">{{ _('There are no tasks for this project yet.') }}
@@ -440,6 +459,15 @@
                             <label class="form-label">{{ _('Deadline') }}</label>
                             <input type="date" name="due_date" class="form-control">
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Assigned To') }}</label>
+                        <select name="assigned_to" class="form-select">
+                            <option value="">{{ _('Unassigned') }}</option>
+                            {% for u in users %}
+                            <option value="{{ u.id }}">{{ u.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
