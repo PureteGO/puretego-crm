@@ -3,7 +3,7 @@ from app.routes.auth import login_required
 from app.models import Client, Visit, Proposal, HealthCheck, KanbanStage, Interaction, Project, ProjectTicket, Deal, Receivable, Company, User
 from app.utils.tenant import filter_by_company
 from config.database import get_db
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, extract
 from sqlalchemy.orm import joinedload
 from datetime import datetime, timedelta
 from app.models.task import Task
