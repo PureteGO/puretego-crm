@@ -37,14 +37,28 @@ def index():
         'avg_ticket': 0.0,
         'total_wins': 0,
         'total_pipeline_value': 0.0,
-        'total_proposals': 0, # Initialize here as it's used in multiple branches
+        'total_proposals': 0,
         'awaiting_payment': 0,
         'pending_contracts': 0,
         'expiring_projects': [],
         'clients_by_stage': [],
         'win_rate': 0,
         'sales_performance': [],
-        'month_name': datetime.now().strftime('%B') # Initialize for consistency
+        'recent_leads': [],
+        'recent_interactions': [],
+        'recent_visits': [],
+        'recent_health_checks': [],
+        'overdue_count': 0,
+        'overdue_items': [],
+        'onboarding_guide': None,
+        'onboarding_percent': 0,
+        'onboarding_count': 0,
+        'execution_count': 0,
+        'pending_tickets': [],
+        'my_clients_count': 0,
+        'critical_leads_count': 0,
+        'leads_pending_followup': [],
+        'month_name': datetime.now().strftime('%B')
     }
 
     with get_db() as db:
@@ -299,6 +313,7 @@ def index():
         # Sort by date (oldest first)
         overdue_items.sort(key=lambda x: x['date'])
         data['overdue_items'] = overdue_items
+        data['overdue_count'] = len(overdue_items)
 
         return render_template('dashboard/index.html', **data)
 
