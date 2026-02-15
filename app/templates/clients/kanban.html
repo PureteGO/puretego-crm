@@ -184,14 +184,20 @@
 
     <!-- Pipeline Summary -->
     {% set total_deals = kanban_data|sum(attribute='stage.count') if kanban_data else 0 %}
-    {% set total_value = kanban_data|sum(attribute='stage.total_value') if kanban_data else 0 %}
+    {# Fix: Only sum stages that are INCLUDED in the funnel #}
+    {% set ns = namespace(total_value=0) %}
+    {% for data in kanban_data %}
+    {% if data.stage.include_in_funnel %}
+    {% set ns.total_value = ns.total_value + data.stage.total_value %}
+    {% endif %}
+    {% endfor %}
     <div class="pipeline-summary">
         <div class="metric">
             <div class="metric-value text-primary">{{ total_deals }}</div>
             <div class="metric-label">{{ _('Active Deals') }}</div>
         </div>
         <div class="metric">
-            <div class="metric-value text-success">Gs. {{ "{:,.0f}".format(total_value).replace(',', '.') }}</div>
+            <div class="metric-value text-success">Gs. {{ "{:,.0f}".format(ns.total_value).replace(',', '.') }}</div>
             <div class="metric-label">{{ _('Pipeline Value') }}</div>
         </div>
         <div class="metric">
@@ -652,6 +658,9 @@
                 }
             });
         });
+
+        // Ensure calculation is correct on load
+        recalculatePipelineValue();
     });
 </script>
 {% endblock %}
