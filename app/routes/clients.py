@@ -6,7 +6,7 @@ Rotas de gestão de clientes e pipeline Kanban com suporte multi-tenant
 import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app.routes.auth import login_required
-from app.models import Client, KanbanStage, Visit, HealthCheck, Proposal, Interaction, ServicePackage
+from app.models import Client, KanbanStage, Visit, HealthCheck, Proposal, Interaction, ServicePackage, Deal, DealStatus, User
 from app.utils.tenant import filter_by_company, set_tenant_context
 from app.utils.decorators import get_current_user
 from config.database import get_db
@@ -69,55 +69,129 @@ def index():
 @bp.route('/kanban')
 @login_required
 def kanban():
-    """Visualização Kanban do pipeline de vendas - filtrada por empresa"""
+    """Visualização Kanban do pipeline de vendas - Clientes + Deals"""
+    owner_filter = request.args.get('owner_id', '')
+    
     with get_db() as db:
-        stages = filter_by_company(db.query(KanbanStage), KanbanStage).order_by(KanbanStage.order).all()
-        first_stage_id = stages[0].id if stages else -1
+        from sqlalchemy.orm import joinedload
         
-        # Organizar clientes por etapa
+        stages = filter_by_company(
+            db.query(KanbanStage).filter(KanbanStage.is_active == True), KanbanStage
+        ).order_by(KanbanStage.order).all()
+        
+        # Build kanban data with both Clients and Deals as cards
         kanban_data = []
         for stage in stages:
-            from sqlalchemy.orm import joinedload
-            clients = filter_by_company(
-                db.query(Client).options(joinedload(Client.interested_package), joinedload(Client.owner))
-                .filter(Client.kanban_stage_id == stage.id, Client.is_active.is_(True)),
-                Client
-            ).all()
+            cards = []
+            stage_value = 0.0
             
-            # Calculate Total Value (Exclude first stage)
-            stage_value = 0
-            if stage.id != first_stage_id:
-                for client in clients:
-                    if client.interested_package:
-                        stage_value += client.interested_package.price
-
-            # Serialize data to avoid DetachedInstanceError after session closes
+            # --- CLIENTS (legacy) ---
+            client_query = filter_by_company(
+                db.query(Client).options(
+                    joinedload(Client.owner),
+                    joinedload(Client.interested_package)
+                ).filter(
+                    Client.kanban_stage_id == stage.id,
+                    Client.is_active == True
+                ), Client
+            )
+            if owner_filter and owner_filter.isdigit():
+                client_query = client_query.filter(Client.owner_id == int(owner_filter))
+            
+            clients_in_stage = client_query.order_by(Client.name).all()
+            
+            for c in clients_in_stage:
+                # Value from interested package price
+                client_value = float(c.interested_package.price) if c.interested_package else 0.0
+                
+                stage_value += client_value
+                cards.append({
+                    'card_type': 'client',
+                    'id': c.id,
+                    'title': c.name,
+                    'value': client_value,
+                    'client_id': c.id,
+                    'client_name': c.name,
+                    'contact_name': c.contact_name,
+                    'owner_id': c.owner_id,
+                    'owner_name': c.owner.name if c.owner else None,
+                    'is_mine': c.owner_id == session.get('user_id'),
+                    'package_name': c.interested_package.name if c.interested_package else None,
+                    'lead_temperature': c.lead_temperature,
+                    'probability': None,
+                    'expected_close_date': None,
+                    'created_at': c.created_at.strftime('%d/%m') if c.created_at else None,
+                })
+            
+            # --- DEALS (new) ---
+            deal_query = filter_by_company(
+                db.query(Deal).options(
+                    joinedload(Deal.client), joinedload(Deal.owner)
+                ).filter(
+                    Deal.kanban_stage_id == stage.id,
+                    Deal.status == DealStatus.OPEN
+                ), Deal
+            )
+            if owner_filter and owner_filter.isdigit():
+                deal_query = deal_query.filter(Deal.owner_id == int(owner_filter))
+            
+            deals = deal_query.order_by(Deal.created_at.desc()).all()
+            
+            for deal in deals:
+                deal_value = float(deal.value or 0)
+                stage_value += deal_value
+                cards.append({
+                    'card_type': 'deal',
+                    'id': deal.id,
+                    'title': deal.title,
+                    'value': deal_value,
+                    'client_id': deal.client_id,
+                    'client_name': deal.client.name if deal.client else None,
+                    'contact_name': None,
+                    'owner_id': deal.owner_id,
+                    'owner_name': deal.owner.name if deal.owner else None,
+                    'is_mine': deal.owner_id == session.get('user_id'),
+                    'package_name': None,
+                    'lead_temperature': None,
+                    'probability': deal.probability,
+                    'expected_close_date': deal.expected_close_date.strftime('%Y-%m-%d') if deal.expected_close_date else None,
+                    'created_at': deal.created_at.strftime('%d/%m') if deal.created_at else None,
+                })
+            
             stage_dict = {
                 'id': stage.id,
                 'name': stage.name,
                 'order': stage.order,
-                'total_value': float(stage_value)
+                'stage_type': stage.stage_type,
+                'color': stage.color,
+                'include_in_funnel': stage.include_in_funnel,
+                'total_value': stage_value,
+                'count': len(cards)
             }
             
-            clients_list = []
-            for client in clients:
-                clients_list.append({
-                    'id': client.id,
-                    'name': client.name,
-                    'contact_name': client.contact_name,
-                    'package_name': client.interested_package.name if client.interested_package else None,
-                    'owner_name': client.owner.name if client.owner else None,
-                    'owner_name': client.owner.name if client.owner else None,
-                    'is_mine': client.owner_id == session.get('user_id'),
-                    'lead_temperature': client.lead_temperature or 'cold'
-                })
-
             kanban_data.append({
                 'stage': stage_dict,
-                'clients': clients_list
+                'cards': cards
             })
+        
+        # Get team members for filter dropdown
+        team = filter_by_company(
+            db.query(User).filter(User.is_active == True), User
+        ).all()
+        team_data = [{'id': u.id, 'name': u.name} for u in team]
+        
+        # Get clients for deal creation dropdown
+        clients = filter_by_company(
+            db.query(Client).filter(Client.is_active == True), Client
+        ).order_by(Client.name).all()
+        clients_data = [{'id': c.id, 'name': c.name} for c in clients]
     
-    return render_template('clients/kanban.html', kanban_data=kanban_data)
+    return render_template('clients/kanban.html',
+        kanban_data=kanban_data,
+        team=team_data,
+        clients=clients_data,
+        owner_filter=owner_filter
+    )
 
 
 @bp.route('/create', methods=['GET', 'POST'])
@@ -451,10 +525,16 @@ def create_stage():
     """Criar nova etapa do Kanban"""
     name = request.form.get('name')
     order = request.form.get('order', 0)
+    stage_type = request.form.get('stage_type', 'open')
+    color = request.form.get('color', '#6c757d')
     
     with get_db() as db:
-        # Create stage for current company
-        stage = KanbanStage(name=name, order=int(order))
+        stage = KanbanStage(
+            name=name,
+            order=int(order),
+            stage_type=stage_type,
+            color=color
+        )
         set_tenant_context(stage)
         db.add(stage)
         db.commit()
@@ -475,8 +555,10 @@ def edit_stage(stage_id):
             flash('Etapa não encontrada.', 'error')
             return redirect(url_for('clients.kanban'))
         
-        stage.name = request.form.get('name')
-        stage.order = int(request.form.get('order', 0))
+        stage.name = request.form.get('name', stage.name)
+        stage.order = int(request.form.get('order', stage.order))
+        stage.stage_type = request.form.get('stage_type', stage.stage_type)
+        stage.color = request.form.get('color', stage.color)
         db.commit()
         
         flash(f'Etapa {stage.name} atualizada com sucesso!', 'success')
@@ -521,6 +603,32 @@ def delete_stage(stage_id):
             flash(f'Error al eliminar la etapa. Asegúrese de que no tenga datos vinculados.', 'error')
 
     return redirect(url_for('clients.kanban'))
+
+
+@bp.route('/stages/<int:stage_id>/toggle_funnel', methods=['POST'])
+@login_required
+def toggle_stage_funnel(stage_id):
+    """Alternar flag de inclusão no funil (API)"""
+    try:
+        data = request.get_json()
+        include = data.get('include_in_funnel')
+        
+        if include is None:
+            return jsonify({'success': False, 'message': 'Parâmetro inválido'}), 400
+            
+        with get_db() as db:
+            stage = db.query(KanbanStage).filter(KanbanStage.id == stage_id).first()
+            if not stage:
+                return jsonify({'success': False, 'message': 'Etapa não encontrada'}), 404
+                
+            stage.include_in_funnel = bool(include)
+            db.commit()
+            
+            return jsonify({'success': True, 'message': 'Configuração atualizada'})
+            
+    except Exception as e:
+        logger.exception("Error toggling funnel flag")
+        return jsonify({'success': False, 'message': f'Erro: {str(e)}'}), 500
 
 
 @bp.route('/stages/reorder', methods=['POST'])
@@ -579,6 +687,110 @@ def reset_stages():
         flash('Kanban resetado. Todos os clientes foram movidos para "Sem Etapa".', 'success')
         
     return redirect(url_for('clients.kanban'))
+
+
+# ─────────────────────────────────────────────
+# DEAL KANBAN API ENDPOINTS
+# ─────────────────────────────────────────────
+
+@bp.route('/kanban/deals/create', methods=['POST'])
+@login_required
+def create_deal_quick():
+    """Criar Deal rápido a partir do modal do Kanban"""
+    from flask_babel import gettext as _
+    
+    with get_db() as db:
+        title = request.form.get('title', '').strip()
+        client_id = request.form.get('client_id')
+        stage_id = request.form.get('stage_id')
+        value = request.form.get('value', 0)
+        
+        if not title:
+            flash(_('Deal title is required'), 'error')
+            return redirect(url_for('clients.kanban'))
+        
+        deal = Deal(
+            title=title,
+            company_id=session.get('company_id'),
+            client_id=int(client_id) if client_id else None,
+            kanban_stage_id=int(stage_id) if stage_id else None,
+            owner_id=session.get('user_id'),
+            value=float(value) if value else 0,
+            status=DealStatus.OPEN
+        )
+        
+        expected_close = request.form.get('expected_close_date')
+        if expected_close:
+            try:
+                deal.expected_close_date = datetime.strptime(expected_close, '%Y-%m-%d')
+            except ValueError:
+                pass
+        
+        db.add(deal)
+        db.commit()
+        flash(_('Deal created successfully'), 'success')
+    
+    return redirect(url_for('clients.kanban'))
+
+
+@bp.route('/kanban/deals/<int:deal_id>/move', methods=['POST'])
+@login_required
+def move_deal(deal_id):
+    """Mover Deal entre estágios do Kanban (drag-and-drop API)"""
+    try:
+        data = request.get_json()
+        new_stage_id = data.get('stage_id')
+        
+        with get_db() as db:
+            deal = filter_by_company(db.query(Deal), Deal).filter(Deal.id == deal_id).first()
+            
+            if not deal:
+                return jsonify({'success': False, 'message': 'Deal não encontrado'}), 404
+            
+            # Get old stage name
+            old_stage_name = deal.stage.name if deal.stage else None
+            
+            # Update stage
+            deal.kanban_stage_id = int(new_stage_id) if new_stage_id else None
+            
+            # Check if new stage is a won/lost type and update deal status
+            if new_stage_id:
+                new_stage = db.query(KanbanStage).get(int(new_stage_id))
+                if new_stage:
+                    new_stage_name = new_stage.name
+                    
+                    if new_stage.stage_type == 'won':
+                        deal.status = DealStatus.WON
+                        deal.closed_at = datetime.utcnow()
+                    elif new_stage.stage_type == 'lost':
+                        deal.status = DealStatus.LOST
+                        deal.closed_at = datetime.utcnow()
+                    else:
+                        deal.status = DealStatus.OPEN
+                        deal.closed_at = None
+                    
+                    # Trigger workflow automation
+                    try:
+                        from app.services.workflow import WorkflowService
+                        WorkflowService.on_deal_stage_changed(
+                            db, session.get('company_id'), deal, old_stage_name, new_stage_name
+                        )
+                    except Exception as wf_err:
+                        logger.warning(f"Workflow error (non-fatal): {wf_err}")
+                    
+                    # Trigger notification
+                    try:
+                        from app.services.notification_service import NotificationService
+                        NotificationService.on_deal_stage_changed(db, deal, old_stage_name, new_stage_name)
+                    except Exception as notif_err:
+                        logger.warning(f"Notification error (non-fatal): {notif_err}")
+            
+            db.commit()
+            return jsonify({'success': True, 'message': 'Deal movido com sucesso'})
+            
+    except Exception as e:
+        logger.exception("Error moving deal to new stage")
+        return jsonify({'success': False, 'message': f'Erro ao mover: {str(e)}'}), 500
 
 
 # API Blueprint for client list endpoint

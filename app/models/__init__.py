@@ -11,6 +11,10 @@ from .visit import Visit
 from .health_check import HealthCheck
 from .service import Service
 from .proposal import Proposal, ProposalItem
+from .proposal_template import ProposalTemplate
+from .quote_option import QuoteOption
+from .quote_item import QuoteItem
+from .payment_plan_preset import PaymentPlanPreset
 from .interaction import Interaction, InteractionType, CadenceRule
 from .service_package import ServicePackage
 from .quick_check_log import QuickCheckLog
@@ -28,7 +32,9 @@ from .email_log import EmailLog
 from .commission import Commission
 from .payable import Payable
 from .payable_category import PayableCategory
+from .notification import Notification
 from .local_search import LocalSearchKeyword, LocalScanResult, LocalMetricsAggregated
+from .project_note import ProjectNote
 
 __all__ = [
     'Company',
@@ -42,6 +48,10 @@ __all__ = [
     'Service',
     'Proposal',
     'ProposalItem',
+    'ProposalTemplate',
+    'QuoteOption',
+    'QuoteItem',
+    'PaymentPlanPreset',
     'Interaction',
     'InteractionType',
     'CadenceRule',
@@ -59,12 +69,15 @@ __all__ = [
     'Task',
     'Project',
     'ProjectTicket',
+    'ProjectNote',
     'Receivable',
     'EmailTemplate',
     'EmailLog',
     'Commission',
     'Payable',
-    'PayableCategory'
+    'PayableCategory',
+    'Notification',
+    'LocalSearchKeyword',
+    'LocalScanResult',
+    'LocalMetricsAggregated'
 ]
-
-

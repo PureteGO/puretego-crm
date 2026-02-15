@@ -1,139 +1,357 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Proposal') }} #{{ proposal.id }}{% endblock %}
-
-{% block scripts %}
-<script>
-    function acceptProposal(proposalId) {
-        if (!confirm("{{ _('Deseja aceitar esta proposta? Isso gerará as faturas e projetos automaticamente.') }}")) return;
-
-        // Show loading state
-        const btn = event.currentTarget;
-        const originalHtml = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>...';
-
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        fetch(`/proposals/${proposalId}/accept`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = data.redirect || window.location.href;
-                } else {
-                    alert(data.message || 'Erro ao aceitar proposta');
-                    btn.disabled = false;
-                    btn.innerHTML = originalHtml;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Erro de conexão');
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
-            });
-    }
-</script>
-{% endblock %}
+{% block title %}{{ proposal.title or _('Proposal') }} #{{ proposal.id }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div
         class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{ _('Proposal') }} #{{ proposal.id }}</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            {% if proposal.status != 'accepted' %}
-            <button class="btn btn-sm btn-success me-2" onclick="acceptProposal({{ proposal.id }})">
-                <i class="bi bi-check-circle"></i> {{ _('Accept Proposal') }}
-            </button>
-            {% endif %}
-            <a href="{{ url_for('proposals.index') }}" class="btn btn-sm btn-outline-secondary me-2">
+        <h1 class="h2">
+            <i class="bi bi-file-earmark-text"></i> {{ proposal.title or _('Proposal') }} <span class="text-muted">#{{
+                proposal.id }}</span>
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0 gap-2">
+            <a href="{{ url_for('proposals.index') }}" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> {{ _('Back') }}
             </a>
-            <a href="{{ url_for('proposals.generate_pdf', proposal_id=proposal.id) }}"
-                class="btn btn-sm btn-outline-danger me-2">
-                <i class="bi bi-file-pdf"></i> PDF
-            </a>
+            {% if proposal.status == 'draft' %}
             <a href="{{ url_for('proposals.edit', proposal_id=proposal.id) }}" class="btn btn-sm btn-outline-primary">
                 <i class="bi bi-pencil"></i> {{ _('Edit') }}
             </a>
+            {% endif %}
+            <a href="{{ url_for('proposals.preview_pdf', id=proposal.id) }}" class="btn btn-sm btn-outline-secondary"
+                target="_blank">
+                <i class="bi bi-eye"></i> {{ _('Preview') }}
+            </a>
+            <a href="{{ url_for('proposals.generate_pdf', proposal_id=proposal.id) }}" class="btn btn-sm btn-danger">
+                <i class="bi bi-file-pdf"></i> PDF
+            </a>
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#" onclick="duplicateProposal({{ proposal.id }})"><i
+                                class="bi bi-copy"></i> {{ _('Duplicate') }}</a></li>
+                    {% if proposal.status == 'draft' %}
+                    <li><a class="dropdown-item" href="#" onclick="sendProposal({{ proposal.id }})"><i
+                                class="bi bi-send"></i> {{ _('Mark as Sent') }}</a></li>
+                    {% endif %}
+                    {% if proposal.status in ['sent', 'draft'] %}
+                    <li><a class="dropdown-item text-success" href="#" onclick="approveProposal({{ proposal.id }})"><i
+                                class="bi bi-check-circle"></i> {{ _('Approve') }}</a></li>
+                    <li><a class="dropdown-item text-danger" href="#" onclick="rejectProposal({{ proposal.id }})"><i
+                                class="bi bi-x-circle"></i> {{ _('Reject') }}</a></li>
+                    {% endif %}
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li>
+                        <form method="POST" action="{{ url_for('proposals.delete', proposal_id=proposal.id) }}"
+                            onsubmit="return confirm('{{ _('Delete this proposal?') }}')">
+                            <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash"></i> {{
+                                _('Delete') }}</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0">{{ _('Proposal Details') }}</h5>
-                </div>
+    <div class="row g-3">
+        <!-- Left: Proposal Details -->
+        <div class="col-lg-8">
+            <!-- Status & Metadata Card -->
+            <div class="card shadow-sm mb-3">
                 <div class="card-body">
-                    <div class="row mb-3">
-                        <div class="col-sm-3 fw-bold">{{ _('Client') }}:</div>
-                        <div class="col-sm-9">
-                            <a href="{{ url_for('clients.view', client_id=proposal.client.id) }}">{{
-                                proposal.client.name }}</a>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">{{ _('Status') }}</small>
+                            {% if proposal.status == 'draft' %}
+                            <span class="badge bg-secondary fs-6"><i class="bi bi-pencil-square"></i> {{ _('Draft')
+                                }}</span>
+                            {% elif proposal.status == 'sent' %}
+                            <span class="badge bg-primary fs-6"><i class="bi bi-send"></i> {{ _('Sent') }}</span>
+                            {% elif proposal.status == 'approved' %}
+                            <span class="badge bg-success fs-6"><i class="bi bi-check-circle"></i> {{ _('Approved')
+                                }}</span>
+                            {% elif proposal.status == 'rejected' %}
+                            <span class="badge bg-danger fs-6"><i class="bi bi-x-circle"></i> {{ _('Rejected') }}</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark fs-6">{{ proposal.status }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">{{ _('Client') }}</small>
+                            <strong><a href="{{ url_for('clients.view', client_id=proposal.client_id) }}"
+                                    class="text-decoration-none">{{ proposal.client_name }}</a></strong>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">{{ _('Created') }}</small>
+                            <strong>{{ proposal.created_at }}</strong>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">{{ _('Valid Until') }}</small>
+                            <strong>{{ proposal.valid_until or '—' }}</strong>
                         </div>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-3 fw-bold">{{ _('Date') }}:</div>
-                        <div class="col-sm-9">{{ proposal.created_at|format_date }}</div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-sm-3 fw-bold">{{ _('Status') }}:</div>
-                        <div class="col-sm-9">
-                            <span
-                                class="badge bg-{{ 'success' if proposal.status in ['approved', 'accepted'] else 'secondary' }}">{{
-                                proposal.status }}</span>
-                        </div>
-                    </div>
+                </div>
+            </div>
 
-                    <h5 class="mt-4 border-bottom pb-2">{{ _('Services') }}</h5>
+            <!-- Quote Options -->
+            {% for option in options %}
+            <div class="card shadow-sm mb-3 {% if option.is_default %}border-primary{% endif %}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        {% if option.is_default %}<i class="bi bi-star-fill text-warning"></i>{% endif %}
+                        {{ option.name }}
+                    </h5>
+                    <span class="badge bg-primary fs-6">{{ proposal.currency }} {{ '{:,.0f}'.format(option.total_amount)
+                        }}</span>
+                </div>
+                <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-sm table-borderless">
-                            <thead>
-                                <tr class="table-light">
-                                    <th>{{ _('Service') }}</th>
-                                    <th class="text-end">{{ _('Price') }}</th>
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{{ _('Service / Package') }}</th>
+                                    <th class="text-center">{{ _('Qty') }}</th>
+                                    <th class="text-end">{{ _('Unit Price') }}</th>
+                                    <th class="text-center">{{ _('Disc.') }}</th>
+                                    <th class="text-center">{{ _('Billing') }}</th>
+                                    <th class="text-center">{{ _('Tag') }}</th>
+                                    <th class="text-end">{{ _('Total') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for item in proposal.items %}
+                                {% for item in option['items'] %}
                                 <tr>
                                     <td>
-                                        <div class="fw-bold">{{ item.service.name }}</div>
-                                        <small class="text-muted">{{ item.description or item.service.description
-                                            }}</small>
+                                        <strong>{{ item.display_name or item.description or 'N/A' }}</strong>
+                                        {% if item.description and item.display_name %}
+                                        <br><small class="text-muted">{{ item.description[:100] }}</small>
+                                        {% endif %}
                                     </td>
-                                    <td class="text-end">{{ item.price|format_currency }}</td>
+                                    <td class="text-center">{{ item.quantity or 1 }}</td>
+                                    <td class="text-end">{{ '{:,.0f}'.format(item.unit_price or item.total or 0) }}</td>
+                                    <td class="text-center">
+                                        {% if item.discount_pct and item.discount_pct > 0 %}
+                                        <span class="badge bg-warning text-dark">-{{ item.discount_pct }}%</span>
+                                        {% else %}—{% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if item.billing_type == 'recurring' %}
+                                        <span class="badge bg-info"><i class="bi bi-arrow-repeat"></i> {{ _('Recurring')
+                                            }}</span>
+                                        {% else %}
+                                        <span class="badge bg-light text-dark">{{ _('One-time') }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if item.tag == 'gift' %}
+                                        <span class="badge bg-success"><i class="bi bi-gift"></i></span>
+                                        {% elif item.tag == 'optional' %}
+                                        <span class="badge bg-warning text-dark"><i
+                                                class="bi bi-question-circle"></i></span>
+                                        {% else %}
+                                        <span class="badge bg-primary"><i class="bi bi-check"></i></span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end fw-bold">{{ '{:,.0f}'.format(item.total or 0) }}</td>
                                 </tr>
                                 {% endfor %}
-                                <tr class="border-top">
-                                    <td class="fw-bold text-end">{{ _('TOTAL') }}:</td>
-                                    <td class="fw-bold text-end">{{ proposal.total_amount|format_currency }}</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0">{{ _('Conditions') }}</h5>
+                <!-- Payment Schedule Preview -->
+                {% if option.payment_schedule %}
+                <div class="card-footer">
+                    <small class="text-body-secondary d-block mb-1"><i class="bi bi-calendar-check"></i> {{ _('Payment
+                        Schedule')
+                        }}</small>
+                    <div class="row g-2">
+                        {% for inst in option.payment_schedule %}
+                        <div class="col-auto">
+                            <span class="badge border text-body">
+                                {{ _('Installment') }} {{ inst.installment }}: {{ proposal.currency }} {{
+                                '{:,.0f}'.format(inst.amount) }}
+                                <small>({{ inst.pct }}%)</small>
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- Payment Terms -->
+            {% if proposal.payment_terms %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-file-text"></i> {{ _('Payment Terms') }}</h6>
                 </div>
                 <div class="card-body">
-                    <p class="small text-muted">{{ proposal.payment_terms or _('Not specified.') }}</p>
+                    <p class="mb-0">{{ proposal.payment_terms }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-lg-4">
+            <!-- Grand Total -->
+            <div class="card shadow-sm mb-3 bg-primary text-white">
+                <div class="card-body text-center">
+                    <small class="text-white-50">{{ _('Grand Total') }}</small>
+                    <h2 class="text-white mb-0">{{ proposal.currency }} {{ '{:,.0f}'.format(proposal.total_amount) }}
+                    </h2>
+                    <small class="text-white-50">{{ _('Language') }}: {{ proposal.language|upper }}</small>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            {% if proposal.status in ['draft', 'sent'] %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-lightning"></i> {{ _('Quick Actions') }}</h6>
+                </div>
+                <div class="card-body d-grid gap-2">
+                    {% if proposal.status == 'draft' %}
+                    <button class="btn btn-primary btn-sm" onclick="sendProposal({{ proposal.id }})">
+                        <i class="bi bi-send"></i> {{ _('Mark as Sent') }}
+                    </button>
+                    {% endif %}
+                    <button class="btn btn-success btn-sm" onclick="approveProposal({{ proposal.id }})">
+                        <i class="bi bi-check-circle"></i> {{ _('Approve & Create Deal') }}
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="rejectProposal({{ proposal.id }})">
+                        <i class="bi bi-x-circle"></i> {{ _('Reject') }}
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Health Check Summary -->
+            {% if health_check %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-heart-pulse"></i> {{ _('Health Check') }}</h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <h3
+                            class="{% if health_check.score >= 70 %}text-success{% elif health_check.score >= 40 %}text-warning{% else %}text-danger{% endif %}">
+                            {{ health_check.score }}%
+                        </h3>
+                        <small class="text-muted">{{ _('Overall Score') }}</small>
+                    </div>
+                    {% if health_check.report_data %}
+                    {% if health_check.report_data.business_name %}
+                    <div class="d-flex justify-content-between border-bottom py-1 mb-2">
+                        <span class="text-muted small">{{ _('Business Name') }}</span>
+                        <span class="fw-bold small">{{ health_check.report_data.business_name }}</span>
+                    </div>
+                    {% endif %}
+                    {% if health_check.report_data.criteria %}
+                    <ul class="list-unstyled small mb-0">
+                        {% for item in health_check.report_data.criteria %}
+                        <li class="d-flex justify-content-between align-items-center border-bottom py-1">
+                            <span>{{ item.name }}</span>
+                            {% if item.status == 'Detectado' or item.score == 100 %}
+                            <span class="badge bg-success-subtle text-success"><i
+                                    class="bi bi-check-circle-fill"></i></span>
+                            {% elif item.status == 'Não detectado' or item.score == 0 %}
+                            <span class="badge bg-danger-subtle text-danger"><i class="bi bi-x-circle-fill"></i></span>
+                            {% else %}
+                            <span class="badge bg-warning-subtle text-warning"><i
+                                    class="bi bi-exclamation-circle-fill"></i></span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% elif health_check.report_data.criteria_results %}
+                    <ul class="list-unstyled small mb-0">
+                        {% for item in health_check.report_data.criteria_results %}
+                        <li class="d-flex justify-content-between align-items-center border-bottom py-1">
+                            <span>{{ item.name_es or item.name_pt or item.name or 'N/A' }}</span>
+                            {% if item.passed %}
+                            <span class="badge bg-success-subtle text-success"><i
+                                    class="bi bi-check-circle-fill"></i></span>
+                            {% else %}
+                            <span class="badge bg-danger-subtle text-danger"><i class="bi bi-x-circle-fill"></i></span>
+                            {% endif %}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Info Card -->
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> {{ _('Details') }}</h6>
+                </div>
+                <div class="card-body small">
+                    <dl class="row mb-0">
+                        <dt class="col-5">{{ _('Created by') }}</dt>
+                        <dd class="col-7">{{ proposal.user_name }}</dd>
+
+                        <dt class="col-5">{{ _('Template') }}</dt>
+                        <dd class="col-7">{{ proposal.template.name if proposal.template else '—' }}</dd>
+
+                        <dt class="col-5">{{ _('Options') }}</dt>
+                        <dd class="col-7">{{ options|length }}</dd>
+
+                        <dt class="col-5">{{ _('Deal') }}</dt>
+                        <dd class="col-7">
+                            {% if proposal.deal_id %}
+                            <a href="{{ url_for('deals.index') }}">Deal #{{ proposal.deal_id }}</a>
+                            {% else %}—{% endif %}
+                        </dd>
+                    </dl>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function sendProposal(id) {
+        if (confirm('{{ _("Mark this proposal as sent?") }}')) {
+            fetch(`/proposals/${id}/send`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.json())
+                .then(data => { if (data.success) location.reload(); else alert(data.message); });
+        }
+    }
+
+    function approveProposal(id) {
+        if (confirm('{{ _("Approve this proposal? This will create a deal, project, and receivables.") }}')) {
+            fetch(`/proposals/${id}/approve`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.json())
+                .then(data => { if (data.success) location.reload(); else alert(data.message); });
+        }
+    }
+
+    function rejectProposal(id) {
+        if (confirm('{{ _("Reject this proposal?") }}')) {
+            fetch(`/proposals/${id}/reject`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.json())
+                .then(data => { if (data.success) location.reload(); else alert(data.message); });
+        }
+    }
+
+    function duplicateProposal(id) {
+        if (confirm('{{ _("Duplicate this proposal?") }}')) {
+            fetch(`/proposals/${id}/duplicate`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.json())
+                .then(data => { if (data.success) window.location.href = data.redirect; else alert(data.message); });
+        }
+    }
+</script>
 {% endblock %}

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PURETEGO CRM 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-13 20:25-0300\n"
+"POT-Creation-Date: 2026-02-14 20:16-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -60,6 +60,20 @@ msgstr ""
 msgid "Password updated successfully! You can now log in."
 msgstr ""
 
+#: app/routes/clients.py:682
+msgid "Deal title is required"
+msgstr "El título del negocio es obligatorio"
+
+#: app/routes/clients.py:704
+msgid "Deal created successfully"
+msgstr "Negocio creado con éxito"
+
+#: app/routes/dashboard.py:105 app/routes/dashboard.py:227
+#: app/templates/projects/view.html:416
+#, fuzzy
+msgid "Unknown"
+msgstr "Nuevo Cliente"
+
 #: app/routes/finance.py:30
 msgid "Missing required fields"
 msgstr ""
@@ -72,11 +86,11 @@ msgstr ""
 msgid "Recebível(eis) registrado(s) com sucesso!"
 msgstr ""
 
-#: app/routes/finance.py:139
+#: app/routes/finance.py:146
 msgid "Pagamento registrado!"
 msgstr ""
 
-#: app/routes/finance.py:315
+#: app/routes/finance.py:322
 msgid "Contas(s) a pagar registrada(s)!"
 msgstr ""
 
@@ -248,105 +262,187 @@ msgstr ""
 msgid "Erro interno ao processar auditoria oficial."
 msgstr "Error al procesar la solicitud"
 
-#: app/routes/interactions.py:140 app/routes/interactions.py:153
+#: app/routes/interactions.py:168 app/routes/interactions.py:200
+#: app/routes/interactions.py:202 app/templates/projects/view.html:251
 #, fuzzy
-msgid "Unknown Client"
-msgstr "Nuevo Cliente"
+msgid "Task"
+msgstr "Visitas"
 
-#: app/routes/interactions.py:141 app/routes/interactions.py:154
-#: app/templates/clients/edit.html:203
-msgid "In-person Visit"
-msgstr "Visita Presencial"
+#: app/routes/interactions.py:194 app/routes/interactions.py:196
+#, fuzzy
+msgid "Visit"
+msgstr "Visitas"
 
-#: app/routes/projects.py:41
+#: app/routes/interactions.py:207 app/routes/interactions.py:210
+#, fuzzy
+msgid "Project Task"
+msgstr "Detalles del Proyecto"
+
+#: app/routes/notifications.py:42
+msgid "Notification not found"
+msgstr "Notificación no encontrada"
+
+#: app/routes/projects.py:70
 #, fuzzy
 msgid "Cliente não encontrado."
 msgstr "Cliente no encontrado."
 
-#: app/routes/projects.py:74
+#: app/routes/projects.py:103
 #, python-format
 msgid "Project \"%(name)s\" launched successfully!"
 msgstr ""
 
-#: app/routes/projects.py:78
+#: app/routes/projects.py:107
 #, fuzzy, python-format
 msgid "Error creating project: %(error)s"
 msgstr "Error al procesar la solicitud"
 
-#: app/routes/projects.py:100 app/routes/projects.py:157
-#: app/routes/projects.py:187 app/routes/projects.py:264
+#: app/routes/projects.py:130 app/routes/projects.py:255
+#: app/routes/projects.py:285 app/routes/projects.py:362
+#: app/routes/projects.py:405
 #, fuzzy
 msgid "Project not found."
 msgstr "Empresa no encontrada"
 
-#: app/routes/projects.py:111
+#: app/routes/projects.py:204
 #, fuzzy, python-format
 msgid "Error loading project: %(error)s"
 msgstr "Error al procesar la solicitud"
 
-#: app/routes/projects.py:134
+#: app/routes/projects.py:231
 msgid "Tarefa adicionada."
 msgstr ""
 
-#: app/routes/projects.py:142
+#: app/routes/projects.py:240
 #, fuzzy
 msgid "Nenhum arquivo enviado."
 msgstr "Ningún archivo enviado."
 
-#: app/routes/projects.py:147
+#: app/routes/projects.py:245
 #, fuzzy
 msgid "Nenhum arquivo selecionado."
 msgstr "Ningún archivo seleccionado."
 
-#: app/routes/projects.py:173
+#: app/routes/projects.py:271
 msgid "Contract uploaded successfully!"
 msgstr ""
 
-#: app/routes/projects.py:198
+#: app/routes/projects.py:296
 #, fuzzy
 msgid "Kickoff Meeting"
 msgstr "Configuraciones"
 
-#: app/routes/projects.py:198
+#: app/routes/projects.py:296
 msgid "Schedule and perform kickoff with the client."
 msgstr ""
 
-#: app/routes/projects.py:199
+#: app/routes/projects.py:297
 msgid "Access Collection"
 msgstr ""
 
-#: app/routes/projects.py:199
+#: app/routes/projects.py:297
 msgid "Request and validate accesses to GMB, Website and Social Media."
 msgstr ""
 
-#: app/routes/projects.py:200
+#: app/routes/projects.py:298
 msgid "Editorial Planning"
 msgstr ""
 
-#: app/routes/projects.py:200
+#: app/routes/projects.py:298
 msgid "Define editorial line and initial schedule."
 msgstr ""
 
-#: app/routes/projects.py:216
+#: app/routes/projects.py:314
 msgid "Project status updated."
 msgstr ""
 
-#: app/routes/projects.py:230
+#: app/routes/projects.py:328
 msgid "Projeto não encontrado"
 msgstr "Empresa no encontrada"
 
-#: app/routes/projects.py:241
+#: app/routes/projects.py:339
 msgid "Projeto renovado com sucesso!"
 msgstr ""
 
-#: app/routes/projects.py:258
+#: app/routes/projects.py:356
 msgid "Invalid data for installments."
 msgstr ""
 
-#: app/routes/projects.py:284
+#: app/routes/projects.py:382
 #, python-format
 msgid "%(count)d installments launched successfully!"
 msgstr ""
+
+#: app/routes/projects.py:396
+#, fuzzy
+msgid "Recurring Payment"
+msgstr "Recurrente (Mensual)"
+
+#: app/routes/projects.py:399
+msgid "Invalid data for recurring payments."
+msgstr ""
+
+#: app/routes/projects.py:425
+#, python-format
+msgid "%(count)d recurring payments launched successfully!"
+msgstr ""
+
+#: app/routes/projects.py:436
+msgid "Message cannot be empty."
+msgstr ""
+
+#: app/routes/projects.py:451
+#, fuzzy
+msgid "Note added."
+msgstr "No hay visitas recientes."
+
+#: app/routes/projects.py:462 app/routes/projects.py:488
+#: app/routes/projects.py:519
+#, fuzzy
+msgid "Task not found."
+msgstr "Tarea no encontrada"
+
+#: app/routes/projects.py:469 app/routes/tasks.py:303 app/routes/tasks.py:342
+msgid "Task submitted for approval"
+msgstr ""
+
+#: app/routes/projects.py:477
+#, fuzzy
+msgid "Task completed!"
+msgstr "Tarea completada"
+
+#: app/routes/projects.py:490 app/routes/projects.py:521
+#, fuzzy
+msgid "Task not awaiting approval."
+msgstr "Ver Propuesta"
+
+#: app/routes/projects.py:502
+#, fuzzy
+msgid "Task approved!"
+msgstr "Aprobada"
+
+#: app/routes/projects.py:513
+#, fuzzy
+msgid "Rejection comment is required."
+msgstr "El título del negocio es obligatorio"
+
+#: app/routes/projects.py:532
+msgid "Task returned for revision."
+msgstr ""
+
+#: app/routes/projects.py:543
+msgid "Permission denied."
+msgstr ""
+
+#: app/routes/projects.py:551
+#, fuzzy
+msgid "Note deleted."
+msgstr "Eliminar"
+
+#: app/routes/projects.py:553
+#, fuzzy
+msgid "Note not found."
+msgstr "Empresa no encontrada"
 
 #: app/routes/saas.py:18
 msgid "Acceso denegado. Área restringida para Super Administradores."
@@ -410,6 +506,97 @@ msgstr ""
 msgid "Package updated successfully!"
 msgstr ""
 
+#: app/routes/tasks.py:209 app/routes/tasks.py:563
+msgid "Task created successfully"
+msgstr "Tarea creada con éxito"
+
+#: app/routes/tasks.py:226 app/routes/tasks.py:292 app/routes/tasks.py:335
+#: app/routes/tasks.py:364 app/routes/tasks.py:396 app/routes/tasks.py:420
+msgid "Task not found"
+msgstr "Tarea no encontrada"
+
+#: app/routes/tasks.py:273 app/routes/tasks.py:317
+msgid "Task updated"
+msgstr "Tarea actualizada"
+
+#: app/routes/tasks.py:287
+msgid "Invalid status"
+msgstr "Estado inválido"
+
+#: app/routes/tasks.py:311 app/routes/tasks.py:350
+#: app/services/notification_service.py:106
+msgid "Task completed"
+msgstr "Tarea completada"
+
+#: app/routes/tasks.py:367 app/routes/tasks.py:399
+msgid "Task is not awaiting approval"
+msgstr ""
+
+#: app/routes/tasks.py:379 app/services/notification_service.py:146
+#, fuzzy
+msgid "Task approved"
+msgstr "Aprobada"
+
+#: app/routes/tasks.py:391
+#, fuzzy
+msgid "Rejection comment is required"
+msgstr "El título del negocio es obligatorio"
+
+#: app/routes/tasks.py:410 app/services/notification_service.py:166
+msgid "Task returned for revision"
+msgstr ""
+
+#: app/routes/tasks.py:501
+#, fuzzy
+msgid "Task title is required"
+msgstr "El título del negocio es obligatorio"
+
+#: app/services/notification_service.py:76
+#: app/templates/interactions/timeline.html:26
+msgid "System"
+msgstr "Sin email"
+
+#: app/services/notification_service.py:82
+msgid "New task assigned to you"
+msgstr "Nueva tarea asignada a ti"
+
+#: app/services/notification_service.py:100
+#: app/services/notification_service.py:120
+msgid "Someone"
+msgstr "Alguien"
+
+#: app/services/notification_service.py:126
+msgid "Task awaiting approval"
+msgstr ""
+
+#: app/services/notification_service.py:127
+msgid "marked task as completed. Review required."
+msgstr ""
+
+#: app/services/notification_service.py:140
+#: app/services/notification_service.py:160
+#, fuzzy
+msgid "Manager"
+msgstr "Administrar"
+
+#: app/services/notification_service.py:147
+msgid "approved your work on"
+msgstr ""
+
+#: app/services/notification_service.py:167
+#, fuzzy
+msgid "returned task"
+msgstr "Crear Tarea"
+
+#: app/services/notification_service.py:167
+#, fuzzy
+msgid "Comment"
+msgstr "Recomendaciones"
+
+#: app/services/notification_service.py:184
+msgid "Deal stage updated"
+msgstr "Etapa del negocio actualizada"
+
 #: app/services/workflow.py:63
 msgid "Cliente Desconhecido"
 msgstr "Cliente Desconocido"
@@ -460,12 +647,11 @@ msgid "Projects"
 msgstr "Proyectos"
 
 #: app/templates/base.html:128 app/templates/calendar/index.html:9
-#: app/templates/calendar/index.html:131 app/templates/dashboard/index.html:236
+#: app/templates/calendar/index.html:131 app/templates/dashboard/index.html:240
 msgid "Agenda"
 msgstr "Agenda"
 
-#: app/templates/base.html:139 app/templates/clients/kanban.html:3
-#: app/templates/clients/kanban.html:70
+#: app/templates/base.html:139
 msgid "Kanban"
 msgstr "Kanban"
 
@@ -477,107 +663,137 @@ msgstr "Kanban"
 msgid "Clients"
 msgstr "Clientes"
 
-#: app/templates/base.html:149 app/templates/clients/view.html:124
+#: app/templates/base.html:149 app/templates/clients/view.html:133
 #: app/templates/proposals/index.html:3 app/templates/proposals/index.html:9
 msgid "Proposals"
 msgstr "Propuestas"
 
-#: app/templates/base.html:159 app/templates/services/index.html:3
+# ===== TASKS =====
+#: app/templates/base.html:157 app/templates/tasks/index.html:3
+#: app/templates/tasks/index.html:129
+msgid "Tasks"
+msgstr "Tareas"
+
+#: app/templates/base.html:167 app/templates/services/index.html:3
 #: app/templates/services/index.html:8
 msgid "Services & Packages"
 msgstr "Servicios y Paquetes"
 
-#: app/templates/base.html:168 app/templates/finance/commissions.html:8
+#: app/templates/base.html:176 app/templates/finance/commissions.html:8
 #: app/templates/finance/payables.html:8
 #: app/templates/finance/receivables.html:8
-#: app/templates/projects/view.html:208
+#: app/templates/projects/view.html:226
 msgid "Finance"
 msgstr "Finanzas"
 
-#: app/templates/base.html:172 app/templates/dashboard/_finance.html:64
+#: app/templates/base.html:180 app/templates/dashboard/_finance.html:78
 #: app/templates/finance/receivables.html:3
 msgid "Accounts Receivable"
 msgstr "Cuentas por Cobrar"
 
-#: app/templates/base.html:174 app/templates/finance/commissions.html:17
+#: app/templates/base.html:182 app/templates/finance/commissions.html:17
 #: app/templates/finance/payables.html:3 app/templates/finance/payables.html:17
 #: app/templates/finance/receivables.html:49
 #: app/templates/finance/receivables.html:63
 msgid "Accounts Payable"
 msgstr "Cuentas por Pagar"
 
-#: app/templates/base.html:176 app/templates/finance/commissions.html:3
+#: app/templates/base.html:184 app/templates/finance/commissions.html:3
 #: app/templates/finance/commissions.html:20
 #: app/templates/finance/payables.html:20
 #: app/templates/finance/receivables.html:66
 msgid "Commissions"
 msgstr "Comisiones"
 
-#: app/templates/base.html:188 app/templates/company/profile.html:71
+#: app/templates/base.html:196 app/templates/company/profile.html:71
 #: app/templates/saas/packages/index.html:41
 msgid "Users"
 msgstr "Usuarios"
 
-#: app/templates/base.html:194
+#: app/templates/base.html:202 app/templates/base.html:558
+#, fuzzy
+msgid "Quick Task"
+msgstr "Acciones"
+
+# ===== NOTIFICATIONS =====
+#: app/templates/base.html:220
+msgid "Notifications"
+msgstr "Notificaciones"
+
+#: app/templates/base.html:222
+msgid "Mark all read"
+msgstr "Marcar todas como leídas"
+
+#: app/templates/base.html:228 app/templates/base.html:499
+msgid "No notifications"
+msgstr "Sin notificaciones"
+
+#: app/templates/base.html:236
 msgid "Toggle theme"
 msgstr "Cambiar Tema"
 
-#: app/templates/base.html:229
+#: app/templates/base.html:271
 msgid "SaaS Admin"
 msgstr "Admin SaaS"
 
-#: app/templates/base.html:236 app/templates/saas/dashboard.html:84
+#: app/templates/base.html:278 app/templates/saas/dashboard.html:84
 msgid "Settings"
 msgstr "Configuraciones"
 
-#: app/templates/base.html:238
+#: app/templates/base.html:280
 msgid "Integrations"
 msgstr "Integraciones"
 
-#: app/templates/base.html:245
+#: app/templates/base.html:287
 msgid "Logout"
 msgstr "Cerrar Sesión"
 
-#: app/templates/base.html:314
+#: app/templates/base.html:356
 msgid "New Action"
 msgstr "Nueva Acción"
 
-#: app/templates/base.html:323 app/templates/calendar/index.html:69
-#: app/templates/dashboard/index.html:393
+#: app/templates/base.html:365 app/templates/base.html:590
+#: app/templates/calendar/index.html:69 app/templates/clients/kanban.html:322
+#: app/templates/dashboard/index.html:413
+#: app/templates/dashboard/index.html:678
 #: app/templates/finance/receivables.html:134
 #: app/templates/finance/receivables.html:227
 #: app/templates/health_checks/index.html:17
 #: app/templates/integrations/location_mapping.html:93
 #: app/templates/projects/view.html:81 app/templates/proposals/create.html:28
 #: app/templates/proposals/edit.html:28 app/templates/proposals/index.html:24
-#: app/templates/proposals/view.html:77 app/templates/visits/create.html:19
+#: app/templates/proposals/view.html:77 app/templates/tasks/index.html:340
+#: app/templates/tasks/index.html:433 app/templates/visits/create.html:19
 #: app/templates/visits/create.html:30 app/templates/visits/edit.html:17
 #: app/templates/visits/index.html:20
 msgid "Client"
 msgstr "Cliente"
 
-#: app/templates/base.html:325 app/templates/base.html:385
+#: app/templates/base.html:367 app/templates/base.html:427
+#: app/templates/clients/kanban.html:324
 #: app/templates/integrations/location_mapping.html:108
 msgid "Select client..."
 msgstr "Seleccionar cliente..."
 
-#: app/templates/base.html:329
+#: app/templates/base.html:371
 msgid "Register new client"
 msgstr "Registrar nuevo cliente"
 
-#: app/templates/base.html:336 app/templates/calendar/index.html:63
+#: app/templates/base.html:378 app/templates/calendar/index.html:63
 msgid "Date and Time"
 msgstr "Fecha y Hora"
 
-#: app/templates/base.html:342
+#: app/templates/base.html:384
 msgid "Notes (optional)"
 msgstr "Notas (opcional)"
 
-#: app/templates/base.html:347 app/templates/calendar/index.html:104
-#: app/templates/clients/index.html:171 app/templates/clients/kanban.html:158
-#: app/templates/clients/kanban.html:243 app/templates/clients/view.html:597
-#: app/templates/clients/view.html:631 app/templates/clients/view.html:653
-#: app/templates/company/edit.html:131 app/templates/finance/payables.html:278
+#: app/templates/base.html:389 app/templates/base.html:620
+#: app/templates/calendar/index.html:104 app/templates/clients/index.html:171
+#: app/templates/clients/kanban.html:353 app/templates/clients/kanban.html:396
+#: app/templates/clients/view.html:606 app/templates/clients/view.html:640
+#: app/templates/clients/view.html:662 app/templates/company/edit.html:131
+#: app/templates/dashboard/index.html:715
+#: app/templates/finance/payables.html:278
 #: app/templates/finance/payables.html:370
 #: app/templates/finance/receivables.html:262
 #: app/templates/finance/receivables.html:317
@@ -586,32 +802,151 @@ msgstr "Notas (opcional)"
 #: app/templates/interactions/log_modal.html:51
 #: app/templates/interactions/manage_types_modal.html:42
 #: app/templates/projects/create.html:100 app/templates/projects/view.html:37
-#: app/templates/projects/view.html:440 app/templates/projects/view.html:485
-#: app/templates/saas/dashboard.html:122
-#: app/templates/saas/packages/edit.html:75 app/templates/users/create.html:66
-#: app/templates/users/edit.html:78 app/templates/visits/create.html:56
-#: app/templates/visits/edit.html:41
+#: app/templates/projects/view.html:686 app/templates/projects/view.html:731
+#: app/templates/projects/view.html:779 app/templates/saas/dashboard.html:122
+#: app/templates/saas/packages/edit.html:75 app/templates/tasks/index.html:239
+#: app/templates/tasks/index.html:389 app/templates/tasks/index.html:488
+#: app/templates/users/create.html:66 app/templates/users/edit.html:78
+#: app/templates/visits/create.html:56 app/templates/visits/edit.html:41
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: app/templates/base.html:350 app/templates/interactions/log_modal.html:73
+#: app/templates/base.html:392 app/templates/interactions/log_modal.html:73
 msgid "Schedule"
 msgstr "Agendar"
 
-#: app/templates/base.html:366 app/templates/clients/index.html:13
-#: app/templates/dashboard/index.html:17
+#: app/templates/base.html:408 app/templates/clients/index.html:13
+#: app/templates/dashboard/index.html:21
 msgid "New Visit"
 msgstr "Nueva Visita"
 
-#: app/templates/base.html:369 app/templates/clients/index.html:17
-#: app/templates/dashboard/index.html:21
+#: app/templates/base.html:411 app/templates/clients/index.html:17
+#: app/templates/dashboard/index.html:25
 msgid "New Call"
 msgstr "Nueva Llamada"
 
-#: app/templates/base.html:422 app/templates/calendar/index.html:126
-#: app/templates/clients/index.html:241
+#: app/templates/base.html:464 app/templates/base.html:719
+#: app/templates/calendar/index.html:126 app/templates/clients/index.html:241
 msgid "Connection Error"
 msgstr "Error de Conexión"
+
+#: app/templates/base.html:564 app/templates/projects/view.html:647
+msgid "Task Title"
+msgstr ""
+
+#: app/templates/base.html:566
+msgid "What needs to be done?"
+msgstr ""
+
+#: app/templates/base.html:569 app/templates/dashboard/index.html:659
+#: app/templates/finance/payables.html:77
+#: app/templates/finance/payables.html:147
+#: app/templates/finance/payables.html:256
+#: app/templates/finance/receivables.html:135
+#: app/templates/finance/receivables.html:237
+#: app/templates/finance/receivables.html:337
+#: app/templates/projects/create.html:32 app/templates/projects/view.html:594
+#: app/templates/saas/packages/edit.html:29
+#: app/templates/services/edit_package.html:36
+#: app/templates/services/edit_service.html:36
+#: app/templates/tasks/index.html:321 app/templates/tasks/index.html:414
+msgid "Description"
+msgstr "Descripción"
+
+#: app/templates/base.html:571
+#, fuzzy
+msgid "Optional details..."
+msgstr "Detalles Adicionales"
+
+#: app/templates/base.html:575 app/templates/dashboard/index.html:668
+#: app/templates/projects/view.html:253 app/templates/projects/view.html:657
+#: app/templates/tasks/index.html:326 app/templates/tasks/index.html:419
+msgid "Priority"
+msgstr "Prioridad"
+
+#: app/templates/base.html:577 app/templates/dashboard/index.html:670
+#: app/templates/projects/view.html:659 app/templates/tasks/index.html:185
+#: app/templates/tasks/index.html:328 app/templates/tasks/index.html:421
+msgid "Low"
+msgstr "Baja"
+
+#: app/templates/base.html:578 app/templates/dashboard/index.html:671
+#: app/templates/projects/view.html:660 app/templates/tasks/index.html:184
+#: app/templates/tasks/index.html:329 app/templates/tasks/index.html:422
+msgid "Medium"
+msgstr "Media"
+
+#: app/templates/base.html:579 app/templates/dashboard/index.html:672
+#: app/templates/projects/view.html:661 app/templates/tasks/index.html:183
+#: app/templates/tasks/index.html:330 app/templates/tasks/index.html:423
+msgid "High"
+msgstr "Alta"
+
+#: app/templates/base.html:580 app/templates/projects/view.html:662
+msgid "Urgent"
+msgstr "Urgente"
+
+#: app/templates/base.html:584 app/templates/projects/view.html:255
+#: app/templates/projects/view.html:666
+#, fuzzy
+msgid "Deadline"
+msgstr "Negocio"
+
+#: app/templates/base.html:592 app/templates/base.html:598
+#: app/templates/base.html:659 app/templates/base.html:672
+#: app/templates/dashboard/index.html:680
+#: app/templates/dashboard/index.html:689 app/templates/tasks/index.html:342
+#: app/templates/tasks/index.html:351 app/templates/tasks/index.html:435
+#: app/templates/tasks/index.html:444
+msgid "None"
+msgstr "Ninguno"
+
+#: app/templates/base.html:596 app/templates/dashboard/index.html:412
+#: app/templates/dashboard/index.html:687 app/templates/tasks/index.html:349
+#: app/templates/tasks/index.html:442
+msgid "Project"
+msgstr "Proyecto"
+
+#: app/templates/base.html:603 app/templates/dashboard/index.html:699
+#, fuzzy
+msgid "Assign To"
+msgstr "Asignar a"
+
+#: app/templates/base.html:605 app/templates/dashboard/index.html:216
+#: app/templates/dashboard/index.html:245
+#: app/templates/dashboard/index.html:260
+#: app/templates/dashboard/index.html:701
+#: app/templates/interactions/manage_types_modal.html:80
+msgid "Loading..."
+msgstr "Cargando..."
+
+#: app/templates/base.html:607
+msgid "Leave blank to assign to yourself"
+msgstr ""
+
+#: app/templates/base.html:614 app/templates/dashboard/index.html:708
+#: app/templates/projects/view.html:676 app/templates/tasks/index.html:379
+#: app/templates/tasks/index.html:479
+msgid "Require Verification"
+msgstr "Requerir Verificación"
+
+#: app/templates/base.html:623 app/templates/base.html:723
+#: app/templates/dashboard/index.html:716 app/templates/tasks/index.html:390
+msgid "Create Task"
+msgstr "Crear Tarea"
+
+#: app/templates/base.html:645
+msgid "Myself"
+msgstr ""
+
+#: app/templates/base.html:647
+#, fuzzy
+msgid "me"
+msgstr "Nombre"
+
+#: app/templates/base.html:686 app/templates/dashboard/index.html:752
+msgid "Creating..."
+msgstr "Creando..."
 
 #: app/templates/auth/forgot_password.html:7
 #: app/templates/auth/forgot_password.html:44
@@ -624,7 +959,7 @@ msgstr "Ingresa tu email y te enviaremos instrucciones"
 
 #: app/templates/auth/forgot_password.html:63 app/templates/auth/login.html:17
 #: app/templates/clients/create.html:47 app/templates/clients/edit.html:71
-#: app/templates/clients/view.html:47 app/templates/company/edit.html:58
+#: app/templates/clients/view.html:56 app/templates/company/edit.html:58
 #: app/templates/company/profile.html:42
 #: app/templates/saas/edit_company.html:25 app/templates/users/create.html:21
 #: app/templates/users/edit.html:22 app/templates/users/index.html:20
@@ -693,7 +1028,8 @@ msgstr "Calendario"
 msgid "New Appointment"
 msgstr "Nueva Cita"
 
-#: app/templates/calendar/index.html:37
+#: app/templates/calendar/index.html:37 app/templates/clients/kanban.html:382
+#: app/templates/clients/kanban.html:425
 #: app/templates/finance/commissions.html:74
 #: app/templates/interactions/log_modal.html:19
 #: app/templates/interactions/manage_types_modal.html:57
@@ -731,20 +1067,19 @@ msgid "Client/Company Name"
 msgstr ""
 
 #: app/templates/calendar/index.html:89 app/templates/clients/create.html:42
-#: app/templates/clients/edit.html:65 app/templates/clients/kanban.html:227
-#: app/templates/clients/view.html:45 app/templates/company/edit.html:64
-#: app/templates/company/profile.html:46
+#: app/templates/clients/edit.html:65 app/templates/clients/view.html:54
+#: app/templates/company/edit.html:64 app/templates/company/profile.html:46
 #: app/templates/saas/edit_company.html:29
 msgid "Phone"
 msgstr "Teléfono"
 
-#: app/templates/calendar/index.html:95 app/templates/clients/view.html:107
+#: app/templates/calendar/index.html:95 app/templates/clients/view.html:116
 msgid "Observations"
 msgstr "Observaciones"
 
-#: app/templates/calendar/index.html:102 app/templates/clients/kanban.html:195
-#: app/templates/clients/view.html:16 app/templates/clients/view.html:403
-#: app/templates/finance/payables.html:216 app/templates/visits/view.html:58
+#: app/templates/calendar/index.html:102 app/templates/clients/view.html:16
+#: app/templates/clients/view.html:412 app/templates/finance/payables.html:216
+#: app/templates/projects/view.html:428 app/templates/visits/view.html:58
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -778,7 +1113,7 @@ msgstr ""
 msgid "Are you sure you want to delete this appointment?"
 msgstr ""
 
-#: app/templates/calendar/index.html:127 app/templates/dashboard/index.html:236
+#: app/templates/calendar/index.html:127 app/templates/dashboard/index.html:240
 msgid "Today"
 msgstr "Hoy"
 
@@ -827,12 +1162,11 @@ msgid "Primary Contact"
 msgstr "Contacto Principal"
 
 #: app/templates/clients/create.html:38 app/templates/clients/edit.html:60
-#: app/templates/clients/kanban.html:223
 msgid "Contact Name"
 msgstr "Nombre de Contacto"
 
 #: app/templates/clients/create.html:51 app/templates/clients/edit.html:76
-#: app/templates/clients/view.html:48
+#: app/templates/clients/view.html:57
 #: app/templates/integrations/manage_location.html:68
 msgid "Website"
 msgstr ""
@@ -842,7 +1176,7 @@ msgid "Ex: www.client.com"
 msgstr ""
 
 #: app/templates/clients/create.html:56 app/templates/clients/edit.html:81
-#: app/templates/clients/view.html:56 app/templates/company/edit.html:70
+#: app/templates/clients/view.html:65 app/templates/company/edit.html:70
 #: app/templates/company/profile.html:50
 #: app/templates/integrations/google_dashboard.html:153
 #: app/templates/integrations/location_mapping.html:48
@@ -868,17 +1202,17 @@ msgid "Closing Probability"
 msgstr "Probabilidad de Cierre"
 
 #: app/templates/clients/create.html:77 app/templates/clients/edit.html:107
-#: app/templates/clients/index.html:106 app/templates/clients/kanban.html:121
+#: app/templates/clients/index.html:106 app/templates/clients/view.html:43
 msgid "Cold"
 msgstr "Frío"
 
 #: app/templates/clients/create.html:83 app/templates/clients/edit.html:113
-#: app/templates/clients/index.html:103 app/templates/clients/kanban.html:119
+#: app/templates/clients/index.html:103 app/templates/clients/view.html:45
 msgid "Warm"
 msgstr "Tibio"
 
 #: app/templates/clients/create.html:88 app/templates/clients/edit.html:119
-#: app/templates/clients/index.html:99 app/templates/clients/kanban.html:117
+#: app/templates/clients/index.html:99 app/templates/clients/view.html:47
 msgid "Hot"
 msgstr "Caliente"
 
@@ -887,13 +1221,11 @@ msgid "Interest"
 msgstr "Clientes"
 
 #: app/templates/clients/create.html:95 app/templates/clients/edit.html:126
-#: app/templates/clients/kanban.html:233
 msgid "Interested Package"
 msgstr "Pack de Interés"
 
 #: app/templates/clients/create.html:97 app/templates/clients/edit.html:129
-#: app/templates/clients/kanban.html:235 app/templates/proposals/create.html:51
-#: app/templates/proposals/edit.html:50
+#: app/templates/proposals/create.html:51 app/templates/proposals/edit.html:50
 msgid "Select a package..."
 msgstr "Seleccionar un pack..."
 
@@ -904,7 +1236,7 @@ msgid ""
 msgstr ""
 
 #: app/templates/clients/create.html:110 app/templates/clients/edit.html:219
-#: app/templates/clients/index.html:172 app/templates/clients/kanban.html:245
+#: app/templates/clients/index.html:172
 #: app/templates/company/email_settings.html:98
 #: app/templates/finance/payables.html:308
 #: app/templates/interactions/log_modal.html:52
@@ -955,7 +1287,7 @@ msgstr "Nombre del Tomador de Decisiones"
 msgid "Who signs the check"
 msgstr "Quién firma el cheque"
 
-#: app/templates/clients/edit.html:165 app/templates/clients/view.html:97
+#: app/templates/clients/edit.html:165 app/templates/clients/view.html:106
 msgid "Decision Factors"
 msgstr "Factores de Decisión"
 
@@ -989,6 +1321,10 @@ msgstr ""
 #: app/templates/interactions/manage_types_modal.html:96
 msgid "Call"
 msgstr "Llamada"
+
+#: app/templates/clients/edit.html:203
+msgid "In-person Visit"
+msgstr "Visita Presencial"
 
 #: app/templates/clients/edit.html:209
 msgid ""
@@ -1024,11 +1360,12 @@ msgstr "Filtrar por Empresa, Contacto, Recepcionista o Decisor."
 msgid "Name / Business"
 msgstr "Nombre / Empresa"
 
-#: app/templates/clients/index.html:60 app/templates/clients/view.html:43
+#: app/templates/clients/index.html:60 app/templates/clients/view.html:52
 msgid "Contact"
 msgstr "Contacto"
 
-#: app/templates/clients/index.html:61 app/templates/clients/view.html:30
+#: app/templates/clients/index.html:61 app/templates/clients/kanban.html:344
+#: app/templates/clients/view.html:30
 msgid "Stage"
 msgstr "Etapa"
 
@@ -1036,9 +1373,9 @@ msgstr "Etapa"
 msgid "Registration Date"
 msgstr "Fecha de Registro"
 
-#: app/templates/clients/index.html:64 app/templates/clients/view.html:179
-#: app/templates/clients/view.html:220 app/templates/clients/view.html:305
-#: app/templates/clients/view.html:361 app/templates/dashboard/index.html:396
+#: app/templates/clients/index.html:64 app/templates/clients/view.html:188
+#: app/templates/clients/view.html:229 app/templates/clients/view.html:314
+#: app/templates/clients/view.html:370 app/templates/dashboard/index.html:416
 #: app/templates/finance/commissions.html:78
 #: app/templates/finance/payables.html:162
 #: app/templates/finance/receivables.html:139
@@ -1047,7 +1384,7 @@ msgstr "Fecha de Registro"
 #: app/templates/integrations/google_dashboard.html:156
 #: app/templates/integrations/location_mapping.html:51
 #: app/templates/interactions/manage_types_modal.html:58
-#: app/templates/projects/view.html:231 app/templates/proposals/index.html:28
+#: app/templates/projects/view.html:256 app/templates/proposals/index.html:28
 #: app/templates/saas/dashboard.html:35 app/templates/services/index.html:32
 #: app/templates/services/index.html:77 app/templates/users/index.html:28
 #: app/templates/visits/index.html:23
@@ -1062,7 +1399,7 @@ msgstr "Cambiar Etapa"
 msgid "No stage"
 msgstr "Notas"
 
-#: app/templates/clients/index.html:115 app/templates/dashboard/index.html:407
+#: app/templates/clients/index.html:115 app/templates/dashboard/index.html:427
 #: app/templates/proposals/index.html:59
 msgid "View"
 msgstr "Ver"
@@ -1072,7 +1409,8 @@ msgstr "Ver"
 #: app/templates/finance/payables.html:212
 #: app/templates/finance/receivables.html:183
 #: app/templates/proposals/index.html:63 app/templates/proposals/view.html:64
-#: app/templates/users/index.html:64 app/templates/visits/view.html:51
+#: app/templates/tasks/index.html:218 app/templates/users/index.html:64
+#: app/templates/visits/view.html:51
 msgid "Edit"
 msgstr "Editar"
 
@@ -1100,67 +1438,141 @@ msgstr "Nueva Etapa"
 msgid "Move"
 msgstr "Mover"
 
-#: app/templates/clients/index.html:236 app/templates/clients/kanban.html:257
+#: app/templates/clients/index.html:236
 msgid "Error moving client"
 msgstr "Error al mover cliente"
 
-#: app/templates/clients/kanban.html:73
-msgid ""
-"WARNING: This will remove all custom columns and move ALL clients to No "
-"Stage. Are you sure?"
-msgstr ""
+# ===== KANBAN / SALES PIPELINE =====
+#: app/templates/clients/kanban.html:3 app/templates/clients/kanban.html:158
+msgid "Sales Pipeline"
+msgstr "Pipeline de Ventas"
 
-#: app/templates/clients/kanban.html:76
-msgid "Restore Default"
-msgstr "Restaurar por Defecto"
+#: app/templates/clients/kanban.html:162
+msgid "All Owners"
+msgstr "Todos los Dueños"
 
-#: app/templates/clients/kanban.html:80 app/templates/clients/kanban.html:142
+#: app/templates/clients/kanban.html:170 app/templates/clients/kanban.html:308
+msgid "New Deal"
+msgstr "Nuevo Negocio"
+
+#: app/templates/clients/kanban.html:173 app/templates/clients/kanban.html:366
 msgid "New Column"
 msgstr "Nueva Columna"
 
-#: app/templates/clients/kanban.html:94
-msgid "Add Client"
-msgstr "Agregar Cliente"
+#: app/templates/clients/kanban.html:176
+msgid "WARNING: This will remove all custom columns. Are you sure?"
+msgstr ""
+"ADVERTENCIA: Esto eliminará todas las columnas personalizadas. ¿Estás "
+"seguro?"
 
-#: app/templates/clients/kanban.html:149 app/templates/clients/kanban.html:178
+#: app/templates/clients/kanban.html:191
+msgid "Active Deals"
+msgstr "Negocios Activos"
+
+#: app/templates/clients/kanban.html:195
+msgid "Pipeline Value"
+msgstr "Valor del Pipeline"
+
+#: app/templates/clients/kanban.html:199
+msgid "Stages"
+msgstr "Etapas"
+
+#: app/templates/clients/kanban.html:215
+msgid "Add Deal"
+msgstr "Agregar Negocio"
+
+#: app/templates/clients/kanban.html:235 app/templates/clients/kanban.html:385
+#: app/templates/clients/kanban.html:428
+msgid "Won"
+msgstr "Ganado"
+
+#: app/templates/clients/kanban.html:235 app/templates/clients/kanban.html:386
+#: app/templates/clients/kanban.html:429
+msgid "Lost"
+msgstr "Perdido"
+
+#: app/templates/clients/kanban.html:317
+msgid "Deal Title"
+msgstr "Título del Negocio"
+
+#: app/templates/clients/kanban.html:319
+msgid "e.g. Website Redesign"
+msgstr "ej. Rediseño del Sitio Web"
+
+#: app/templates/clients/kanban.html:332 app/templates/dashboard/index.html:415
+#: app/templates/finance/commissions.html:75
+#: app/templates/finance/payables.html:82
+#: app/templates/finance/payables.html:157
+#: app/templates/finance/payables.html:260
+#: app/templates/finance/receivables.html:137
+#: app/templates/finance/receivables.html:244
+#: app/templates/finance/receivables.html:343
+msgid "Value"
+msgstr "Valor"
+
+#: app/templates/clients/kanban.html:339
+msgid "Expected Close"
+msgstr "Cierre Esperado"
+
+#: app/templates/clients/kanban.html:354
+msgid "Create Deal"
+msgstr "Crear Negocio"
+
+#: app/templates/clients/kanban.html:373 app/templates/clients/kanban.html:416
 msgid "Stage Name"
 msgstr "Agenda"
 
-#: app/templates/clients/kanban.html:153 app/templates/clients/kanban.html:182
+#: app/templates/clients/kanban.html:378 app/templates/clients/kanban.html:421
 msgid "Order"
 msgstr "Ver"
 
-#: app/templates/clients/kanban.html:159
+#: app/templates/clients/kanban.html:384 app/templates/clients/kanban.html:427
+#: app/templates/finance/payables.html:131
+#: app/templates/finance/payables.html:198
+#: app/templates/finance/receivables.html:17
+msgid "Open"
+msgstr "Abierto"
+
+#: app/templates/clients/kanban.html:390 app/templates/clients/kanban.html:433
+#: app/templates/finance/payables.html:303
+#, fuzzy
+msgid "Color"
+msgstr "Crear"
+
+#: app/templates/clients/kanban.html:397
 msgid "Create"
 msgstr "Crear"
 
-#: app/templates/clients/kanban.html:171
+#: app/templates/clients/kanban.html:409
 msgid "Edit Stage"
 msgstr "Editar Etapa"
 
-#: app/templates/clients/kanban.html:186 app/templates/company/edit.html:128
+#: app/templates/clients/kanban.html:438 app/templates/company/edit.html:128
 #: app/templates/finance/receivables.html:358
-#: app/templates/saas/edit_company.html:71 app/templates/visits/edit.html:39
+#: app/templates/saas/edit_company.html:71 app/templates/tasks/index.html:489
+#: app/templates/visits/edit.html:39
 msgid "Save Changes"
 msgstr "Guardar Cambios"
 
-#: app/templates/clients/kanban.html:191 app/templates/clients/kanban.html:193
+#: app/templates/clients/kanban.html:442
 msgid "Are you sure you want to delete this stage?"
 msgstr ""
 
-#: app/templates/clients/kanban.html:207
-msgid "Add Client to Column"
-msgstr "Agregar Cliente a la Columna"
+#: app/templates/clients/kanban.html:445
+msgid "Delete Stage"
+msgstr "Eliminar Etapa"
 
-#: app/templates/clients/kanban.html:216
-msgid "Business / Client Name"
-msgstr "Nombre de la Empresa / Cliente"
+#: app/templates/clients/kanban.html:457
+msgid "Error moving deal"
+msgstr "Error al mover negocio"
 
-#: app/templates/clients/kanban.html:258
-msgid "Connection error moving client."
-msgstr "Error al crear lead"
+#: app/templates/clients/kanban.html:458 app/templates/clients/view.html:842
+#: app/templates/clients/view.html:879
+#, fuzzy
+msgid "Connection error"
+msgstr "Error de Conexión"
 
-#: app/templates/clients/kanban.html:339
+#: app/templates/clients/kanban.html:526
 msgid "Error reordering columns"
 msgstr "Error al reordenar columnas"
 
@@ -1172,84 +1584,84 @@ msgstr "Detalles del Cliente"
 msgid "Client Information"
 msgstr "Información del Cliente"
 
-#: app/templates/clients/view.html:60
+#: app/templates/clients/view.html:69
 msgid "Connected Profiles"
 msgstr "Perfiles Conectados"
 
-#: app/templates/clients/view.html:70
+#: app/templates/clients/view.html:79
 #: app/templates/integrations/location_mapping.html:66
 msgid "Primary"
 msgstr "Principal"
 
-#: app/templates/clients/view.html:91
+#: app/templates/clients/view.html:100
 msgid "Additional Details"
 msgstr "Detalles Adicionales"
 
-#: app/templates/clients/view.html:94
+#: app/templates/clients/view.html:103
 msgid "Receptionist"
 msgstr "Recepcionista"
 
-#: app/templates/clients/view.html:95
+#: app/templates/clients/view.html:104
 msgid "Decision Maker"
 msgstr "Tomador de Decisión"
 
-#: app/templates/clients/view.html:100
+#: app/templates/clients/view.html:109
 msgid "Preferred Time"
 msgstr "Horario de Preferencia"
 
-#: app/templates/clients/view.html:102
+#: app/templates/clients/view.html:111
 msgid "Preferred Method"
 msgstr "Método de Preferencia"
 
-#: app/templates/clients/view.html:120
+#: app/templates/clients/view.html:129
 msgid "Interactions"
 msgstr "Interacciones"
 
-#: app/templates/clients/view.html:128
+#: app/templates/clients/view.html:137
 msgid "Visits"
 msgstr "Visitas"
 
-#: app/templates/clients/view.html:133
+#: app/templates/clients/view.html:142
 msgid "Health Check"
 msgstr "Auditoría de Salud"
 
-#: app/templates/clients/view.html:136
+#: app/templates/clients/view.html:145
 msgid ""
 "SEO\n"
 "                                Ranking"
 msgstr ""
 
-#: app/templates/clients/view.html:141
+#: app/templates/clients/view.html:150
 msgid "GMB Insights"
 msgstr "Insights de GMB"
 
-#: app/templates/clients/view.html:146
+#: app/templates/clients/view.html:155
 msgid "Projects / Post-Sales"
 msgstr "Proyectos / Post-Venta"
 
-#: app/templates/clients/view.html:157
+#: app/templates/clients/view.html:166
 msgid "Log Visit / Call"
 msgstr "Registrar Visita / Llamada"
 
-#: app/templates/clients/view.html:168 app/templates/proposals/create.html:3
+#: app/templates/clients/view.html:177 app/templates/proposals/create.html:3
 #: app/templates/proposals/create.html:9 app/templates/proposals/index.html:12
 msgid "New Proposal"
 msgstr "Nueva Propuesta"
 
-#: app/templates/clients/view.html:176 app/templates/clients/view.html:217
-#: app/templates/clients/view.html:227 app/templates/clients/view.html:302
+#: app/templates/clients/view.html:185 app/templates/clients/view.html:226
+#: app/templates/clients/view.html:236 app/templates/clients/view.html:311
 #: app/templates/health_checks/index.html:16
 #: app/templates/proposals/index.html:27 app/templates/proposals/view.html:84
 #: app/templates/visits/index.html:19
 msgid "Date"
 msgstr "Fecha"
 
-#: app/templates/clients/view.html:177 app/templates/proposals/create.html:89
-#: app/templates/proposals/edit.html:119
+#: app/templates/clients/view.html:186 app/templates/proposals/create.html:89
+#: app/templates/proposals/edit.html:119 app/templates/tasks/index.html:140
 msgid "Total"
 msgstr "Total"
 
-#: app/templates/clients/view.html:178 app/templates/clients/view.html:304
+#: app/templates/clients/view.html:187 app/templates/clients/view.html:313
 #: app/templates/company/email_templates.html:32
 #: app/templates/company/email_templates.html:85
 #: app/templates/company/profile.html:80
@@ -1261,249 +1673,249 @@ msgstr "Total"
 #: app/templates/integrations/google_dashboard.html:47
 #: app/templates/integrations/google_dashboard.html:155
 #: app/templates/integrations/location_mapping.html:49
-#: app/templates/projects/view.html:228 app/templates/projects/view.html:365
+#: app/templates/projects/view.html:252 app/templates/projects/view.html:597
 #: app/templates/proposals/create.html:39 app/templates/proposals/edit.html:32
 #: app/templates/proposals/index.html:26 app/templates/proposals/view.html:88
 #: app/templates/saas/dashboard.html:32 app/templates/users/index.html:25
 msgid "Status"
 msgstr "Estado"
 
-#: app/templates/clients/view.html:196 app/templates/proposals/index.html:78
+#: app/templates/clients/view.html:205 app/templates/proposals/index.html:78
 msgid "No proposals registered."
 msgstr "No hay propuestas registradas."
 
-#: app/templates/clients/view.html:210 app/templates/visits/create.html:3
+#: app/templates/clients/view.html:219 app/templates/visits/create.html:3
 #: app/templates/visits/create.html:54
 msgid "Log Visit"
 msgstr "Nueva Visita"
 
-#: app/templates/clients/view.html:218
+#: app/templates/clients/view.html:227
 #: app/templates/interactions/log_modal.html:37
 #: app/templates/visits/index.html:21
 msgid "Notes"
 msgstr "Notas"
 
-#: app/templates/clients/view.html:219 app/templates/visits/edit.html:33
+#: app/templates/clients/view.html:228 app/templates/visits/edit.html:33
 #: app/templates/visits/index.html:22 app/templates/visits/view.html:36
 msgid "Next Step"
 msgstr ""
 
-#: app/templates/clients/view.html:242
+#: app/templates/clients/view.html:251
 msgid "Ver"
 msgstr "Volver"
 
-#: app/templates/clients/view.html:249 app/templates/visits/index.html:50
+#: app/templates/clients/view.html:258 app/templates/visits/index.html:50
 msgid "No visits registered."
 msgstr "No hay visitas recientes."
 
-#: app/templates/clients/view.html:266
+#: app/templates/clients/view.html:275
 msgid "Advanced Audit (API)"
 msgstr ""
 
-#: app/templates/clients/view.html:287
+#: app/templates/clients/view.html:296
 msgid "Link Another Profile"
 msgstr ""
 
-#: app/templates/clients/view.html:288
+#: app/templates/clients/view.html:297
 msgid "Link Google Profile"
 msgstr ""
 
-#: app/templates/clients/view.html:294
+#: app/templates/clients/view.html:303
 msgid "New Health Check (Public)"
 msgstr "Health Check"
 
-#: app/templates/clients/view.html:303
+#: app/templates/clients/view.html:312
 #: app/templates/health_checks/index.html:18
 msgid "Score"
 msgstr "Crear"
 
-#: app/templates/clients/view.html:332
+#: app/templates/clients/view.html:341
 #: app/templates/health_checks/index.html:47
-#: app/templates/projects/view.html:338
+#: app/templates/projects/view.html:564
 msgid "No audits performed."
 msgstr ""
 
-#: app/templates/clients/view.html:349
+#: app/templates/clients/view.html:358
 msgid "Track Keyword"
 msgstr "Rastrear Palabra Clave"
 
-#: app/templates/clients/view.html:357 app/templates/clients/view.html:618
+#: app/templates/clients/view.html:366 app/templates/clients/view.html:627
 msgid "Keyword"
 msgstr ""
 
-#: app/templates/clients/view.html:358
+#: app/templates/clients/view.html:367
 msgid "Local Position"
 msgstr "Puntos Positivos"
 
-#: app/templates/clients/view.html:359
+#: app/templates/clients/view.html:368
 msgid "Organic Position"
 msgstr ""
 
-#: app/templates/clients/view.html:360
+#: app/templates/clients/view.html:369
 msgid "Last Check"
 msgstr ""
 
-#: app/templates/clients/view.html:392
+#: app/templates/clients/view.html:401
 msgid "Update"
 msgstr ""
 
-#: app/templates/clients/view.html:400
+#: app/templates/clients/view.html:409
 msgid "Delete this keyword?"
 msgstr ""
 
-#: app/templates/clients/view.html:414
+#: app/templates/clients/view.html:423
 msgid "No keywords tracked."
 msgstr ""
 
-#: app/templates/clients/view.html:427
+#: app/templates/clients/view.html:436
 msgid "Performance"
 msgstr ""
 
-#: app/templates/clients/view.html:447
+#: app/templates/clients/view.html:456
 msgid "Update Data"
 msgstr "Actualizar Datos"
 
-#: app/templates/clients/view.html:466
+#: app/templates/clients/view.html:475
 msgid "Total Impressions"
 msgstr "Total de Impresiones"
 
-#: app/templates/clients/view.html:476 app/templates/clients/view.html:759
+#: app/templates/clients/view.html:485 app/templates/clients/view.html:768
 msgid "Calls"
 msgstr "Llamadas"
 
-#: app/templates/clients/view.html:486 app/templates/clients/view.html:767
+#: app/templates/clients/view.html:495 app/templates/clients/view.html:776
 msgid "Website Clicks"
 msgstr "Clics en Sitio Web"
 
-#: app/templates/clients/view.html:499
+#: app/templates/clients/view.html:508
 msgid "No data collected for this account yet. Click \"Update Data\" to import."
 msgstr ""
 
-#: app/templates/clients/view.html:501
+#: app/templates/clients/view.html:510
 msgid "Link a Google Business account to see performance metrics."
 msgstr ""
 
-#: app/templates/clients/view.html:511
+#: app/templates/clients/view.html:520
 msgid "Active Projects and Deliveries"
 msgstr "Proyectos y Entregas Activas"
 
-#: app/templates/clients/view.html:513 app/templates/projects/create.html:19
+#: app/templates/clients/view.html:522 app/templates/projects/create.html:19
 msgid "Start New Project"
 msgstr "Iniciar Nuevo Proyecto"
 
-#: app/templates/clients/view.html:527
+#: app/templates/clients/view.html:536
 msgid "No description."
 msgstr "Descripción"
 
-#: app/templates/clients/view.html:534
+#: app/templates/clients/view.html:543
 #: app/templates/integrations/google_dashboard.html:190
 msgid "Manage"
 msgstr "Administrar"
 
-#: app/templates/clients/view.html:546
+#: app/templates/clients/view.html:555
 msgid "This client does not have an active project yet."
 msgstr ""
 
-#: app/templates/clients/view.html:547
+#: app/templates/clients/view.html:556
 msgid "Projects allow managing contracts and post-sales tasks."
 msgstr ""
 
-#: app/templates/clients/view.html:564
+#: app/templates/clients/view.html:573
 msgid "Link Google Business Profile"
 msgstr ""
 
-#: app/templates/clients/view.html:573
+#: app/templates/clients/view.html:582
 #: app/templates/integrations/google_dashboard.html:45
 msgid "Google Account"
 msgstr "Cuenta de Google"
 
-#: app/templates/clients/view.html:575
+#: app/templates/clients/view.html:584
 msgid "Select an account..."
 msgstr "Seleccionar cliente..."
 
-#: app/templates/clients/view.html:583
+#: app/templates/clients/view.html:592
 #: app/templates/integrations/location_mapping.html:47
 msgid "Business Profile"
 msgstr ""
 
-#: app/templates/clients/view.html:585
+#: app/templates/clients/view.html:594
 msgid "Loading profiles..."
 msgstr "Seleccione una opción"
 
-#: app/templates/clients/view.html:593
+#: app/templates/clients/view.html:602
 msgid "Searching profiles..."
 msgstr "Seleccione una opción"
 
-#: app/templates/clients/view.html:598
+#: app/templates/clients/view.html:607
 #: app/templates/integrations/location_mapping.html:114
 msgid "Link"
 msgstr ""
 
-#: app/templates/clients/view.html:610
+#: app/templates/clients/view.html:619
 msgid "Track New Keyword"
 msgstr ""
 
-#: app/templates/clients/view.html:620
+#: app/templates/clients/view.html:629
 msgid "Ex: Pizzeria in Asuncion"
 msgstr "Ej: Pizzería en Asunción"
 
-#: app/templates/clients/view.html:624
+#: app/templates/clients/view.html:633
 msgid "Location"
 msgstr "Opcional"
 
-#: app/templates/clients/view.html:626
+#: app/templates/clients/view.html:635
 msgid "Ex: Asuncion, Paraguay"
 msgstr "Ej: Asunción, Paraguay"
 
-#: app/templates/clients/view.html:627
+#: app/templates/clients/view.html:636
 msgid "Leave empty for global search or enter City, Country"
 msgstr ""
 
-#: app/templates/clients/view.html:632
+#: app/templates/clients/view.html:641
 msgid "Track"
 msgstr ""
 
-#: app/templates/clients/view.html:644
+#: app/templates/clients/view.html:653
 msgid "Confirm Deletion"
 msgstr "Confirmar Eliminación"
 
-#: app/templates/clients/view.html:649
+#: app/templates/clients/view.html:658
 msgid "Are you sure you want to delete the client"
 msgstr "¿Está seguro de que desea eliminar al cliente"
 
-#: app/templates/clients/view.html:650
+#: app/templates/clients/view.html:659
 msgid "This action will move the client to the trash (Soft Delete)."
 msgstr "Esta acción moverá al cliente a la papelera (Soft Delete)."
 
-#: app/templates/clients/view.html:656
+#: app/templates/clients/view.html:665
 msgid "Delete Client"
 msgstr "Eliminar Cliente"
 
-#: app/templates/clients/view.html:699
+#: app/templates/clients/view.html:708
 msgid "Select profile..."
 msgstr "Seleccione una opción"
 
-#: app/templates/clients/view.html:710
+#: app/templates/clients/view.html:719
 msgid "No profiles found in this account."
 msgstr ""
 
-#: app/templates/clients/view.html:715
+#: app/templates/clients/view.html:724
 msgid "Error loading profiles."
 msgstr "Error al crear lead"
 
-#: app/templates/clients/view.html:751
+#: app/templates/clients/view.html:760
 msgid "Impressions"
 msgstr "Impuestos"
 
-#: app/templates/clients/view.html:825
+#: app/templates/clients/view.html:834
 #, fuzzy
 msgid "Error updating stage"
 msgstr "Error al crear lead"
 
-#: app/templates/clients/view.html:833
+#: app/templates/clients/view.html:872
 #, fuzzy
-msgid "Connection error"
-msgstr "Error de Conexión"
+msgid "Error updating probability"
+msgstr "Probabilidad de Cierre"
 
 #: app/templates/company/edit.html:2 app/templates/company/edit.html:10
 #: app/templates/saas/edit_company.html:3
@@ -1873,7 +2285,8 @@ msgstr "Estadísticas"
 #: app/templates/company/profile.html:82
 #: app/templates/integrations/google_dashboard.html:80
 #: app/templates/saas/dashboard.html:48 app/templates/saas/dashboard.html:62
-#: app/templates/saas/packages/index.html:24 app/templates/users/index.html:49
+#: app/templates/saas/packages/index.html:24 app/templates/tasks/index.html:173
+#: app/templates/tasks/index.html:174 app/templates/users/index.html:49
 msgid "Active"
 msgstr "Activo"
 
@@ -2133,62 +2546,79 @@ msgid "Deseja realmente remover o logo da empresa?"
 msgstr ""
 
 #: app/templates/dashboard/_finance.html:6
-msgid "Accounts Receivable (Total)"
+#, fuzzy
+msgid ""
+"Accounts Receivable\n"
+"                    (Total)"
 msgstr "Cuentas por Cobrar"
 
-#: app/templates/dashboard/_finance.html:8
+#: app/templates/dashboard/_finance.html:9
 msgid "Open pending invoices"
 msgstr ""
 
-#: app/templates/dashboard/_finance.html:16
-#: app/templates/dashboard/index.html:350
-msgid "Pending Contracts"
+#: app/templates/dashboard/_finance.html:17
+#, fuzzy
+msgid ""
+"Pending\n"
+"                    Contracts"
 msgstr "Contratos Pendientes"
 
-#: app/templates/dashboard/_finance.html:18
+#: app/templates/dashboard/_finance.html:20
 msgid "Projects without signed contract"
 msgstr ""
 
-#: app/templates/dashboard/_finance.html:26
-msgid "Received (Month)"
-msgstr "Paquete Activo (Disponible para venta)"
-
 #: app/templates/dashboard/_finance.html:28
-msgid "Total value received this month"
-msgstr ""
+#, fuzzy
+msgid "Monthly Billing"
+msgstr "Valor Mensual"
+
+#: app/templates/dashboard/_finance.html:31
+#, fuzzy
+msgid "Total expected for this month"
+msgstr "Repetir por [N] meses"
 
 #: app/templates/dashboard/_finance.html:39
+msgid ""
+"Closed Sales\n"
+"                    (Contract)"
+msgstr ""
+
+#: app/templates/dashboard/_finance.html:42
+msgid "New contract volume this month"
+msgstr ""
+
+#: app/templates/dashboard/_finance.html:53
 msgid "Billing Queue"
 msgstr ""
 
-#: app/templates/dashboard/_finance.html:41
+#: app/templates/dashboard/_finance.html:55
 msgid "View All Receivables"
 msgstr "Cuentas por Cobrar"
 
-#: app/templates/dashboard/_finance.html:48
+#: app/templates/dashboard/_finance.html:62
 msgid "Loading billing..."
 msgstr "Cargando..."
 
-#: app/templates/dashboard/_finance.html:59
+#: app/templates/dashboard/_finance.html:73
 msgid "Financial Management"
 msgstr ""
 
-#: app/templates/dashboard/_finance.html:67
+#: app/templates/dashboard/_finance.html:81
 msgid "Review Projects"
 msgstr "Editar Propuesta"
 
-#: app/templates/dashboard/_finance.html:70
+#: app/templates/dashboard/_finance.html:84
 msgid "View Proposals"
 msgstr "Nueva Propuesta"
 
-#: app/templates/dashboard/_finance.html:73
+#: app/templates/dashboard/_finance.html:87
 msgid "Sync Data"
 msgstr ""
 
-#: app/templates/dashboard/_finance.html:78
+#: app/templates/dashboard/_finance.html:92
 msgid ""
-"Remember to validate the payment receipt before releasing production "
-"onboarding."
+"Remember to validate the payment receipt before\n"
+"                    releasing production onboarding."
 msgstr ""
 
 #: app/templates/dashboard/_production.html:6
@@ -2365,11 +2795,17 @@ msgstr ""
 msgid "Welcome"
 msgstr "Bienvenido"
 
-#: app/templates/dashboard/index.html:34
+#: app/templates/dashboard/index.html:17 app/templates/dashboard/index.html:648
+#: app/templates/projects/view.html:242 app/templates/tasks/index.html:131
+#: app/templates/tasks/index.html:308
+msgid "New Task"
+msgstr "Nueva Tarea"
+
+#: app/templates/dashboard/index.html:38
 msgid "Attention: Follow-up required"
 msgstr "Atención: Seguimiento pendiente"
 
-#: app/templates/dashboard/index.html:36
+#: app/templates/dashboard/index.html:40
 msgid ""
 "The following leads were worked on today but have no next step scheduled."
 " Define a next step\n"
@@ -2379,323 +2815,348 @@ msgstr ""
 "programado. Defina una acción antes del final del día para mantener el "
 "proceso de ventas."
 
-#: app/templates/dashboard/index.html:88
+#: app/templates/dashboard/index.html:92
 msgid ""
 "First Steps for\n"
 "                                    Your Success"
 msgstr ""
 
-#: app/templates/dashboard/index.html:90
+#: app/templates/dashboard/index.html:94
 msgid ""
 "Complete these fundamental steps\n"
 "                                    to get your agency ready to sell more."
 msgstr ""
 
-#: app/templates/dashboard/index.html:104
+#: app/templates/dashboard/index.html:108
 msgid "Logo & Branding"
 msgstr "Logo y Marca"
 
-#: app/templates/dashboard/index.html:116
+#: app/templates/dashboard/index.html:120
 msgid "E-mail (SMTP)"
 msgstr "Correo Electrónico (SMTP)"
 
-#: app/templates/dashboard/index.html:128
+#: app/templates/dashboard/index.html:132
 msgid "SDR/Sales Team"
 msgstr "Equipo SDR/Ventas"
 
-#: app/templates/dashboard/index.html:140
+#: app/templates/dashboard/index.html:144
 msgid "First Clients"
 msgstr "Editar Cliente"
 
-#: app/templates/dashboard/index.html:146
+#: app/templates/dashboard/index.html:150
 msgid "Configured"
 msgstr "Configurado"
 
-#: app/templates/dashboard/index.html:177
+#: app/templates/dashboard/index.html:181
 msgid "You have overdue tasks"
 msgstr "Usted tiene tareas vencidas"
 
-#: app/templates/dashboard/index.html:179
+#: app/templates/dashboard/index.html:183
 msgid "There are items that require your attention."
 msgstr "Hay elementos que requieren su atención."
 
-#: app/templates/dashboard/index.html:183
+#: app/templates/dashboard/index.html:187
 msgid "View Overdue Items"
 msgstr "Ver Elementos Vencidos"
 
-#: app/templates/dashboard/index.html:195
-msgid ""
-"Quick Health Check\n"
-"                            (GMB)"
-msgstr ""
+#: app/templates/dashboard/index.html:199
+msgid "Quick Health Check (GMB)"
+msgstr "Chequeo Rápido de Salud (GMB)"
 
-#: app/templates/dashboard/index.html:197
+#: app/templates/dashboard/index.html:201
 msgid ""
 "Enter the company name to perform an instant Google My\n"
 "                            Business analysis."
 msgstr ""
 
-#: app/templates/dashboard/index.html:202
+#: app/templates/dashboard/index.html:206
 msgid "Company name (e.g., AGR Equipamientos)..."
 msgstr "Nombre de la empresa (p. ej., AGR Equipamientos)..."
 
-#: app/templates/dashboard/index.html:203
+#: app/templates/dashboard/index.html:207
 msgid "Verify Now"
 msgstr "Verificar Ahora"
 
-#: app/templates/dashboard/index.html:212
-#: app/templates/dashboard/index.html:241
-#: app/templates/dashboard/index.html:256
-#: app/templates/interactions/manage_types_modal.html:80
-msgid "Loading..."
-msgstr "Cargando..."
-
-#: app/templates/dashboard/index.html:214
-#: app/templates/dashboard/index.html:633
+#: app/templates/dashboard/index.html:218
+#: app/templates/dashboard/index.html:737
 #: app/templates/health_checks/create.html:42
 msgid "Analyzing..."
 msgstr "Analizando..."
 
-#: app/templates/dashboard/index.html:251
+#: app/templates/dashboard/index.html:255
 msgid "Next 7 Days"
 msgstr "Próximos 7 Días"
 
-#: app/templates/dashboard/index.html:282
+#: app/templates/dashboard/index.html:287
 msgid "NEW LEADS (7d)"
 msgstr "NUEVOS LEADS (7d)"
 
-#: app/templates/dashboard/index.html:285
+#: app/templates/dashboard/index.html:290
 msgid "Last 7 Days"
 msgstr "Últimos 7 Días"
 
-#: app/templates/dashboard/index.html:295
+#: app/templates/dashboard/index.html:300
 msgid "NEW LEADS (15d)"
 msgstr "NUEVOS LEADS (15d)"
 
-#: app/templates/dashboard/index.html:298
+#: app/templates/dashboard/index.html:303
 msgid "Last 15 Days"
 msgstr "Últimos 15 Días"
 
-#: app/templates/dashboard/index.html:308
-msgid "CLOSED SALES"
+#: app/templates/dashboard/index.html:313
+#, fuzzy
+msgid "CLOSED SALES (VOL)"
 msgstr "VENTAS CERRADAS"
 
-#: app/templates/dashboard/index.html:312
-msgid "This Month"
-msgstr "Este Mes"
+#: app/templates/dashboard/index.html:317
+#, fuzzy
+msgid "New Contracts (Setup)"
+msgstr "Contrato Firmado"
 
-#: app/templates/dashboard/index.html:322
+#: app/templates/dashboard/index.html:327
+#, fuzzy
+msgid "MONTHLY BILLING"
+msgstr "Valor Mensual"
+
+#: app/templates/dashboard/index.html:332
+#, fuzzy
+msgid "Installments + Recurring"
+msgstr "Total Clientes"
+
+#: app/templates/dashboard/index.html:342
 msgid "AVG TICKET"
 msgstr "TICKET PROMEDIO"
 
-#: app/templates/dashboard/index.html:326
-msgid "Average Value Won"
+#: app/templates/dashboard/index.html:346
+#, fuzzy
+msgid "Avg. Value Won"
 msgstr "Valor Promedio Ganado"
 
-#: app/templates/dashboard/index.html:340
+#: app/templates/dashboard/index.html:360
 msgid "Future Receivables / Total Closed"
 msgstr "Cobros Futuros / Total Cerrado"
 
-#: app/templates/dashboard/index.html:359
+#: app/templates/dashboard/index.html:370
+msgid "Pending Contracts"
+msgstr "Contratos Pendientes"
+
+#: app/templates/dashboard/index.html:379
 msgid ""
 "Total\n"
 "                            Clients"
 msgstr ""
 
-#: app/templates/dashboard/index.html:370
+#: app/templates/dashboard/index.html:390
 #, fuzzy
 msgid "Total Proposals"
 msgstr "Propuestas"
 
-#: app/templates/dashboard/index.html:385
+#: app/templates/dashboard/index.html:405
 msgid "Renewal Alerts (Next 30 Days)"
 msgstr "Alertas de Renovación (Próximos 30 Días)"
 
-#: app/templates/dashboard/index.html:392
-msgid "Project"
-msgstr "Proyecto"
-
-#: app/templates/dashboard/index.html:394
+#: app/templates/dashboard/index.html:414
 msgid "End Date"
 msgstr "Fecha de Finalización"
 
-#: app/templates/dashboard/index.html:395
-#: app/templates/finance/commissions.html:75
-#: app/templates/finance/payables.html:82
-#: app/templates/finance/payables.html:157
-#: app/templates/finance/payables.html:260
-#: app/templates/finance/receivables.html:137
-#: app/templates/finance/receivables.html:244
-#: app/templates/finance/receivables.html:343
-msgid "Value"
-msgstr "Valor"
-
-#: app/templates/dashboard/index.html:422
+#: app/templates/dashboard/index.html:442
 msgid "Operational Task Queue (Pending)"
 msgstr "Cola de Tareas Operativas (Pendientes)"
 
-#: app/templates/dashboard/index.html:436
+#: app/templates/dashboard/index.html:456
 msgid "No pending tasks."
 msgstr "No hay tareas pendientes."
 
-#: app/templates/dashboard/index.html:448
+#: app/templates/dashboard/index.html:468
 msgid "Client Pipeline"
 msgstr "Pipeline de Clientes"
 
-#: app/templates/dashboard/index.html:458
+#: app/templates/dashboard/index.html:478
 msgid "Pipeline Distribution"
 msgstr "Distribución del Pipeline"
 
-#: app/templates/dashboard/index.html:471
+#: app/templates/dashboard/index.html:491
 msgid "Recent Activity"
 msgstr "Actividade Reciente"
 
-#: app/templates/dashboard/index.html:477
+#: app/templates/dashboard/index.html:497
 msgid ""
 "Latest\n"
 "                                    Leads"
 msgstr ""
 
-#: app/templates/dashboard/index.html:492
+#: app/templates/dashboard/index.html:513
 #, fuzzy
 msgid "No recent leads."
 msgstr "No hay visitas recientes."
 
-#: app/templates/dashboard/index.html:500
+#: app/templates/dashboard/index.html:521
 #, fuzzy
 msgid "Latest Interactions"
 msgstr "Editar Interacción"
 
-#: app/templates/dashboard/index.html:513
+#: app/templates/dashboard/index.html:535
 msgid "No recent interactions."
 msgstr "No hay interacciones recientes."
 
-#: app/templates/dashboard/index.html:520
+#: app/templates/dashboard/index.html:542
 msgid ""
 "Latest\n"
 "                                    Visits"
 msgstr ""
 
-#: app/templates/dashboard/index.html:533
+#: app/templates/dashboard/index.html:556
 msgid ""
 "No\n"
 "                                            observations"
 msgstr ""
 
-#: app/templates/dashboard/index.html:537
+#: app/templates/dashboard/index.html:560
 msgid "No recent visits."
 msgstr "No hay visitas recientes."
 
-#: app/templates/dashboard/index.html:544
+#: app/templates/dashboard/index.html:567
 msgid ""
 "Latest\n"
 "                                    Health Checks"
 msgstr ""
 
-#: app/templates/dashboard/index.html:564
+#: app/templates/dashboard/index.html:588
 msgid "No recent health checks."
 msgstr "Sin health checks recientes"
 
-#: app/templates/dashboard/index.html:580
+#: app/templates/dashboard/index.html:604
 msgid "Overdue Items"
 msgstr "Ítems Atrasados"
 
-#: app/templates/dashboard/index.html:599
+#: app/templates/dashboard/index.html:623
 #: app/templates/finance/payables.html:196
 #: app/templates/finance/receivables.html:169
-#: app/templates/projects/view.html:378
+#: app/templates/projects/view.html:610
 msgid "Overdue"
 msgstr "Atrasado"
 
-#: app/templates/dashboard/index.html:607
+#: app/templates/dashboard/index.html:631
 msgid "No overdue items found."
 msgstr "No se encontraron ítems atrasados."
 
-#: app/templates/dashboard/index.html:613
+#: app/templates/dashboard/index.html:637
 msgid "Close"
 msgstr "Cerrar"
 
-#: app/templates/dashboard/index.html:631
+#: app/templates/dashboard/index.html:654 app/templates/tasks/index.html:317
+#: app/templates/tasks/index.html:410
+msgid "Title"
+msgstr "Título"
+
+#: app/templates/dashboard/index.html:664
+#: app/templates/finance/payables.html:86
+#: app/templates/finance/payables.html:151
+#: app/templates/finance/payables.html:264
+#: app/templates/finance/receivables.html:136
+#: app/templates/finance/receivables.html:251
+#: app/templates/finance/receivables.html:351
+#: app/templates/projects/view.html:595 app/templates/tasks/index.html:334
+#: app/templates/tasks/index.html:427
+msgid "Due Date"
+msgstr "Vencimiento"
+
+#: app/templates/dashboard/index.html:710 app/templates/tasks/index.html:383
+msgid "Completion must be approved by the creator."
+msgstr ""
+
+#: app/templates/dashboard/index.html:735
 msgid "No tasks for today."
 msgstr "No hay tareas para hoy."
 
-#: app/templates/dashboard/index.html:632
+#: app/templates/dashboard/index.html:736
 msgid "No upcoming tasks."
 msgstr "No hay tareas próximas."
 
-#: app/templates/dashboard/index.html:634
+#: app/templates/dashboard/index.html:738
 msgid "Please wait while we query Google."
 msgstr "Espere mientras consultamos a Google."
 
-#: app/templates/dashboard/index.html:635
+#: app/templates/dashboard/index.html:739
 msgid "Analysis Complete!"
 msgstr "¡Análisis Completado!"
 
-#: app/templates/dashboard/index.html:636
+#: app/templates/dashboard/index.html:740
 msgid "Business found"
 msgstr "Empresa encontrada"
 
-#: app/templates/dashboard/index.html:637
+#: app/templates/dashboard/index.html:741
 msgid "Points"
 msgstr "Puntos"
 
-#: app/templates/dashboard/index.html:638
+#: app/templates/dashboard/index.html:742
 msgid "Analysis Summary"
 msgstr "Resumen del Análisis"
 
-#: app/templates/dashboard/index.html:639
+#: app/templates/dashboard/index.html:743
 #: app/templates/health_checks/view.html:281
 msgid "Critical Points"
 msgstr "Pontos Críticos"
 
-#: app/templates/dashboard/index.html:640
+#: app/templates/dashboard/index.html:744
 msgid "Moderate Points"
 msgstr "Puntos Moderados"
 
-#: app/templates/dashboard/index.html:641
+#: app/templates/dashboard/index.html:745
 msgid "Positive Points"
 msgstr "Puntos Positivos"
 
-#: app/templates/dashboard/index.html:642
+#: app/templates/dashboard/index.html:746
 msgid "View Full Report"
 msgstr "Ver Reporte Completo"
 
-#: app/templates/dashboard/index.html:643
+#: app/templates/dashboard/index.html:747
 msgid "Create Lead Based on This"
 msgstr "Crear Lead basado en esto"
 
-#: app/templates/dashboard/index.html:644
+#: app/templates/dashboard/index.html:748
 msgid "Error"
 msgstr "Error"
 
-#: app/templates/dashboard/index.html:645
+#: app/templates/dashboard/index.html:749
 msgid "Try to be more specific (e.g., Company X, City Y)"
 msgstr ""
 
-#: app/templates/dashboard/index.html:646
+#: app/templates/dashboard/index.html:750
 msgid "Connection Error."
 msgstr "Error al crear lead"
 
-#: app/templates/dashboard/index.html:647
+#: app/templates/dashboard/index.html:751
 msgid "Try Again"
 msgstr ""
 
-#: app/templates/dashboard/index.html:648
-msgid "Creating..."
-msgstr "Creando..."
-
-#: app/templates/dashboard/index.html:649
+#: app/templates/dashboard/index.html:753
 msgid "Error creating lead"
 msgstr "Error al crear lead"
 
-#: app/templates/dashboard/index.html:770
-#: app/templates/dashboard/index.html:807
+#: app/templates/dashboard/index.html:780
+#, fuzzy
+msgid "Me"
+msgstr "Nombre"
+
+#: app/templates/dashboard/index.html:887
+#: app/templates/dashboard/index.html:929
 msgid "No. of Clients"
 msgstr "# de Clientes"
 
-#: app/templates/dashboard/index.html:854
+#: app/templates/dashboard/index.html:976
 msgid "Sales Closed"
 msgstr ""
+
+#: app/templates/dashboard/index.html:1293
+#, fuzzy
+msgid "Task created!"
+msgstr "Tarea completada"
+
+#: app/templates/dashboard/index.html:1303
+#, fuzzy
+msgid "Error creating task"
+msgstr "Error al crear lead"
 
 #: app/templates/finance/commissions.html:14
 #: app/templates/finance/payables.html:14
@@ -2746,15 +3207,16 @@ msgstr ""
 #: app/templates/finance/receivables.html:20
 #: app/templates/finance/receivables.html:158
 #: app/templates/finance/receivables.html:165
-#: app/templates/projects/view.html:74 app/templates/projects/view.html:376
+#: app/templates/projects/view.html:74 app/templates/projects/view.html:93
+#: app/templates/projects/view.html:608
 msgid "Paid"
 msgstr ""
 
 #: app/templates/finance/commissions.html:97
 #: app/templates/finance/receivables.html:171
 #: app/templates/interactions/timeline.html:24
-#: app/templates/projects/view.html:73 app/templates/projects/view.html:164
-#: app/templates/projects/view.html:246
+#: app/templates/projects/view.html:73 app/templates/projects/view.html:177
+#: app/templates/projects/view.html:271
 msgid "Pending"
 msgstr "Pendiente"
 
@@ -2782,29 +3244,6 @@ msgstr "Total Pagado"
 #: app/templates/finance/payables.html:67
 msgid "New Payable"
 msgstr "Nueva Cuenta por Pagar"
-
-#: app/templates/finance/payables.html:77
-#: app/templates/finance/payables.html:147
-#: app/templates/finance/payables.html:256
-#: app/templates/finance/receivables.html:135
-#: app/templates/finance/receivables.html:237
-#: app/templates/finance/receivables.html:337
-#: app/templates/projects/create.html:32 app/templates/projects/view.html:362
-#: app/templates/saas/packages/edit.html:29
-#: app/templates/services/edit_package.html:36
-#: app/templates/services/edit_service.html:36
-msgid "Description"
-msgstr "Descripción"
-
-#: app/templates/finance/payables.html:86
-#: app/templates/finance/payables.html:151
-#: app/templates/finance/payables.html:264
-#: app/templates/finance/receivables.html:136
-#: app/templates/finance/receivables.html:251
-#: app/templates/finance/receivables.html:351
-#: app/templates/projects/view.html:363
-msgid "Due Date"
-msgstr "Vencimiento"
 
 #: app/templates/finance/payables.html:90
 #: app/templates/finance/payables.html:160
@@ -2839,14 +3278,8 @@ msgstr "Asientos"
 msgid "Search by description..."
 msgstr "Descripción"
 
-#: app/templates/finance/payables.html:131
-#: app/templates/finance/payables.html:198
-#: app/templates/finance/receivables.html:17
-msgid "Open"
-msgstr "Abierto"
-
 #: app/templates/finance/payables.html:137
-#: app/templates/finance/receivables.html:23
+#: app/templates/finance/receivables.html:23 app/templates/tasks/index.html:165
 msgid "All"
 msgstr "Cancelar"
 
@@ -2889,11 +3322,6 @@ msgstr "Gestionar Tipos"
 #: app/templates/users/index.html:19
 msgid "Name"
 msgstr "Nombre"
-
-#: app/templates/finance/payables.html:303
-#, fuzzy
-msgid "Color"
-msgstr "Crear"
 
 #: app/templates/finance/payables.html:339
 #: app/templates/finance/receivables.html:178
@@ -3584,17 +4012,15 @@ msgid "Interaction"
 msgstr "Interacciones"
 
 #: app/templates/interactions/timeline.html:24
-#: app/templates/projects/view.html:250
+#: app/templates/projects/view.html:280 app/templates/tasks/index.html:178
+#: app/templates/tasks/index.html:237
 msgid "Done"
 msgstr ""
 
 #: app/templates/interactions/timeline.html:26
+#: app/templates/tasks/index.html:287
 msgid "by"
 msgstr ""
-
-#: app/templates/interactions/timeline.html:26
-msgid "System"
-msgstr "Sin email"
 
 #: app/templates/interactions/timeline.html:32
 msgid "No interactions recorded."
@@ -3618,7 +4044,7 @@ msgstr ""
 msgid "What is included in this contract?"
 msgstr ""
 
-#: app/templates/projects/create.html:39
+#: app/templates/projects/create.html:39 app/templates/projects/view.html:768
 #, fuzzy
 msgid "Start Date"
 msgstr "Fecha de Inicio del Embudo"
@@ -3635,15 +4061,16 @@ msgstr "Recurrente (Mensual)"
 msgid "Fixed Term (Total Value)"
 msgstr "Plazo Fijo (Valor Total)"
 
-#: app/templates/projects/create.html:56 app/templates/projects/view.html:93
+#: app/templates/projects/create.html:56 app/templates/projects/view.html:106
 msgid "Monthly Value"
 msgstr "Valor Mensual"
 
-#: app/templates/projects/create.html:65 app/templates/projects/view.html:95
+#: app/templates/projects/create.html:65 app/templates/projects/view.html:107
+#: app/templates/projects/view.html:772
 msgid "Billing Day"
 msgstr "Día de Facturación"
 
-#: app/templates/projects/create.html:74 app/templates/projects/view.html:90
+#: app/templates/projects/create.html:74 app/templates/projects/view.html:89
 msgid "Total Contract Value"
 msgstr "Valor Total del Contrato"
 
@@ -3683,27 +4110,23 @@ msgstr "Todos"
 msgid "Sem descrição."
 msgstr "Sin descripción."
 
-#: app/templates/projects/index.html:45
-msgid "/mês"
-msgstr "/mes"
+#: app/templates/projects/index.html:61
+msgid "View Project"
+msgstr "Ver Proyecto"
 
-#: app/templates/projects/index.html:56
-msgid "Gerenciar Projeto"
-msgstr "Gestionar Proyecto"
-
-#: app/templates/projects/index.html:67
+#: app/templates/projects/index.html:72
 msgid "Nenhum projeto encontrado."
 msgstr "Ningún proyecto encontrado."
 
-#: app/templates/projects/index.html:68
+#: app/templates/projects/index.html:73
 msgid "Projetos são criados a partir da visualização de um Cliente."
 msgstr "Los proyectos se crean desde la vista de Cliente."
 
-#: app/templates/projects/index.html:70
+#: app/templates/projects/index.html:75
 msgid "Ver Clientes"
 msgstr "Ver Clientes"
 
-#: app/templates/projects/view.html:12 app/templates/projects/view.html:189
+#: app/templates/projects/view.html:12 app/templates/projects/view.html:199
 #, fuzzy
 msgid "Renew Contract"
 msgstr "Contrato Firmado"
@@ -3773,221 +4196,288 @@ msgstr "Esperando Finanzas"
 msgid "Approved"
 msgstr "Aprobada"
 
-#: app/templates/projects/view.html:103
+#: app/templates/projects/view.html:100
+msgid "Attention!"
+msgstr "¡Atención!"
+
+#: app/templates/projects/view.html:100
+#, fuzzy
+msgid ""
+"No billing data registered for this project.\n"
+"                            Please register Setup and Recurring payments "
+"in the Finance tab immediately."
+msgstr ""
+"No hay datos de facturación registrados para este proyecto. Registre los "
+"pagos de Setup y Recurrentes en la pestaña Finanzas inmediatamente."
+
+#: app/templates/projects/view.html:116
 msgid "Signed Contract"
 msgstr "Contrato Firmado"
 
-#: app/templates/projects/view.html:109
+#: app/templates/projects/view.html:122
 msgid "Upload Contract"
 msgstr "Subir Contrato"
 
-#: app/templates/projects/view.html:115
+#: app/templates/projects/view.html:128
 #, fuzzy
 msgid "Contract"
 msgstr "Contacto"
 
-#: app/templates/projects/view.html:117
+#: app/templates/projects/view.html:130
 #, fuzzy
 msgid "Signed on"
 msgstr "Contrato Firmado"
 
-#: app/templates/projects/view.html:127
+#: app/templates/projects/view.html:140
 msgid "Workflow Control"
 msgstr "Control de Flujo"
 
-#: app/templates/projects/view.html:135
+#: app/templates/projects/view.html:148
 msgid "Release to Execution"
 msgstr "Liberar para Ejecución"
 
-#: app/templates/projects/view.html:140
+#: app/templates/projects/view.html:153
 msgid "Awaiting Contract and Payment to release execution."
 msgstr ""
 
-#: app/templates/projects/view.html:150
+#: app/templates/projects/view.html:163
 #, fuzzy
 msgid "Start Execution"
 msgstr "Ejecución"
 
-#: app/templates/projects/view.html:157
+#: app/templates/projects/view.html:170
 msgid "Administrative Actions"
 msgstr "Acciones Administrativas"
 
-#: app/templates/projects/view.html:166
+#: app/templates/projects/view.html:179
 #, fuzzy
 msgid "Invoice Sent"
 msgstr "Ver Clientes"
 
-#: app/templates/projects/view.html:168
+#: app/templates/projects/view.html:181
 msgid "Paid / Confirmed"
 msgstr "Pagado / Confirmado"
 
-#: app/templates/projects/view.html:170
+#: app/templates/projects/view.html:183
 #, fuzzy
 msgid "Financial Approved"
 msgstr "Estado Financiero"
 
-#: app/templates/projects/view.html:174
+#: app/templates/projects/view.html:187
 #, fuzzy
 msgid "Alt"
 msgstr "Cancelar"
 
-#: app/templates/projects/view.html:185
-#, fuzzy
-msgid "New Task"
-msgstr "Nueva Etapa"
-
-#: app/templates/projects/view.html:200
+#: app/templates/projects/view.html:210
 msgid "Tasks and Deliveries"
 msgstr "Tareas y Entregas"
 
-#: app/templates/projects/view.html:204
+#: app/templates/projects/view.html:214
+msgid "Memory"
+msgstr ""
+
+#: app/templates/projects/view.html:218
+#, fuzzy
+msgid "Timeline"
+msgstr "Negocio"
+
+#: app/templates/projects/view.html:222
 msgid "Sales Context"
 msgstr "Contexto de Ventas"
 
-#: app/templates/projects/view.html:217
+#: app/templates/projects/view.html:235
 msgid "Execution Queue"
 msgstr "Cola de Ejecución"
 
-#: app/templates/projects/view.html:219
+#: app/templates/projects/view.html:238
 msgid "registered"
 msgstr "registrados"
 
-#: app/templates/projects/view.html:227
-#, fuzzy
-msgid "Task"
-msgstr "Visitas"
+#: app/templates/projects/view.html:254
+msgid "Responsible"
+msgstr ""
 
-#: app/templates/projects/view.html:229 app/templates/projects/view.html:425
-#, fuzzy
-msgid "Priority"
-msgstr "Principal"
-
-#: app/templates/projects/view.html:230 app/templates/projects/view.html:434
-#, fuzzy
-msgid "Deadline"
-msgstr "Negocio"
-
-#: app/templates/projects/view.html:248
+#: app/templates/projects/view.html:273 app/templates/tasks/index.html:175
+#: app/templates/tasks/index.html:204 app/templates/tasks/index.html:235
 #, fuzzy
 msgid "In Progress"
 msgstr "Vincular Perfiles"
 
-#: app/templates/projects/view.html:270
+#: app/templates/projects/view.html:277 app/templates/tasks/index.html:208
+#, fuzzy
+msgid "Pending Approval"
+msgstr "Ver Propuesta"
+
+#: app/templates/projects/view.html:320 app/templates/projects/view.html:321
+#: app/templates/tasks/index.html:226 app/templates/tasks/index.html:259
+#, fuzzy
+msgid "Approve"
+msgstr "Aprobada"
+
+#: app/templates/projects/view.html:326 app/templates/projects/view.html:328
+#: app/templates/tasks/index.html:228 app/templates/tasks/index.html:263
+#, fuzzy
+msgid "Reject"
+msgstr "Rechazada"
+
+#: app/templates/projects/view.html:337
+#, fuzzy
+msgid "Mark as Done"
+msgstr "Marcar como completada"
+
+#: app/templates/projects/view.html:352
 msgid "There are no tasks for this project yet."
 msgstr ""
 
-#: app/templates/projects/view.html:290
+#: app/templates/projects/view.html:385
+#, fuzzy
+msgid "Project Memory"
+msgstr "Proyecto"
+
+#: app/templates/projects/view.html:396
+msgid "Add a note, thought or decision..."
+msgstr ""
+
+#: app/templates/projects/view.html:399
+#, fuzzy
+msgid "Save Note"
+msgstr "Agenda"
+
+#: app/templates/projects/view.html:425
+#, fuzzy
+msgid "Delete this note?"
+msgstr "¿Eliminar este tipo?"
+
+#: app/templates/projects/view.html:441
+msgid ""
+"No notes yet. Use this space to document decisions, ideas and log\n"
+"                                    meetings."
+msgstr ""
+
+#: app/templates/projects/view.html:453
+#, fuzzy
+msgid "Activity Timeline"
+msgstr "Pipeline de Clientes"
+
+#: app/templates/projects/view.html:502
+#, fuzzy
+msgid "No activity recorded yet."
+msgstr "No hay interacciones registradas."
+
+#: app/templates/projects/view.html:516
 msgid ""
 "Latest\n"
 "                                        Proposals"
 msgstr ""
 
-#: app/templates/projects/view.html:311
+#: app/templates/projects/view.html:537
 #, fuzzy
 msgid "No proposals sent."
 msgstr "Propuestas"
 
-#: app/templates/projects/view.html:322
+#: app/templates/projects/view.html:548
 msgid ""
 "Diagnostics\n"
 "                                        (Health Checks)"
 msgstr ""
 
-#: app/templates/projects/view.html:351
+#: app/templates/projects/view.html:577
 #, fuzzy
 msgid "Project Payments"
 msgstr "Detalles del Proyecto"
 
-#: app/templates/projects/view.html:354 app/templates/projects/view.html:452
+#: app/templates/projects/view.html:581 app/templates/projects/view.html:743
+#: app/templates/projects/view.html:780
+#, fuzzy
+msgid "Launch Recurring"
+msgstr "Proyectos"
+
+#: app/templates/projects/view.html:585 app/templates/projects/view.html:698
 #, fuzzy
 msgid "Launch Installments"
 msgstr "Total Clientes"
 
-#: app/templates/projects/view.html:364
+#: app/templates/projects/view.html:596
 #, fuzzy
 msgid "Amount"
 msgstr "Mes"
 
-#: app/templates/projects/view.html:380
+#: app/templates/projects/view.html:612
 #, fuzzy
 msgid "Awaiting"
 msgstr "Creando..."
 
-#: app/templates/projects/view.html:387
+#: app/templates/projects/view.html:619
 #, fuzzy
 msgid "No payments registered for this project."
 msgstr "No hay clientes registrados aún."
 
-#: app/templates/projects/view.html:408
+#: app/templates/projects/view.html:640
 #, fuzzy
 msgid "New Operational Task"
 msgstr "Cola de Tareas Operativas (Pendientes)"
 
-#: app/templates/projects/view.html:415
-msgid "Task Title"
-msgstr ""
-
-#: app/templates/projects/view.html:417
+#: app/templates/projects/view.html:649
 msgid "Ex: Optimize GMB Photos"
 msgstr ""
 
-#: app/templates/projects/view.html:420
+#: app/templates/projects/view.html:652
 #, fuzzy
 msgid "Description/Instructions"
 msgstr "Enviar Instrucciones"
 
-#: app/templates/projects/view.html:427
-msgid "Low"
+#: app/templates/projects/view.html:680 app/templates/tasks/index.html:483
+msgid "If active, task completion must be approved by the creator."
 msgstr ""
 
-#: app/templates/projects/view.html:428
-#, fuzzy
-msgid "Medium"
-msgstr "EDITAR"
-
-#: app/templates/projects/view.html:429
-msgid "High"
-msgstr ""
-
-#: app/templates/projects/view.html:430
-#, fuzzy
-msgid "Urgent"
-msgstr "Enviada"
-
-#: app/templates/projects/view.html:441
+#: app/templates/projects/view.html:687
 #, fuzzy
 msgid "Save Task"
 msgstr "Guardar Paquete"
 
-#: app/templates/projects/view.html:459
+#: app/templates/projects/view.html:705 app/templates/projects/view.html:754
 #, fuzzy
 msgid "Base Description"
 msgstr "Descripción"
 
-#: app/templates/projects/view.html:461
+#: app/templates/projects/view.html:707
 #, fuzzy
 msgid "Project Payment"
 msgstr "Detalles del Proyecto"
 
-#: app/templates/projects/view.html:464
+#: app/templates/projects/view.html:710
 #, fuzzy
 msgid "Total Amount"
 msgstr "Total Pendiente"
 
-#: app/templates/projects/view.html:474
+#: app/templates/projects/view.html:720
 #, fuzzy
 msgid "No. of Installments"
 msgstr "Total Clientes"
 
-#: app/templates/projects/view.html:479
+#: app/templates/projects/view.html:725
 #, fuzzy
 msgid "First Due Date"
 msgstr "Vencimiento"
 
-#: app/templates/projects/view.html:486
+#: app/templates/projects/view.html:732
 #, fuzzy
 msgid "Launch Payments"
 msgstr "Pendiente de Pago"
+
+#: app/templates/projects/view.html:751
+msgid "This will generate receivables for the remaining months of the contract."
+msgstr ""
+
+#: app/templates/projects/view.html:756
+#, fuzzy
+msgid "Monthly Fee"
+msgstr "Valor Mensual"
+
+#: app/templates/projects/view.html:759
+#, fuzzy
+msgid "Monthly Amount"
+msgstr "Valor Mensual"
 
 #: app/templates/proposals/create.html:24 app/templates/proposals/edit.html:24
 msgid "General Data"
@@ -4354,6 +4844,88 @@ msgstr "Packs de Servicios"
 msgid "Package"
 msgstr "Pack"
 
+#: app/templates/tasks/index.html:144
+msgid "High Priority"
+msgstr "Prioridad Alta"
+
+#: app/templates/tasks/index.html:153
+msgid "My Tasks"
+msgstr "Mis Tareas"
+
+#: app/templates/tasks/index.html:159
+msgid "Created by Me"
+msgstr "Creadas por Mí"
+
+#: app/templates/tasks/index.html:176
+msgid ""
+"Pending\n"
+"                Approval"
+msgstr ""
+
+#: app/templates/tasks/index.html:179
+msgid "Canceled"
+msgstr "Cancelada"
+
+#: app/templates/tasks/index.html:182
+msgid "All Priorities"
+msgstr "Todas las Prioridades"
+
+#: app/templates/tasks/index.html:194
+msgid "Mark as done"
+msgstr "Marcar como completada"
+
+#: app/templates/tasks/index.html:254
+#, fuzzy
+msgid "Awaiting your review"
+msgstr "Esperando Finanzas"
+
+#: app/templates/tasks/index.html:297
+msgid "No tasks found"
+msgstr "No se encontraron tareas"
+
+#: app/templates/tasks/index.html:298
+msgid "Create a new task to get started"
+msgstr "Crea una nueva tarea para comenzar"
+
+#: app/templates/tasks/index.html:365 app/templates/tasks/index.html:458
+msgid "Assign to"
+msgstr "Asignar a"
+
+#: app/templates/tasks/index.html:367 app/templates/tasks/index.html:460
+msgid "Unassigned"
+msgstr "Sin asignar"
+
+#: app/templates/tasks/index.html:402
+#, fuzzy
+msgid "Edit Task"
+msgstr "Editar Etapa"
+
+#: app/templates/tasks/index.html:468
+#, fuzzy
+msgid "Execution Comment / Memo"
+msgstr "Cola de Ejecución"
+
+#: app/templates/tasks/index.html:470
+msgid "Assignee input here..."
+msgstr ""
+
+#: app/templates/tasks/index.html:471
+msgid "Field for the person assigned to report results or notes."
+msgstr ""
+
+#: app/templates/tasks/index.html:603
+msgid "Approve this task completion?"
+msgstr ""
+
+#: app/templates/tasks/index.html:617
+msgid "Reason for rejection:"
+msgstr ""
+
+#: app/templates/tasks/index.html:620
+#, fuzzy
+msgid "Comment is required"
+msgstr "El título del negocio es obligatorio"
+
 #: app/templates/users/create.html:2 app/templates/users/create.html:10
 #: app/templates/users/index.html:9
 msgid "New User"
@@ -4483,23 +5055,23 @@ msgstr ""
 msgid "Are you sure you want to delete this visit record?"
 msgstr ""
 
-#: app/utils/decorators.py:49
+#: app/utils/decorators.py:54
 msgid "You must be logged in to access this page."
 msgstr ""
 
-#: app/utils/decorators.py:56
+#: app/utils/decorators.py:61
 msgid "Session expired. Please log in again."
 msgstr ""
 
-#: app/utils/decorators.py:61
+#: app/utils/decorators.py:66
 msgid "Your account is inactive. Contact the administrator."
 msgstr ""
 
-#: app/utils/decorators.py:66
+#: app/utils/decorators.py:71
 msgid "Your company is inactive. Contact support."
 msgstr ""
 
-#: app/utils/decorators.py:93 app/utils/decorators.py:120
+#: app/utils/decorators.py:98 app/utils/decorators.py:125
 msgid "You do not have permission to access this feature."
 msgstr ""
 
@@ -6998,7 +7570,7 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Gerenciar Projeto"
-#~ msgstr "Editar Propuesta"
+#~ msgstr "Gestionar Proyecto"
 
 #~ msgid "Nenhum projeto encontrado."
 #~ msgstr "Empresa encontrada"
@@ -7383,8 +7955,8 @@ msgstr ""
 #~ msgid "Phone / WhatsApp"
 #~ msgstr "Teléfono / WhatsApp"
 
-#~ msgid "Latest Leads"
-#~ msgstr "Últimos Leads"
+msgid "Latest Leads"
+msgstr "Últimos Leads"
 
 #~ msgid "CRM"
 #~ msgstr "CRM"
@@ -7392,16 +7964,14 @@ msgstr ""
 #~ msgid "Sales"
 #~ msgstr "Ventas"
 
-#~ msgid "Total Received"
-#~ msgstr "Total Recibido"
+msgid "Total Received"
+msgstr "Total Recibido"
 
-#~ msgid "Overdue Invoices"
-#~ msgstr "Facturas Vencidas"
+msgid "Overdue Invoices"
+msgstr "Facturas Vencidas"
 
-#~ msgid ""
-#~ "Pending\n"
-#~ "                            Contracts"
-#~ msgstr ""
+msgid "Pending Contracts"
+msgstr "Contratos Pendientes"
 
 #~ msgid ""
 #~ "Total\n"
@@ -7413,11 +7983,8 @@ msgstr ""
 #~ "                                    Interactions"
 #~ msgstr ""
 
-#~ msgid ""
-#~ "Latest\n"
-#~ "                                    Health\n"
-#~ "                                    Checks"
-#~ msgstr ""
+msgid "Latest Health Checks"
+msgstr "Últimos Chequeos de Salud"
 
 #~ msgid "Category Name"
 #~ msgstr "Categoría"
@@ -7427,4 +7994,45 @@ msgstr ""
 
 #~ msgid "0 registered"
 #~ msgstr "0 registrados"
+
+#~ msgid "/mês"
+#~ msgstr "/mes"
+
+#~ msgid "Assigned To"
+#~ msgstr "Asignar a"
+
+#~ msgid "Error loading team"
+#~ msgstr "Error al mover negocio"
+
+msgid "Completion must be approved by the creator."
+msgstr "La finalización debe ser aprobada por el creador."
+
+msgid "If active, task completion must be approved by the creator."
+msgstr "Si está activo, la finalización de la tarea debe ser aprobada por el creador."
+
+msgid "Task returned for revision"
+msgstr "Tarea devuelta para revisión"
+
+msgid "Task approved"
+msgstr "Tarea aprobada"
+
+msgid "Task is not awaiting approval"
+msgstr "La tarea no está esperando aprobación"
+
+msgid "Task not awaiting approval."
+msgstr "La tarea no está esperando aprobación."
+
+msgid "Add to Pipeline Value"
+msgstr "Sumar al Valor del Pipeline"
+
+msgid "Error updating configuration"
+msgstr "Error al actualizar configuración"
+
+
+
+msgid "Latest Visits"
+msgstr "Últimas Visitas"
+
+msgid "Paid"
+msgstr "Pagado"
 

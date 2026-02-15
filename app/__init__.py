@@ -67,7 +67,7 @@ def create_app(config_object=None):
         init_db()
     
     # Registrar blueprints (rotas)
-    from app.routes import auth, dashboard, users, clients, interactions, visits, health_checks, proposals, google_oauth, saas, calendar, prospecting, company, projects, tasks, finance, services
+    from app.routes import auth, dashboard, users, clients, interactions, visits, health_checks, proposals, google_oauth, saas, calendar, prospecting, company, projects, tasks, finance, services, notifications
     
     app.register_blueprint(auth.bp)
     app.register_blueprint(dashboard.bp)
@@ -88,6 +88,7 @@ def create_app(config_object=None):
     app.register_blueprint(tasks.api_bp)
     app.register_blueprint(finance.bp)
     app.register_blueprint(services.bp)
+    app.register_blueprint(notifications.bp)
     
     # Language switching route
     @app.route('/set-language/<lang>')
@@ -153,6 +154,7 @@ def create_app(config_object=None):
         
         user = None
         overdue_count = 0
+        unread_notifications = 0
         
         try:
             user = get_current_user()
@@ -169,12 +171,20 @@ def create_app(config_object=None):
                 # Add overdue Tasks for this user/role
                 task_overdue = db_session.query(func.count(Task.id)).filter(
                     Task.company_id == session.get('company_id'),
-                    Task.status == 'pending',
+                    Task.status.in_(['open', 'in_progress']),
                     Task.due_date < datetime.now(),
-                    or_(Task.user_id == user.id, (Task.user_id.is_(None)) & (Task.role_target == (user.role.name if user.role else 'sales')))
+                    or_(Task.assigned_to_id == user.id, (Task.assigned_to_id.is_(None)) & (Task.role_target == (user.role.name if user.role else 'sales')))
                 ).scalar() or 0
                 
                 overdue_count += task_overdue
+                
+                # Count unread notifications
+                from app.models import Notification
+                unread_notifications = db_session.query(func.count(Notification.id)).filter(
+                    Notification.user_id == user.id,
+                    Notification.company_id == session.get('company_id'),
+                    Notification.is_read == False
+                ).scalar() or 0
         except Exception as e:
             # Log error - in production it goes to stderr/logs
             import logging
@@ -191,6 +201,7 @@ def create_app(config_object=None):
             'available_languages': lang_info,
             'current_user': user,
             'overdue_count': overdue_count,
+            'unread_notifications': unread_notifications if user else 0,
             'datetime': datetime
         }
     

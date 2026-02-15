@@ -4,237 +4,392 @@
 
 {% block content %}
 <div class="container-fluid">
-    <div
-        class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">{{ _('Edit Proposal') }} #{{ proposal.id }}</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}" class="btn btn-sm btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> {{ _('Back') }}
-            </a>
-        </div>
+    <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="bi bi-pencil-square"></i> {{ _('Edit Proposal') }} <span class="text-muted">#{{
+                proposal.id }}</span></h1>
+        <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> {{ _('Back') }}
+        </a>
     </div>
 
-    <form method="POST" action="{{ url_for('proposals.edit', proposal_id=proposal.id) }}">
+    <form method="POST" id="proposalForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="row">
-            <!-- Datos de la Propuesta -->
-            <div class="col-md-4 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light">
-                        <h5 class="card-title mb-0">{{ _('General Data') }}</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label">{{ _('Client') }}</label>
-                            <input type="text" class="form-control" value="{{ proposal.client.name }}" disabled>
-                        </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">{{ _('Status') }}</label>
-                            <select class="form-select" id="status" name="status">
-                                <option value="draft" {% if proposal.status=='draft' %}selected{% endif %}>{{
-                                    _('Draft') }}
-                                </option>
-                                <option value="sent" {% if proposal.status=='sent' %}selected{% endif %}>{{ _('Sent')
-                                    }}
-                                </option>
-                                <option value="approved" {% if proposal.status=='approved' %}selected{% endif %}>
-                                    {{ _('Approved') }}</option>
-                                <option value="rejected" {% if proposal.status=='rejected' %}selected{% endif %}>
-                                    {{ _('Rejected') }}</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="package_id" class="form-label text-primary fw-bold">{{ _('Load Suggested
-                                Package') }}</label>
-                            <select class="form-select border-primary" id="package_id" onchange="applyPackage(this)">
-                                <option value="">{{ _('Select a package...') }}</option>
-                                {% for package in packages %}
-                                <option value="{{ package.id }}" data-price="{{ package.price }}"
-                                    data-desc="{{ package.description }}" {% if proposal.client and
-                                    proposal.client.interested_package_id==package.id %}selected{% endif %}>
-                                    {{ package.name }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <div class="form-text small">
-                                {{ _('This will replace or add the price and description of the first item.') }}
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="payment_terms" class="form-label">{{ _('Payment Terms') }}</label>
-                            <textarea class="form-control" id="payment_terms" name="payment_terms"
-                                rows="3">{{ proposal.payment_terms }}</textarea>
-                        </div>
-                    </div>
-                </div>
+        <!-- Metadata -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> {{ _('Proposal Details') }}</h5>
             </div>
-
-            <!-- Items de la Propuesta -->
-            <div class="col-md-8 mb-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">{{ _('Services / Items') }}</h5>
-                        <button type="button" class="btn btn-sm btn-outline-primary" id="add-item-btn">
-                            <i class="bi bi-plus-lg"></i> {{ _('Add Service') }}
-                        </button>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">{{ _('Title') }}</label>
+                        <input type="text" name="title" class="form-control" value="{{ proposal.title or '' }}">
                     </div>
-                    <div class="card-body">
-                        <div id="items-container">
-                            {% for item in proposal.items %}
-                            <div class="row mb-3 item-row border-bottom pb-3">
-                                <div class="col-md-5">
-                                    <label class="form-label small">{{ _('Service') }}</label>
-                                    <select class="form-select service-select" name="service_ids[]" required
-                                        onchange="updatePrice(this)">
-                                        <option value="">{{ _('Select...') }}</option>
-                                        {% for service in services %}
-                                        <option value="{{ service.id }}" data-price="{{ service.base_price }}"
-                                            data-desc="{{ service.description }}" {% if item.service_id==service.id
-                                            %}selected{% endif %}>{{ service.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">{{ _('Price') }} (GS)</label>
-                                    <input type="number" class="form-control price-input" name="service_prices[]"
-                                        value="{{ item.price }}" step="0.01" onchange="calculateTotal()" required>
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label small">{{ _('Custom Description') }}</label>
-                                    <input type="text" class="form-control desc-input" name="service_descriptions[]"
-                                        value="{{ item.description or '' }}" placeholder="{{ _('Optional') }}">
-                                </div>
-                                <div class="col-md-1 d-flex align-items-end">
-                                    <button type="button" class="btn btn-outline-danger btn-sm"
-                                        onclick="removeItem(this)">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
+                    <div class="col-md-3">
+                        <label class="form-label">{{ _('Template') }}</label>
+                        <select name="template_id" class="form-select">
+                            <option value="">{{ _('No template') }}</option>
+                            {% for t in templates %}
+                            <option value="{{ t.id }}" {% if proposal.template_id==t.id %}selected{% endif %}>{{ t.name
+                                }}</option>
                             {% endfor %}
-                        </div>
-
-                        <div class="row mt-4 border-top pt-3">
-                            <div class="col-md-6 offset-md-6 text-end">
-                                <h4>{{ _('Total') }}: <span id="total-display">GS {{ proposal.total_amount }}</span>
-                                </h4>
-                            </div>
-                        </div>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">{{ _('Currency') }}</label>
+                        <select name="currency" class="form-select">
+                            <option value="Gs" {% if proposal.currency=='Gs' %}selected{% endif %}>Gs</option>
+                            <option value="USD" {% if proposal.currency=='USD' %}selected{% endif %}>USD</option>
+                            <option value="BRL" {% if proposal.currency=='BRL' %}selected{% endif %}>BRL</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">{{ _('Language') }}</label>
+                        <select name="language" class="form-select">
+                            <option value="es" {% if proposal.language=='es' %}selected{% endif %}>ES</option>
+                            <option value="pt" {% if proposal.language=='pt' %}selected{% endif %}>PT</option>
+                            <option value="en" {% if proposal.language=='en' %}selected{% endif %}>EN</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">{{ _('Status') }}</label>
+                        <select name="status" class="form-select">
+                            <option value="draft" {% if proposal.status=='draft' %}selected{% endif %}>{{ _('Draft') }}
+                            </option>
+                            <option value="sent" {% if proposal.status=='sent' %}selected{% endif %}>{{ _('Sent') }}
+                            </option>
+                        </select>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary btn-lg">
-                <i class="bi bi-save"></i> {{ _('Update Proposal') }}
-            </button>
+        <!-- Quote Options (reuses same JS as create) -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-list-columns-reverse"></i> {{ _('Quote Options') }}</h5>
+                <button type="button" class="btn btn-sm btn-outline-primary" id="addOptionBtn">
+                    <i class="bi bi-plus-lg"></i> {{ _('Add Option') }}
+                </button>
+            </div>
+            <div class="card-body" id="optionsContainer">
+                <!-- Populated by JS from existing data -->
+            </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">{{ _('Payment Terms') }}</label>
+                        <textarea name="payment_terms" class="form-control"
+                            rows="3">{{ proposal.payment_terms or '' }}</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ _('Notes') }}</label>
+                        <textarea name="notes" class="form-control" rows="3">{{ proposal.notes_text or '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total -->
+        <div class="card shadow-sm mb-3 border-primary">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-calculator"></i> {{ _('Grand Total (Default Option)') }}</h5>
+                <h3 class="mb-0 text-primary" id="grandTotal">{{ proposal.currency }} {{
+                    '{:,.0f}'.format(proposal.total_amount) }}</h3>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-4">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> {{ _('Save Changes')
+                }}</button>
+            <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}" class="btn btn-outline-secondary">{{
+                _('Cancel') }}</a>
         </div>
     </form>
 </div>
 
-<!-- Template para nuevos items (oculto) -->
-<template id="item-template">
-    <div class="row mb-3 item-row border-bottom pb-3">
-        <div class="col-md-5">
-            <label class="form-label small">{{ _('Service') }}</label>
-            <select class="form-select service-select" name="service_ids[]" required onchange="updatePrice(this)">
-                <option value="">{{ _('Select...') }}</option>
-                {% for service in services %}
-                <option value="{{ service.id }}" data-price="{{ service.base_price }}"
-                    data-desc="{{ service.description }}">{{ service.name }}</option>
-                {% endfor %}
-            </select>
+<!-- Same templates as create.html -->
+<template id="optionTemplate">
+    <div class="option-block border rounded p-3 mb-3" data-option-idx="__IDX__">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center gap-2">
+                <h6 class="mb-0 option-title">{{ _('Option') }} <span class="option-letter">A</span></h6>
+                <div class="form-check ms-3">
+                    <input type="checkbox" class="form-check-input is-default-check" name="options[__IDX__][is_default]"
+                        value="1">
+                    <label class="form-check-label small">{{ _('Default') }}</label>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-primary fs-6 option-total">0</span>
+                <button type="button" class="btn btn-sm btn-outline-danger remove-option-btn"><i
+                        class="bi bi-trash"></i></button>
+            </div>
         </div>
-        <div class="col-md-3">
-            <label class="form-label small">{{ _('Price') }} (GS)</label>
-            <input type="number" class="form-control price-input" name="service_prices[]" step="0.01"
-                onchange="calculateTotal()" required>
+        <div class="row g-2 mb-3">
+            <div class="col-md-4">
+                <input type="text" name="options[__IDX__][name]" class="form-control form-control-sm option-name-input"
+                    value="Opción __LETTER__">
+            </div>
+            <div class="col-md-4">
+                <select name="options[__IDX__][preset_id]" class="form-select form-select-sm preset-select">
+                    <option value="">{{ _('No payment plan') }}</option>
+                    {% for p in presets %}
+                    <option value="{{ p.id }}">{{ p.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-        <div class="col-md-3">
-            <label class="form-label small">{{ _('Custom Description') }}</label>
-            <input type="text" class="form-control desc-input" name="service_descriptions[]"
-                placeholder="{{ _('Optional') }}">
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered mb-0 items-table">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:150px">{{ _('Type') }}</th>
+                        <th>{{ _('Service / Package') }}</th>
+                        <th style="width:60px">{{ _('Qty') }}</th>
+                        <th style="width:120px">{{ _('Unit Price') }}</th>
+                        <th style="width:80px">{{ _('Disc.') }} %</th>
+                        <th style="width:100px">{{ _('Billing') }}</th>
+                        <th style="width:90px">{{ _('Tag') }}</th>
+                        <th style="width:100px">{{ _('Total') }}</th>
+                        <th style="width:40px"></th>
+                    </tr>
+                </thead>
+                <tbody class="items-body"></tbody>
+            </table>
         </div>
-        <div class="col-md-1 d-flex align-items-end">
-            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeItem(this)">
-                <i class="bi bi-trash"></i>
-            </button>
-        </div>
+        <button type="button" class="btn btn-sm btn-outline-success mt-2 add-item-btn"><i class="bi bi-plus"></i> {{
+            _('Add Item') }}</button>
     </div>
 </template>
-{% endblock %}
 
-{% block scripts %}
+<template id="itemTemplate">
+    <tr class="item-row" data-item-idx="__ITEM_IDX__">
+        <td>
+            <select class="form-select form-select-sm item-type-select">
+                <option value="service">{{ _('Service') }}</option>
+                <option value="package">{{ _('Package') }}</option>
+                <option value="custom">{{ _('Custom') }}</option>
+            </select>
+        </td>
+        <td>
+            <select class="form-select form-select-sm service-select" style="display:block">
+                <option value="">{{ _('Select...') }}</option>
+                {% for s in services %}
+                <option value="{{ s.id }}" data-price="{{ s.base_price }}">{{ s.name }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-select form-select-sm package-select" style="display:none">
+                <option value="">{{ _('Select...') }}</option>
+                {% for pkg in packages %}
+                <option value="{{ pkg.id }}" data-price="{{ pkg.price }}">{{ pkg.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" class="form-control form-control-sm custom-desc" style="display:none">
+        </td>
+        <td><input type="number" class="form-control form-control-sm item-qty" value="1" min="1"></td>
+        <td><input type="number" class="form-control form-control-sm item-price" value="0" step="0.01" min="0"></td>
+        <td><input type="number" class="form-control form-control-sm item-discount" value="0" step="0.01" min="0"
+                max="100"></td>
+        <td>
+            <select class="form-select form-select-sm item-billing">
+                <option value="one_time">{{ _('One-time') }}</option>
+                <option value="recurring">{{ _('Recurring') }}</option>
+            </select>
+        </td>
+        <td>
+            <select class="form-select form-select-sm item-tag">
+                <option value="principal">{{ _('Principal') }}</option>
+                <option value="optional">{{ _('Optional') }}</option>
+                <option value="gift">{{ _('Gift') }}</option>
+            </select>
+        </td>
+        <td class="text-end fw-bold item-total-display">0</td>
+        <td><button type="button" class="btn btn-sm btn-outline-danger remove-item-btn"><i class="bi bi-x"></i></button>
+        </td>
+    </tr>
+</template>
+
 <script>
-    function addItem() {
-        const template = document.getElementById('item-template');
-        const clone = template.content.cloneNode(true);
-        document.getElementById('items-container').appendChild(clone);
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('optionsContainer');
+        const optionTpl = document.getElementById('optionTemplate');
+        const itemTpl = document.getElementById('itemTemplate');
+        let optionCount = 0;
 
-    function removeItem(btn) {
-        btn.closest('.item-row').remove();
-        calculateTotal();
-    }
+        // Load existing options
+        const existingOptions = {{ options_json| safe
+    }};
 
-    function updatePrice(select) {
-        const option = select.options[select.selectedIndex];
-        const row = select.closest('.item-row');
-        const priceInput = row.querySelector('.price-input');
-        const descInput = row.querySelector('.desc-input');
-
-        if (option.value) {
-            priceInput.value = option.dataset.price;
-            if (!descInput.value) {
-                descInput.value = option.dataset.desc || '';
-            }
-        } else {
-            priceInput.value = '';
-        }
-        calculateTotal();
-    }
-
-    function applyPackage(select) {
-        const option = select.options[select.selectedIndex];
-        if (!option.value) return;
-
-        // Asegurar que hay al menos um row
-        const container = document.getElementById('items-container');
-        if (container.children.length === 0) {
-            addItem();
-        }
-
-        const firstRow = container.querySelector('.item-row');
-        const priceInput = firstRow.querySelector('.price-input');
-        const descInput = firstRow.querySelector('.desc-input');
-        const serviceSelect = firstRow.querySelector('.service-select');
-
-        // Buscar servicio con el mismo nome se existe
-        for (let i = 0; i < serviceSelect.options.length; i++) {
-            if (serviceSelect.options[i].text.trim() === option.text.trim()) {
-                serviceSelect.selectedIndex = i;
-                break;
-            }
-        }
-
-        priceInput.value = option.dataset.price;
-        descInput.value = option.dataset.desc;
-
-        calculateTotal();
-    }
-
-    function calculateTotal() {
-        let total = 0;
-        document.querySelectorAll('.price-input').forEach(input => {
-            total += parseFloat(input.value) || 0;
+    if (existingOptions.length > 0) {
+        existingOptions.forEach((optData, idx) => {
+            addOption(optData);
         });
-        document.getElementById('total-display').innerText = 'GS ' + total.toLocaleString('es-PY');
+    } else {
+        addOption();
     }
 
-    document.getElementById('add-item-btn').addEventListener('click', addItem);
+    document.getElementById('addOptionBtn').addEventListener('click', () => addOption());
 
-    // Calcular total inicial
-    calculateTotal();
+    function addOption(data) {
+        const idx = optionCount++;
+        const letter = String.fromCharCode(65 + idx);
+        let html = optionTpl.innerHTML.replace(/__IDX__/g, idx).replace(/__LETTER__/g, letter);
+
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        const block = div.firstElementChild;
+        container.appendChild(block);
+
+        block.querySelector('.option-letter').textContent = letter;
+
+        if (data) {
+            block.querySelector('.option-name-input').value = data.name || `Opción ${letter}`;
+            block.querySelector('.is-default-check').checked = !!data.is_default;
+            if (data.preset_id) block.querySelector('.preset-select').value = data.preset_id;
+        } else if (idx === 0) {
+            block.querySelector('.is-default-check').checked = true;
+        }
+
+        block.querySelector('.add-item-btn').addEventListener('click', () => addItem(block, idx));
+        block.querySelector('.remove-option-btn').addEventListener('click', function () {
+            if (container.querySelectorAll('.option-block').length > 1) {
+                block.remove(); recalcGrandTotal();
+            }
+        });
+
+        // Load existing items or add empty
+        if (data && data.items && data.items.length > 0) {
+            data.items.forEach(itemData => addItem(block, idx, itemData));
+        } else {
+            addItem(block, idx);
+        }
+    }
+
+    function addItem(optionBlock, optIdx, data) {
+        const tbody = optionBlock.querySelector('.items-body');
+        const itemIdx = tbody.querySelectorAll('.item-row').length;
+        let html = itemTpl.innerHTML.replace(/__ITEM_IDX__/g, itemIdx);
+        const tr = document.createElement('tbody');
+        tr.innerHTML = html;
+        const row = tr.querySelector('.item-row');
+        tbody.appendChild(row);
+
+        // Load existing data
+        if (data) {
+            if (data.service_package_id) {
+                row.querySelector('.item-type-select').value = 'package';
+                row.querySelector('.service-select').style.display = 'none';
+                row.querySelector('.package-select').style.display = 'block';
+                row.querySelector('.package-select').value = data.service_package_id;
+            } else if (data.service_id) {
+                row.querySelector('.item-type-select').value = 'service';
+                row.querySelector('.service-select').value = data.service_id;
+            } else {
+                row.querySelector('.item-type-select').value = 'custom';
+                row.querySelector('.service-select').style.display = 'none';
+                row.querySelector('.custom-desc').style.display = 'block';
+                row.querySelector('.custom-desc').value = data.description || '';
+            }
+            row.querySelector('.item-qty').value = data.quantity || 1;
+            row.querySelector('.item-price').value = data.unit_price || 0;
+            row.querySelector('.item-discount').value = data.discount_pct || 0;
+            row.querySelector('.item-billing').value = data.billing_type || 'one_time';
+            row.querySelector('.item-tag').value = data.tag || 'principal';
+            recalcItem(row, optionBlock);
+        }
+
+        // Type toggle
+        row.querySelector('.item-type-select').addEventListener('change', function () {
+            row.querySelector('.service-select').style.display = this.value === 'service' ? 'block' : 'none';
+            row.querySelector('.package-select').style.display = this.value === 'package' ? 'block' : 'none';
+            row.querySelector('.custom-desc').style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+
+        // Auto-fill prices
+        row.querySelector('.service-select').addEventListener('change', function () {
+            const opt = this.options[this.selectedIndex];
+            if (opt.dataset.price) { row.querySelector('.item-price').value = opt.dataset.price; recalcItem(row, optionBlock); }
+        });
+        row.querySelector('.package-select').addEventListener('change', function () {
+            const opt = this.options[this.selectedIndex];
+            if (opt.dataset.price) { row.querySelector('.item-price').value = opt.dataset.price; row.querySelector('.item-billing').value = 'recurring'; recalcItem(row, optionBlock); }
+        });
+
+        ['item-qty', 'item-price', 'item-discount'].forEach(cls => {
+            row.querySelector('.' + cls).addEventListener('input', () => recalcItem(row, optionBlock));
+        });
+
+        row.querySelector('.remove-item-btn').addEventListener('click', () => { row.remove(); recalcOption(optionBlock); });
+    }
+
+    function recalcItem(row, optionBlock) {
+        const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const disc = parseFloat(row.querySelector('.item-discount').value) || 0;
+        const total = qty * price * (1 - disc / 100);
+        row.querySelector('.item-total-display').textContent = Math.round(total).toLocaleString('es-PY');
+        recalcOption(optionBlock);
+    }
+
+    function recalcOption(optionBlock) {
+        let total = 0;
+        optionBlock.querySelectorAll('.item-row').forEach(row => {
+            const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+            const price = parseFloat(row.querySelector('.item-price').value) || 0;
+            const disc = parseFloat(row.querySelector('.item-discount').value) || 0;
+            total += qty * price * (1 - disc / 100);
+        });
+        optionBlock.querySelector('.option-total').textContent = 'Gs ' + Math.round(total).toLocaleString('es-PY');
+        recalcGrandTotal();
+    }
+
+    function recalcGrandTotal() {
+        const defaultCheck = container.querySelector('.is-default-check:checked');
+        if (defaultCheck) {
+            const optBlock = defaultCheck.closest('.option-block');
+            document.getElementById('grandTotal').textContent = optBlock.querySelector('.option-total').textContent;
+        }
+    }
+
+    // Before submit: generate hidden inputs
+    document.getElementById('proposalForm').addEventListener('submit', function (e) {
+        container.querySelectorAll('.option-block').forEach((optBlock) => {
+            optBlock.querySelectorAll('.item-row').forEach((row, itemIdx) => {
+                const prefix = `options[${optBlock.dataset.optionIdx}][items][${itemIdx}]`;
+                const type = row.querySelector('.item-type-select').value;
+                let serviceId = '', packageId = '', description = '';
+
+                if (type === 'service') {
+                    serviceId = row.querySelector('.service-select').value;
+                    description = row.querySelector('.service-select').options[row.querySelector('.service-select').selectedIndex].text;
+                } else if (type === 'package') {
+                    packageId = row.querySelector('.package-select').value;
+                    description = row.querySelector('.package-select').options[row.querySelector('.package-select').selectedIndex].text;
+                } else {
+                    description = row.querySelector('.custom-desc').value;
+                }
+
+                [{ name: `${prefix}[service_id]`, value: serviceId },
+                { name: `${prefix}[package_id]`, value: packageId },
+                { name: `${prefix}[description]`, value: description },
+                { name: `${prefix}[quantity]`, value: row.querySelector('.item-qty').value },
+                { name: `${prefix}[unit_price]`, value: row.querySelector('.item-price').value },
+                { name: `${prefix}[discount_pct]`, value: row.querySelector('.item-discount').value },
+                { name: `${prefix}[billing_type]`, value: row.querySelector('.item-billing').value },
+                { name: `${prefix}[tag]`, value: row.querySelector('.item-tag').value }
+                ].forEach(h => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden'; input.name = h.name; input.value = h.value;
+                    row.appendChild(input);
+                });
+            });
+        });
+    });
+});
 </script>
 {% endblock %}

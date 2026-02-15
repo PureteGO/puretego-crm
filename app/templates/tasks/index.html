@@ -1,0 +1,636 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Tasks') }}{% endblock %}
+
+{% block head %}
+<style>
+    .task-tabs .nav-link {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 0.5rem 1rem;
+    }
+
+    .task-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        transition: background 0.15s;
+    }
+
+    .task-card:hover {
+        background: var(--bg-hover, var(--bg-base));
+    }
+
+    .task-card.overdue {
+        border-left: 3px solid var(--danger, #dc3545);
+    }
+
+    .task-card.high-priority {
+        border-left: 3px solid var(--danger, #dc3545);
+    }
+
+    .task-card.medium-priority {
+        border-left: 3px solid var(--warning, #ffc107);
+    }
+
+    .task-card.low-priority {
+        border-left: 3px solid var(--info, #0dcaf0);
+    }
+
+    .task-check {
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+        margin-top: 2px;
+        cursor: pointer;
+        accent-color: var(--success, #28a745);
+    }
+
+    .task-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+    }
+
+    .task-meta {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .priority-badge {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 3px;
+    }
+
+    .priority-high {
+        background: rgba(220, 53, 69, 0.15);
+        color: #dc3545;
+    }
+
+    .priority-medium {
+        background: rgba(255, 193, 7, 0.15);
+        color: #d4a800;
+    }
+
+    .priority-low {
+        background: rgba(13, 202, 240, 0.15);
+        color: #0dcaf0;
+    }
+
+    .task-stats {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .task-stats .stat {
+        text-align: center;
+    }
+
+    .task-stats .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .task-stats .stat-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: var(--text-secondary);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        opacity: 0.3;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h1 class="h2 mb-0"><i class="bi bi-check2-square me-2"></i>{{ _('Tasks') }}</h1>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+            <i class="bi bi-plus-lg me-1"></i>{{ _('New Task') }}
+        </button>
+    </div>
+
+    <!-- Stats -->
+    {% set overdue_tasks = tasks|selectattr('due_date')|rejectattr('due_date', 'none') %}
+    <div class="task-stats">
+        <div class="stat">
+            <div class="stat-value text-primary">{{ tasks|length }}</div>
+            <div class="stat-label">{{ _('Total') }}</div>
+        </div>
+        <div class="stat">
+            <div class="stat-value text-danger">{{ tasks|selectattr('priority', 'equalto', 'high')|list|length }}</div>
+            <div class="stat-label">{{ _('High Priority') }}</div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-pills task-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {{ 'active' if current_tab == 'my' }}"
+                href="?tab=my&status={{ status_filter }}&priority={{ priority_filter }}">
+                {{ _('My Tasks') }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ 'active' if current_tab == 'created' }}"
+                href="?tab=created&status={{ status_filter }}&priority={{ priority_filter }}">
+                {{ _('Created by Me') }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ 'active' if current_tab == 'all' }}"
+                href="?tab=all&status={{ status_filter }}&priority={{ priority_filter }}">
+                {{ _('All') }}
+            </a>
+        </li>
+    </ul>
+
+    <!-- Filters -->
+    <div class="d-flex gap-2 mb-3 flex-wrap">
+        <select class="form-select form-select-sm" style="width: auto;" onchange="applyFilter('status', this.value)">
+            <option value="" {{ 'selected' if not status_filter }}>{{ _('Active') }}</option>
+            <option value="open" {{ 'selected' if status_filter=='open' }}>{{ _('Active') }}</option>
+            <option value="in_progress" {{ 'selected' if status_filter=='in_progress' }}>{{ _('In Progress') }}</option>
+            <option value="pending_approval" {{ 'selected' if status_filter=='pending_approval' }}>{{ _('Pending
+                Approval') }}</option>
+            <option value="done" {{ 'selected' if status_filter=='done' }}>{{ _('Done') }}</option>
+            <option value="canceled" {{ 'selected' if status_filter=='canceled' }}>{{ _('Canceled') }}</option>
+        </select>
+        <select class="form-select form-select-sm" style="width: auto;" onchange="applyFilter('priority', this.value)">
+            <option value="" {{ 'selected' if not priority_filter }}>{{ _('All Priorities') }}</option>
+            <option value="high" {{ 'selected' if priority_filter=='high' }}>🔴 {{ _('High') }}</option>
+            <option value="medium" {{ 'selected' if priority_filter=='medium' }}>🟡 {{ _('Medium') }}</option>
+            <option value="low" {{ 'selected' if priority_filter=='low' }}>🔵 {{ _('Low') }}</option>
+        </select>
+    </div>
+
+    <!-- Task List -->
+    {% if tasks %}
+    {% for task in tasks %}
+    {% set is_overdue = task.due_date and task.due_date < now and task.status not in ['done', 'canceled' ] %} <div
+        class="task-card {{ task.priority + '-priority' }} {{ 'overdue' if is_overdue }}">
+        <input type="checkbox" class="task-check" title="{{ _('Mark as done') }}"
+            onchange="completeTask({{ task.id }}, this)" {{ 'checked disabled' if task['status']=='done' }}>
+        <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <span class="task-title {{ 'text-decoration-line-through text-muted' if task.status == 'done' }}">
+                        {{ task.title }}
+                    </span>
+                    <span class="priority-badge priority-{{ task.priority }} ms-2">{{ task.priority }}</span>
+                    {% if task.status == 'in_progress' %}
+                    <span class="badge bg-info ms-1" style="font-size: 0.65rem;">{{ _('In Progress') }}</span>
+                    {% elif task.status == 'pending_approval' %}
+                    <span class="badge bg-warning text-dark border border-warning ms-1 glow-warning"
+                        style="font-size: 0.65rem;">
+                        <i class="bi bi-hourglass-split"></i> {{ _('Pending Approval') }}
+                    </span>
+                    {% endif %}
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-link text-muted p-0" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="editTask({{ task.id }})">
+                                <i class="bi bi-pencil me-2 text-primary"></i>{{ _('Edit') }}</a></li>
+
+                        {% if task.status == 'pending_approval' and (task.assigned_by_id == session.get('user_id') or
+                        session.get('role') in ['owner', 'admin']) %}
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="#" onclick="approveTask({{ task.id }})">
+                                <i class="bi bi-check-all me-2 text-success"></i>{{ _('Approve') }}</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="rejectTask({{ task.id }})">
+                                <i class="bi bi-x-circle me-2 text-danger"></i>{{ _('Reject') }}</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        {% endif %}
+
+                        <li><a class="dropdown-item" href="#" onclick="updateTaskStatus({{ task.id }}, 'in_progress')">
+                                <i class="bi bi-play-fill me-2 text-info"></i>{{ _('In Progress') }}</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="updateTaskStatus({{ task.id }}, 'done')">
+                                <i class="bi bi-check-lg me-2 text-success"></i>{{ _('Done') }}</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="updateTaskStatus({{ task.id }}, 'canceled')">
+                                <i class="bi bi-x-lg me-2 text-danger"></i>{{ _('Cancel') }}</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="task-meta mt-2">
+                {% if task.description %}
+                <div class="mb-1 text-muted small">{{ task.description[:150] }}{{ '...' if task.description|length > 150
+                    }}</div>
+                {% endif %}
+
+                {% if task.status == 'pending_approval' %}
+                <div
+                    class="verification-alert themed-card p-2 mt-2 mb-2 border-warning bg-warning bg-opacity-10 rounded shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="small fw-bold">
+                            <i class="bi bi-info-circle-fill text-warning me-1"></i> {{ _('Awaiting your review') }}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-xs btn-success py-1 px-3 d-flex align-items-center"
+                                onclick="approveTask({{ task.id }})">
+                                <i class="bi bi-check-lg me-1"></i> {{ _('Approve') }}
+                            </button>
+                            <button class="btn btn-xs btn-outline-danger py-1 px-3 d-flex align-items-center"
+                                onclick="rejectTask({{ task.id }})">
+                                <i class="bi bi-x-lg me-1"></i> {{ _('Reject') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="d-flex align-items-center gap-3">
+                    {% if task.due_date %}
+                    <span class="small">
+                        <i class="bi bi-clock {{ 'text-danger fw-bold' if is_overdue else 'text-muted' }} me-1"></i>
+                        {{ task.due_date.strftime('%d/%m/%Y %H:%M') if task.due_date is not string else task.due_date }}
+                    </span>
+                    {% endif %}
+                    {% if task.assigned_to_name %}
+                    <span class="ms-2"><i class="bi bi-person me-1"></i>{{ task.assigned_to_name }}</span>
+                    {% endif %}
+                    {% if task.client_name %}
+                    <span class="ms-2"><i class="bi bi-building me-1"></i>{{ task.client_name }}</span>
+                    {% endif %}
+                    {% if task.deal_title %}
+                    <span class="ms-2"><i class="bi bi-briefcase me-1"></i>{{ task.deal_title }}</span>
+                    {% endif %}
+                    {% if task.assigned_by_name %}
+                    <span class="ms-2 text-muted">({{ _('by') }} {{ task.assigned_by_name }})</span>
+                    {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox d-block mb-3"></i>
+            <h5>{{ _('No tasks found') }}</h5>
+            <p>{{ _('Create a new task to get started') }}</p>
+        </div>
+        {% endif %}
+</div>
+
+<!-- Create Task Modal -->
+<div class="modal fade" id="createTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content themed-card">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>{{ _('New Task') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('tasks.create') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="next" value="{{ url_for('tasks.index', tab=current_tab) }}">
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Title') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Description') }}</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Priority') }}</label>
+                            <select class="form-select" name="priority">
+                                <option value="low">{{ _('Low') }}</option>
+                                <option value="medium" selected>{{ _('Medium') }}</option>
+                                <option value="high">{{ _('High') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Due Date') }}</label>
+                            <input type="datetime-local" class="form-control flatpickr-datetime" name="due_date">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Client') }}</label>
+                            <select class="form-select" name="client_id">
+                                <option value="">{{ _('None') }}</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Project') }}</label>
+                            <select class="form-select" name="project_id">
+                                <option value="">{{ _('None') }}</option>
+                                {% for project in projects %}
+                                <option value="{{ project.id }}">
+                                    {% if project.client_name %}
+                                    {{ project.client_name }} - {{ project.name }}
+                                    {% else %}
+                                    {{ project.name }}
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Assign to') }}</label>
+                        <select class="form-select" name="assigned_to_id">
+                            <option value="">{{ _('Unassigned') }}</option>
+                            {% for member in team %}
+                            <option value="{{ member.id }}">{{ member.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <div class="themed-card shadow-sm border rounded p-3 bg-light bg-opacity-10">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="verification_required"
+                                    id="verifRequired" value="1">
+                                <label class="form-check-label fw-bold" for="verifRequired">
+                                    <i class="bi bi-shield-check me-1"></i> {{ _('Require Verification') }}
+                                </label>
+                            </div>
+                            <div class="form-text small mt-1">
+                                {{ _('Completion must be approved by the creator.') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Create Task') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content themed-card">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>{{ _('Edit Task') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="#" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Title') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Description') }}</label>
+                        <textarea class="form-control" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Priority') }}</label>
+                            <select class="form-select" name="priority">
+                                <option value="low">{{ _('Low') }}</option>
+                                <option value="medium">{{ _('Medium') }}</option>
+                                <option value="high">{{ _('High') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Due Date') }}</label>
+                            <input type="datetime-local" class="form-control flatpickr-datetime" name="due_date">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Client') }}</label>
+                            <select class="form-select" name="client_id">
+                                <option value="">{{ _('None') }}</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Project') }}</label>
+                            <select class="form-select" name="project_id">
+                                <option value="">{{ _('None') }}</option>
+                                {% for project in projects %}
+                                <option value="{{ project.id }}">
+                                    {% if project.client_name %}
+                                    {{ project.client_name }} - {{ project.name }}
+                                    {% else %}
+                                    {{ project.name }}
+                                    {% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Assign to') }}</label>
+                        <select class="form-select" name="assigned_to_id">
+                            <option value="">{{ _('Unassigned') }}</option>
+                            {% for member in team %}
+                            <option value="{{ member.id }}">{{ member.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-primary-emphasis fw-bold"><i
+                                class="bi bi-chat-left-text me-2"></i>{{ _('Execution Comment / Memo') }}</label>
+                        <textarea class="form-control" name="assigned_comment" rows="2"
+                            placeholder="{{ _('Assignee input here...') }}"></textarea>
+                        <div class="form-text">{{ _('Field for the person assigned to report results or notes.') }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="verification_required"
+                                id="verifRequiredEdit">
+                            <label class="form-check-label" for="verifRequiredEdit">
+                                {{ _('Require Verification') }}
+                            </label>
+                        </div>
+                        <div class="form-text">
+                            {{ _('If active, task completion must be approved by the creator.') }}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    function applyFilter(key, value) {
+        const url = new URL(window.location.href);
+        if (value) {
+            url.searchParams.set(key, value);
+        } else {
+            url.searchParams.delete(key);
+        }
+        window.location.href = url.toString();
+    }
+
+    function completeTask(taskId, checkbox) {
+        fetch(`/tasks/${taskId}/complete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken }
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    checkbox.disabled = true;
+                    checkbox.closest('.task-card').classList.add('opacity-50');
+                    setTimeout(() => location.reload(), 500);
+                } else {
+                    checkbox.checked = false;
+                    alert(data.message);
+                }
+            })
+            .catch(() => { checkbox.checked = false; });
+    }
+
+    function updateTaskStatus(taskId, status) {
+        fetch(`/tasks/${taskId}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            body: JSON.stringify({ status: status })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert(data.message);
+            });
+    }
+
+    function editTask(taskId) {
+        const modalEl = document.getElementById('editTaskModal');
+        const form = modalEl.querySelector('form');
+
+        // Clear previous values
+        form.reset();
+
+        fetch(`/tasks/${taskId}/details`)
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    const task = data.task;
+
+                    form.action = `/tasks/${task.id}/update`;
+                    form.querySelector('[name=title]').value = task.title;
+                    form.querySelector('[name=description]').value = task.description || '';
+                    form.querySelector('[name=priority]').value = task.priority;
+                    form.querySelector('[name=assigned_to_id]').value = task.assigned_to_id || '';
+                    form.querySelector('[name=client_id]').value = task.client_id || '';
+                    form.querySelector('[name=project_id]').value = task.project_id || '';
+                    form.querySelector('[name=assigned_comment]').value = task.assigned_comment || '';
+
+                    const verifCheck = form.querySelector('[name=verification_required]');
+                    if (verifCheck) verifCheck.checked = task.verification_required;
+
+                    const dateInput = form.querySelector('[name=due_date]');
+                    if (task.due_date) {
+                        // Ensure format is compatible with datetime-local (YYYY-MM-DDTHH:MM)
+                        // The API returns ISO string usually.
+                        let dateStr = task.due_date;
+                        if (dateStr.length > 16) dateStr = dateStr.substring(0, 16);
+
+                        dateInput.value = dateStr;
+
+                        if (dateInput._flatpickr) {
+                            dateInput._flatpickr.setDate(dateStr);
+                        }
+                    } else {
+                        dateInput.value = '';
+                        if (dateInput._flatpickr) dateInput._flatpickr.clear();
+                    }
+
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                } else {
+                    alert(data.message || 'Error loading task details');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error fetching task details');
+            });
+    }
+
+    // Re-init flatpickr in modal
+    document.getElementById('createTaskModal').addEventListener('shown.bs.modal', function () {
+        if (typeof initGlobalFlatpickr === 'function') initGlobalFlatpickr();
+    });
+
+    function approveTask(taskId) {
+        if (!confirm('{{ _("Approve this task completion?") }}')) return;
+
+        fetch(`/tasks/${taskId}/approve`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken }
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert(data.message);
+            });
+    }
+
+    function rejectTask(taskId) {
+        const comment = prompt('{{ _("Reason for rejection:") }}');
+        if (comment === null) return; // Cancelled
+        if (!comment.trim()) {
+            alert('{{ _("Comment is required") }}');
+            return;
+        }
+
+        fetch(`/tasks/${taskId}/reject`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+            body: JSON.stringify({ comment: comment })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) location.reload();
+                else alert(data.message);
+            });
+    }
+</script>
+{% endblock %}

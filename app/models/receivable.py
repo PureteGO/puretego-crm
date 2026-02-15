@@ -42,7 +42,7 @@ class Receivable(Base):
     company = relationship('Company')
     client = relationship('Client', backref='receivables')
     deal = relationship('Deal', backref='receivables')
-    project = relationship('Project', backref='receivables')
+    project = relationship('Project', back_populates='receivables')
 
     def __init__(self, company_id, client_id, description, amount, due_date, deal_id=None, project_id=None, status='open', paid_amount=0):
         self.company_id = company_id

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ _('Kanban') }}{% endblock %}
+{% block title %}{{ _('Sales Pipeline') }}{% endblock %}
 
 {% block head %}
 <style>
@@ -21,7 +21,30 @@
         transition: box-shadow 0.2s;
     }
 
-    /* Mobile view: Stack columns vertically */
+    .kanban-stage-header {
+        border-bottom: 3px solid var(--stage-color, var(--primary));
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .kanban-stage-header .stage-name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .kanban-stage-header .stage-metrics {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+    }
+
+    .kanban-stage-header .stage-value {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--success);
+    }
+
     @media (max-width: 768px) {
         .kanban-board {
             flex-direction: column;
@@ -31,26 +54,49 @@
         .kanban-stage {
             flex: 0 0 auto;
             width: 100%;
-            margin-right: 0;
         }
-    }
-
-    .kanban-stage h5 {
-        font-size: 1rem;
-        font-weight: bold;
     }
 
     .kanban-card {
         background-color: var(--bg-card);
-        border-radius: 3px;
-        padding: 0.5rem;
+        border-radius: 6px;
+        padding: 0.75rem;
         margin-bottom: 0.5rem;
         cursor: grab;
         box-shadow: var(--shadow-sm);
+        border-left: 3px solid var(--stage-color, var(--primary));
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .kanban-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .kanban-card .deal-title {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+    }
+
+    .kanban-card .deal-client {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .kanban-card .deal-value {
+        font-weight: 700;
+        color: var(--success);
+        font-size: 0.85rem;
+    }
+
+    .kanban-card .deal-meta {
+        font-size: 0.7rem;
+        color: var(--text-muted);
     }
 
     .kanban-cards-container {
-        min-height: 200px;
+        min-height: 80px;
     }
 
     .kanban-card a {
@@ -62,102 +108,264 @@
         color: var(--primary);
     }
 
-    /* Custom caret for dropdown */
     .no-caret::after {
         display: none !important;
+    }
+
+    .pipeline-summary {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .pipeline-summary .metric {
+        text-align: center;
+    }
+
+    .pipeline-summary .metric-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .pipeline-summary .metric-label {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .probability-bar {
+        height: 4px;
+        background: var(--border-color);
+        border-radius: 2px;
+        margin-top: 0.35rem;
+        overflow: hidden;
+    }
+
+    .probability-bar .fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s;
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h2 mb-0">{{ _('Kanban') }}</h1>
-        <div>
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h1 class="h2 mb-0"><i class="bi bi-kanban me-2"></i>{{ _('Sales Pipeline') }}</h1>
+        <div class="d-flex gap-2 flex-wrap">
+            <!-- Owner Filter -->
+            <select class="form-select form-select-sm" style="width: auto;" onchange="filterByOwner(this.value)">
+                <option value="">{{ _('All Owners') }}</option>
+                {% for member in team %}
+                <option value="{{ member.id }}" {% if owner_filter==member.id|string %}selected{% endif %}>{{
+                    member.name }}</option>
+                {% endfor %}
+            </select>
+
+            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#createDealModal">
+                <i class="bi bi-plus-lg me-1"></i>{{ _('New Deal') }}
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#createStageModal">
+                <i class="bi bi-columns-gap me-1"></i>{{ _('New Column') }}
+            </button>
             <form action="{{ url_for('clients.reset_stages') }}" method="POST" class="d-inline"
-                data-confirm="{{ _('WARNING: This will remove all custom columns and move ALL clients to No Stage. Are you sure?') }}">
+                data-confirm="{{ _('WARNING: This will remove all custom columns. Are you sure?') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                <button type="submit" class="btn btn-outline-danger me-2">
-                    <i class="bi bi-arrow-counterclockwise me-1"></i>{{ _('Restore Default') }}
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-arrow-counterclockwise"></i>
                 </button>
             </form>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createStageModal">
-                <i class="bi bi-plus-lg me-1"></i>{{ _('New Column') }}
-            </button>
         </div>
     </div>
 
+    <!-- Pipeline Summary -->
+    {% set total_deals = kanban_data|sum(attribute='stage.count') if kanban_data else 0 %}
+    {% set total_value = kanban_data|sum(attribute='stage.total_value') if kanban_data else 0 %}
+    <div class="pipeline-summary">
+        <div class="metric">
+            <div class="metric-value text-primary">{{ total_deals }}</div>
+            <div class="metric-label">{{ _('Active Deals') }}</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value text-success">Gs. {{ "{:,.0f}".format(total_value).replace(',', '.') }}</div>
+            <div class="metric-label">{{ _('Pipeline Value') }}</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">{{ kanban_data|length }}</div>
+            <div class="metric-label">{{ _('Stages') }}</div>
+        </div>
+    </div>
+
+    <!-- Kanban Board -->
     <div class="kanban-board">
         {% for data in kanban_data %}
-        <div class="kanban-stage" data-stage-id="{{ data.stage.id }}">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="mb-0 text-truncate" title="{{ data.stage.name }}">
-                    {{ data.stage.name }}
-                    <span class="badge bg-secondary rounded-pill ms-1">{{ data.clients|length }}</span>
-                </h5>
-                <div class="d-flex gap-1">
-                    <button class="btn btn-sm btn-outline-primary p-1 border-0" title="{{ _('Add Client') }}"
-                        onclick="openQuickClientModal({{ data.stage.id }})">
-                        <i class="bi bi-person-plus-fill"></i>
-                    </button>
-                    <button class="btn btn-sm btn-link text-muted p-1 edit-stage-btn" data-id="{{ data.stage.id }}"
-                        data-name="{{ data.stage.name }}" data-order="{{ data.stage.order }}">
-                        <i class="bi bi-pencil" style="font-size: 0.8rem;"></i>
-                    </button>
+        <div class="kanban-stage" data-stage-id="{{ data.stage.id }}"
+            style="--stage-color: {{ data.stage.color or '#6c757d' }};">
+            <div class="kanban-stage-header" style="border-color: {{ data.stage.color or '#6c757d' }};">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="stage-name text-truncate" title="{{ data.stage.name }}">
+                        {{ data.stage.name }}
+                        <span class="badge bg-secondary rounded-pill ms-1">{{ data.cards|length }}</span>
+                    </span>
+                    <div class="d-flex gap-1">
+                        <button class="btn btn-sm btn-link text-muted p-0" title="{{ _('Add Deal') }}"
+                            onclick="openCreateDealInStage({{ data.stage.id }})">
+                            <i class="bi bi-plus-circle" style="font-size: 0.85rem;"></i>
+                        </button>
+                        <button class="btn btn-sm btn-link text-muted p-0 edit-stage-btn" data-id="{{ data.stage.id }}"
+                            data-name="{{ data.stage.name }}" data-order="{{ data.stage.order }}"
+                            data-type="{{ data.stage.stage_type or 'open' }}"
+                            data-color="{{ data.stage.color or '#6c757d' }}">
+                            <i class="bi bi-pencil" style="font-size: 0.75rem;"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <div class="form-check form-switch mt-1 mb-1">
+                    <input class="form-check-input funnel-toggle" type="checkbox" id="funnel-{{ data.stage.id }}"
+                        data-stage-id="{{ data.stage.id }}" {% if data.stage.include_in_funnel %}checked{% endif %}
+                        title="{{ _('Add to Pipeline Value') }}">
+                    <label class="form-check-label" for="funnel-{{ data.stage.id }}" style="font-size: 0.7rem;">
+                        {{ _('Add to Pipeline Value') }}
+                    </label>
+                </div>
+
+                {% if data.stage.total_value > 0 %}
+                <div class="stage-value mt-1">
+                    Gs. {{ "{:,.0f}".format(data.stage.total_value).replace(',', '.') }}
+                </div>
+                {% endif %}
+                {% if data.stage.stage_type and data.stage.stage_type != 'open' %}
+                <span class="badge {{ 'bg-success' if data.stage.stage_type == 'won' else 'bg-danger' }} mt-1"
+                    style="font-size: 0.65rem;">
+                    {{ _('Won') if data.stage.stage_type == 'won' else _('Lost') }}
+                </span>
+                {% endif %}
             </div>
-            {% if data.stage.total_value > 0 %}
-            <div class="mb-2 text-end text-success fw-bold border-bottom pb-1">
-                Gs. {{ "{:,.0f}".format(data.stage.total_value).replace(',', '.') }}
-            </div>
-            {% endif %}
 
             <div class="kanban-cards-container" data-stage-id="{{ data.stage.id }}">
-                {% for client in data.clients %}
-                <div class="kanban-card" data-client-id="{{ client.id }}"
-                    ondblclick="window.location.href='{{ url_for('clients.view', client_id=client.id) }}'">
-                    <a href="{{ url_for('clients.view', client_id=client.id) }}" class="d-block">
-                        <div class="dropdown">
-                            <a href="#" class="text-decoration-none dropdown-toggle no-caret" data-bs-toggle="dropdown">
-                                {% if client.lead_temperature == 'hot' %}
-                                <i class="bi bi-fire text-danger" title="{{ _('Hot') }}"></i>
-                                {% elif client.lead_temperature == 'warm' %}
-                                <i class="bi bi-thermometer-half text-warning" title="{{ _('Warm') }}"></i>
-                                {% elif client.lead_temperature == 'cold' %}
-                                <i class="bi bi-snow text-info" title="{{ _('Cold') }}"></i>
-                                {% else %}
-                                <i class="bi bi-thermometer-low text-muted" title="{{ _('Probability') }}"></i>
-                                {% endif %}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                <li>
-                                    <h6 class="dropdown-header">{{ _('Probability of Closure') }}</h6>
-                                </li>
-                                <li><a class="dropdown-item" href="#"
-                                        onclick="updateTemperature({{ client.id }}, 'hot')">
-                                        <i class="bi bi-fire text-danger me-2"></i> {{ _('Hot') }}
-                                    </a></li>
-                                <li><a class="dropdown-item" href="#"
-                                        onclick="updateTemperature({{ client.id }}, 'warm')">
-                                        <i class="bi bi-thermometer-half text-warning me-2"></i> {{ _('Warm') }}
-                                    </a></li>
-                                <li><a class="dropdown-item" href="#"
-                                        onclick="updateTemperature({{ client.id }}, 'cold')">
-                                        <i class="bi bi-snow text-info me-2"></i> {{ _('Cold') }}
-                                    </a></li>
-                            </ul>
-                        </div>
-                        <div class="fw-bold text-truncate" title="{{ client.name }}">{{ client.name }}</div>
-                        <div class="small text-muted mb-1">{{ client.contact_name or '' }}</div>
-                        {% if client.package_name %}
-                        <div class="badge bg-info text-dark">{{ client.package_name }}</div>
+                {% for card in data.cards %}
+                <div class="kanban-card" data-deal-id="{{ card.id }}" data-card-type="{{ card.card_type }}"
+                    data-client-id="{{ card.client_id or card.id }}" title="{{ _('Double-click to view details') }}">
+                    <!-- Lead temperature icon -->
+                    {% if card.lead_temperature %}
+                    <span class="me-1" title="{{ card.lead_temperature }}" style="font-size: 0.8rem;">
+                        {% if card.lead_temperature == 'hot' %}🔥
+                        {% elif card.lead_temperature == 'warm' %}☀️
+                        {% else %}❄️{% endif %}
+                    </span>
+                    {% endif %}
+                    <div class="deal-title text-truncate" title="{{ card.title }}">{{ card.title }}</div>
+
+                    {% if card.card_type == 'client' and card.contact_name %}
+                    <div class="deal-client">
+                        <i class="bi bi-person me-1"></i>{{ card.contact_name }}
+                    </div>
+                    {% elif card.card_type == 'deal' and card.client_name %}
+                    <div class="deal-client">
+                        <i class="bi bi-building me-1"></i>{{ card.client_name }}
+                    </div>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        {% if card.value > 0 %}
+                        <span class="deal-value">Gs. {{ "{:,.0f}".format(card.value).replace(',', '.') }}</span>
+                        {% else %}
+                        <span></span>
                         {% endif %}
-                    </a>
+                        {% if card.owner_name %}
+                        <span class="deal-meta" title="{{ card.owner_name }}">
+                            <i class="bi bi-person-fill"></i> {{ card.owner_name.split(' ')[0] }}
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    {% if card.package_name %}
+                    <div class="mt-1">
+                        <span class="badge rounded-pill"
+                            style="font-size: 0.65rem; background: {{ data.stage.color or '#17a2b8' }};">
+                            {{ card.package_name }}
+                        </span>
+                    </div>
+                    {% endif %}
+
+                    {% if card.probability is not none and card.probability > 0 %}
+                    <div class="probability-bar">
+                        <div class="fill"
+                            style="width: {{ card.probability }}%; background: {{ '#28a745' if card.probability >= 70 else '#ffc107' if card.probability >= 40 else '#dc3545' }};">
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if card.expected_close_date %}
+                    <div class="deal-meta mt-1"><i class="bi bi-clock me-1"></i>{{ card.expected_close_date }}</div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endfor %}
+    </div>
+</div>
+
+<!-- Modal: Create Deal -->
+<div class="modal fade" id="createDealModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>{{ _('New Deal') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ url_for('clients.create_deal_quick') }}" method="POST">
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" id="dealStageId" name="stage_id" value="">
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Deal Title') }} <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="title" required
+                            placeholder="{{ _('e.g. Website Redesign') }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Client') }}</label>
+                        <select class="form-select" name="client_id">
+                            <option value="">{{ _('Select client...') }}</option>
+                            {% for c in clients %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Value') }}</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Gs.</span>
+                                <input type="number" class="form-control" name="value" value="0" step="1000">
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label">{{ _('Expected Close') }}</label>
+                            <input type="date" class="form-control" name="expected_close_date">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Stage') }}</label>
+                        <select class="form-select" name="stage_id" id="dealStageSelect">
+                            {% for data in kanban_data %}
+                            <option value="{{ data.stage.id }}">{{ data.stage.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-success">{{ _('Create Deal') }}</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -173,12 +381,26 @@
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label for="name" class="form-label">{{ _('Stage Name') }}</label>
+                        <label class="form-label">{{ _('Stage Name') }}</label>
                         <input type="text" class="form-control" name="name" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="order" class="form-label">{{ _('Order') }}</label>
-                        <input type="number" class="form-control" name="order" value="10">
+                    <div class="row">
+                        <div class="col-4 mb-3">
+                            <label class="form-label">{{ _('Order') }}</label>
+                            <input type="number" class="form-control" name="order" value="10">
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label">{{ _('Type') }}</label>
+                            <select class="form-select" name="stage_type">
+                                <option value="open">{{ _('Open') }}</option>
+                                <option value="won">{{ _('Won') }}</option>
+                                <option value="lost">{{ _('Lost') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label">{{ _('Color') }}</label>
+                            <input type="color" class="form-control form-control-color" name="color" value="#6c757d">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -202,75 +424,37 @@
                 <form id="editStageForm" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label for="stageName" class="form-label">{{ _('Stage Name') }}</label>
+                        <label class="form-label">{{ _('Stage Name') }}</label>
                         <input type="text" class="form-control" id="stageName" name="name" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="stageOrder" class="form-label">{{ _('Order') }}</label>
-                        <input type="number" class="form-control" id="stageOrder" name="order">
+                    <div class="row">
+                        <div class="col-4 mb-3">
+                            <label class="form-label">{{ _('Order') }}</label>
+                            <input type="number" class="form-control" id="stageOrder" name="order">
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label">{{ _('Type') }}</label>
+                            <select class="form-select" id="stageType" name="stage_type">
+                                <option value="open">{{ _('Open') }}</option>
+                                <option value="won">{{ _('Won') }}</option>
+                                <option value="lost">{{ _('Lost') }}</option>
+                            </select>
+                        </div>
+                        <div class="col-4 mb-3">
+                            <label class="form-label">{{ _('Color') }}</label>
+                            <input type="color" class="form-control form-control-color" id="stageColor" name="color"
+                                value="#6c757d">
+                        </div>
                     </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
-                    </div>
+                    <button type="submit" class="btn btn-primary w-100">{{ _('Save Changes') }}</button>
                 </form>
                 <hr>
-                <form id="deleteStageForm" method="POST" class="mt-3"
+                <form id="deleteStageForm" method="POST"
                     data-confirm="{{ _('Are you sure you want to delete this stage?') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <p class="text-danger small mb-2">{{ _('Are you sure you want to delete this stage?') }}</p>
                     <button type="submit" class="btn btn-outline-danger btn-sm w-100">
-                        <i class="bi bi-trash me-1"></i>{{ _('Delete') }}
+                        <i class="bi bi-trash me-1"></i>{{ _('Delete Stage') }}
                     </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Quick Add Client Modal -->
-<div class="modal fade" id="quickAddClientModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ _('Add Client to Column') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="quickAddClientForm" action="{{ url_for('clients.create') }}" method="POST">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <input type="hidden" id="quickStageId" name="kanban_stage_id" value="">
-
-                    <div class="mb-3">
-                        <label class="form-label">{{ _('Business / Client Name') }} <span
-                                class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="name" required>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-6 mb-3">
-                            <label class="form-label">{{ _('Contact Name') }}</label>
-                            <input type="text" class="form-control" name="contact_name">
-                        </div>
-                        <div class="col-6 mb-3">
-                            <label class="form-label">{{ _('Phone') }}</label>
-                            <input type="text" class="form-control" name="phone">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">{{ _('Interested Package') }}</label>
-                        <select class="form-select" name="interested_package_id">
-                            <option value="">{{ _('Select a package...') }}</option>
-                            {% for pkg in packages %}
-                            <option value="{{ pkg.id }}">{{ pkg.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="modal-footer px-0 pb-0 mt-3">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel')
-                            }}</button>
-                        <button type="submit" class="btn btn-primary">{{ _('Save') }}</button>
-                    </div>
                 </form>
             </div>
         </div>
@@ -281,63 +465,38 @@
 {% block scripts %}
 <script>
     const translations = {
-        errorMoving: "{{ _('Error moving client') }}",
-        connectionError: "{{ _('Connection error moving client.') }}"
+        errorMoving: "{{ _('Error moving deal') }}",
+        connectionError: "{{ _('Connection error') }}"
     };
 
-    function openQuickClientModal(stageId) {
-        document.getElementById('quickStageId').value = stageId;
-        new bootstrap.Modal(document.getElementById('quickAddClientModal')).show();
+    function filterByOwner(ownerId) {
+        const url = new URL(window.location.href);
+        if (ownerId) {
+            url.searchParams.set('owner_id', ownerId);
+        } else {
+            url.searchParams.delete('owner_id');
+        }
+        window.location.href = url.toString();
     }
 
-    function updateTemperature(clientId, temperature) {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        fetch(`/clients/${clientId}/update_temperature`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            },
-            body: JSON.stringify({ temperature: temperature })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert("Error: " + data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+    function openCreateDealInStage(stageId) {
+        document.getElementById('dealStageId').value = stageId;
+        document.getElementById('dealStageSelect').value = stageId;
+        new bootstrap.Modal(document.getElementById('createDealModal')).show();
     }
 
-    function editStage(id, name, order) {
-        // alert("Debug: Edit Stage " + id);
-        console.log("Opening edit modal for stage:", id);
-        const editForm = document.getElementById('editStageForm');
-        const deleteForm = document.getElementById('deleteStageForm');
-
-        if (editForm) {
-            editForm.action = `/clients/stages/${id}/edit`;
-        } else {
-            alert("Error: Edit Form Missing");
-        }
-
-        if (deleteForm) {
-            deleteForm.action = `/clients/stages/${id}/delete`;
-            // alert("Debug: Delete action set to " + deleteForm.action);
-        } else {
-            alert("Error: Delete Form Missing");
-        }
-
+    function editStage(id, name, order, stageType, color) {
+        document.getElementById('editStageForm').action = `/clients/stages/${id}/edit`;
+        document.getElementById('deleteStageForm').action = `/clients/stages/${id}/delete`;
         document.getElementById('stageName').value = name;
         document.getElementById('stageOrder').value = order;
+        document.getElementById('stageType').value = stageType || 'open';
+        document.getElementById('stageColor').value = color || '#6c757d';
         new bootstrap.Modal(document.getElementById('editStageModal')).show();
     }
 
-    // Global Confirmation Handler for Forms
+    // Global Confirmation Handler
     document.addEventListener('submit', function (e) {
-        // Check if form has data-confirm attribute
         if (e.target && e.target.dataset.confirm) {
             if (!confirm(e.target.dataset.confirm)) {
                 e.preventDefault();
@@ -345,14 +504,91 @@
         }
     });
 
-    // Event Delegation for Edit Buttons
+    // Event Delegation for Edit Stage Buttons
     document.addEventListener('click', function (e) {
         const btn = e.target.closest('.edit-stage-btn');
         if (btn) {
-            const id = btn.dataset.id;
-            const name = btn.dataset.name;
-            const order = btn.dataset.order;
-            editStage(id, name, order);
+            editStage(btn.dataset.id, btn.dataset.name, btn.dataset.order, btn.dataset.type, btn.dataset.color);
+        }
+    });
+
+    // Funnel Toggle Handler
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('funnel-toggle')) {
+            const stageId = e.target.dataset.stageId;
+            const isChecked = e.target.checked;
+            toggleStageFunnel(stageId, isChecked);
+        }
+    });
+
+    function toggleStageFunnel(stageId, isChecked) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch(`/clients/stages/${stageId}/toggle_funnel`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ include_in_funnel: isChecked })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    recalculatePipelineValue();
+                } else {
+                    alert("{{ _('Error updating configuration') }}");
+                    // Revert checkbox if failed
+                    document.getElementById(`funnel-${stageId}`).checked = !isChecked;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("{{ _('Connection error') }}");
+                document.getElementById(`funnel-${stageId}`).checked = !isChecked;
+            });
+    }
+
+    function recalculatePipelineValue() {
+        let totalValue = 0;
+        const stages = document.querySelectorAll('.kanban-stage');
+
+        stages.forEach(stage => {
+            const stageId = stage.dataset.stageId;
+            const checkbox = document.getElementById(`funnel-${stageId}`);
+
+            if (checkbox && checkbox.checked) {
+                // Parse value from the stage header text (needs robust parsing)
+                // Better approach: Calculate from cards in DOM to be strictly accurate with view
+                const cards = stage.querySelectorAll('.deal-value');
+                cards.forEach(cardVal => {
+                    // "Gs. 1.500.000" -> 1500000
+                    const text = cardVal.textContent.replace('Gs.', '').replace(/\./g, '').trim();
+                    const val = parseFloat(text);
+                    if (!isNaN(val)) {
+                        totalValue += val;
+                    }
+                });
+            }
+        });
+
+        // Update Total Display
+        const valueDisplay = document.querySelector('.pipeline-summary .metric-value.text-success');
+        if (valueDisplay) {
+            // Format number: Gs. X.XXX.XXX
+            const formatted = new Intl.NumberFormat('es-PY', { minimumFractionDigits: 0 }).format(totalValue);
+            valueDisplay.textContent = `Gs. ${formatted.replace(/,/g, '.')}`;
+        }
+    }
+
+    // Double-click handler for Kanban cards
+    document.addEventListener('dblclick', function (e) {
+        const card = e.target.closest('.kanban-card');
+        if (card) {
+            const clientId = card.dataset.clientId;
+            if (clientId) {
+                window.location.href = `/clients/${clientId}`;
+            }
         }
     });
 
@@ -365,56 +601,47 @@
             return;
         }
 
-        // 1. Column Reordering
+        // Column Reordering
         new Sortable(board, {
             animation: 150,
-            handle: '.kanban-stage h5', // Drag by title
-            onEnd: function (evt) {
+            handle: '.stage-name',
+            onEnd: function () {
                 const orderedIds = Array.from(board.children).map(el => el.dataset.stageId);
                 const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
                 fetch('/clients/stages/reorder', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
+                    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
                     body: JSON.stringify({ order: orderedIds })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (!data.success) {
-                            alert("{{ _('Error reordering columns') }}");
-                        }
-                    })
-                    .catch(error => console.error('Error reordering:', error));
+                }).then(r => r.json()).then(data => {
+                    if (!data.success) alert("{{ _('Error reordering columns') }}");
+                });
             }
         });
 
-        // 2. Card Reordering (Existing Logic)
+        // Card Drag-and-Drop (Deal movement)
         containers.forEach(container => {
             new Sortable(container, {
                 group: 'kanban',
                 animation: 150,
                 onEnd: function (evt) {
-                    const client_id = evt.item.dataset.clientId;
-                    const new_stage_id = evt.to.dataset.stageId;
-
+                    const dealId = evt.item.dataset.dealId;
+                    const newStageId = evt.to.dataset.stageId;
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                    fetch(`/clients/${client_id}/move`, {
+                    fetch(`/clients/kanban/deals/${dealId}/move`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': csrfToken
-                        },
-                        body: JSON.stringify({ stage_id: new_stage_id })
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+                        body: JSON.stringify({ stage_id: newStageId })
                     })
-                        .then(response => response.json())
+                        .then(r => r.json())
                         .then(data => {
                             if (!data.success) {
                                 alert(translations.errorMoving + ': ' + data.message);
                                 evt.from.appendChild(evt.item);
+                            } else {
+                                // Reload to refresh metrics
+                                setTimeout(() => location.reload(), 800);
                             }
                         })
                         .catch(error => {

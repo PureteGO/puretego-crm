@@ -38,7 +38,10 @@ class Project(Base):
     client = relationship('Client', back_populates='projects')
     company = relationship('Company')
     deal = relationship('Deal', back_populates='project', uselist=False)
+    
     tickets = relationship('ProjectTicket', back_populates='project', cascade='all, delete-orphan')
+    receivables = relationship('Receivable', back_populates='project', cascade='all, delete-orphan')
+    notes = relationship('ProjectNote', back_populates='project', cascade='all, delete-orphan')
 
 class ProjectTicket(Base):
     """Internal tasks or steps for a specific project."""
@@ -58,10 +61,43 @@ class ProjectTicket(Base):
     
     due_date = Column(Date)
     assigned_to = Column(Integer, ForeignKey('users.id'), nullable=True) # Team member
+    assigned_by_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    
+    # Verification workflow
+    verification_required = Column(Boolean, default=False)
+    approved_at = Column(DateTime)
+    approved_by_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    rejection_comment = Column(Text)
+    assigned_comment = Column(Text)
+    
+    completed_at = Column(DateTime)
+    completed_by = Column(Integer, ForeignKey('users.id'), nullable=True)
     
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
     
     # Relationships
     project = relationship('Project', back_populates='tickets')
-    assignee = relationship('User')
+    assignee = relationship('User', foreign_keys=[assigned_to])
+    assigned_by = relationship('User', foreign_keys=[assigned_by_id])
+    approved_by = relationship('User', foreign_keys=[approved_by_id])
+    completer = relationship('User', foreign_keys=[completed_by])
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'description': self.description,
+            'status': self.status,
+            'priority': self.priority,
+            'due_date': self.due_date.isoformat() if self.due_date else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'assignee': self.assignee.name if self.assignee else None,
+            'assigned_by_id': self.assigned_by_id,
+            'verification_required': self.verification_required,
+            'approved_at': self.approved_at.isoformat() if self.approved_at else None,
+            'rejection_comment': self.rejection_comment,
+            'assigned_comment': self.assigned_comment,
+            'completer': self.completer.name if self.completer else None
+        }

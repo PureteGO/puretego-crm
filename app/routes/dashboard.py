@@ -96,7 +96,7 @@ def index():
                 # Aggregate Pipeline
                 pipeline_query = filter_by_company(
                     db.query(KanbanStage.name, func.count(Client.id))\
-                    .join(Client, Client.kanban_stage_id == KanbanStage.id, isouter=True), Client
+                    .join(Client, (Client.kanban_stage_id == KanbanStage.id) & (Client.is_active == True), isouter=True), Client
                 ).group_by(KanbanStage.id, KanbanStage.name).order_by(KanbanStage.order).all()
                 
                 # Defensive mapping to ensure labels are strings and data is consistent for JS charts
@@ -219,7 +219,7 @@ def index():
                 # Personal Pipeline
                 pipeline_query = filter_by_company(
                     db.query(KanbanStage.name, func.count(Client.id))\
-                    .join(Client, Client.kanban_stage_id == KanbanStage.id, isouter=True), Client
+                    .join(Client, (Client.kanban_stage_id == KanbanStage.id) & (Client.is_active == True), isouter=True), Client
                 ).filter(Client.owner_id == user_id).group_by(KanbanStage.id, KanbanStage.name).order_by(KanbanStage.order).all()
 
                 from flask_babel import _
@@ -321,9 +321,9 @@ def index():
                 
             # 2. Overdue Tasks
             overdue_tasks = filter_by_company(db.query(Task), Task).filter(
-                Task.status == 'pending',
+                Task.status.in_(['open', 'in_progress']),
                 Task.due_date < datetime.now(),
-                or_(Task.user_id == user_id, (Task.user_id.is_(None)) & (Task.role_target == user_role))
+                or_(Task.assigned_to_id == user_id, (Task.assigned_to_id.is_(None)) & (Task.role_target == user_role))
             ).all()
             
             for t in overdue_tasks:
@@ -332,7 +332,7 @@ def index():
                     'id': t.id,
                     'title': t.title,
                     'date': t.due_date,
-                    'url': '#' # Tasks might need a specific view, for now just show them
+                    'url': '/tasks/'
                 })
                 
             # Sort by date (oldest first)
@@ -342,6 +342,22 @@ def index():
             
             data['overdue_items'] = overdue_items_to_sort
             data['overdue_count'] = len(overdue_items_to_sort)
+
+            # Dropdown data for New Task modal
+            clients = filter_by_company(db.query(Client).order_by(Client.name), Client).all()
+            projects = filter_by_company(
+                db.query(Project).options(joinedload(Project.client)).filter(Project.status == 'active').order_by(Project.name), 
+                Project
+            ).all()
+            
+            data['clients_data'] = [{'id': c.id, 'name': c.name} for c in clients]
+            data['projects_data'] = [
+                {
+                    'id': p.id, 
+                    'name': p.name, 
+                    'client_name': p.client.name if p.client else None
+                } for p in projects
+            ]
 
             return render_template('dashboard/index.html', **data)
     except Exception as e:

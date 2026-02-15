@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_babel import _
 from app.routes.auth import login_required
-from app.models import Interaction, InteractionType, CadenceRule, Client, Visit
+from app.models import Interaction, InteractionType, CadenceRule, Client, Visit, Task, Project, ProjectTicket
 from config.database import get_db
 from datetime import datetime, timedelta
 from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 
 bp = Blueprint('interactions', __name__, url_prefix='/interactions')
 
@@ -127,36 +128,86 @@ def agenda():
             Visit.visit_date <= end_of_7_days,
             Client.company_id == company_id
         ).all()
+
+        # 4. General Tasks (Task Model)
+        task_query = db.query(Task).options(joinedload(Task.client)).filter(
+            Task.status.in_(['open', 'in_progress', 'pending_approval']),
+            Task.company_id == company_id
+        )
+        if user_role not in ['owner', 'admin', 'manager', 'superadmin']:
+            task_query = task_query.filter(Task.assigned_to_id == user_id)
+            
+        tasks_today = task_query.filter(Task.due_date <= end_of_today).all()
+        tasks_future = task_query.filter(Task.due_date > end_of_today, Task.due_date <= end_of_7_days).all()
+
+        # 5. Project Tickets
+        ticket_query = db.query(ProjectTicket).join(Project).options(joinedload(ProjectTicket.project)).filter(
+            ProjectTicket.status.in_(['pending', 'in_progress', 'pending_approval']),
+            Project.status == 'active',
+            Project.company_id == company_id
+        )
+        # For tickets, we filter by assignment usually, or if user is owner of project?
+        # Sticking to assignment for agenda to avoid clutter
+        ticket_query = ticket_query.filter(ProjectTicket.assigned_to == user_id)
+        
+        tickets_today = ticket_query.filter(or_(ProjectTicket.due_date <= end_of_today, ProjectTicket.due_date.is_(None))).all()  
+        # Note: Showing undated tickets in 'Today' or just ignoring? 
+        # If due_date is None, maybe putting them in Today is safer so they don't get lost
+        
+        tickets_future = ticket_query.filter(ProjectTicket.due_date > end_of_today, ProjectTicket.due_date <= end_of_7_days).all()
         
         # Combine and formatting
-        today_list = [t.to_dict() for t in urgent_tasks]
-        upcoming_list = [t.to_dict() for t in future_tasks]
-        
-        # Add Visits to Today
-        for v in visits_today:
-            today_list.append({
-                'id': f"v_{v.id}",
-                'client_id': v.client_id,
-                'client_name': v.client.name if v.client else _('Unknown Client'),
-                'type_name': _('In-person Visit'),
-                'is_call': False,
-                'date': v.visit_date.isoformat(),
-                'status': 'scheduled',
-                'notes': v.notes
-            })
+        today_list = []
+        upcoming_list = []
+
+        # Helper to format items
+        def format_item(item, type_label, url, is_call=False, date_field='date', note_field='notes'):
+            date_val = getattr(item, date_field)
+            if not date_val: date_val = datetime.now() # Fallback
             
-        # Add Visits to Upcoming
+            client_name = _('Task')
+            if hasattr(item, 'client') and item.client:
+                client_name = item.client.name
+            elif hasattr(item, 'project') and item.project and item.project.client:
+                client_name = item.project.client.name
+                
+            return {
+                'id': f"{type_label}_{item.id}",
+                'client_id': getattr(item, 'client_id', None), # Keep for legacy compatibility
+                'client_name': client_name,
+                'type_name': type_label,
+                'is_call': is_call,
+                'date': date_val.isoformat(),
+                'status': getattr(item, 'status', 'scheduled'),
+                'notes': getattr(item, note_field, '') or getattr(item, 'title', ''), # Use title for tasks/tickets as 'notes'
+                'url': url
+            }
+
+        # Add Interactions
+        for i in urgent_tasks:
+            today_list.append(format_item(i, i.type.name, url_for('clients.view', client_id=i.client_id), is_call=i.type.is_call))
+        for i in future_tasks:
+            upcoming_list.append(format_item(i, i.type.name, url_for('clients.view', client_id=i.client_id), is_call=i.type.is_call))
+            
+        # Add Visits
+        for v in visits_today:
+            today_list.append(format_item(v, _('Visit'), url_for('clients.view', client_id=v.client_id), is_call=False, date_field='visit_date'))
         for v in visits_future:
-            upcoming_list.append({
-                'id': f"v_{v.id}",
-                'client_id': v.client_id,
-                'client_name': v.client.name if v.client else _('Unknown Client'),
-                'type_name': _('In-person Visit'),
-                'is_call': False,
-                'date': v.visit_date.isoformat(),
-                'status': 'scheduled',
-                'notes': v.notes
-            })
+            upcoming_list.append(format_item(v, _('Visit'), url_for('clients.view', client_id=v.client_id), is_call=False, date_field='visit_date'))
+
+        # Add General Tasks
+        for t in tasks_today:
+            today_list.append(format_item(t, _('Task'), url_for('tasks.index'), date_field='due_date', note_field='title'))
+        for t in tasks_future:
+            upcoming_list.append(format_item(t, _('Task'), url_for('tasks.index'), date_field='due_date', note_field='title'))
+
+        # Add Project Tickets
+        for t in tickets_today:
+            proj_url = url_for('projects.view', project_id=t.project_id)
+            today_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
+        for t in tickets_future:
+            proj_url = url_for('projects.view', project_id=t.project_id)
+            upcoming_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
             
         # Sort lists by date
         today_list.sort(key=lambda x: x['date'])

@@ -12,6 +12,10 @@
             <p class="text-muted mb-0">{{ _('Welcome') }}, {{ session["user_name"] }}!</p>
         </div>
         <div class="btn-group">
+            <button type="button" class="btn btn-warning text-dark" data-bs-toggle="modal"
+                data-bs-target="#newTaskModal">
+                <i class="bi bi-check2-square me-1"></i> {{ _('New Task') }}
+            </button>
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quickActionModal"
                 onclick="setQuickActionType('visit')">
                 <i class="bi bi-geo-alt-fill me-1"></i> {{ _('New Visit') }}
@@ -352,8 +356,8 @@
             <div class="col-md-3 mb-3">
                 <div class="card text-white bg-success h-100 shadow-sm">
                     <div class="card-body d-flex flex-column justify-content-between">
-                        <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-wallet2"></i> {{
-                            _('Future Receivables / Total Closed') }}</h6>
+                        <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-wallet2"></i> {{ _('Future
+                            Receivables / Total Closed') }}</h6>
                         <h3 class="card-text fw-bold mb-0 text-end" id="stat-awaiting-payment">{{
                             awaiting_payment|format_currency }}</h3>
                     </div>
@@ -595,7 +599,7 @@
 <!-- Overdue Items Modal -->
 <div class="modal fade" id="overdueModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div class="modal-content bg-body">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> {{ _('Overdue Items') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
@@ -635,6 +639,86 @@
         </div>
     </div>
 </div>
+
+<!-- New Task Modal -->
+<div class="modal fade" id="newTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-body">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title"><i class="bi bi-check2-square"></i> {{ _('New Task') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTaskForm">
+                    <div class="mb-3">
+                        <label for="taskTitle" class="form-label">{{ _('Title') }} <span
+                                class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="taskTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDesc" class="form-label">{{ _('Description') }}</label>
+                        <textarea class="form-control" id="taskDesc" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="taskDueDate" class="form-label">{{ _('Due Date') }}</label>
+                            <input type="date" class="form-control" id="taskDueDate" name="due_date">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="taskPriority" class="form-label">{{ _('Priority') }}</label>
+                            <select class="form-select" id="taskPriority" name="priority">
+                                <option value="low">{{ _('Low') }}</option>
+                                <option value="medium" selected>{{ _('Medium') }}</option>
+                                <option value="high">{{ _('High') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ _('Client') }}</label>
+                            <select name="client_id" class="form-select">
+                                <option value="">{{ _('None') }}</option>
+                                {% for client in clients_data %}
+                                <option value="{{ client.id }}">{{ client.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ _('Project') }}</label>
+                            <select name="project_id" class="form-select">
+                                <option value="">{{ _('None') }}</option>
+                                {% for p in projects_data %}
+                                <option value="{{ p.id }}">
+                                    {% if p.client_name %}{{ p.client_name }} - {% endif %}{{ p.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskAssignee" class="form-label">{{ _('Assign To') }}</label>
+                        <select class="form-select" id="taskAssignee" name="assigned_to_id">
+                            <option value="">{{ _('Loading...') }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" name="verification_required" id="taskVerif"
+                                value="true">
+                            <label class="form-check-label" for="taskVerif">{{ _('Require Verification') }}</label>
+                        </div>
+                        <div class="form-text small">{{ _('Completion must be approved by the creator.') }}</div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="submitNewTask()">{{ _('Create Task') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -685,6 +769,18 @@
                 console.error("Error loading agenda:", err);
                 document.getElementById('todayList').innerHTML = `<p class="text-danger text-center my-3">${translations.error}: ${err.message}</p>`;
                 document.getElementById('upcomingList').innerHTML = `<p class="text-danger text-center my-3">${translations.error}: ${err.message}</p>`;
+                document.getElementById('upcomingList').innerHTML = `<p class="text-danger text-center my-3">${translations.error}: ${err.message}</p>`;
+            });
+
+        // Load Team for Dropdown
+        fetch('/api/tasks/team')
+            .then(r => r.json())
+            .then(users => {
+                const select = document.getElementById('taskAssignee');
+                select.innerHTML = '<option value="">{{ _("Me") }}</option>';
+                users.forEach(u => {
+                    select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+                });
             });
 
         // Initialize reactive features
@@ -708,7 +804,7 @@
 
         tasks.forEach(task => {
             const item = document.createElement('a');
-            item.href = `/clients/${task.client_id}`;
+            item.href = task.url || `/clients/${task.client_id}`;
             item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-transparent';
             item.style.color = 'var(--text-primary)';
 
@@ -1164,6 +1260,47 @@
                     btn.disabled = false;
                     btn.innerText = translations.tryAgain;
                 }
+            });
+    }
+    function submitNewTask() {
+        const form = document.getElementById('newTaskForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const data = Object.fromEntries(new FormData(form).entries());
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch('/api/tasks/quick-create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    // Close Modal
+                    const modalEl = document.getElementById('newTaskModal');
+                    const modal = bootstrap.Modal.getInstance(modalEl);
+                    modal.hide();
+                    form.reset();
+
+                    // Show success
+                    alert("{{ _('Task created!') }}");
+
+                    // Reload Agenda
+                    location.reload(); // Simple reload to fetch new agenda
+                } else {
+                    alert(res.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("{{ _('Error creating task') }}");
             });
     }
 </script>

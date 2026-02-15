@@ -14,15 +14,58 @@
         </div>
     </div>
 
+    <!-- Filters -->
+    <div class="card shadow-sm mb-3">
+        <div class="card-body py-2">
+            <form method="GET" class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small mb-0">{{ _('Status') }}</label>
+                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">{{ _('All') }}</option>
+                        <option value="draft" {% if status_filter=='draft' %}selected{% endif %}>{{ _('Draft') }}
+                        </option>
+                        <option value="sent" {% if status_filter=='sent' %}selected{% endif %}>{{ _('Sent') }}</option>
+                        <option value="approved" {% if status_filter=='approved' %}selected{% endif %}>{{ _('Approved')
+                            }}</option>
+                        <option value="rejected" {% if status_filter=='rejected' %}selected{% endif %}>{{ _('Rejected')
+                            }}</option>
+                        <option value="expired" {% if status_filter=='expired' %}selected{% endif %}>{{ _('Expired') }}
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small mb-0">{{ _('Client') }}</label>
+                    <select name="client_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">{{ _('All') }}</option>
+                        {% for c in clients %}
+                        <option value="{{ c.id }}" {% if client_filter==c.id|string %}selected{% endif %}>{{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    {% if status_filter or client_filter %}
+                    <a href="{{ url_for('proposals.index') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> {{ _('Clear') }}
+                    </a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Proposals Table -->
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th># ID</th>
+                            <th>#</th>
+                            <th>{{ _('Title') }}</th>
                             <th>{{ _('Client') }}</th>
                             <th>{{ _('Total Value') }}</th>
+                            <th>{{ _('Options') }}</th>
                             <th>{{ _('Status') }}</th>
                             <th>{{ _('Date') }}</th>
                             <th>{{ _('Actions') }}</th>
@@ -31,51 +74,88 @@
                     <tbody>
                         {% for proposal in proposals %}
                         <tr>
-                            <td>#{{ proposal.id }}</td>
+                            <td><span class="text-muted">#{{ proposal.id }}</span></td>
+                            <td>
+                                <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}"
+                                    class="text-decoration-none fw-semibold">
+                                    {{ proposal.title }}
+                                </a>
+                                {% if proposal.template_name %}
+                                <br><small class="text-muted"><i class="bi bi-layout-text-sidebar"></i> {{
+                                    proposal.template_name }}</small>
+                                {% endif %}
+                            </td>
                             <td>
                                 <a href="{{ url_for('clients.view', client_id=proposal.client_id) }}"
                                     class="text-decoration-none">
                                     {{ proposal.client_name }}
                                 </a>
                             </td>
-                            <td class="fw-bold">{{ proposal.total_amount|format_currency }}</td>
+                            <td class="fw-bold">{{ proposal.currency }} {{ '{:,.0f}'.format(proposal.total_amount) }}
+                            </td>
+                            <td>
+                                {% if proposal.options_count > 1 %}
+                                <span class="badge bg-info">{{ proposal.options_count }} {{ _('options') }}</span>
+                                {% elif proposal.options_count == 1 %}
+                                <span class="badge bg-light text-dark">1 {{ _('option') }}</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if proposal.status == 'draft' %}
-                                <span class="badge bg-secondary">{{ _('Draft') }}</span>
+                                <span class="badge bg-secondary"><i class="bi bi-pencil-square"></i> {{ _('Draft')
+                                    }}</span>
                                 {% elif proposal.status == 'sent' %}
-                                <span class="badge bg-primary">{{ _('Sent') }}</span>
+                                <span class="badge bg-primary"><i class="bi bi-send"></i> {{ _('Sent') }}</span>
                                 {% elif proposal.status == 'approved' %}
-                                <span class="badge bg-success">{{ _('Approved') }}</span>
+                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> {{ _('Approved')
+                                    }}</span>
                                 {% elif proposal.status == 'rejected' %}
-                                <span class="badge bg-danger">{{ _('Rejected') }}</span>
+                                <span class="badge bg-danger"><i class="bi bi-x-circle"></i> {{ _('Rejected') }}</span>
+                                {% elif proposal.status == 'expired' %}
+                                <span class="badge bg-warning text-dark"><i class="bi bi-clock-history"></i> {{
+                                    _('Expired') }}</span>
                                 {% else %}
                                 <span class="badge bg-light text-dark">{{ proposal.status }}</span>
                                 {% endif %}
                             </td>
-                            <td>{{ proposal.created_at|format_date }}</td>
+                            <td>
+                                <small>{{ proposal.created_at|format_date }}</small>
+                                {% if proposal.valid_until %}
+                                <br><small class="text-muted">{{ _('Valid until') }}: {{
+                                    proposal.valid_until|format_date }}</small>
+                                {% endif %}
+                            </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <a href="{{ url_for('proposals.view', proposal_id=proposal.id) }}"
                                         class="btn btn-outline-primary" title="{{ _('View') }}">
                                         <i class="bi bi-eye"></i>
                                     </a>
+                                    {% if proposal.status == 'draft' %}
                                     <a href="{{ url_for('proposals.edit', proposal_id=proposal.id) }}"
                                         class="btn btn-outline-secondary" title="{{ _('Edit') }}">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    {% if proposal.pdf_file_path %}
+                                    {% endif %}
                                     <a href="{{ url_for('proposals.generate_pdf', proposal_id=proposal.id) }}"
                                         class="btn btn-outline-danger" title="PDF">
                                         <i class="bi bi-file-pdf"></i>
                                     </a>
-                                    {% endif %}
+                                    <button type="button" class="btn btn-outline-info btn-duplicate"
+                                        data-id="{{ proposal.id }}" title="{{ _('Duplicate') }}">
+                                        <i class="bi bi-copy"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" class="text-center py-4">
-                                <p class="text-muted mb-0">{{ _('No proposals registered.') }}</p>
+                            <td colspan="8" class="text-center py-4">
+                                <i class="bi bi-file-earmark-text display-4 text-muted"></i>
+                                <p class="text-muted mb-0 mt-2">{{ _('No proposals registered.') }}</p>
+                                <a href="{{ url_for('proposals.create') }}" class="btn btn-sm btn-primary mt-2">
+                                    <i class="bi bi-plus-lg"></i> {{ _('Create your first proposal') }}
+                                </a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -85,4 +165,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.btn-duplicate').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = this.dataset.id;
+            if (confirm('{{ _("Duplicate this proposal?") }}')) {
+                fetch(`/proposals/${id}/duplicate`, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) window.location.href = data.redirect;
+                        else alert(data.message);
+                    });
+            }
+        });
+    });
+</script>
 {% endblock %}

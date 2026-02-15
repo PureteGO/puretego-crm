@@ -7,7 +7,7 @@
 <!-- Modal: Renew Project -->
 <div class="modal fade" id="renewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content themed-card">
             <div class="modal-header">
                 <h5 class="modal-title">{{ _('Renew Contract') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -86,13 +86,26 @@
                     </div>
 
                     <div class="mb-4">
-                        {% if project.billing_type == 'fixed' %}
                         <label class="small text-muted d-block">{{ _('Total Contract Value') }}</label>
-                        <h5 class="text-primary">{{ project.total_amount|format_currency }}</h5>
+                        {% if contract_value > 0 %}
+                        <h5 class="text-primary">Gs. {{ "{:,.0f}".format(contract_value).replace(',', '.') }}</h5>
+                        {% if receivables_paid > 0 %}
+                        <small class="text-success"><i class="bi bi-check-circle-fill me-1"></i>{{ _('Paid') }}: Gs. {{
+                            "{:,.0f}".format(receivables_paid).replace(',', '.') }}</small>
+                        {% endif %}
                         {% else %}
-                        <label class="small text-muted d-block">{{ _('Monthly Value') }}</label>
-                        <h5 class="text-primary">{{ project.monthly_value|format_currency }}</h5>
-                        <small class="text-muted">{{ _('Billing Day') }}: {{ project.billing_base_day }}</small>
+                        <h5 class="text-danger">Gs. 0</h5>
+                        <div class="alert alert-warning py-2 px-3 mt-2" style="font-size: 0.82rem;">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            <strong>{{ _('Attention!') }}</strong> {{ _('No billing data registered for this project.
+                            Please register Setup and Recurring payments in the Finance tab immediately.') }}
+                        </div>
+                        {% endif %}
+                        {% if project.billing_type == 'recurring' and project.monthly_value %}
+                        <small class="text-muted d-block mt-1">
+                            {{ _('Monthly Value') }}: Gs. {{ "{:,.0f}".format(project.monthly_value|float).replace(',',
+                            '.') }} &middot; {{ _('Billing Day') }}: {{ project.billing_base_day }}
+                        </small>
                         {% endif %}
                     </div>
 
@@ -122,7 +135,7 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0 mb-4 bg-light">
+            <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
                     <h6 class="fw-bold mb-3">{{ _('Workflow Control') }}</h6>
 
@@ -197,6 +210,14 @@
                         type="button" role="tab">{{ _('Tasks and Deliveries') }}</button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="memory-tab" data-bs-toggle="tab" data-bs-target="#memory" type="button"
+                        role="tab"><i class="bi bi-chat-left-text"></i> {{ _('Memory') }}</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="timeline-tab" data-bs-toggle="tab" data-bs-target="#timeline"
+                        type="button" role="tab"><i class="bi bi-clock-history"></i> {{ _('Timeline') }}</button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="context-tab" data-bs-toggle="tab" data-bs-target="#context"
                         type="button" role="tab">{{ _('Sales Context') }}</button>
                 </li>
@@ -210,10 +231,10 @@
                 <!-- Tickets Tab -->
                 <div class="tab-pane fade show active" id="tickets" role="tabpanel">
                     <div class="card shadow-sm border-0">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">{{ _('Execution Queue') }}</h5>
                             <div class="d-flex align-items-center gap-3">
-                                <div class="badge bg-light text-dark">
+                                <div class="badge bg-secondary text-white">
                                     {{ project.tickets|length }} {{ _('registered') }}
                                 </div>
                                 <button class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
@@ -225,7 +246,7 @@
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="bg-light">
+                                    <thead>
                                         <tr>
                                             <th class="ps-4">{{ _('Task') }}</th>
                                             <th>{{ _('Status') }}</th>
@@ -250,8 +271,18 @@
                                                 <span class="badge bg-warning text-dark">{{ _('Pending') }}</span>
                                                 {% elif ticket.status == 'in_progress' %}
                                                 <span class="badge bg-info">{{ _('In Progress') }}</span>
+                                                {% elif ticket.status == 'pending_approval' %}
+                                                <span
+                                                    class="badge bg-warning text-dark border border-warning shadow-sm">
+                                                    <i class="bi bi-hourglass-split"></i> {{ _('Pending Approval') }}
+                                                </span>
                                                 {% elif ticket.status == 'done' %}
                                                 <span class="badge bg-success">{{ _('Done') }}</span>
+                                                {% endif %}
+
+                                                {% if ticket.rejection_comment %}
+                                                <div class="mt-1 small text-danger"><i class="bi bi-info-circle"></i> {{
+                                                    ticket.rejection_comment }}</div>
                                                 {% endif %}
                                             </td>
                                             <td>
@@ -277,8 +308,40 @@
                                             </td>
                                             <td>{{ ticket.due_date|format_date if ticket.due_date else '-' }}</td>
                                             <td class="pe-4">
-                                                <button class="btn btn-sm btn-light text-primary"><i
-                                                        class="bi bi-check2-circle"></i></button>
+                                                {% if ticket.status == 'pending_approval' %}
+                                                <div class="d-flex gap-2">
+                                                    <form
+                                                        action="{{ url_for('projects.approve_ticket', project_id=project.id, ticket_id=ticket.id) }}"
+                                                        method="POST" class="d-inline">
+                                                        <input type="hidden" name="csrf_token"
+                                                            value="{{ csrf_token() }}">
+                                                        <button type="submit"
+                                                            class="btn btn-sm btn-success d-flex align-items-center px-2"
+                                                            title="{{ _('Approve') }}">
+                                                            <i class="bi bi-check-lg me-1"></i> {{ _('Approve') }}
+                                                        </button>
+                                                    </form>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-outline-danger d-flex align-items-center px-2"
+                                                        title="{{ _('Reject') }}"
+                                                        onclick="rejectTicket({{ project.id }}, {{ ticket.id }})">
+                                                        <i class="bi bi-x-lg me-1"></i> {{ _('Reject') }}
+                                                    </button>
+                                                </div>
+                                                {% elif ticket.status != 'done' %}
+                                                <form
+                                                    action="{{ url_for('projects.complete_ticket', project_id=project.id, ticket_id=ticket.id) }}"
+                                                    method="POST" class="d-inline">
+                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-sm btn-light text-primary"
+                                                        title="{{ _('Mark as Done') }}">
+                                                        <i class="bi bi-check2-circle"></i>
+                                                    </button>
+                                                </form>
+                                                {% else %}
+                                                <button class="btn btn-sm btn-light text-success" disabled><i
+                                                        class="bi bi-check-circle-fill"></i></button>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                         {% else %}
@@ -299,19 +362,163 @@
                     </div>
                 </div>
 
+                <!-- Memory Tab -->
+                <div class="tab-pane fade" id="memory" role="tabpanel">
+                    <style>
+                        [data-theme="dark"] .note-content,
+                        [data-theme="dark"] .note-author {
+                            color: #e0e0e0 !important;
+                        }
+
+                        [data-theme="dark"] .note-textarea {
+                            background-color: #2b3035 !important;
+                            color: #e0e0e0 !important;
+                            border-color: #495057;
+                        }
+
+                        [data-theme="dark"] .note-textarea::placeholder {
+                            color: #adb5bd !important;
+                        }
+                    </style>
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header py-3">
+                            <h5 class="mb-0">{{ _('Project Memory') }}</h5>
+                        </div>
+                        <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                            <!-- Add Note Form -->
+                            <div class="card mb-4 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <form action="{{ url_for('projects.add_note', project_id=project.id) }}"
+                                        method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div class="input-group">
+                                            <textarea name="content" class="form-control note-textarea" rows="2"
+                                                placeholder="{{ _('Add a note, thought or decision...') }}"
+                                                required></textarea>
+                                            <button class="btn btn-primary" type="submit"><i class="bi bi-send"></i> {{
+                                                _('Save Note') }}</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Notes Feed -->
+                            {% for note in notes %}
+                            <div class="card mb-3 border-0 shadow-sm">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-xs me-2">
+                                                <span class="avatar-title rounded-circle bg-soft-info text-info small">
+                                                    {{ note.author.name[0]|upper if note.author else '?' }}
+                                                </span>
+                                            </div>
+                                            <strong class="small note-author">{{ note.author.name or _('Unknown')
+                                                }}</strong>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <small class="text-muted">{{ note.created_at|format_date }}</small>
+                                            {% if session.get('is_superadmin') or session.get('role') == 'owner' %}
+                                            <form
+                                                action="{{ url_for('projects.delete_note', project_id=project.id, note_id=note.id) }}"
+                                                method="POST" class="d-inline"
+                                                onsubmit="return confirm('{{ _('Delete this note?') }}');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-link p-0 text-danger"
+                                                    title="{{ _('Delete') }}" style="text-decoration: none;">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <p class="mb-0 note-content" style="white-space: pre-wrap;">{{ note.content }}</p>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-chat-square-text display-4 opacity-25"></i>
+                                <p class="mt-2">{{ _('No notes yet. Use this space to document decisions, ideas and log
+                                    meetings.') }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Tab -->
+                <div class="tab-pane fade" id="timeline" role="tabpanel">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-header py-3">
+                            <h5 class="mb-0">{{ _('Activity Timeline') }}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if timeline_events %}
+                            <div class="list-group list-group-flush">
+                                {% for event in timeline_events %}
+                                <div class="list-group-item p-4 bg-transparent">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <div class="d-flex">
+                                            <div class="me-3">
+                                                <!-- Icon based on type -->
+                                                {% if event.type == 'note' %}
+                                                <div class="icon-shape icon-sm bg-soft-info text-info rounded-circle">
+                                                    <i class="bi bi-chat-left-text-fill"></i>
+                                                </div>
+                                                {% elif event.type == 'ticket_completed' %}
+                                                <div
+                                                    class="icon-shape icon-sm bg-soft-success text-success rounded-circle">
+                                                    <i class="bi bi-check-circle-fill"></i>
+                                                </div>
+                                                {% elif event.type == 'ticket_created' %}
+                                                <div
+                                                    class="icon-shape icon-sm bg-soft-primary text-primary rounded-circle">
+                                                    <i class="bi bi-plus-circle-fill"></i>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">{{ event.content }}</h6>
+                                                {% if event.type == 'note' %}
+                                                <small class="text-muted d-block mb-1">{{
+                                                    event.data.content|truncate(100) }}</small>
+                                                {% endif %}
+                                                <small class="text-muted">
+                                                    <i class="bi bi-person-circle"></i> {{ event.user }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                        <small class="text-end text-muted" style="min-width: 120px;">
+                                            {{ event.date|format_date }}<br>
+                                            {{ event.date.strftime('%H:%M') if event.date else '' }}
+                                        </small>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-clock-history display-4 opacity-25"></i>
+                                <p class="mt-2">{{ _('No activity recorded yet.') }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Sales Context Tab -->
                 <div class="tab-pane fade" id="context" role="tabpanel">
                     <div class="row">
                         <!-- Proposals -->
                         <div class="col-md-6 mb-4">
                             <div class="card shadow-sm border-0">
-                                <div class="card-header bg-white py-3">
+                                <div class="card-header py-3">
                                     <h6 class="mb-0 fw-bold"><i class="bi bi-file-earmark-text"></i> {{ _('Latest
                                         Proposals') }}</h6>
                                 </div>
                                 <div class="list-group list-group-flush">
                                     {% for proposal in proposals %}
-                                    <div class="list-group-item">
+                                    <div class="list-group-item bg-transparent">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h6 class="mb-1 text-primary">#{{ proposal.id }} - {{
                                                 proposal.total_amount|format_currency }}</h6>
@@ -337,13 +544,13 @@
                         <!-- Health Checks -->
                         <div class="col-md-6 mb-4">
                             <div class="card shadow-sm border-0">
-                                <div class="card-header bg-white py-3">
+                                <div class="card-header py-3">
                                     <h6 class="mb-0 fw-bold"><i class="bi bi-clipboard-pulse"></i> {{ _('Diagnostics
                                         (Health Checks)') }}</h6>
                                 </div>
                                 <div class="list-group list-group-flush">
                                     {% for check in health_checks %}
-                                    <div class="list-group-item">
+                                    <div class="list-group-item bg-transparent">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h6 class="mb-1">Score: <span class="text-{{ check.get_score_color() }}">{{
                                                     check.score }}%</span></h6>
@@ -366,7 +573,7 @@
                 <!-- Finance Tab -->
                 <div class="tab-pane fade" id="finance" role="tabpanel">
                     <div class="card shadow-sm border-0">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">{{ _('Project Payments') }}</h5>
                             <div class="d-flex gap-2">
                                 <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
@@ -382,7 +589,7 @@
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-hover align-middle mb-0">
-                                    <thead class="bg-light">
+                                    <thead>
                                         <tr>
                                             <th class="ps-4">{{ _('Description') }}</th>
                                             <th>{{ _('Due Date') }}</th>
@@ -428,7 +635,7 @@
 <!-- Modal: Add Ticket -->
 <div class="modal fade" id="addTicketModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content themed-card">
             <div class="modal-header">
                 <h5 class="modal-title">{{ _('New Operational Task') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -460,14 +667,19 @@
                             <input type="date" name="due_date" class="form-control">
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ _('Assigned To') }}</label>
-                        <select name="assigned_to" class="form-select">
-                            <option value="">{{ _('Unassigned') }}</option>
-                            {% for u in users %}
-                            <option value="{{ u.id }}">{{ u.name }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="mb-0">
+                        <div class="themed-card shadow-sm border rounded p-3 bg-light bg-opacity-10">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="verification_required"
+                                    id="verifRequiredProj">
+                                <label class="form-check-label fw-bold" for="verifRequiredProj">
+                                    <i class="bi bi-shield-check me-1"></i> {{ _('Require Verification') }}
+                                </label>
+                            </div>
+                            <div class="form-text small mt-1">
+                                {{ _('If active, task completion must be approved by the creator.') }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -518,6 +730,54 @@
                 <div class="modal-footer border-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
                     <button type="submit" class="btn btn-primary">{{ _('Launch Payments') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal: Launch Recurring -->
+<div class="modal fade" id="launchRecurringModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content themed-card">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title font-weight-bold">{{ _('Launch Recurring') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ url_for('projects.launch_recurring', project_id=project.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="alert alert-info small mb-3">
+                        <i class="bi bi-info-circle-fill me-1"></i>
+                        {{ _('This will generate receivables for the remaining months of the contract.') }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Base Description') }}</label>
+                        <input type="text" name="description" class="form-control"
+                            value="{{ _('Monthly Fee') }}: {{ project.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ _('Monthly Amount') }}</label>
+                        <div class="input-group">
+                            <span class="input-group-text">{{ session.get('company_currency', 'Gs') }}</span>
+                            <input type="number" name="amount" class="form-control" value="{{ project.monthly_value }}"
+                                placeholder="0.00" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ _('Start Date') }}</label>
+                            <input type="date" name="start_date" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ _('Billing Day') }}</label>
+                            <input type="number" name="billing_day" class="form-control"
+                                value="{{ project.billing_base_day }}" min="1" max="31" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Launch Recurring') }}</button>
                 </div>
             </form>
         </div>

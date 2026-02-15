@@ -121,15 +121,22 @@ def mark_as_paid(id):
             # Update status
             if receivable.paid_amount >= receivable.amount:
                 receivable.status = 'paid'
-                # Se estiver ligado a um projeto, atualizar o status financeiro do projeto também se for o caso
+                # Se estiver ligado a um projeto, verificar status financeiro
                 if receivable.project:
-                    receivable.project.financial_status = 'paid'
-                    if receivable.project.phase == 'financeiro':
-                        receivable.project.phase = 'onboarding'
-            else:
-                receivable.status = 'partial'
-                if receivable.project:
-                    receivable.project.financial_status = 'partial'
+                    # Verificar se existe algum outro recebível atrasado
+                    has_overdue = db.query(Receivable).filter(
+                        Receivable.project_id == receivable.project.id,
+                        Receivable.status == 'open',
+                        Receivable.due_date < datetime.utcnow().date()
+                    ).first()
+                    
+                    if not has_overdue:
+                        receivable.project.financial_status = 'paid'
+                        # Se for o primeiro pagamento e estiver na fase financeiro, avançar
+                        if receivable.project.phase == 'financeiro':
+                            receivable.project.phase = 'onboarding'
+                    else:
+                        receivable.project.financial_status = 'overdue'
                
             db.commit()
             
