@@ -185,14 +185,18 @@ def agenda():
 
         # Add Interactions
         for i in urgent_tasks:
+            if not i.type: continue
             today_list.append(format_item(i, i.type.name, url_for('clients.view', client_id=i.client_id), is_call=i.type.is_call))
         for i in future_tasks:
+            if not i.type: continue
             upcoming_list.append(format_item(i, i.type.name, url_for('clients.view', client_id=i.client_id), is_call=i.type.is_call))
             
         # Add Visits
         for v in visits_today:
+            if not v.client_id: continue
             today_list.append(format_item(v, _('Visit'), url_for('clients.view', client_id=v.client_id), is_call=False, date_field='visit_date'))
         for v in visits_future:
+            if not v.client_id: continue
             upcoming_list.append(format_item(v, _('Visit'), url_for('clients.view', client_id=v.client_id), is_call=False, date_field='visit_date'))
 
         # Add General Tasks
@@ -203,9 +207,11 @@ def agenda():
 
         # Add Project Tickets
         for t in tickets_today:
+            if not t.project_id: continue
             proj_url = url_for('projects.view', project_id=t.project_id)
             today_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
         for t in tickets_future:
+            if not t.project_id: continue
             proj_url = url_for('projects.view', project_id=t.project_id)
             upcoming_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
             
