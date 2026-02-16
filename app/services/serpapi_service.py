@@ -30,17 +30,22 @@ class SerpApiService:
                 logger.error(f"SerpApi Error: {str(e)}")
                 return {'error': f"Connection failed: {str(e)}"}
 
-    def search_business(self, business_name, location=None):
+    def search_business(self, business_name, location=None, coordinates=None):
         params = {
             "engine": "google_maps",
             "q": business_name,
             "type": "search",
             "api_key": self.api_key
         }
-        if location:
+        
+        if coordinates:
+            # coordinates format expected: "@lat,long,zoom" e.g. "@-25.2637,57.5759,14z"
+            params["ll"] = coordinates
+        elif location:
             params["q"] += f", {location}"
         else:
-            params["ll"] = "@-25.2637,57.5759,14z"
+            params["ll"] = "@-25.2637,57.5759,14z" # Default Asuncion
+            
         return self._execute_request(params)
 
     def search_local_pack(self, query, location=None, gl="py", hl="es"):
