@@ -136,88 +136,104 @@ def create():
     """Criar nova tarefa"""
     user = get_current_user()
     
-    with get_db() as db:
-
-        assigned_to_id = int(request.form['assigned_to_id']) if request.form.get('assigned_to_id') else user.id
-        client_id = int(request.form['client_id']) if request.form.get('client_id') else None
-        project_id = int(request.form['project_id']) if request.form.get('project_id') else None
-        deal_id = int(request.form['deal_id']) if request.form.get('deal_id') else None
-
-        company_id = session.get('company_id')
-
-        # Validate Associations (Strict Tenant Isolation)
-        if assigned_to_id:
-             # Force check against session company_id, avoiding superadmin bypass
-            valid_user = db.query(User).filter(User.id == assigned_to_id)
-            if company_id:
-                valid_user = valid_user.filter(User.company_id == company_id)
-            
-            if not valid_user.first():
-                assigned_to_id = None
-        
-        if client_id:
-             valid_client = db.query(Client).filter(Client.id == client_id)
-             if company_id:
-                 valid_client = valid_client.filter(Client.company_id == company_id)
-             if not valid_client.first():
-                 client_id = None
-                 
-        if project_id:
-             valid_project = db.query(Project).filter(Project.id == project_id)
-             if company_id:
-                 valid_project = valid_project.filter(Project.company_id == company_id)
-             if not valid_project.first():
-                 project_id = None
-
-        task = Task(
-            company_id=session.get('company_id'),
-            title=request.form.get('title', '').strip(),
-            description=request.form.get('description', '').strip() or None,
-            status='open',
-
-            priority=request.form.get('priority', 'medium'),
-            role_target=request.form.get('role_target', ''),
-            assigned_to_id=assigned_to_id,
-            assigned_by_id=user.id,
-            client_id=client_id,
-            deal_id=deal_id,
-            project_id=project_id,
-            verification_required=True if request.form.get('verification_required') == 'on' else False,
-            type=request.form.get('type', 'operational'), # Default to operational as per req
-        )
-        
-        # Parse due_date
-        due_date_str = request.form.get('due_date', '')
-        if due_date_str:
+    try:
+        with get_db() as db:
+            # Safely parse IDs from form
             try:
-                task.due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M')
+                assigned_to_id = int(request.form.get('assigned_to_id')) if request.form.get('assigned_to_id') else user.id
+                client_id = int(request.form.get('client_id')) if request.form.get('client_id') else None
+                project_id = int(request.form.get('project_id')) if request.form.get('project_id') else None
+                deal_id = int(request.form.get('deal_id')) if request.form.get('deal_id') else None
             except ValueError:
+                flash(_('Invalid data format in some fields.'), 'error')
+                return redirect(request.referrer or url_for('tasks.index'))
+
+            # Fallback for company_id (Critical for Superadmins or session timeouts)
+            company_id = session.get('company_id') or user.company_id
+            if not company_id:
+                flash(_('Company context not found. Please log in again.'), 'error')
+                return redirect(url_for('auth.login'))
+
+            # Validate Associations (Strict Tenant Isolation)
+            if assigned_to_id:
+                 # Force check against session company_id, avoiding superadmin bypass
+                valid_user = db.query(User).filter(User.id == assigned_to_id)
+                if company_id:
+                    valid_user = valid_user.filter(User.company_id == company_id)
+                
+                if not valid_user.first():
+                    assigned_to_id = None
+            
+            if client_id:
+                 valid_client = db.query(Client).filter(Client.id == client_id)
+                 if company_id:
+                     valid_client = valid_client.filter(Client.company_id == company_id)
+                 if not valid_client.first():
+                     client_id = None
+                     
+            if project_id:
+                 valid_project = db.query(Project).filter(Project.id == project_id)
+                 if company_id:
+                     valid_project = valid_project.filter(Project.company_id == company_id)
+                 if not valid_project.first():
+                     project_id = None
+
+            task = Task(
+                company_id=company_id,
+                title=request.form.get('title', '').strip(),
+                description=request.form.get('description', '').strip() or None,
+                status='open',
+                priority=request.form.get('priority', 'medium'),
+                role_target=request.form.get('role_target', ''),
+                assigned_to_id=assigned_to_id,
+                assigned_by_id=user.id,
+                client_id=client_id,
+                deal_id=deal_id,
+                project_id=project_id,
+                verification_required=True if request.form.get('verification_required') == 'on' else False,
+                type=request.form.get('type', 'operational'), # Default to operational as per req
+            )
+            
+            # Parse due_date
+            due_date_str = request.form.get('due_date', '')
+            if due_date_str:
                 try:
-                    task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
+                    task.due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M')
                 except ValueError:
                     try:
-                        task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+                        task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
                     except ValueError:
-                        task.due_date = None
+                        try:
+                            task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+                        except ValueError:
+                            task.due_date = None
+            
+            db.add(task)
+            db.commit() # Commit task FIRST to ensure ID is generated and data is safe
+            
+            # Send notification to assigned user (Safely)
+            if task.assigned_to_id:
+                try:
+                    from app.services.notification_service import NotificationService
+                    NotificationService.on_task_assigned(db, task)
+                    db.commit()
+                except Exception as e:
+                    # Log error but don't fail the request
+                    import logging
+                    logging.error(f"Failed to send notification: {e}")
+                    db.rollback() # Rollback only the notification part (though session might be messy, task is committed)
+            
+            flash(_('Task created successfully'), 'success')
         
-        db.add(task)
-        db.commit() # Commit task FIRST to ensure ID is generated and data is safe
-        
-        # Send notification to assigned user (Safely)
-        if task.assigned_to_id:
-            try:
-                from app.services.notification_service import NotificationService
-                NotificationService.on_task_assigned(db, task)
-                db.commit()
-            except Exception as e:
-                # Log error but don't fail the request
-                print(f"Failed to send notification: {e}")
-                db.rollback() # Rollback only the notification part (though session might be messy, task is committed)
-        flash(_('Task created successfully'), 'success')
-    
-    # Redirect back to referrer or tasks list
-    next_url = request.form.get('next', url_for('tasks.index'))
-    return redirect(next_url)
+        # Redirect back to referrer or tasks list
+        next_url = request.form.get('next', url_for('tasks.index'))
+        return redirect(next_url)
+
+    except Exception as e:
+        import logging
+        logging.exception("Error in task creation route")
+        flash(_('Error creating task: ') + str(e), 'error')
+        return redirect(request.referrer or url_for('tasks.index'))
 
 
 @bp.route('/<int:task_id>/update', methods=['POST'])
@@ -508,80 +524,92 @@ def api_quick_create():
     title = (data.get('title') or '').strip()
     if not title:
         return jsonify({'success': False, 'message': _('Task title is required')}), 400
-    
-    db = SessionLocal()
-    try:
-        task = Task(
-            company_id=session.get('company_id'),
-            title=title,
-            description=(data.get('description') or '').strip() or None,
-            status='open',
-            type='operational', # Default for quick add
-            verification_required=True if data.get('verification_required') else False,
 
-            assigned_by_id=user.id,
-        )
-        
-        # Validation (Strict)
-        company_id = session.get('company_id')
-        
-        aid = int(data['assigned_to_id']) if data.get('assigned_to_id') else user.id
-        if aid:
-            q = db.query(User).filter(User.id == aid)
-            if company_id:
-                q = q.filter(User.company_id == company_id)
-            if q.first():
-                task.assigned_to_id = aid
-        
-        pid = int(data['project_id']) if data.get('project_id') else None
-        if pid:
-            q = db.query(Project).filter(Project.id == pid)
-            if company_id:
-                q = q.filter(Project.company_id == company_id)
-            if q.first():
-                task.project_id = pid
-            
-        cid = int(data['client_id']) if data.get('client_id') else None
-        if cid:
-            q = db.query(Client).filter(Client.id == cid)
-            if company_id:
-                q = q.filter(Client.company_id == company_id)
-            if q.first():
-                task.client_id = cid
-        
-        # Parse due_date
-        due_date_str = data.get('due_date', '')
-        if due_date_str:
+    try:
+        with get_db() as db:
+            # Safely parse assigned_to_id
             try:
-                task.due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M')
-            except ValueError:
+                assigned_to_id = int(data.get('assigned_to_id')) if data.get('assigned_to_id') else user.id
+            except (ValueError, TypeError):
+                assigned_to_id = user.id
+
+            # Fallback for company_id (Critical for Superadmins or session timeouts)
+            company_id = session.get('company_id') or user.company_id
+            if not company_id:
+                 return jsonify({'success': False, 'message': _('Company context not found')}), 401
+
+            # Validate assigned_to_id belongs to the same company
+            if assigned_to_id:
+                valid_user = db.query(User).filter(User.id == assigned_to_id, User.company_id == company_id).first()
+                if not valid_user:
+                    assigned_to_id = user.id
+
+            task = Task(
+                company_id=company_id,
+                title=title,
+                description=(data.get('description') or '').strip() or None,
+                status='open',
+                type='operational', # Default for quick add
+                verification_required=True if data.get('verification_required') else False,
+                assigned_by_id=user.id,
+                assigned_to_id=assigned_to_id
+            )
+
+            # Optional associations
+            try:
+                if data.get('client_id'): 
+                    cid = int(data['client_id'])
+                    valid_client = db.query(Client).filter(Client.id == cid, Client.company_id == company_id).first()
+                    if valid_client:
+                        task.client_id = cid
+                
+                if data.get('project_id'): 
+                    pid = int(data['project_id'])
+                    valid_project = db.query(Project).filter(Project.id == pid, Project.company_id == company_id).first()
+                    if valid_project:
+                        task.project_id = pid
+            except (ValueError, TypeError):
+                pass
+            
+            # Optional due date
+            due_date_str = data.get('due_date', '')
+            if due_date_str:
                 try:
-                    task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
-                except ValueError:
+                    # Handle both ISO and common formats
+                    if 'T' in due_date_str:
+                        task.due_date = datetime.fromisoformat(due_date_str.replace('Z', '+00:00'))
+                    else:
+                        task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
+                except:
                     try:
                         task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
-                    except ValueError:
-                        task.due_date = None
-        
-        db.add(task)
-        db.flush()
-        
-        # Notify assigned user
-        if task.assigned_to_id and task.assigned_to_id != user.id:
-            try:
-                from app.services.notification_service import NotificationService
-                NotificationService.on_task_assigned(db, task)
-            except Exception as e:
-                print(f"Notification error: {e}")
-        
-        db.commit()
-        return jsonify({'success': True, 'message': _('Task created successfully'), 'task_id': task.id})
+                    except:
+                        pass
+
+            db.add(task)
+            db.commit()
+
+            # Notification
+            if task.assigned_to_id:
+                try:
+                    from app.services.notification_service import NotificationService
+                    NotificationService.on_task_assigned(db, task)
+                    db.commit()
+                except Exception as e:
+                    import logging
+                    logging.error(f"Error in quick-create notification: {e}")
+                    db.rollback()
+
+            return jsonify({
+                'success': True,
+                'message': _('Task created!'),
+                'task': task.to_dict()
+            })
+
     except Exception as e:
-        db.rollback()
-        print(f"Error creating task: {e}")
-        return jsonify({'success': False, 'message': f"Error creating task: {str(e)}"}), 500
-    finally:
-        db.close()
+        import logging
+        logging.exception("Error in api_quick_create")
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @api_bp.route('/team')
