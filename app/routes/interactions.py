@@ -206,10 +206,7 @@ def agenda():
                 task_query = task_query.filter(
                     or_(
                         Task.assigned_to_id == user_id,
-                        (Task.assigned_to_id.is_(None)) & (
-                            (Task.assigned_by_id == user_id) | 
-                            (Task.role_target == user_role)
-                        )
+                        (Task.assigned_to_id.is_(None)) & (Task.assigned_by_id == user_id)
                     )
                 )
                 
