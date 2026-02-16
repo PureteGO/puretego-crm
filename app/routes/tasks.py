@@ -193,9 +193,12 @@ def create():
                 task.due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M')
             except ValueError:
                 try:
-                    task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+                    task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
                 except ValueError:
-                    task.due_date = None
+                    try:
+                        task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+                    except ValueError:
+                        task.due_date = None
         
         db.add(task)
         db.commit() # Commit task FIRST to ensure ID is generated and data is safe
