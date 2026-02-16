@@ -319,11 +319,17 @@ def index():
                     'url': f"/clients/{i.client_id}"  # Direct link to client
                 })
                 
-            # 2. Overdue Tasks
+            # 2. Overdue Tasks (assigned to user OR (no assignee AND (created by user OR user role)))
             overdue_tasks = filter_by_company(db.query(Task), Task).filter(
-                Task.status.in_(['open', 'in_progress']),
+                Task.status.in_(['open', 'in_progress', 'pending_approval']),
                 Task.due_date < datetime.now(),
-                or_(Task.assigned_to_id == user_id, (Task.assigned_to_id.is_(None)) & (Task.role_target == user_role))
+                or_(
+                    Task.assigned_to_id == user_id,
+                    (Task.assigned_to_id.is_(None)) & (
+                        (Task.assigned_by_id == user_id) | 
+                        (Task.role_target == user_role)
+                    )
+                )
             ).all()
             
             for t in overdue_tasks:

@@ -59,12 +59,11 @@ def index():
             if not user.role or user.role.name not in ['owner', 'manager', 'admin', 'partner']:
                 base_query = base_query.filter(Task.assigned_to_id == user.id)
         
-        # Status filter
         if status_filter:
             base_query = base_query.filter(Task.status == status_filter)
         else:
-            # By default, show active tasks (not done/canceled)
-            base_query = base_query.filter(Task.status.in_(['open', 'in_progress']))
+            # By default, show active tasks (including those pending approval)
+            base_query = base_query.filter(Task.status.in_(['open', 'in_progress', 'pending_approval']))
         
         # Priority filter
         if priority_filter:
@@ -485,7 +484,7 @@ def my_tasks():
         tasks = filter_by_company(
             db.query(Task).options(joinedload(Task.client), joinedload(Task.assigned_by)), Task
         ).filter(
-            Task.status.in_(['open', 'in_progress']),
+            Task.status.in_(['open', 'in_progress', 'pending_approval']),
             or_(
                 Task.assigned_to_id == user.id,
                 (Task.assigned_to_id.is_(None)) & (Task.role_target == role_name),
