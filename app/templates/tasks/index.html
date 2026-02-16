@@ -64,6 +64,23 @@
         color: var(--text-secondary);
     }
 
+    .task-meta span {
+        max-width: 100%;
+    }
+
+    @media (max-width: 576px) {
+        .task-meta span {
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .task-meta span:has(.bi-clock) {
+            max-width: none;
+            /* Don't truncate date */
+        }
+    }
+
     .priority-badge {
         font-size: 0.65rem;
         text-transform: uppercase;
@@ -267,27 +284,32 @@
                 </div>
                 {% endif %}
 
-                <div class="d-flex align-items-center gap-3 flex-wrap">
+                <div class="d-flex align-items-center flex-wrap gap-2 text-muted">
                     {% if task.due_date %}
-                    <span class="small d-flex align-items-center">
+                    <span class="small text-nowrap d-flex align-items-center">
                         <i class="bi bi-clock {{ 'text-danger fw-bold' if is_overdue else 'text-muted' }} me-1"></i>
                         {{ task.due_date.strftime('%d/%m/%Y %H:%M') if task.due_date is not string else task.due_date }}
                     </span>
                     {% endif %}
                     {% if task.assigned_to_name %}
-                    <span class="small d-flex align-items-center"><i class="bi bi-person me-1"></i>{{
-                        task.assigned_to_name }}</span>
+                    <span class="small text-nowrap d-flex align-items-center">
+                        <i class="bi bi-person me-1"></i>{{ task.assigned_to_name }}
+                    </span>
                     {% endif %}
                     {% if task.client_name %}
-                    <span class="small d-flex align-items-center"><i class="bi bi-building me-1"></i>{{ task.client_name
-                        }}</span>
+                    <span class="small text-nowrap d-flex align-items-center">
+                        <i class="bi bi-building me-1"></i>{{ task.client_name }}
+                    </span>
                     {% endif %}
                     {% if task.deal_title %}
-                    <span class="small d-flex align-items-center"><i class="bi bi-briefcase me-1"></i>{{ task.deal_title
-                        }}</span>
+                    <span class="small text-nowrap d-flex align-items-center">
+                        <i class="bi bi-briefcase me-1"></i>{{ task.deal_title }}
+                    </span>
                     {% endif %}
                     {% if task.assigned_by_name %}
-                    <span class="small text-muted">({{ _('by') }} {{ task.assigned_by_name }})</span>
+                    <span class="small text-muted text-nowrap">
+                        ({{ _('by') }} {{ task.assigned_by_name }})
+                    </span>
                     {% endif %}
                 </div>
             </div>
