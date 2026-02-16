@@ -452,18 +452,20 @@
     // Competitor Chart (Radar) - Added Missing Initialization
     const compCtx = document.getElementById('competitorChart');
     if (compCtx) {
-        let clientData, marketData, labels;
+        let clientData = [0, 0, 0, 0];
+        let marketData = [0, 0, 0, 0];
+        let labels = ['Visibilidade', 'Posição', 'Reviews', 'Autoridade'];
+        let metrics = null;
 
         {% if health_check.report_data and health_check.report_data.radar_metrics %}
         // Real Data available
-        let metrics = {{ health_check.report_data.radar_metrics | tojson
-    }};
+        metrics = {{ health_check.report_data.radar_metrics | tojson }
+    };
 
-    // Zero-check fallback: if real scan returned partial zeros or failed to match
+    // Zero-check fallback
     if ((!metrics.visibility || metrics.visibility === 0) && (!metrics.position || metrics.position === 0)) {
         const baseScore = {{ health_check.score }
     };
-    // Construct synthetic metrics for better visualization
     metrics = {
         visibility: baseScore,
         position: baseScore > 50 ? 60 : 20,
@@ -471,14 +473,25 @@
         authority: baseScore * 0.8,
         market_avg: { visibility: 75, position: 70, reviews: 80, authority: 65 }
     };
-        }
+            }
+    {% endif %}
 
-    clientData = [
-        metrics.visibility || 0,
-        metrics.position || 0,
-        metrics.reviews || 0,
-        metrics.authority || 0
-    ];
+    if (metrics) {
+        clientData = [
+            metrics.visibility || 0,
+            metrics.position || 0,
+            metrics.reviews || 0,
+            metrics.authority || 0
+        ];
+        // Safe access to market_avg
+        const mkt = metrics.market_avg || {};
+        marketData = [
+            mkt.visibility || 0,
+            mkt.position || 0,
+            mkt.reviews || 0,
+            mkt.authority || 0
+        ];
+    }
     // Safe access to market_avg
     const mkt = metrics.market_avg || {};
     marketData = [

@@ -113,7 +113,15 @@ def view(health_check_id):
             
             # --- Radar Metrics Backfill (Runtime) ---
             # If report is missing radar data (e.g. from bug), try to fetch it from DB
-            report = health_check.report_data or {}
+            report = health_check.report_data
+            if isinstance(report, str):
+                try:
+                    report = json.loads(report)
+                except:
+                    report = {}
+            if not report:
+                report = {}
+                
             radar = report.get('radar_metrics')
             
             # Check if radar is missing or zeroed out (all 0s)
