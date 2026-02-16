@@ -137,19 +137,49 @@ class HealthCheckService:
         reviews_data = {}
         photos_data = {}
         posts_data = {}
+        deep_fetch_error = False
         
         if data_id:
             import concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                future_reviews = executor.submit(serpapi.get_place_reviews, data_id, gl=gl)
-                future_photos = executor.submit(serpapi.get_place_photos, data_id, gl=gl)
-                future_posts = executor.submit(serpapi.get_place_posts, data_id, gl=gl)
-                
-                reviews_data = future_reviews.result()
-                photos_data = future_photos.result()
-                posts_data = future_posts.result()
+            try:
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    future_reviews = executor.submit(serpapi.get_place_reviews, data_id, gl=gl)
+                    future_photos = executor.submit(serpapi.get_place_photos, data_id, gl=gl)
+                    future_posts = executor.submit(serpapi.get_place_posts, data_id, gl=gl)
+                    
+                    try:
+                        reviews_data = future_reviews.result(timeout=10)
+                    except Exception as e:
+                        current_app.logger.error(f"Error fetching reviews for {data_id}: {e}")
+                        reviews_data = {}
+
+                    try:
+                        photos_data = future_photos.result(timeout=10)
+                    except Exception as e:
+                        current_app.logger.error(f"Error fetching photos for {data_id}: {e}")
+                        photos_data = {}
+
+                    try:
+                        posts_data = future_posts.result(timeout=10)
+                    except Exception as e:
+                        current_app.logger.error(f"Error fetching posts for {data_id}: {e}")
+                        posts_data = {}
+            except Exception as e:
+                current_app.logger.error(f"Global error in ThreadPool for {data_id}: {e}")
+                # Fallback to empty dicts if pool fails entirely
+                if not reviews_data: reviews_data = {}
+                if not photos_data: photos_data = {}
+                if not posts_data: posts_data = {}
+                # Add warning to be picked up in Analysis later? 
+                # We don't have 'details' list initialized here. It's later.
+                # Use a flag.
+                deep_fetch_error = True
+            else:
+                deep_fetch_error = False
             
         # 4. Analysis & Logic
+        
+        # ... (later in code)
         
         # A. Reviews Analysis
         reviews_list = reviews_data.get('reviews', [])
@@ -213,6 +243,10 @@ class HealthCheckService:
         moderate_issues = 0
         critical_issues = 0
         
+        if deep_fetch_error:
+            details.append("Aviso: Falha temporária na API de busca profunda. Algumas métricas (Reviews, Fotos) podem estar incompletas.")
+            # moderate_issues += 1 # Optional
+            
         for c in criteria:
             cid = c['id']
             passed = False
@@ -234,7 +268,15 @@ class HealthCheckService:
                 else:
                      details.append("Sem indícios de gerenciamento ativo (Não verificado)")
             elif cid == 5: # Site
-                passed = bool(place_data.get('website'))
+                website = place_data.get('website', '').lower()
+                passed = bool(website)
+                if passed:
+                    # Check if it's a social profile masquerading as a website
+                    social_domains = ['facebook.com', 'instagram.com', 'tiktok.com', 'linktr.ee', 'linkedin.com', 'twitter.com', 'x.com']
+                    if any(domain in website for domain in social_domains):
+                        passed = False
+                        details.append(f"Site detectado é uma rede social ({website}), o que não conta como Website Oficial para SEO.")
+
             elif cid == 6: # Q&A
                 # Q&A is hard to get via public API
                 # If we have 'extensions' or 'about' or rich 'parameters', we assume user engagement
@@ -307,6 +349,31 @@ class HealthCheckService:
                 'weight': c['weight'],
                 'type': c.get('type','moderate')
             })
+            
+        # --- Score Adjustment Logic (Critical Issues) ---
+        # 1. Count missing criticals
+        # Note: critical_issues variable already counts missing criticals inside the loop
+        critical_missing_count = critical_issues
+        
+        # 2. Determine multiplier
+        multiplier = 1.0
+        if critical_missing_count == 1:
+            multiplier = 0.8
+        elif critical_missing_count == 2:
+            multiplier = 0.6
+        elif critical_missing_count >= 3:
+            multiplier = 0.4
+            
+        # 3. Apply multiplier
+        score = round(score * multiplier)
+        
+        # Add explanation if penalized
+        if multiplier < 1.0:
+            details.append(f"Nota ajustada devido à ausência de {critical_missing_count} fatores críticos fundamentais.")
+
+        # Apply penalty for unverified profile (Cumulative)
+        if not is_managed:
+            score = round(score * 0.8)
 
         # Relatório final
         score = min(100, max(0, score))
@@ -416,6 +483,45 @@ class HealthCheckService:
             import traceback
             current_app.logger.error(traceback.format_exc())
 
+        # --- AI Quick Summary Generation ---
+        try:
+             from app.services.gemini_service import GeminiService
+             gemini = GeminiService()
+             
+             if gemini.model:
+                 # 1. Detect site type
+                 website_url = place_data.get('website')
+                 site_type = HealthCheckService._detect_site_type(website_url)
+                 
+                 # 2. Prepare Input Data
+                 input_data = {
+                     'business_name': place_data.get('title'),
+                     'language': 'pt', # Default to PT for Quick Check or use gl/client preference? 
+                     # Quick Check is often for prospecting, so PT or ES might depend on target region.
+                     # The prompt handles languages. Let's pass 'pt' or 'es' based on `gl` context?
+                     # Method has `gl` variable. 'py' -> 'es', 'br' -> 'pt'.
+                     'language': 'pt' if gl == 'br' else 'es',
+                     'criteria_results': criteria_results,
+                     'summary': {
+                         'score_publico': score,
+                         'critical_issues_count': critical_issues,
+                         'moderate_issues_count': moderate_issues,
+                         'positive_points_count': positive_points
+                     },
+                     'details': details,
+                     'recommendations': recommendations,
+                     'site_type': site_type,
+                     'site_url': website_url
+                 }
+                 
+                 # Call AI
+                 ai_summary = gemini.generate_quick_check_summary(input_data)
+                 report_data['ai_summary'] = ai_summary
+                 
+        except Exception as e: 
+             current_app.logger.error(f"AI Generation failed for Public Audit: {e}")
+             # Non-blocking
+
         check_id = None
         if client_id:
             with get_db() as db:
@@ -502,13 +608,25 @@ class HealthCheckService:
             
         # Status de Verificação (Voice of Merchant)
         is_verified = vcom_state.get('hasVoiceOfMerchant', False)
+        vcom_error = vcom_state.get('error')
         gain_vcom = vcom_state.get('gainVoiceOfMerchant', {})
         
+        if vcom_error:
+            # API Error - Do not penalize heavily, just warn
+            details.append(f"Erro na verificação de status (API): {vcom_error}")
+            moderate_issues += 1
+            # Assume verified for scoring to give benefit of doubt if it's an API config issue
+            # Or at least don't apply the 0.8 multiple later
+            verification_status_unknown = True
+        else:
+            verification_status_unknown = False
+
         if is_verified:
             score += 15 # Aumentado para 15
             positive_points += 1
             details.append("Perfil Verificado e Gerenciado (Confirmado via Google)")
-        else:
+        elif not verification_status_unknown:
+            # Only go into details if we are sure it's NOT verified
             # Analisar motivo da não-verificação
             msg = "Perfil não verificado ou requer ação manual no Google Business Profile."
             if 'resolveOwnershipConflict' in gain_vcom:
@@ -551,12 +669,19 @@ class HealthCheckService:
              score += 5
              positive_points += 1
         else:
+             # Check if it's 24 hours or just missing?
+             # API returns regularHours as {periods: []} or None?
              details.append("Sem horário de funcionamento.")
              moderate_issues += 1
 
         # --- B. Imagem e Conteúdo (Max 30) ---
         # Fotos (Verificadas via API Media)
         photo_count = len(media_items)
+        
+        # Check for potential API failure in Media
+        if photo_count == 0:
+            details.append("Não foi possível detectar fotos (Pode ser erro de Permissão da API ou Perfil vazio).")
+        
         has_logo = any(m.get('locationAssociation') == 'LOGO' for m in media_items)
         has_interior = any(m.get('locationAssociation') == 'INTERIOR' for m in media_items)
         
@@ -570,8 +695,8 @@ class HealthCheckService:
             details.append(f"Poucas fotos ({photo_count}). Ideal > 10.")
         else:
             critical_issues += 1
-            details.append("Sem fotos publicadas.")
-            
+            # details.append("Sem fotos publicadas.") # Already added above
+
         if has_logo:
             score += 5
             positive_points += 1
@@ -651,12 +776,21 @@ class HealthCheckService:
             else:
                  recommendations.append(f"Ponto Positivo: {detail}")
 
+        # Apply penalty for unverified profile (Official)
+        # We need to re-verify the variable 'is_verified' scope or use 'critical_issues' analysis?
+        # 'is_verified' var corresponds to Voice of Merchant check from line 543.
+        # Apply penalty for unverified profile (Official)
+        if not is_verified and not verification_status_unknown:
+            score = score * 0.8
+            # Explicitly add critical issue if not already added?
+            # It was added in the block above
+
         # Relatório final formatado
         score = min(100, max(0, score))
         
         # Prepare report data
         # Ensure ID is available at root for header
-        if loc_details.get('metadata'):
+        if loc_details and loc_details.get('metadata'):
             loc_details['place_id'] = loc_details['metadata'].get('placeId')
             loc_details['placeId'] = loc_details['metadata'].get('placeId')
 
@@ -741,6 +875,103 @@ class HealthCheckService:
             # Fallback to mock/calculated structure if needed or just leave empty
             pass
         
+        # --- AI Internal Analysis Generation ---
+        try:
+             from app.services.gemini_service import GeminiService
+             gemini = GeminiService()
+             
+             if gemini.model:
+                 # 1. Detect site type
+                 website_url = loc_details.get('websiteUri')
+                 site_type = HealthCheckService._detect_site_type(website_url)
+                 
+                 # 2. Prepare Input Data
+                 input_data = {
+                     'business_name': loc_details.get('title'),
+                     'language': 'es', # Default to Spanish for internal/official audit or make configurable
+                     'criteria_results': report_data['criteria'], # Note: report_data['criteria'] format is simplified (name, status, score). We need report_data['criteria_details']?
+                     # Wait, report_data assigned 'criteria' at line 675 with simplified format.
+                     # We need the rich 'criteria_results' which was NOT created in perform_official_audit (it uses 'details' list).
+                     # We must construct a compatible criteria_results list from 'details' or mapped IDs.
+                     # Since official audit logic is different, we'll map details to a "mock" criteria structure or pass 'details' directly.
+                     # The prompt uses 'criteria_results' with 'type' and 'passed'. Official audit logic didn't build this structured list.
+                     # We will pass 'details' and a constructed 'criteria_results' based on critical/moderate counts logic implicitly?
+                     # Let's verify prompt: "criteria_results (array of objects): id, name_pt, passed, type, weight".
+                     # perform_official_audit logic (lines 498-641) calculates `details` and counts directly.
+                     # We should reconstruct a minimal criteria list for the AI to understand the structure.
+                     
+                     # RE-PLAN: Adapt prompt input or data.
+                     # The prompt logic relies on 'criteria_results' to count critical misses.
+                     # In Official Audit, we already counted 'critical_issues'. We can pass that summary directly?
+                     # The prompt RE-CALCULATES critical_missing_count. So it needs the raw items.
+                     # Since Official Audit code is unstructured (just `details.append`), we can't easily rebuild the exact criteria list without refactoring.
+                     # HOWEVER, we can stick to passing the `details` text and letting the AI parse it?
+                     # No, prompt says "INPUT (JSON)... criteria_results".
+                     # Let's create a synthetic list from the `details` + hardcoded knowledge of official check criteria.
+                     
+                     # OR simpler: Use the `quick_check` logic (public audit) structure since prompt is shared?
+                     # But `perform_official_audit` is different.
+                     
+                     # Let's pass the 'details' text as 'criteria_results' for now? No, type mismatch.
+                     # Let's pass an empty criteria_results and rely on 'summary' counts? 
+                     # Prompt Logic Step 1: "count how many such items exist".
+                     # So if we pass empty, it counts 0.
+                     # We need to pass the actual failures.
+                     # Since we can't easily map back, let's skip AI generation for Official Audit OR refactor Official Audit to use structured criteria.
+                     # Refactoring Official Audit to use structured criteria like Public Audit is better but risky/large change.
+                     
+                     # ALTERNATIVE: Since User asked for "Health Check na ficha do cliente" (Client Sheet Health Check),
+                     # which usually refers to the internal view.
+                     # The prompt "HEALTH CHECK INTERNO" expects the same structure.
+                     # I will do my best to map the `details` to `criteria_results`.
+                     
+                     # Mapping based on text in details
+                     'criteria_results': [], # Populated below
+                     'summary': {
+                         'score_publico': score,
+                         'critical_issues_count': critical_issues,
+                         'moderate_issues_count': moderate_issues,
+                         'positive_points_count': positive_points
+                     },
+                     'details': details,
+                     'recommendations': recommendations,
+                     'site_type': site_type,
+                     'site_url': website_url
+                 }
+                 
+                 # Reconstruct criteria_results from details (Best Effort)
+                 # We know which are critical in general logic.
+                 # Critical: Verification, Website (if missing), Phone?
+                 
+                 # Let's iterate details and try to assign to a generic criteria list
+                 # This is hacky. 
+                 # Maybe we just pass the `critical_issues` count and ask AI to trust it?
+                 # But Prompt Step 3 recalculates it.
+                 
+                 # Let's just create "Dummy" criteria entries for the detected failures.
+                 for detail in details:
+                     is_failure = any(x in detail.lower() for x in ["sem ", "não ", "poucas", "baixa", "pendente"])
+                     severity = 'critical' if any(x in detail.lower() for x in ["verificado", "site", "telefone", "suspenso"]) else 'moderate'
+                     if "logo" in detail.lower() or "interior" in detail.lower(): severity = 'moderate'
+                     
+                     if is_failure:
+                         input_data['criteria_results'].append({
+                             'id': 99,
+                             'name_pt': detail,
+                             'name_es': detail,
+                             'passed': False,
+                             'type': severity,
+                             'weight': 5
+                         })
+                 
+                 # Call AI
+                 ai_summary = gemini.generate_internal_audit_summary(input_data)
+                 report_data['ai_internal_analysis'] = ai_summary
+                 
+        except Exception as e:
+             current_app.logger.error(f"AI Generation failed for Official Audit: {e}")
+             # Non-blocking
+        
         # Salvar auditoria
         with get_db() as db:
             health_check = HealthCheck(
@@ -762,3 +993,25 @@ class HealthCheckService:
             'score': score,
             'report': report_data 
         }
+
+    @staticmethod
+    def _detect_site_type(url):
+        """
+        Detecta o tipo de site baseado na URL.
+        Returns: 'website_real', 'social_profile', 'link_hub', 'none'
+        """
+        if not url:
+            return 'none'
+        
+        url_lower = url.lower()
+        
+        social_domains = ['facebook.com', 'instagram.com', 'twitter.com', 'linkedin.com', 'tiktok.com', 'pinterest.com', 'youtube.com']
+        link_hubs = ['linktr.ee', 'bio.site', 'campsite.bio', 'beacons.ai', 'solo.to', 'hopp.co']
+        
+        if any(d in url_lower for d in social_domains):
+            return 'social_profile'
+            
+        if any(d in url_lower for d in link_hubs):
+            return 'link_hub'
+            
+        return 'website_real'
