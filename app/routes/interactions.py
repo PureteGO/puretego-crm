@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_babel import _
 from app.routes.auth import login_required
 from app.models import Interaction, InteractionType, CadenceRule, Client, Visit, Task, Project, ProjectTicket
-from config.database import get_db
+from config.database import get_db, SessionLocal
 from datetime import datetime, timedelta
 from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
@@ -89,7 +89,8 @@ def agenda():
     user_role = session.get('role') or 'sales'
     company_id = session.get('company_id')
     
-    with get_db() as db:
+    db = SessionLocal()
+    try:
         from sqlalchemy.orm import joinedload
         
         # Combine and formatting
@@ -255,6 +256,8 @@ def agenda():
             'today': today_list,
             'upcoming': upcoming_list
         })
+    finally:
+        db.close()
 
 
 @bp.route('/types')

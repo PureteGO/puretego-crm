@@ -11,7 +11,7 @@ from app.models.user import User
 from app.models.client import Client
 from app.models.project import Project
 from app.utils.tenant import filter_by_company
-from config.database import get_db
+from config.database import get_db, SessionLocal
 from datetime import datetime
 from sqlalchemy import or_
 
@@ -507,7 +507,8 @@ def api_quick_create():
     if not title:
         return jsonify({'success': False, 'message': _('Task title is required')}), 400
     
-    with get_db() as db:
+    db = SessionLocal()
+    try:
         task = Task(
             company_id=session.get('company_id'),
             title=title,
@@ -560,24 +561,25 @@ def api_quick_create():
                     except ValueError:
                         task.due_date = None
         
-        try:
-            db.add(task)
-            db.flush()
-            
-            # Notify assigned user
-            if task.assigned_to_id and task.assigned_to_id != user.id:
-                try:
-                    from app.services.notification_service import NotificationService
-                    NotificationService.on_task_assigned(db, task)
-                except Exception as e:
-                    print(f"Notification error: {e}")
-            
-            db.commit()
-            return jsonify({'success': True, 'message': _('Task created successfully'), 'task_id': task.id})
-        except Exception as e:
-            db.rollback()
-            print(f"Error creating task: {e}")
-            return jsonify({'success': False, 'message': f"Error creating task: {str(e)}"}), 500
+        db.add(task)
+        db.flush()
+        
+        # Notify assigned user
+        if task.assigned_to_id and task.assigned_to_id != user.id:
+            try:
+                from app.services.notification_service import NotificationService
+                NotificationService.on_task_assigned(db, task)
+            except Exception as e:
+                print(f"Notification error: {e}")
+        
+        db.commit()
+        return jsonify({'success': True, 'message': _('Task created successfully'), 'task_id': task.id})
+    except Exception as e:
+        db.rollback()
+        print(f"Error creating task: {e}")
+        return jsonify({'success': False, 'message': f"Error creating task: {str(e)}"}), 500
+    finally:
+        db.close()
 
 
 @api_bp.route('/team')
