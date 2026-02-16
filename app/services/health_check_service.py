@@ -61,134 +61,62 @@ class HealthCheckService:
         place_data = search_res['places'][0]
         place_id = place_data.get('placeId') or place_data.get('cid')
         
-        # 3. SerpApi Deep Dive (Fetch details using data_id/place_id)
+        # --- NOVO: Verificação de Perfil Gerenciado (API Oficial) ---
+        # Se o perfil já é nosso cliente e está conectado, usamos a API Oficial com integridade 100%
+        official_service = None
+        current_location_link = None
+        
+        # 3. Fetch Details & Media (High-Integrity Public Search)
+        from app.services.serpapi_service import SerpApiService
         serpapi = SerpApiService()
         
-        # Detalhes inicias para pegar o data_id (hex)
-        deep_details = {}
-        data_id = None
-        
-        if place_id:
-            # Tentar pegar via place_id standard
-            details_res = serpapi.get_business_details(place_id)
-            
-            # Extract data_id immediately to check if we need fallback
-            if 'search_parameters' in details_res:
-                data_id = details_res['search_parameters'].get('data_id')
-            if not data_id and 'local_results' in details_res and details_res['local_results']:
-                data_id = details_res['local_results'][0].get('data_id')
-            if not data_id and 'place_results' in details_res:
-                data_id = details_res['place_results'].get('data_id')
-             
-            # FALLBACK: Se falhar, ou não retornar resultados, OU se não conseguimos extrair o data_id crítico
-            # (get_place_reviews exige data_id, place_id não serve)
-            if details_res.get('error') or (not details_res.get('place_results') and not details_res.get('local_results')) or not data_id:
-                current_app.logger.info(f"Lookup by ID {place_id} failed, incomplete, or missing data_id. Falling back to Search by Name for: {place_data.get('title')}")
-                search_term = place_data.get('title')
-                if place_data.get('address'):
-                    search_term += f" {place_data.get('address')}"
-                
-                fallback_res = serpapi.search_business(search_term)
-                
-                if not fallback_res.get('error'):
-                    best_match = None
-                    if 'local_results' in fallback_res and fallback_res['local_results']:
-                        # Encontramos via busca (lista)! Usar o primeiro resultado
-                        best_match = fallback_res['local_results'][0]
-                        place_data.update(best_match) # Merge rich data
-                        
-                        # Mapping Search API 'images' to 'photos' expected structure
-                        if 'images' in best_match:
-                             place_data['photos'] = best_match['images']
-                             if any(img.get('title') == 'Videos' for img in best_match['images']):
-                                 place_data['has_video_indicator'] = True
-                        
-                        # Mockar estrutura para extração de data_id abaixo
-                        details_res = {'local_results': [best_match]}
-                        if best_match.get('data_id'):
-                            # Overwrite data_id with the one from search
-                            data_id = best_match.get('data_id')
-                            details_res['search_parameters'] = {'data_id': data_id}
-
-                    elif 'place_results' in fallback_res:
-                        # Encontramos via busca (resultado único/place)!
-                        best_match = fallback_res['place_results']
-                        place_data.update(best_match)
-                        
-                        if 'images' in best_match:
-                             place_data['photos'] = best_match['images']
-                             if any(img.get('title') == 'Videos' for img in best_match['images']):
-                                 place_data['has_video_indicator'] = True
-
-                        details_res = {'place_results': best_match}
-                        if best_match.get('data_id'):
-                            data_id = best_match.get('data_id')
-                            details_res['search_parameters'] = {'data_id': data_id}
-
-            if not details_res.get('error'):
-                 # Reforçar extração caso fallback tenha atualizado details_res mas não data_id localmente
-                if not data_id and 'search_parameters' in details_res:
-                    data_id = details_res['search_parameters'].get('data_id')
-                if not data_id and 'local_results' in details_res and details_res['local_results']:
-                     data_id = details_res['local_results'][0].get('data_id')
-                if not data_id and 'place_results' in details_res:
-                     data_id = details_res['place_results'].get('data_id')
-                      
-                # Se place_results existir, use-o como base mais rica
-                if 'place_results' in details_res:
-                    place_data.update(details_res['place_results'])
-        
-        # Se ainda sem data_id, usar o cid/place_id como último recurso (raramente funciona para reviews)
-        if not data_id:
-            data_id = place_id
-
-        # --- Deep Fetching (Parallelizable in future) ---
+        # Data containers
         reviews_data = {}
         photos_data = {}
         posts_data = {}
+        data_id = place_id
         deep_fetch_error = False
         
+        # Use SerpApi for a deeper look at place details (Discovery of data_id)
+        details_res = {}
+        if place_id:
+            details_res = serpapi.get_business_details(place_id)
+            if 'search_parameters' in details_res:
+                data_id = details_res['search_parameters'].get('data_id')
+
+        # Fallback if no data_id found via place_id
+        if not data_id:
+            search_term = place_data.get('title')
+            if place_data.get('address'): search_term += f" {place_data.get('address')}"
+            fallback_res = serpapi.search_business(search_term)
+            
+            match = fallback_res.get('local_results', [None])[0] or fallback_res.get('place_results')
+            if match:
+                place_data.update(match)
+                data_id = match.get('data_id')
+                # Map photo structure
+                if 'images' in match: 
+                    place_data['photos'] = match['images']
+                    if any(i.get('title') == 'Videos' for i in match['images']): 
+                        place_data['has_video_indicator'] = True
+
+        # Parallel Deep Scraping (Photos, Reviews, Posts)
         if data_id:
             import concurrent.futures
             try:
                 with concurrent.futures.ThreadPoolExecutor() as executor:
-                    future_reviews = executor.submit(serpapi.get_place_reviews, data_id, gl=gl)
-                    future_photos = executor.submit(serpapi.get_place_photos, data_id, gl=gl)
-                    future_posts = executor.submit(serpapi.get_place_posts, data_id, gl=gl)
+                    f_revs = executor.submit(serpapi.get_place_reviews, data_id, gl=gl)
+                    f_imgs = executor.submit(serpapi.get_place_photos, data_id, gl=gl)
+                    f_posts = executor.submit(serpapi.get_place_posts, data_id, gl=gl)
                     
-                    try:
-                        reviews_data = future_reviews.result(timeout=5)
-                    except Exception as e:
-                        current_app.logger.error(f"Error fetching reviews for {data_id}: {e}")
-                        reviews_data = {}
-
-                    try:
-                        photos_data = future_photos.result(timeout=5)
-                    except Exception as e:
-                        current_app.logger.error(f"Error fetching photos for {data_id}: {e}")
-                        photos_data = {}
-
-                    try:
-                        posts_data = future_posts.result(timeout=5)
-                    except Exception as e:
-                        current_app.logger.error(f"Error fetching posts for {data_id}: {e}")
-                        posts_data = {}
+                    reviews_data = f_revs.result(timeout=6)
+                    photos_data = f_imgs.result(timeout=6)
+                    posts_data = f_posts.result(timeout=6)
             except Exception as e:
-                current_app.logger.error(f"Global error in ThreadPool for {data_id}: {e}")
-                # Fallback to empty dicts if pool fails entirely
-                if not reviews_data: reviews_data = {}
-                if not photos_data: photos_data = {}
-                if not posts_data: posts_data = {}
-                # Add warning to be picked up in Analysis later? 
-                # We don't have 'details' list initialized here. It's later.
-                # Use a flag.
+                current_app.logger.error(f"HealthCheck: Scraping error for {data_id}: {e}")
                 deep_fetch_error = True
-            else:
-                deep_fetch_error = False
-            
-        # 4. Analysis & Logic
         
-        # ... (later in code)
+        # 4. Analysis & Logic (Intelligent Public Auditor)
         
         # A. Reviews Analysis
         reviews_list = reviews_data.get('reviews', [])
@@ -265,67 +193,68 @@ class HealthCheckService:
             if cid == 1: # Horário
                 passed = bool(place_data.get('hours') or place_data.get('openingHours') or place_data.get('operating_hours'))
             elif cid == 2: # Fotos Produtos
-                photos_count = len(photos_list)
-                # Se for gerido e tiver fotos, assumimos que são de qualidade
-                passed = (is_managed and photos_count > 5) or (photos_count >= 10) or bool(place_data.get('menu'))
-                if passed: res_score = c['weight']
+                # Buscar especificamente por fotos enviadas pelo proprietário (Imagem 1)
+                passed = has_owner_photos or len(photos_list) > 10
             elif cid == 3: # Vídeos
-                # Se é gerido e tem muitas fotos, é 90% provável que tenha vídeos (fallback para perfis otimizados)
-                passed = has_video or (is_managed and len(photos_list) > 15)
+                passed = has_video
             elif cid == 4: # Perfil Verificado
-                passed = is_managed
+                # Prova definitiva: Se tem 'Updates' ou Respostas (Imagens 3 e 4)
+                passed = has_posts or has_owner_response or is_managed
                 if passed: 
-                     details.append("Perfil Verificado e Otimizado (Gestão Ativa Identificada)")
+                     details.append("Perfil Gerenciado (Updates/Posts ativos detectados)")
                 else:
-                     details.append("Sem indícios de gerenciamento ativo (Não verificado)")
+                     details.append("Sem indícios de gestão ativa (Faltam Posts/Updates)")
             elif cid == 5: # Site
                 website = place_data.get('website', '').lower()
-                passed = bool(website) and not any(d in website for d in ['facebook.com', 'instagram.com', 'linktr.ee'])
-
+                passed = bool(website)
+                if passed:
+                    social_domains = ['facebook.com', 'instagram.com', 'tiktok.com', 'linktr.ee', 'linkedin.com', 'twitter.com', 'x.com']
+                    if any(domain in website for domain in social_domains):
+                        passed = False
+                        details.append(f"Site detectado é rede social ({website})")
             elif cid == 6: # Q&A
-                passed = bool(place_data.get('questions_and_answers')) or (is_managed and place_data.get('reviews', 0) > 20)
-                if passed: details.append("Atividade de interação detectada.")
+                passed = bool(place_data.get('questions_and_answers'))
             elif cid == 7: # Posts
+                # Seção 'Updates from User' (Imagem 3)
                 passed = has_posts
             elif cid == 8: # Descrição
-                desc = place_data.get('description') or place_data.get('snippet') or place_data.get('about') or place_data.get('summary')
-                # Perfis geridos quase sempre têm descrição, se não aparecer na busca curta, confiamos no status de gestão
-                passed = (len(str(desc)) > 10) or is_managed or bool(place_data.get('extensions'))
+                # Seção 'From the business' (Imagem 3)
+                desc = place_data.get('description') or place_data.get('about', {}).get('summary')
+                passed = bool(desc and len(str(desc)) > 20)
             elif cid == 9: # Redes Sociais
-                website_str = str(place_data.get('website', '')).lower()
-                has_social_links = any(x in website_str for x in ['facebook', 'instagram', 'linkedin', 'twitter'])
-                passed = bool(place_data.get('profiles')) or has_social_links or has_posts
+                passed = bool(place_data.get('profiles')) or has_posts
             elif cid == 10: # Presença Maps
                 passed = True
             elif cid == 11: # Fotos Exterior
-                # Se é gerido e tem fotos, o dono certamente postou a fachada
-                passed = any(x in str(p).lower() for p in photos_list for x in ['exterior', 'street view', 'outside', 'fachada'])
-                if not passed and is_managed and len(photos_list) > 5: passed = True 
+                # Buscar a aba literal 'Street View' ou 'Exterior' no objeto da SerpApi (Imagem 1)
+                passed = any(x in str(c.get('title', '')).lower() for c in photo_cats for x in ['exterior', 'street view', 'outside', 'fachada'])
+                if not passed:
+                    # Fallback: se o dono postou fotos e o total é alto, é provável que incluiu a fachada
+                    passed = has_owner_photos and len(photos_list) > 15
             elif cid == 12: # Fotos Interior
-                passed = any(x in str(p).lower() for p in photos_list for x in ['interior', 'inside', 'by owner', 'dentro'])
-                if not passed and is_managed and len(photos_list) > 5: passed = True
-            elif cid == 13: # Info Produtos/Serviços
-                # Para escolas e serviços, category + services é o suficiente
-                passed = bool(place_data.get('menu')) or bool(place_data.get('products')) or bool(place_data.get('services')) or is_managed
+                # Buscar a aba literal 'Interior' ou 'Inside' (Imagem 1)
+                passed = any(x in str(c.get('title', '')).lower() for c in photo_cats for x in ['interior', 'inside', 'dentro'])
+                if not passed:
+                    passed = has_owner_photos and len(photos_list) > 15
+            elif cid == 13: # Info Produtos
+                # Verificado via seção de Updates ou campos ricos
+                passed = bool(place_data.get('menu')) or bool(place_data.get('products')) or has_posts or place_data.get('extensions')
             elif cid == 14: # Avaliações
-                rev_count = place_data.get('reviews') or place_data.get('user_reviews') or 0
-                if isinstance(rev_count, dict): rev_count = 0
-                passed = rev_count > 0
-                if rev_count >= 10: res_score = c['weight']
-                elif rev_count > 0: res_score = c['weight'] // 2; status = 'moderate'
+                rev_count = place_data.get('reviews') or 0
+                if rev_count >= 10: 
+                    passed = True; res_score = c['weight']
+                elif rev_count > 0:
+                    passed = True; res_score = c['weight'] // 2; status = 'moderate'
+                else: passed = False
             elif cid == 15: # Endereço
                 passed = bool(place_data.get('address'))
             elif cid == 16: # Logotipo
-                passed = bool(place_data.get('thumbnail')) or bool(place_data.get('logo')) or is_managed
+                passed = bool(place_data.get('thumbnail')) or bool(place_data.get('logo'))
             elif cid == 17: # Resposta a Avaliações
-                if has_owner_response:
-                    passed = True
-                    res_score = c['weight'] if unreplied_count <= 2 else c['weight'] // 2
-                else:
-                    # Se o rating é alto e o perfil é gerido, o dono provavelmente responde mas a API não trouxe as últimas 50
-                    if place_data.get('rating', 0) >= 4.5 and is_managed:
-                         passed = True; res_score = c['weight'] // 2; status = 'moderate'
-                    else: passed = False
+                passed = has_owner_response
+                if passed and unreplied_count > 5:
+                    status = 'moderate'
+                    res_score = c['weight'] // 2
 
             if passed:
                 if res_score == 0: res_score = c['weight']
