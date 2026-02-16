@@ -31,16 +31,16 @@
                     <i class="bi bi-three-dots"></i>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" onclick="duplicateProposal({{ proposal.id }})"><i
+                    <li><a class="dropdown-item" href="#" onclick="duplicateProposal('{{ proposal.id }}')"><i
                                 class="bi bi-copy"></i> {{ _('Duplicate') }}</a></li>
                     {% if proposal.status == 'draft' %}
-                    <li><a class="dropdown-item" href="#" onclick="sendProposal({{ proposal.id }})"><i
+                    <li><a class="dropdown-item" href="#" onclick="sendProposal('{{ proposal.id }}')"><i
                                 class="bi bi-send"></i> {{ _('Mark as Sent') }}</a></li>
                     {% endif %}
                     {% if proposal.status in ['sent', 'draft'] %}
-                    <li><a class="dropdown-item text-success" href="#" onclick="approveProposal({{ proposal.id }})"><i
+                    <li><a class="dropdown-item text-success" href="#" onclick="approveProposal('{{ proposal.id }}')"><i
                                 class="bi bi-check-circle"></i> {{ _('Approve') }}</a></li>
-                    <li><a class="dropdown-item text-danger" href="#" onclick="rejectProposal({{ proposal.id }})"><i
+                    <li><a class="dropdown-item text-danger" href="#" onclick="rejectProposal('{{ proposal.id }}')"><i
                                 class="bi bi-x-circle"></i> {{ _('Reject') }}</a></li>
                     {% endif %}
                     <li>
@@ -48,7 +48,7 @@
                     </li>
                     <li>
                         <form method="POST" action="{{ url_for('proposals.delete', proposal_id=proposal.id) }}"
-                            onsubmit="return confirm('{{ _('Delete this proposal?') }}')">
+                            onsubmit="return confirm(&quot;{{ _('Delete this proposal?') }}&quot;)">
                             <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash"></i> {{
                                 _('Delete') }}</button>
                         </form>
@@ -174,7 +174,7 @@
                     <div class="row g-2">
                         {% for inst in option.payment_schedule %}
                         <div class="col-auto">
-                            <span class="badge border text-body">
+                            <span class="badge bg-body-tertiary text-body border">
                                 {{ _('Installment') }} {{ inst.installment }}: {{ proposal.currency }} {{
                                 '{:,.0f}'.format(inst.amount) }}
                                 <small>({{ inst.pct }}%)</small>
@@ -220,14 +220,14 @@
                 </div>
                 <div class="card-body d-grid gap-2">
                     {% if proposal.status == 'draft' %}
-                    <button class="btn btn-primary btn-sm" onclick="sendProposal({{ proposal.id }})">
+                    <button class="btn btn-primary btn-sm" onclick="sendProposal('{{ proposal.id }}')">
                         <i class="bi bi-send"></i> {{ _('Mark as Sent') }}
                     </button>
                     {% endif %}
-                    <button class="btn btn-success btn-sm" onclick="approveProposal({{ proposal.id }})">
+                    <button class="btn btn-success btn-sm" onclick="approveProposal('{{ proposal.id }}')">
                         <i class="bi bi-check-circle"></i> {{ _('Approve & Create Deal') }}
                     </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="rejectProposal({{ proposal.id }})">
+                    <button class="btn btn-outline-danger btn-sm" onclick="rejectProposal('{{ proposal.id }}')">
                         <i class="bi bi-x-circle"></i> {{ _('Reject') }}
                     </button>
                 </div>
@@ -246,20 +246,20 @@
                             class="{% if health_check.score >= 70 %}text-success{% elif health_check.score >= 40 %}text-warning{% else %}text-danger{% endif %}">
                             {{ health_check.score }}%
                         </h3>
-                        <small class="text-muted">{{ _('Overall Score') }}</small>
+                        <small class="text-secondary">{{ _('Overall Score') }}</small>
                     </div>
                     {% if health_check.report_data %}
                     {% if health_check.report_data.business_name %}
                     <div class="d-flex justify-content-between border-bottom py-1 mb-2">
-                        <span class="text-muted small">{{ _('Business Name') }}</span>
-                        <span class="fw-bold small">{{ health_check.report_data.business_name }}</span>
+                        <span class="text-secondary small">{{ _('Business Name') }}</span>
+                        <span class="fw-bold small text-body">{{ health_check.report_data.business_name }}</span>
                     </div>
                     {% endif %}
                     {% if health_check.report_data.criteria %}
                     <ul class="list-unstyled small mb-0">
                         {% for item in health_check.report_data.criteria %}
                         <li class="d-flex justify-content-between align-items-center border-bottom py-1">
-                            <span>{{ item.name }}</span>
+                            <span class="text-body">{{ item.name }}</span>
                             {% if item.status == 'Detectado' or item.score == 100 %}
                             <span class="badge bg-success-subtle text-success"><i
                                     class="bi bi-check-circle-fill"></i></span>
@@ -276,7 +276,7 @@
                     <ul class="list-unstyled small mb-0">
                         {% for item in health_check.report_data.criteria_results %}
                         <li class="d-flex justify-content-between align-items-center border-bottom py-1">
-                            <span>{{ item.name_es or item.name_pt or item.name or 'N/A' }}</span>
+                            <span class="text-body">{{ item.name_es or item.name_pt or item.name or 'N/A' }}</span>
                             {% if item.passed %}
                             <span class="badge bg-success-subtle text-success"><i
                                     class="bi bi-check-circle-fill"></i></span>

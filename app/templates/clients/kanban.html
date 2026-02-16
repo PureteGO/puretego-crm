@@ -631,11 +631,21 @@
                 group: 'kanban',
                 animation: 150,
                 onEnd: function (evt) {
-                    const dealId = evt.item.dataset.dealId;
+                    const id = evt.item.dataset.dealId;
+                    const cardType = evt.item.dataset.cardType;
                     const newStageId = evt.to.dataset.stageId;
                     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-                    fetch(`/clients/kanban/deals/${dealId}/move`, {
+                    // Determine correct endpoint based on card type
+                    let url = '';
+                    if (cardType === 'client') {
+                        url = `/clients/${id}/move`;
+                    } else {
+                        // Default to deal
+                        url = `/clients/kanban/deals/${id}/move`;
+                    }
+
+                    fetch(url, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
                         body: JSON.stringify({ stage_id: newStageId })
