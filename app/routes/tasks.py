@@ -190,7 +190,7 @@ def create():
                 client_id=client_id,
                 deal_id=deal_id,
                 project_id=project_id,
-                verification_required=True if request.form.get('verification_required') == 'on' else False,
+                verification_required=True if request.form.get('verification_required') in ['on', '1'] else False,
                 type=request.form.get('type', 'operational'), # Default to operational as per req
             )
             
@@ -585,7 +585,7 @@ def api_quick_create():
                         task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
                     except:
                         pass
-
+            
             db.add(task)
             db.commit()
 

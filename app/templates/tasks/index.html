@@ -286,18 +286,18 @@
                     {% if task.assigned_by_name %}
                     <span class="ms-2 text-muted">({{ _('by') }} {{ task.assigned_by_name }})</span>
                     {% endif %}
-                    </span>
                 </div>
             </div>
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="empty-state">
-            <i class="bi bi-inbox d-block mb-3"></i>
-            <h5>{{ _('No tasks found') }}</h5>
-            <p>{{ _('Create a new task to get started') }}</p>
-        </div>
-        {% endif %}
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state">
+    <i class="bi bi-inbox d-block mb-3"></i>
+    <h5>{{ _('No tasks found') }}</h5>
+    <p>{{ _('Create a new task to get started') }}</p>
+</div>
+{% endif %}
 </div>
 
 <!-- Create Task Modal -->
