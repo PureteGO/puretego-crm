@@ -178,9 +178,14 @@ def create():
                  if not valid_project.first():
                      project_id = None
 
+            title = request.form.get('title', '').strip()
+            if not title:
+                flash(_('Task title is required.'), 'error')
+                return redirect(request.referrer or url_for('tasks.index'))
+
             task = Task(
                 company_id=company_id,
-                title=request.form.get('title', '').strip(),
+                title=title,
                 description=request.form.get('description', '').strip() or None,
                 status='open',
                 priority=request.form.get('priority', 'medium'),
