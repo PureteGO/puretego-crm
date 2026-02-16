@@ -553,21 +553,31 @@ def api_quick_create():
                 task.due_date = datetime.strptime(due_date_str, '%Y-%m-%dT%H:%M')
             except ValueError:
                 try:
-                    task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+                    task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d %H:%M')
                 except ValueError:
-                    task.due_date = None
+                    try:
+                        task.due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+                    except ValueError:
+                        task.due_date = None
         
-        db.add(task)
-        db.flush()
-        
-        # Notify assigned user
-        if task.assigned_to_id and task.assigned_to_id != user.id:
-            from app.services.notification_service import NotificationService
-            NotificationService.on_task_assigned(db, task)
-        
-        db.commit()
-        
-        return jsonify({'success': True, 'message': _('Task created successfully'), 'task_id': task.id})
+        try:
+            db.add(task)
+            db.flush()
+            
+            # Notify assigned user
+            if task.assigned_to_id and task.assigned_to_id != user.id:
+                try:
+                    from app.services.notification_service import NotificationService
+                    NotificationService.on_task_assigned(db, task)
+                except Exception as e:
+                    print(f"Notification error: {e}")
+            
+            db.commit()
+            return jsonify({'success': True, 'message': _('Task created successfully'), 'task_id': task.id})
+        except Exception as e:
+            db.rollback()
+            print(f"Error creating task: {e}")
+            return jsonify({'success': False, 'message': f"Error creating task: {str(e)}"}), 500
 
 
 @api_bp.route('/team')
