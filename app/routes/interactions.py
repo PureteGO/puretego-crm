@@ -173,31 +173,50 @@ def agenda():
                 
             return {
                 'id': f"{type_label}_{item.id}",
-                'client_id': getattr(item, 'client_id', None), # Keep for legacy compatibility
+                'client_id': getattr(item, 'client_id', None), 
                 'client_name': client_name,
                 'type_name': type_label,
                 'is_call': is_call,
-                'date': date_val.isoformat(),
+                'date': date_val.isoformat() if date_val else datetime.now().isoformat(),
                 'status': getattr(item, 'status', 'scheduled'),
-                'notes': getattr(item, note_field, '') or getattr(item, 'title', ''), # Use title for tasks/tickets as 'notes'
+                'notes': getattr(item, note_field, '') or getattr(item, 'title', ''), 
                 'url': url
             }
 
         # Add Interactions
         for i in urgent_tasks:
             if not i.type: continue
-            today_list.append(format_item(i, i.type.name, url_for('clients.view', client_id=i.client_id), is_call=i.type.is_call))
+            # Safe URL generation
+            try:
+                client_url = url_for('clients.view', client_id=i.client_id)
+            except:
+                client_url = "#"
+            today_list.append(format_item(i, i.type.name, client_url, is_call=i.type.is_call))
+            
         for i in future_tasks:
             if not i.type: continue
-            upcoming_list.append(format_item(i, i.type.name, url_for('clients.view', client_id=i.client_id), is_call=i.type.is_call))
+            try:
+                client_url = url_for('clients.view', client_id=i.client_id)
+            except:
+                client_url = "#"
+            upcoming_list.append(format_item(i, i.type.name, client_url, is_call=i.type.is_call))
             
         # Add Visits
         for v in visits_today:
             if not v.client_id: continue
-            today_list.append(format_item(v, _('Visit'), url_for('clients.view', client_id=v.client_id), is_call=False, date_field='visit_date'))
+            try:
+                client_url = url_for('clients.view', client_id=v.client_id)
+            except:
+                client_url = "#"
+            today_list.append(format_item(v, _('Visit'), client_url, is_call=False, date_field='visit_date'))
+            
         for v in visits_future:
             if not v.client_id: continue
-            upcoming_list.append(format_item(v, _('Visit'), url_for('clients.view', client_id=v.client_id), is_call=False, date_field='visit_date'))
+            try:
+                client_url = url_for('clients.view', client_id=v.client_id)
+            except:
+                client_url = "#"
+            upcoming_list.append(format_item(v, _('Visit'), client_url, is_call=False, date_field='visit_date'))
 
         # Add General Tasks
         for t in tasks_today:
@@ -208,16 +227,23 @@ def agenda():
         # Add Project Tickets
         for t in tickets_today:
             if not t.project_id: continue
-            proj_url = url_for('projects.view', project_id=t.project_id)
+            try:
+                proj_url = url_for('projects.view', project_id=t.project_id)
+            except:
+                proj_url = "#"
             today_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
+            
         for t in tickets_future:
             if not t.project_id: continue
-            proj_url = url_for('projects.view', project_id=t.project_id)
+            try:
+                proj_url = url_for('projects.view', project_id=t.project_id)
+            except:
+                proj_url = "#"
             upcoming_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
             
         # Sort lists by date
-        today_list.sort(key=lambda x: x['date'])
-        upcoming_list.sort(key=lambda x: x['date'])
+        today_list.sort(key=lambda x: x['date'] or '')
+        upcoming_list.sort(key=lambda x: x['date'] or '')
         
         return jsonify({
             'today': today_list,
