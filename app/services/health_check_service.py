@@ -71,10 +71,19 @@ class HealthCheckService:
         if place_id:
             # Tentar pegar via place_id standard
             details_res = serpapi.get_business_details(place_id)
+            
+            # Extract data_id immediately to check if we need fallback
+            if 'search_parameters' in details_res:
+                data_id = details_res['search_parameters'].get('data_id')
+            if not data_id and 'local_results' in details_res and details_res['local_results']:
+                data_id = details_res['local_results'][0].get('data_id')
+            if not data_id and 'place_results' in details_res:
+                data_id = details_res['place_results'].get('data_id')
              
-            # FALLBACK: Se falhar ou não retornar resultados relevantes, tentar busca por nome
-            if details_res.get('error') or (not details_res.get('place_results') and not details_res.get('local_results')):
-                current_app.logger.info(f"Lookup by ID {place_id} failed/empty. Falling back to Search by Name for: {place_data.get('title')}")
+            # FALLBACK: Se falhar, ou não retornar resultados, OU se não conseguimos extrair o data_id crítico
+            # (get_place_reviews exige data_id, place_id não serve)
+            if details_res.get('error') or (not details_res.get('place_results') and not details_res.get('local_results')) or not data_id:
+                current_app.logger.info(f"Lookup by ID {place_id} failed, incomplete, or missing data_id. Falling back to Search by Name for: {place_data.get('title')}")
                 search_term = place_data.get('title')
                 if place_data.get('address'):
                     search_term += f" {place_data.get('address')}"
@@ -91,45 +100,45 @@ class HealthCheckService:
                         # Mapping Search API 'images' to 'photos' expected structure
                         if 'images' in best_match:
                              place_data['photos'] = best_match['images']
-                             # Mark as having video if 'Videos' title exists in images
                              if any(img.get('title') == 'Videos' for img in best_match['images']):
                                  place_data['has_video_indicator'] = True
                         
                         # Mockar estrutura para extração de data_id abaixo
                         details_res = {'local_results': [best_match]}
                         if best_match.get('data_id'):
-                            details_res['search_parameters'] = {'data_id': best_match.get('data_id')}
+                            # Overwrite data_id with the one from search
+                            data_id = best_match.get('data_id')
+                            details_res['search_parameters'] = {'data_id': data_id}
 
                     elif 'place_results' in fallback_res:
                         # Encontramos via busca (resultado único/place)!
                         best_match = fallback_res['place_results']
                         place_data.update(best_match)
                         
-                        # Mapping Search API 'images' to 'photos' expected structure
                         if 'images' in best_match:
                              place_data['photos'] = best_match['images']
                              if any(img.get('title') == 'Videos' for img in best_match['images']):
                                  place_data['has_video_indicator'] = True
 
-                        # Mockar estrutura para extração de data_id
                         details_res = {'place_results': best_match}
                         if best_match.get('data_id'):
-                            details_res['search_parameters'] = {'data_id': best_match.get('data_id')}
+                            data_id = best_match.get('data_id')
+                            details_res['search_parameters'] = {'data_id': data_id}
 
             if not details_res.get('error'):
-                # Tentar extrair data_id das search_parameters ou results
-                if 'search_parameters' in details_res:
+                 # Reforçar extração caso fallback tenha atualizado details_res mas não data_id localmente
+                if not data_id and 'search_parameters' in details_res:
                     data_id = details_res['search_parameters'].get('data_id')
                 if not data_id and 'local_results' in details_res and details_res['local_results']:
-                    data_id = details_res['local_results'][0].get('data_id')
+                     data_id = details_res['local_results'][0].get('data_id')
                 if not data_id and 'place_results' in details_res:
-                    data_id = details_res['place_results'].get('data_id')
+                     data_id = details_res['place_results'].get('data_id')
                       
                 # Se place_results existir, use-o como base mais rica
                 if 'place_results' in details_res:
                     place_data.update(details_res['place_results'])
         
-        # Se ainda sem data_id, usar o cid/place_id como fallback (muitas vezes funciona)
+        # Se ainda sem data_id, usar o cid/place_id como último recurso (raramente funciona para reviews)
         if not data_id:
             data_id = place_id
 
