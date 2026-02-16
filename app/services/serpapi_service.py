@@ -136,17 +136,48 @@ class SerpApiService:
             business = raw_response['local_results'][0]
         elif 'place_results' in raw_response:
             business = raw_response['place_results']
+            # Normalize fields for consistency
+            if 'hours' in business and 'operating_hours' not in business:
+                business['operating_hours'] = business['hours']
+            if 'images' in business and 'photos' not in business:
+                business['photos'] = business['images']
+            if 'user_reviews' in business and 'reviews' not in business:
+                # Map specific review counts if available, or fallback
+                business['reviews'] = business.get('reviews', 0) 
+            if 'gps_coordinates' in business:
+                business['gps_coordinates'] = business['gps_coordinates'] # Ensure it's kept
         else:
             # Fallback to root if it contains common GMB fields
             business = raw_response
             
-        if not business or 'title' not in business:
+        if not business or ('title' not in business and 'name' not in business):
              return {'score': 0, 'report': {'error': 'Negative match'}, 'raw_data': None}
 
-        details = business if ('operating_hours' in business and 'address' in business) else None
+        # Ensure title is present for later use
+        if 'name' in business and 'title' not in business:
+            business['title'] = business['name']
+
+        # Check if the initial business object has enough data
+        has_essential_data = (
+            'operating_hours' in business 
+            and 'address' in business
+            and (business.get('photos') or business.get('images'))
+            and (business.get('reviews') or business.get('user_reviews'))
+        )
+        
+        details = business if has_essential_data else None
+        
         if not details and 'place_id' in business:
             details = self.get_business_details(business['place_id'])
+            # Re-apply normalizations to details if fetched separately
+            if details:
+                if 'hours' in details and 'operating_hours' not in details:
+                    details['operating_hours'] = details['hours']
+                if 'images' in details and 'photos' not in details:
+                    details['photos'] = details['images']
         
+        # Merge details back into business for evaluation if needed, or pass both
+        # The _evaluate_criteria function handles merging
         results = self._evaluate_criteria(business, details)
         total_score = sum(item['score'] for item in results)
         
@@ -196,6 +227,8 @@ class SerpApiService:
             data.update(details)
             
         results = []
+        photos = data.get('photos', []) or data.get('images', [])
+        
         for cr in criteria:
             cid = cr['id']
             res = {
@@ -213,20 +246,22 @@ class SerpApiService:
             
             # Implementation for all 17 criteria
             if cid == 1: # Horário de Funcionamento
-                found = bool(data.get('operating_hours'))
+                found = bool(data.get('operating_hours')) or bool(data.get('hours'))
             elif cid == 2: # Fotos dos Produtos/Serviços
-                photos = data.get('photos', [])
                 count = len(photos) if isinstance(photos, list) else 0
                 if count >= 10: 
                     found = True; res['score'] = cr['weight']
                 elif count > 0: 
                     found = True; res['score'] = cr['weight'] // 2; res['status'] = 'moderate'
             elif cid == 3: # Vídeos
-                # SerpApi doesn't always explicitly list videos, but sometimes they are in photos
-                # We'll check for any video-like indicators or just mark social media indicators
-                found = 'videos' in data or 'video_count' in data
+                # Check for explicit video counts or "Videos" category in images
+                has_video_category = any(img.get('title') == 'Videos' for img in photos if isinstance(img, dict))
+                found = 'videos' in data or 'video_count' in data or has_video_category
             elif cid == 4: # Perfil Verificado
-                found = data.get('verified', False)
+                # If 'unclaimed_listing' is explicitly True, it's not verified. 
+                # If it's missing (and we have a valid result), it's likely verified/claimed.
+                is_unclaimed = data.get('unclaimed_listing', False)
+                found = data.get('verified', False) or (not is_unclaimed and bool(data.get('place_id')))
             elif cid == 5: # Possui Site
                 found = bool(data.get('website'))
             elif cid == 6: # Perguntas e Respostas
@@ -234,19 +269,23 @@ class SerpApiService:
             elif cid == 7: # Posts/Publicações
                 found = bool(data.get('posts')) or bool(data.get('updates'))
             elif cid == 8: # Descrição do Negócio
-                desc = data.get('description', '')
+                desc = data.get('description', '') or data.get('summary', '')
                 found = len(desc) > 50
             elif cid == 9: # Presença nas Redes Sociais
-                found = any(x in str(data.get('website', '')) for x in ['facebook', 'instagram', 'linkedin'])
+                # Also count GMB Posts as social activity
+                has_social_links = any(x in str(data.get('website', '')) for x in ['facebook', 'instagram', 'linkedin', 'twitter'])
+                has_posts = bool(data.get('posts')) or bool(data.get('updates'))
+                found = has_social_links or has_posts
             elif cid == 10: # Presença no Google Maps
                 found = bool(data.get('place_id')) or bool(data.get('gps_coordinates'))
             elif cid == 11: # Fotos do Exterior
-                # Approximation: check if any photo tags mention exterior
-                found = any('exterior' in str(p).lower() for p in data.get('photos', []))
+                # Check for "Street View" or "Exterior" in titles
+                found = any(x in str(p).lower() for p in photos for x in ['exterior', 'street view', 'outside'])
             elif cid == 12: # Fotos do Interior
-                found = any('interior' in str(p).lower() for p in data.get('photos', []))
+                # Check for "Interior" or "By owner" (often imply interior/details)
+                found = any(x in str(p).lower() for p in photos for x in ['interior', 'inside', 'by owner'])
             elif cid == 13: # Informações de Produtos e Serviços
-                found = bool(data.get('menu')) or bool(data.get('products')) or bool(data.get('services'))
+                found = bool(data.get('menu')) or bool(data.get('products')) or bool(data.get('services')) or bool(data.get('service_options')) or bool(data.get('extensions'))
             elif cid == 14: # Possui Avaliações
                 revs = data.get('reviews', 0)
                 if revs >= 10: 
@@ -256,10 +295,15 @@ class SerpApiService:
             elif cid == 15: # Endereço Configurado
                 found = bool(data.get('address'))
             elif cid == 16: # Possui Logotipo
-                found = bool(data.get('thumbnail'))
+                found = bool(data.get('thumbnail')) or bool(data.get('logo'))
             elif cid == 17: # Resposta a Avaliações
-                # Advanced check: requires looking into individual reviews
-                found = 'review_responses' in data or 'answered_reviews' in data
+                # If we can't see the responses explicitly but the rating is high (4.5+) and review count is significant, 
+                # imply active management/response (heuristic fallback). 
+                # Ideally we need 'review_responses' field.
+                explicit_response = 'review_responses' in data or 'answered_reviews' in data
+                # Heuristic: High rating + verified + posts = likely managing reviews
+                heuristic_active = (data.get('rating', 0) >= 4.4 and bool(data.get('posts')))
+                found = explicit_response or heuristic_active
 
             # Finalize score and status
             if found:

@@ -150,14 +150,14 @@ def view(health_check_id):
                                 'visibility': agg.visibility_score,
                                 'position': agg.avg_position_score,
                                 'reviews': agg.reviews_score,
-                            'authority': agg.local_authority_score,
-                            'market_avg': {
-                                'visibility': agg.market_avg_visibility,
-                                'position': agg.market_avg_position,
-                                'reviews': agg.market_avg_reviews,
-                                'authority': agg.market_avg_authority
+                                'authority': agg.local_authority_score,
+                                'market_avg': {
+                                    'visibility': agg.market_avg_visibility,
+                                    'position': agg.market_avg_position,
+                                    'reviews': agg.market_avg_reviews,
+                                    'authority': agg.market_avg_authority
+                                }
                             }
-                        }
                         # Update in-memory object (and potentially save if we commit)
                         health_check.report_data = report
                         # Optional: Persist fixed data

@@ -96,8 +96,7 @@
         <div class="d-flex align-items-center gap-3">
             <span class="fs-2">🏆</span>
             <div>
-                <h1 class="h4 mb-0 font-bold">{{ _('%(client_name)s: Premium Profile',
-                    client_name=health_check.client.name) }}</h1>
+                <h1 class="h4 mb-0 font-bold">{{ _('%(client_name)s: Premium Profile', client_name=health_check.client.name) }}</h1>
                 <small class="text-secondary">{{ _('Google Business Profile Audit') }}</small>
 
                 {% set src = health_check.report_data.source_data %}
@@ -107,15 +106,13 @@
                         <div class="d-flex align-items-center">
                             <span class="text-secondary small me-2 text-uppercase fw-bold"
                                 style="letter-spacing: 1px;">GBP ID:</span>
-                            <span class="font-monospace text-white bg-white bg-opacity-10 px-2 py-1 rounded small">{{
-                                src.place_id or src.placeId or src.cid or src.data_id or 'ID N/A' }}</span>
+                            <span class="font-monospace text-white bg-white bg-opacity-10 px-2 py-1 rounded small">{{ src.place_id or src.placeId or src.cid or src.data_id or 'ID N/A' }}</span>
                         </div>
 
                         <div class="d-flex align-items-center">
                             <i class="bi bi-star-fill text-warning fs-4 me-2"></i>
                             <span class="fs-4 fw-bold text-white me-1">{{ src.rating or src.averageRating or 0 }}</span>
-                            <span class="text-white text-opacity-75 small">({{ src.reviews or src.user_ratings_total or
-                                src.ratingCount or src.totalReviewCount or 0 }} avaliações)</span>
+                            <span class="text-white text-opacity-75 small">({{ src.reviews or src.user_ratings_total or src.ratingCount or src.totalReviewCount or 0 }} avaliações)</span>
                         </div>
 
                         {% if src.place_id or src.placeId %}
@@ -135,8 +132,6 @@
         </div>
     </header>
 
-    </header>
-
     {% if health_check.report_data.ai_summary %}
     <div class="row mb-4">
         <div class="col-12">
@@ -147,8 +142,7 @@
                     <h3 class="h5 font-bold text-white mb-0">{{ _('Quick AI Assessment') }}</h3>
                 </div>
                 <div class="p-4 bg-black bg-opacity-20 rounded text-purple-100"
-                    style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.6;">{{
-                    health_check.report_data.ai_summary | safe }}</div>
+                    style="white-space: pre-wrap; font-size: 1.05rem; line-height: 1.6;">{{ health_check.report_data.ai_summary | safe }}</div>
             </div>
         </div>
     </div>
@@ -183,8 +177,7 @@
                         {% elif health_check.score >= 70 %}
                         {{ _('Se pode melhorar. Melhorar é atrair novos e mais clientes.') }}
                         {% else %}
-                        <strong class="text-warning bg-opacity-20 bg-black px-2 py-1 rounded d-inline-block mt-1">{{
-                            _('¡ALERTA CRÍTICA! Tu perfil de Google no está convirtiendo.
+                        <strong class="text-warning bg-opacity-20 bg-black px-2 py-1 rounded d-inline-block mt-1">{{ _('¡ALERTA CRÍTICA! Tu perfil de Google no está convirtiendo.
                             Estás perdiendo clientes valiosos frente a tu competencia ahora mismo.') }}</strong>
                         {% endif %}
                     </div>
@@ -228,8 +221,7 @@
                     {% else %}
                     <div class="col-12">
                         <div class="alert alert-info py-2 small">
-                            <i class="bi bi-info-circle me-1"></i> {{ _('Criterion details not available for this
-                            history.') }}
+                            <i class="bi bi-info-circle me-1"></i> {{ _('Criterion details not available for this history.') }}
                         </div>
                     </div>
                     {% endif %}
@@ -251,9 +243,7 @@
                         class="badge bg-purple bg-opacity-10 text-purple-200 border-purple-subtle px-2 py-1 rounded small">Gemini
                         2.5 Flash</span>
                 </div>
-                <p class="small text-purple-200 mb-4">{{ _('Use AI to create high-conversion content and maintain
-                    relevance on Google.') }}</p>
-
+                <p class="small text-purple-200 mb-4">{{ _('Use AI to create high-conversion content and maintain relevance on Google.') }}</p>
                 <div class="d-grid gap-3">
                     <button onclick="runAITask('post-evento')" class="btn btn-primary"
                         style="background-color: #8B5CF6; border: none;">
@@ -273,10 +263,8 @@
                     <div id="aiOutputContainer" class="collapse">
                         <div class="p-3 bg-purple bg-opacity-5 rounded border border-purple-subtle">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="x-small font-bold text-purple-700 text-uppercase" id="aiOutputTitle">{{
-                                    _('Result') }}</span>
-                                <button onclick="copyAIResult()" class="btn btn-link p-0 x-small text-purple-600">{{
-                                    _('Copy') }}</button>
+                                <span class="x-small font-bold text-purple-700 text-uppercase" id="aiOutputTitle">{{ _('Result') }}</span>
+                                <button onclick="copyAIResult()" class="btn btn-link p-0 x-small text-purple-600">{{ _('Copy') }}</button>
                             </div>
                             <div id="aiContent" class="small text-purple-100 italic whitespace-pre-line"
                                 style="font-style: italic;"></div>
@@ -293,8 +281,7 @@
                 <div class="chart-container-premium">
                     <canvas id="competitorChart"></canvas>
                 </div>
-                <p class="x-small text-muted mt-3 text-center italic">{{ _('Your profile stands out in quality and
-                    engagement.') }}</p>
+                <p class="x-small text-muted mt-3 text-center italic">{{ _('Your profile stands out in quality and engagement.') }}</p>
             </div>
         </div>
 
@@ -303,8 +290,7 @@
             <div class="card shadow-sm border-0">
                 <div class="card-header d-flex justify-content-between align-items-center"
                     style="background: linear-gradient(135deg, #0f172a 0%, #334155 100%) !important; border-bottom: 2px solid #3B82F6;">
-                    <h5 class="mb-0 fw-bold text-white"><i class="bi bi-list-check me-2"></i>{{ _('Recommended Action
-                        Plan') }}
+                    <h5 class="mb-0 fw-bold text-white"><i class="bi bi-list-check me-2"></i>{{ _('Recommended Action Plan') }}
                     </h5>
                     <a href="{{ url_for('proposals.create', client_id=health_check.client_id) }}"
                         class="btn btn-sm btn-success fw-bold">
@@ -314,22 +300,20 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h6 class="fw-bold text-danger mb-3"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{
-                                _('Critical Points') }}</h6>
+                            <h6 class="fw-bold text-danger mb-3"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ _('Critical Points') }}</h6>
                             <ul class="list-group list-group-flush mb-4">
                                 {% for issue in report.top_critical_issues %}
-                                class="list-group-item border-start border-danger border-4 small mb-2 shadow-sm rounded
+                                <li class="list-group-item border-start border-danger border-4 small mb-2 shadow-sm rounded
                                 bg-dark text-white border-0" style="background-color: rgba(239, 68, 68, 0.1)
                                 !important;">
-                                <strong>{{ issue.name }}</strong><br>
-                                <span class="text-white-50">{{ issue.message }}</span>
+                                    <strong>{{ issue.name }}</strong><br>
+                                    <span class="text-white-50">{{ issue.message }}</span>
                                 </li>
                                 {% endfor %}
                             </ul>
                         </div>
                         <div class="col-md-6">
-                            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-lightbulb-fill me-2"></i>{{
-                                _('Expert Suggestions') }}</h6>
+                            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-lightbulb-fill me-2"></i>{{ _('Expert Suggestions') }}</h6>
                             <div class="p-3 bg-light rounded border">
                                 <ul class="mb-0 small">
                                     {% for rec in report.recommendations %}
@@ -345,7 +329,7 @@
                         class="d-inline">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-link text-danger text-decoration-none x-small"
-                            onclick="return confirm('{{ _('Delete this report?') }}')">
+                            onclick="return confirm(&quot;{{ _('Delete this report?') }}&quot;)">
                             <i class="bi bi-trash"></i> {{ _('Remove Report') }}
                         </button>
                     </form>
@@ -357,8 +341,7 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const score = {{ health_check.score | default (0)
-    }};
+        const score = {{ health_check.score | default (0) }};
     let barColor = "#EF4444"; // Red
     if (score > 90) {
         barColor = "#10B981"; // Green (Top 1%)
@@ -458,14 +441,12 @@
         let metrics = null;
 
         {% if health_check.report_data and health_check.report_data.radar_metrics %}
-        // Real Data available
-        metrics = {{ health_check.report_data.radar_metrics | tojson }
-    };
+        // --- 1. Real Data ---
+        metrics = {{ health_check.report_data.radar_metrics | tojson }};
 
     // Zero-check fallback
     if ((!metrics.visibility || metrics.visibility === 0) && (!metrics.position || metrics.position === 0)) {
-        const baseScore = {{ health_check.score }
-    };
+        const baseScore = {{ health_check.score }};
     metrics = {
         visibility: baseScore,
         position: baseScore > 50 ? 60 : 20,
@@ -474,7 +455,6 @@
         market_avg: { visibility: 75, position: 70, reviews: 80, authority: 65 }
     };
             }
-    {% endif %}
 
     if (metrics) {
         clientData = [
@@ -483,7 +463,6 @@
             metrics.reviews || 0,
             metrics.authority || 0
         ];
-        // Safe access to market_avg
         const mkt = metrics.market_avg || {};
         marketData = [
             mkt.visibility || 0,
@@ -492,25 +471,18 @@
             mkt.authority || 0
         ];
     }
-    // Safe access to market_avg
-    const mkt = metrics.market_avg || {};
-    marketData = [
-        mkt.visibility || 0,
-        mkt.position || 0,
-        mkt.reviews || 0,
-        mkt.authority || 0
-    ];
     labels = ['{{ _("Visibility") }}', '{{ _("Avg Position") }}', '{{ _("Reviews") }}', '{{ _("Local Authority") }}'];
+
     {% else %}
-    // Fallback Logic based on Score
+    // --- 2. Fallback (No Radar Data) ---
     const baseScore = {{ health_check.score }};
     clientData = [
-        baseScore, // Visibility
-        baseScore > 50 ? 60 : 20, // Avg Position (Mock)
-        baseScore > 50 ? baseScore : baseScore * 0.5, // Reviews
-        baseScore * 0.8 // Authority
+        baseScore,
+        baseScore > 50 ? 60 : 20,
+        baseScore > 50 ? baseScore : baseScore * 0.5,
+        baseScore * 0.8
     ];
-    marketData = [75, 70, 80, 65]; // Baseline Market Average
+    marketData = [75, 70, 80, 65];
     labels = ['{{ _("Visibility") }}', '{{ _("Avg Position") }}', '{{ _("Reviews") }}', '{{ _("Local Authority") }}'];
     {% endif %}
 
@@ -571,8 +543,8 @@
             }
         }
     });
-            }
-        });
+        }
+    });
 
     function runAITask(type) {
         const loading = document.getElementById('aiLoading');
@@ -582,9 +554,7 @@
 
         loading.classList.remove('collapse');
         output.classList.add('collapse');
-        content.innerText = ""; // Clear previous content
-
-        // Call real API
+        content.innerText = "";
         fetch(`/health-checks/{{ health_check.id }}/ai-generate`, {
             method: 'POST',
             headers: {
@@ -594,7 +564,7 @@
             body: JSON.stringify({ type: type })
         })
             .then(async response => {
-                const data = await response.json().catch(() => ({})); // Handle non-JSON response
+                const data = await response.json().catch(() => ({}));
                 if (!response.ok) {
                     throw new Error(data.message || data.error || `Server Error ${response.status}`);
                 }

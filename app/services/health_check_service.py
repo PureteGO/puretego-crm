@@ -157,19 +157,19 @@ class HealthCheckService:
                     future_posts = executor.submit(serpapi.get_place_posts, data_id, gl=gl)
                     
                     try:
-                        reviews_data = future_reviews.result(timeout=10)
+                        reviews_data = future_reviews.result(timeout=5)
                     except Exception as e:
                         current_app.logger.error(f"Error fetching reviews for {data_id}: {e}")
                         reviews_data = {}
 
                     try:
-                        photos_data = future_photos.result(timeout=10)
+                        photos_data = future_photos.result(timeout=5)
                     except Exception as e:
                         current_app.logger.error(f"Error fetching photos for {data_id}: {e}")
                         photos_data = {}
 
                     try:
-                        posts_data = future_posts.result(timeout=10)
+                        posts_data = future_posts.result(timeout=5)
                     except Exception as e:
                         current_app.logger.error(f"Error fetching posts for {data_id}: {e}")
                         posts_data = {}
@@ -266,8 +266,12 @@ class HealthCheckService:
                 passed = bool(place_data.get('hours') or place_data.get('openingHours') or place_data.get('operating_hours'))
             elif cid == 2: # Fotos Produtos
                 # Inferir do menu ou fotos
-                # Se photos_list veio do 'images' array, pode ter apenas thumbnails, mas a contagem é > 0
-                passed = bool(place_data.get('menu')) or (len(photos_list) > 2) # Reduzi de 5 para 2 pois images traz categorias
+                photos_count = len(photos_list)
+                if photos_count >= 10: 
+                    passed = True; res_score = c['weight']
+                elif photos_count > 0: 
+                    passed = True; res_score = c['weight'] // 2; status = 'moderate'
+                else: passed = False
             elif cid == 3: # Vídeos
                 passed = has_video
             elif cid == 4: # Perfil Verificado
@@ -288,7 +292,6 @@ class HealthCheckService:
 
             elif cid == 6: # Q&A
                 # Q&A is hard to get via public API
-                # If we have 'extensions' or 'about' or rich 'parameters', we assume user engagement
                 passed = bool(place_data.get('questions_and_answers'))
                 if not passed and (place_data.get('extensions') or place_data.get('about')):
                     # Proxy: Profiles with rich extensions often have Q&A or are at least optimized
@@ -305,32 +308,45 @@ class HealthCheckService:
                     details.append("Nenhum post/atualização recente encontrada.")
             elif cid == 8: # Descrição
                 # Fallback: check extensions/amenities/service_options if description is missing
-                has_desc = bool(place_data.get('description') or place_data.get('snippet') or place_data.get('about'))
+                desc = place_data.get('description') or place_data.get('snippet') or place_data.get('about') or place_data.get('summary')
+                has_desc = len(str(desc)) > 10 if desc else False
+
                 if not has_desc and place_data.get('extensions'):
-                     # Se tem "extensions" (amenities, service options), o perfil tem info rica preenchida
                      current_app.logger.info(f"HealthCheck: Using 'extensions' as proxy for Description for {place_data.get('title')}")
                      has_desc = True 
                 passed = has_desc
             elif cid == 9: # Redes Sociais
-                passed = bool(place_data.get('profiles'))
+                # Also check website for social links
+                website_str = str(place_data.get('website', '')).lower()
+                has_social_links = any(x in website_str for x in ['facebook', 'instagram', 'linkedin', 'twitter'])
+                passed = bool(place_data.get('profiles')) or has_social_links or has_posts
             elif cid == 10: # Presença Maps
                 passed = True # Se chegou aqui, está no maps
             elif cid == 11: # Fotos Exterior
-                passed = len(photos_list) > 0 # Simplificação
+                 # Check for "Street View" or "Exterior" in titles
+                passed = any(x in str(p).lower() for p in photos_list for x in ['exterior', 'street view', 'outside', 'fachada'])
+                if not passed and len(photos_list) > 5: passed = True 
             elif cid == 12: # Fotos Interior
-                passed = len(photos_list) > 2 # Simplificação
+                # Check for "Interior" or "By owner"
+                passed = any(x in str(p).lower() for p in photos_list for x in ['interior', 'inside', 'by owner', 'dentro'])
+                if not passed and len(photos_list) > 5: passed = True
             elif cid == 13: # Info Produtos
-                passed = bool(place_data.get('category'))
+                passed = bool(place_data.get('menu')) or bool(place_data.get('products')) or bool(place_data.get('services')) or bool(place_data.get('service_options')) or bool(place_data.get('extensions'))
             elif cid == 14: # Avaliações
-                passed = (place_data.get('reviews') or 0) > 0
+                rev_count = place_data.get('reviews') or place_data.get('user_reviews') or 0
+                if isinstance(rev_count, dict): rev_count = 0
+                if rev_count >= 10: 
+                    passed = True; res_score = c['weight']
+                elif rev_count > 0:
+                    passed = True; res_score = c['weight'] // 2; status = 'moderate'
+                else: passed = False
             elif cid == 15: # Endereço
                 passed = bool(place_data.get('address'))
             elif cid == 16: # Logotipo
-                passed = bool(place_data.get('thumbnail'))
+                passed = bool(place_data.get('thumbnail')) or bool(place_data.get('logo'))
             elif cid == 17: # Resposta a Avaliações
                 if has_owner_response:
                     passed = True
-                    # Calcular taxa simples
                     if unreplied_count > 5:
                         status = 'moderate'
                         res_score = c['weight'] // 2
@@ -339,8 +355,14 @@ class HealthCheckService:
                         res_score = c['weight']
                         details.append("Respostas do proprietário detectadas.")
                 else:
-                    passed = False
-                    details.append("Nenhuma resposta do proprietário detectada nas últimas reviews.")
+                    if place_data.get('rating', 0) >= 4.5 and is_managed:
+                         passed = True
+                         res_score = c['weight'] // 2
+                         status = 'moderate'
+                         details.append("Provável gestão ativa (Alto Rating).")
+                    else:
+                        passed = False
+                        details.append("Nenhuma resposta do proprietário detectada nas últimas reviews.")
 
             if passed:
                 if res_score == 0: res_score = c['weight']
@@ -364,14 +386,14 @@ class HealthCheckService:
         # Note: critical_issues variable already counts missing criticals inside the loop
         critical_missing_count = critical_issues
         
-        # 2. Determine multiplier
+        # 2. Determine multiplier (Less aggressive penalty)
         multiplier = 1.0
         if critical_missing_count == 1:
-            multiplier = 0.8
+            multiplier = 0.95
         elif critical_missing_count == 2:
-            multiplier = 0.6
+            multiplier = 0.85
         elif critical_missing_count >= 3:
-            multiplier = 0.4
+            multiplier = 0.7
             
         # 3. Apply multiplier
         score = round(score * multiplier)

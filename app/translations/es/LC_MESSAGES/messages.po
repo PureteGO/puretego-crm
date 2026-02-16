@@ -522,6 +522,12 @@ msgstr "Tarea creada con éxito"
 #: app/routes/tasks.py:240
 #, fuzzy
 msgid "Error creating task: "
+msgstr "Error al crear tarea: "
+
+msgid "Connection Error."
+msgstr "Error de conexión."
+
+msgid "Error creating lead"
 msgstr "Error al crear lead"
 
 #: app/routes/tasks.py:254 app/routes/tasks.py:320 app/routes/tasks.py:363
