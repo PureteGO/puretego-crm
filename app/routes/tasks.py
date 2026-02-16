@@ -198,14 +198,18 @@ def create():
                     task.due_date = None
         
         db.add(task)
-        db.flush()
+        db.commit() # Commit task FIRST to ensure ID is generated and data is safe
         
-        # Send notification to assigned user
+        # Send notification to assigned user (Safely)
         if task.assigned_to_id:
-            from app.services.notification_service import NotificationService
-            NotificationService.on_task_assigned(db, task)
-        
-        db.commit()
+            try:
+                from app.services.notification_service import NotificationService
+                NotificationService.on_task_assigned(db, task)
+                db.commit()
+            except Exception as e:
+                # Log error but don't fail the request
+                print(f"Failed to send notification: {e}")
+                db.rollback() # Rollback only the notification part (though session might be messy, task is committed)
         flash(_('Task created successfully'), 'success')
     
     # Redirect back to referrer or tasks list
