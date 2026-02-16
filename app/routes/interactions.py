@@ -92,70 +92,6 @@ def agenda():
     with get_db() as db:
         from sqlalchemy.orm import joinedload
         
-        # Base query for interactions
-        interaction_query = db.query(Interaction).options(joinedload(Interaction.client), joinedload(Interaction.type))\
-            .join(Client).filter(
-                Interaction.status == 'scheduled',
-                Client.company_id == company_id
-            )
-            
-        # If not an privileged role, filter by current user only
-        if user_role not in ['owner', 'admin', 'manager', 'superadmin']:
-            interaction_query = interaction_query.filter(Interaction.user_id == user_id)
-            
-        # 1. Interactions: Overdue & Today
-        urgent_tasks = interaction_query.filter(Interaction.date <= end_of_today)\
-            .order_by(Interaction.date).all()
-        
-        # 2. Interactions: Upcoming (Next 7 Days)
-        future_tasks = interaction_query.filter(
-                Interaction.date > end_of_today,
-                Interaction.date <= end_of_7_days
-            ).order_by(Interaction.date).all()
-
-        # 3. Visits (Treat as Interactions)
-        # Fetch visits for today - from the current user or all company users
-        company_id = session.get('company_id')
-        
-        visits_today = db.query(Visit).options(joinedload(Visit.client)).join(Client).filter(
-            Visit.visit_date <= end_of_today,
-            Visit.visit_date >= now.replace(hour=0, minute=0, second=0),
-            Client.company_id == company_id
-        ).all()
-        
-        visits_future = db.query(Visit).options(joinedload(Visit.client)).join(Client).filter(
-            Visit.visit_date > end_of_today,
-            Visit.visit_date <= end_of_7_days,
-            Client.company_id == company_id
-        ).all()
-
-        # 4. General Tasks (Task Model)
-        task_query = db.query(Task).options(joinedload(Task.client)).filter(
-            Task.status.in_(['open', 'in_progress', 'pending_approval']),
-            Task.company_id == company_id
-        )
-        if user_role not in ['owner', 'admin', 'manager', 'superadmin']:
-            task_query = task_query.filter(Task.assigned_to_id == user_id)
-            
-        tasks_today = task_query.filter(Task.due_date <= end_of_today).all()
-        tasks_future = task_query.filter(Task.due_date > end_of_today, Task.due_date <= end_of_7_days).all()
-
-        # 5. Project Tickets
-        ticket_query = db.query(ProjectTicket).join(Project).options(joinedload(ProjectTicket.project)).filter(
-            ProjectTicket.status.in_(['pending', 'in_progress', 'pending_approval']),
-            Project.status == 'active',
-            Project.company_id == company_id
-        )
-        # For tickets, we filter by assignment usually, or if user is owner of project?
-        # Sticking to assignment for agenda to avoid clutter
-        ticket_query = ticket_query.filter(ProjectTicket.assigned_to == user_id)
-        
-        tickets_today = ticket_query.filter(or_(ProjectTicket.due_date <= end_of_today, ProjectTicket.due_date.is_(None))).all()  
-        # Note: Showing undated tickets in 'Today' or just ignoring? 
-        # If due_date is None, maybe putting them in Today is safer so they don't get lost
-        
-        tickets_future = ticket_query.filter(ProjectTicket.due_date > end_of_today, ProjectTicket.due_date <= end_of_7_days).all()
-        
         # Combine and formatting
         today_list = []
         upcoming_list = []
@@ -182,64 +118,134 @@ def agenda():
                 'notes': getattr(item, note_field, '') or getattr(item, 'title', ''), 
                 'url': url
             }
+            
+        # 1. Interactions
+        try:
+            # Base query for interactions
+            interaction_query = db.query(Interaction).options(joinedload(Interaction.client), joinedload(Interaction.type))\
+                .join(Client).filter(
+                    Interaction.status == 'scheduled',
+                    Client.company_id == company_id
+                )
+                
+            # If not an privileged role, filter by current user only
+            if user_role not in ['owner', 'admin', 'manager', 'superadmin']:
+                interaction_query = interaction_query.filter(Interaction.user_id == user_id)
+                
+            # Interactions: Overdue & Today
+            urgent_tasks = interaction_query.filter(Interaction.date <= end_of_today)\
+                .order_by(Interaction.date).all()
+            
+            # Interactions: Upcoming (Next 7 Days)
+            future_tasks = interaction_query.filter(
+                    Interaction.date > end_of_today,
+                    Interaction.date <= end_of_7_days
+                ).order_by(Interaction.date).all()
 
-        # Add Interactions
-        for i in urgent_tasks:
-            if not i.type: continue
-            # Safe URL generation
-            try:
-                client_url = url_for('clients.view', client_id=i.client_id)
-            except:
-                client_url = "#"
-            today_list.append(format_item(i, i.type.name, client_url, is_call=i.type.is_call))
-            
-        for i in future_tasks:
-            if not i.type: continue
-            try:
-                client_url = url_for('clients.view', client_id=i.client_id)
-            except:
-                client_url = "#"
-            upcoming_list.append(format_item(i, i.type.name, client_url, is_call=i.type.is_call))
-            
-        # Add Visits
-        for v in visits_today:
-            if not v.client_id: continue
-            try:
-                client_url = url_for('clients.view', client_id=v.client_id)
-            except:
-                client_url = "#"
-            today_list.append(format_item(v, _('Visit'), client_url, is_call=False, date_field='visit_date'))
-            
-        for v in visits_future:
-            if not v.client_id: continue
-            try:
-                client_url = url_for('clients.view', client_id=v.client_id)
-            except:
-                client_url = "#"
-            upcoming_list.append(format_item(v, _('Visit'), client_url, is_call=False, date_field='visit_date'))
+            for i in urgent_tasks:
+                if not i.type: continue
+                # Safe URL generation
+                try:
+                    client_url = url_for('clients.view', client_id=i.client_id)
+                except:
+                    client_url = "#"
+                today_list.append(format_item(i, i.type.name, client_url, is_call=i.type.is_call))
+                
+            for i in future_tasks:
+                if not i.type: continue
+                try:
+                    client_url = url_for('clients.view', client_id=i.client_id)
+                except:
+                    client_url = "#"
+                upcoming_list.append(format_item(i, i.type.name, client_url, is_call=i.type.is_call))
+        except Exception as e:
+            print(f"Error fetching interactions: {e}")
 
-        # Add General Tasks
-        for t in tasks_today:
-            today_list.append(format_item(t, _('Task'), url_for('tasks.index'), date_field='due_date', note_field='title'))
-        for t in tasks_future:
-            upcoming_list.append(format_item(t, _('Task'), url_for('tasks.index'), date_field='due_date', note_field='title'))
-
-        # Add Project Tickets
-        for t in tickets_today:
-            if not t.project_id: continue
-            try:
-                proj_url = url_for('projects.view', project_id=t.project_id)
-            except:
-                proj_url = "#"
-            today_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
+        # 2. Visits
+        try:
+            company_id = session.get('company_id')
             
-        for t in tickets_future:
-            if not t.project_id: continue
-            try:
-                proj_url = url_for('projects.view', project_id=t.project_id)
-            except:
-                proj_url = "#"
-            upcoming_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
+            visits_today = db.query(Visit).options(joinedload(Visit.client)).join(Client).filter(
+                Visit.visit_date <= end_of_today,
+                Visit.visit_date >= now.replace(hour=0, minute=0, second=0),
+                Client.company_id == company_id
+            ).all()
+            
+            visits_future = db.query(Visit).options(joinedload(Visit.client)).join(Client).filter(
+                Visit.visit_date > end_of_today,
+                Visit.visit_date <= end_of_7_days,
+                Client.company_id == company_id
+            ).all()
+
+            for v in visits_today:
+                if not v.client_id: continue
+                try:
+                    client_url = url_for('clients.view', client_id=v.client_id)
+                except:
+                    client_url = "#"
+                today_list.append(format_item(v, _('Visit'), client_url, is_call=False, date_field='visit_date'))
+                
+            for v in visits_future:
+                if not v.client_id: continue
+                try:
+                    client_url = url_for('clients.view', client_id=v.client_id)
+                except:
+                    client_url = "#"
+                upcoming_list.append(format_item(v, _('Visit'), client_url, is_call=False, date_field='visit_date'))
+        except Exception as e:
+            print(f"Error fetching visits: {e}")
+
+        # 3. Tasks
+        try:
+            task_query = db.query(Task).options(joinedload(Task.client)).filter(
+                Task.status.in_(['open', 'in_progress', 'pending_approval']),
+                Task.company_id == company_id
+            )
+            if user_role not in ['owner', 'admin', 'manager', 'superadmin']:
+                task_query = task_query.filter(Task.assigned_to_id == user_id)
+                
+            tasks_today = task_query.filter(Task.due_date <= end_of_today).all()
+            tasks_future = task_query.filter(Task.due_date > end_of_today, Task.due_date <= end_of_7_days).all()
+
+            for t in tasks_today:
+                today_list.append(format_item(t, _('Task'), url_for('tasks.index'), date_field='due_date', note_field='title'))
+            for t in tasks_future:
+                upcoming_list.append(format_item(t, _('Task'), url_for('tasks.index'), date_field='due_date', note_field='title'))
+        except Exception as e:
+             print(f"Error fetching tasks: {e}")
+
+        # 4. Project Tickets
+        try:
+            ticket_query = db.query(ProjectTicket).join(Project).options(joinedload(ProjectTicket.project)).filter(
+                ProjectTicket.status.in_(['pending', 'in_progress', 'pending_approval']),
+                Project.status == 'active',
+                Project.company_id == company_id
+            )
+            # For tickets, we filter by assignment usually, or if user is owner of project?
+            # Sticking to assignment for agenda to avoid clutter
+            ticket_query = ticket_query.filter(ProjectTicket.assigned_to == user_id)
+            
+            tickets_today = ticket_query.filter(or_(ProjectTicket.due_date <= end_of_today, ProjectTicket.due_date.is_(None))).all()  
+            
+            tickets_future = ticket_query.filter(ProjectTicket.due_date > end_of_today, ProjectTicket.due_date <= end_of_7_days).all()
+
+            for t in tickets_today:
+                if not t.project_id: continue
+                try:
+                    proj_url = url_for('projects.view', project_id=t.project_id)
+                except:
+                    proj_url = "#"
+                today_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
+                
+            for t in tickets_future:
+                if not t.project_id: continue
+                try:
+                    proj_url = url_for('projects.view', project_id=t.project_id)
+                except:
+                    proj_url = "#"
+                upcoming_list.append(format_item(t, _('Project Task'), proj_url, date_field='due_date', note_field='title'))
+        except Exception as e:
+            print(f"Error fetching tickets: {e}")
             
         # Sort lists by date
         today_list.sort(key=lambda x: x['date'] or '')

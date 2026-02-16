@@ -604,7 +604,6 @@
                             <select name="assigned_to_id" id="quickTaskAssignee" class="form-select">
                                 <option value="">{{ _('Loading...') }}</option>
                             </select>
-                            <small class="text-muted">{{ _('Leave blank to assign to yourself') }}</small>
                         </div>
                         <div class="mb-0">
                             <div class="form-check form-switch">
@@ -642,7 +641,7 @@
                 fetch('/api/tasks/team')
                     .then(r => r.json())
                     .then(users => {
-                        let html = '<option value="">{{ _("Myself") }}</option>';
+                        let html = '<option value="">{{ _("Unassigned") }}</option>';
                         users.forEach(u => {
                             const label = u.is_me ? u.name + ' ({{ _("me") }})' : u.name;
                             html += `<option value="${u.id}" ${u.is_me ? 'selected' : ''}>${label}</option>`;

@@ -777,10 +777,12 @@
             .then(r => r.json())
             .then(users => {
                 const select = document.getElementById('taskAssignee');
-                select.innerHTML = '<option value="">{{ _("Me") }}</option>';
+                let html = '<option value="">{{ _("Unassigned") }}</option>';
                 users.forEach(u => {
-                    select.innerHTML += `<option value="${u.id}">${u.name}</option>`;
+                    const label = u.is_me ? u.name + ' ({{ _("me") }})' : u.name;
+                    html += `<option value="${u.id}" ${u.is_me ? 'selected' : ''}>${label}</option>`;
                 });
+                select.innerHTML = html;
             });
 
         // Initialize reactive features
