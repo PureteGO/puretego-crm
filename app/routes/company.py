@@ -41,6 +41,8 @@ def profile():
             'slug': company.slug,
             'email': company.email,
             'phone': company.phone,
+            'website': company.website,
+            'tax_id': company.tax_id,
             'address': company.address,
             'logo_url': company.logo_url,
             'is_active': company.is_active,
@@ -98,6 +100,11 @@ def update_branding():
             return redirect(url_for('dashboard.index'))
         
         company.name = request.form.get('name')
+        company.email = request.form.get('email')
+        company.phone = request.form.get('phone')
+        company.website = request.form.get('website')
+        company.tax_id = request.form.get('tax_id')
+        company.address = request.form.get('address')
         company.theme_style = request.form.get('theme_style', 'tech-teal')
         company.currency_symbol = request.form.get('currency_symbol', 'Gs')
         

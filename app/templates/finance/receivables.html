@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">{{ _('Finance') }}</h1>
+        <h1 class="h3 mb-0" style="color: var(--text-primary);">{{ _('Finance') }}</h1>
         <div class="d-flex align-items-center gap-2">
             <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
                 data-bs-target="#newReceivableModal">
@@ -32,23 +32,26 @@
                 <div class="col-md-3 border-end">
                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1">{{ _('Estimated Net Profit') }}
                     </div>
-                    <div class="h4 mb-0 font-weight-bold" id="stat-net-profit">...</div>
+                    <div class="h4 mb-0 font-weight-bold" id="stat-net-profit">{{ stats.net_profit_estimate |
+                        format_currency }}</div>
                     <small class="text-muted">{{ _('(Receivables - Commissions - Costs - Payroll)') }}</small>
                 </div>
                 <div class="col-md-3 border-end">
                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">{{ _('Payroll (Fixed)') }}
                     </div>
-                    <div class="h5 mb-0 font-weight-bold" id="stat-payroll">...</div>
+                    <div class="h5 mb-0 font-weight-bold" id="stat-payroll">{{ stats.payroll | format_currency }}</div>
                 </div>
                 <div class="col-md-3 border-end">
                     <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">{{ _('Pending Commissions') }}
                     </div>
-                    <div class="h5 mb-0 font-weight-bold" id="stat-commissions">...</div>
+                    <div class="h5 mb-0 font-weight-bold" id="stat-commissions">{{ stats.commissions_pending |
+                        format_currency }}</div>
                 </div>
                 <div class="col-md-3">
                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ _('Accounts Payable') }}
                     </div>
-                    <div class="h5 mb-0 font-weight-bold" id="stat-payables">...</div>
+                    <div class="h5 mb-0 font-weight-bold" id="stat-payables">{{ stats.payables_open | format_currency }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -76,7 +79,8 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">{{ _('Total Open') }}
                             </div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_open | format_currency }}
+                            <div class="h5 mb-0 font-weight-bold" style="color: var(--text-primary);">{{
+                                stats.total_open | format_currency }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -93,7 +97,8 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">{{ _('Total
                                 Received') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_paid | format_currency }}
+                            <div class="h5 mb-0 font-weight-bold" style="color: var(--text-primary);">{{
+                                stats.total_paid | format_currency }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -110,7 +115,8 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">{{ _('Overdue
                                 Invoices') }}</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.overdue_count }}</div>
+                            <div class="h5 mb-0 font-weight-bold" style="color: var(--text-primary);">{{
+                                stats.overdue_count }}</div>
                         </div>
                         <div class="col-auto">
                             <i class="bi bi-exclamation-triangle fa-2x text-gray-300"></i>
@@ -123,8 +129,27 @@
 
     <!-- Receivables Table -->
     <div class="card shadow-sm mb-4">
-        <div class="card-header py-3 d-flex justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">{{ _('Receivables List') }}</h6>
+        <div class="card-header py-3 d-flex flex-wrap align-items-center justify-content-between">
+            <div class="col">
+                <h6 class="m-0 font-weight-bold text-primary">{{ _('Receivables List') }}</h6>
+            </div>
+            <div class="col-md-5">
+                <form action="{{ url_for('finance.list_receivables') }}" method="GET">
+                    {% if request.args.get('status') %}
+                    <input type="hidden" name="status" value="{{ request.args.get('status') }}">
+                    {% endif %}
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-transparent border-end-0"
+                            style="border-color: var(--border-color); color: var(--text-secondary);">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control border-start-0"
+                            style="background-color: var(--bg-input); color: var(--text-primary); border-color: var(--border-color);"
+                            placeholder="{{ _('Client name...') }}" value="{{ request.args.get('search', '') }}">
+                        <button class="btn btn-outline-primary" type="submit">{{ _('Filter') }}</button>
+                    </div>
+                </form>
+            </div>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -174,12 +199,12 @@
                             <td>
                                 {% if rec.status != 'paid' %}
                                 <button type="button" class="btn btn-sm btn-success"
-                                    onclick="openPaymentModal({{ rec.id }}, '{{ rec.description }}', {{ rec.amount }}, {{ rec.paid_amount or 0 }})"
+                                    onclick="openPaymentModal({{ rec.id }}, {{ rec.description | tojson | safe }}, {{ rec.amount }}, {{ rec.paid_amount or 0 }})"
                                     title="{{ _('Register Payment') }}">
                                     <i class="bi bi-check-circle"></i>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary ms-1"
-                                    onclick="openEditModal({{ rec.id }}, '{{ rec.description }}', {{ rec.amount }}, '{{ rec.due_date }}')"
+                                    onclick="openEditModal({{ rec.id }}, {{ rec.description | tojson | safe }}, {{ rec.amount }}, '{{ rec.due_date }}')"
                                     title="{{ _('Edit') }}">
                                     <i class="bi bi-pencil"></i>
                                 </button>

@@ -16,7 +16,7 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <!-- Metadata -->
         <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white">
+            <div class="card-header">
                 <h5 class="mb-0"><i class="bi bi-info-circle"></i> {{ _('Proposal Details') }}</h5>
             </div>
             <div class="card-body">
@@ -66,7 +66,7 @@
 
         <!-- Quote Options (reuses same JS as create) -->
         <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-list-columns-reverse"></i> {{ _('Quote Options') }}</h5>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="addOptionBtn">
                     <i class="bi bi-plus-lg"></i> {{ _('Add Option') }}
@@ -222,7 +222,7 @@
         let optionCount = 0;
 
         // Load existing options
-        const existingOptions = {{ options_json| safe
+        const existingOptions = {{ options_json | safe
     }};
 
     if (existingOptions.length > 0) {

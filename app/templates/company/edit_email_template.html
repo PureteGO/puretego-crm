@@ -14,8 +14,8 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white py-3">
+            <div class="card shadow-sm border-0 themed-card">
+                <div class="card-header border-bottom py-3">
                     <h5 class="mb-0 fw-bold text-primary">{{ _('Editar Modelo:') }} {{ template.name }}</h5>
                 </div>
                 <div class="card-body p-4">
@@ -30,7 +30,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold small">{{ _('Corpo do E-mail') }}</label>
-                            <div class="alert alert-light border small text-muted mb-2 py-2">
+                            <div class="alert alert-secondary border-0 bg-hover-themed small text-muted mb-2 py-2">
                                 <i class="bi bi-info-circle me-1"></i> {{ _('Use a sintaxe {{ placeholder }} para
                                 inserir dados dinâmicos.') }}
                             </div>
@@ -39,7 +39,8 @@
                                 required>{{ template.body }}</textarea>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4 border-top pt-4">
+                        <div
+                            class="d-flex justify-content-between mt-4 border-top border-secondary border-opacity-10 pt-4">
                             <div>
                                 <button type="submit" class="btn btn-primary px-4 bg-gradient">
                                     <i class="bi bi-check-lg me-1"></i> {{ _('Salvar Template') }}
@@ -61,8 +62,8 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-header bg-light py-3">
+            <div class="card shadow-sm border-0 h-100 themed-card">
+                <div class="card-header bg-hover-themed py-3 border-bottom">
                     <h6 class="mb-0 fw-bold"><i class="bi bi-braces me-2"></i>{{ _('Placeholders Disponíveis') }}</h6>
                 </div>
                 <div class="card-body">
@@ -71,14 +72,16 @@
 
                     <h6 class="fw-bold small text-primary mb-2">{{ _('Dados do Cliente') }}</h6>
                     <ul class="list-group list-group-flush mb-3">
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{client_name}}')">{{ '{{client_name}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-primary"
+                                onclick="copyToClipboard('{{ '{{' }}client_name{{ '}}' }}')">{{ '{{client_name}}' }}</code>
                             <span class="small text-muted">{{ _('Nome Completo') }}</span>
                         </li>
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{client_company}}')">{{ '{{client_company}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-primary"
+                                onclick="copyToClipboard('{{ '{{' }}client_company{{ '}}' }}')">{{ '{{client_company}}' }}</code>
                             <span class="small text-muted">{{ _('Empresa') }}</span>
                         </li>
                     </ul>
@@ -86,19 +89,22 @@
                     {% if template.area == 'sales' %}
                     <h6 class="fw-bold small text-success mb-2">{{ _('Dados da Proposta') }}</h6>
                     <ul class="list-group list-group-flush mb-3">
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{deal_title}}')">{{ '{{deal_title}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-success"
+                                onclick="copyToClipboard('{{ '{{' }}deal_title{{ '}}' }}')">{{ '{{deal_title}}' }}</code>
                             <span class="small text-muted">{{ _('Título do Negócio') }}</span>
                         </li>
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{deal_value}}')">{{ '{{deal_value}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-success"
+                                onclick="copyToClipboard('{{ '{{' }}deal_value{{ '}}' }}')">{{ '{{deal_value}}' }}</code>
                             <span class="small text-muted">{{ _('Valor Total') }}</span>
                         </li>
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{proposal_link}}')">{{ '{{proposal_link}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-success"
+                                onclick="copyToClipboard('{{ '{{' }}proposal_link{{ '}}' }}')">{{ '{{proposal_link}}' }}</code>
                             <span class="small text-muted">{{ _('Link Público') }}</span>
                         </li>
                     </ul>
@@ -107,19 +113,22 @@
                     {% if template.area == 'finance' %}
                     <h6 class="fw-bold small text-danger mb-2">{{ _('Dados Financeiros') }}</h6>
                     <ul class="list-group list-group-flush mb-3">
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{amount}}')">{{ '{{amount}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-danger"
+                                onclick="copyToClipboard('{{ '{{' }}amount{{ '}}' }}')">{{ '{{amount}}' }}</code>
                             <span class="small text-muted">{{ _('Valor da Cobrança') }}</span>
                         </li>
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{due_date}}')">{{ '{{due_date}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-danger"
+                                onclick="copyToClipboard('{{ '{{' }}due_date{{ '}}' }}')">{{ '{{due_date}}' }}</code>
                             <span class="small text-muted">{{ _('Data de Vencimento') }}</span>
                         </li>
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{invoice_description}}')">{{ '{{invoice_description}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-danger"
+                                onclick="copyToClipboard('{{ '{{' }}invoice_description{{ '}}' }}')">{{ '{{invoice_description}}' }}</code>
                             <span class="small text-muted">{{ _('Descrição') }}</span>
                         </li>
                     </ul>
@@ -127,14 +136,16 @@
 
                     <h6 class="fw-bold small text-secondary mb-2">{{ _('Dados da sua Agência') }}</h6>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{tenant_name}}')">{{ '{{tenant_name}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-bottom-themed">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-secondary"
+                                onclick="copyToClipboard('{{ '{{' }}tenant_name{{ '}}' }}')">{{ '{{tenant_name}}' }}</code>
                             <span class="small text-muted">{{ _('Nome da Agência') }}</span>
                         </li>
-                        <li class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center">
-                            <code class="p-1 bg-light rounded cursor-pointer"
-                                onclick="copyToClipboard('{{sender_name}}')">{{ '{{sender_name}}' }}</code>
+                        <li
+                            class="list-group-item px-0 py-2 d-flex justify-content-between align-items-center bg-transparent border-0">
+                            <code class="p-1 bg-hover-themed rounded cursor-pointer text-secondary"
+                                onclick="copyToClipboard('{{ '{{' }}sender_name{{ '}}' }}')">{{ '{{sender_name}}' }}</code>
                             <span class="small text-muted">{{ _('Seu Nome') }}</span>
                         </li>
                     </ul>
@@ -143,6 +154,27 @@
         </div>
     </div>
 </div>
+
+<style>
+    .themed-card {
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+    }
+
+    .card-header {
+        background-color: transparent !important;
+        border-bottom-color: var(--border-color) !important;
+    }
+
+    .bg-hover-themed {
+        background-color: var(--bg-hover) !important;
+    }
+
+    .border-bottom-themed {
+        border-bottom-color: var(--border-color) !important;
+    }
+</style>
+
 
 <script>
     function copyToClipboard(text) {

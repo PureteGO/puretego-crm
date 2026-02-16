@@ -15,7 +15,7 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <!-- Step 1: Client & Metadata -->
         <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white">
+            <div class="card-header">
                 <h5 class="mb-0"><i class="bi bi-1-circle-fill text-primary"></i> {{ _('Basic Information') }}</h5>
             </div>
             <div class="card-body">
@@ -74,7 +74,7 @@
 
         <!-- Step 2: Quote Options -->
         <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-2-circle-fill text-primary"></i> {{ _('Quote Options') }}</h5>
                 <button type="button" class="btn btn-sm btn-outline-primary" id="addOptionBtn">
                     <i class="bi bi-plus-lg"></i> {{ _('Add Option') }}
@@ -87,7 +87,7 @@
 
         <!-- Step 3: Notes & Terms -->
         <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white">
+            <div class="card-header">
                 <h5 class="mb-0"><i class="bi bi-3-circle-fill text-primary"></i> {{ _('Notes & Terms') }}</h5>
             </div>
             <div class="card-body">

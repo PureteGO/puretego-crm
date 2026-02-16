@@ -377,8 +377,7 @@
                 <div class="card text-white bg-primary h-100 shadow-sm">
                     <div class="card-body d-flex flex-column justify-content-between">
                         <h6 class="card-title text-white opacity-75 mb-0"><i class="bi bi-people"></i> {{ _('Total
-                            Clients') }}
-                        </h6>
+                            Clients') }}</h6>
                         <h3 class="card-text fw-bold mb-0 text-end" id="stat-total-clients">{{ total_clients }}</h3>
                     </div>
                 </div>
@@ -1090,12 +1089,8 @@
                 spinner.classList.add('d-none');
 
                 if (data.success) {
-                    // SALES LOGIC: Cap score to facilitate sales if it's too high
-                    // Real score is preserved in data.score, but we show a lower one for the "Quick" view
+                    // Sales Logic removed as per request
                     let displayScore = data.score;
-                    if (displayScore > 65) {
-                        displayScore = 57;
-                    }
 
                     const summary = data.report.summary;
                     const scoreStatus = displayScore > 90 ? 'Líder de Mercado' : (displayScore > 70 ? 'Ótimo' : (displayScore > 40 ? 'Regular' : 'Crítico'));

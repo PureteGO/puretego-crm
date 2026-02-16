@@ -5,11 +5,11 @@
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-12">
-            <h1 class="h3 mb-4 text-gray-800"><i class="bi bi-building-gear me-2"></i>{{ _('Configurações da Empresa')
+            <h1 class="h3 mb-4"><i class="bi bi-building-gear me-2"></i>{{ _('Configurações da Empresa')
                 }}</h1>
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-white p-0">
+            <div class="card shadow-sm border-0 themed-card">
+                <div class="card-header p-0 border-bottom">
                     <ul class="nav nav-tabs border-bottom-0" id="companySettingsTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link px-4 py-3 active fw-bold" id="branding-tab" data-bs-toggle="tab"
@@ -43,13 +43,14 @@
                                 enctype="multipart/form-data">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <div class="row">
-                                    <div class="col-md-4 text-center border-end">
+                                    <div class="col-md-4 text-center border-end-themed">
                                         <label class="form-label fw-bold d-block mb-3">{{ _('Agency Logo') }}</label>
                                         <div class="mb-3 position-relative d-inline-block">
                                             {% if company.logo_url %}
-                                            <img src="{{ company.logo_url }}" alt="Logo"
-                                                class="img-fluid rounded shadow-sm"
-                                                style="max-height: 150px; background: #f8f9fa; padding: 10px;">
+                                            <div class="logo-preview-container">
+                                                <img src="{{ company.logo_url }}" alt="Logo"
+                                                    class="img-fluid rounded shadow-sm">
+                                            </div>
                                             <div class="mt-2">
                                                 <button type="button" class="btn btn-sm btn-outline-danger border-0"
                                                     onclick="confirmDeleteLogo()">
@@ -57,8 +58,8 @@
                                                 </button>
                                             </div>
                                             {% else %}
-                                            <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                                style="height: 150px; width: 150px; border: 2px dashed #dee2e6;">
+                                            <div class="bg-hover-themed rounded d-flex align-items-center justify-content-center"
+                                                style="height: 150px; width: 150px; border: 2px dashed var(--border-color);">
                                                 <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
                                             </div>
                                             {% endif %}
@@ -110,9 +111,40 @@
                                                         value="{{ company.currency_symbol or 'Gs' }}" maxlength="5">
                                                 </div>
                                             </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small">{{ _('Email de Contato') }}</label>
+                                                    <input type="email" class="form-control" name="email"
+                                                        value="{{ company.email or '' }}">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small">{{ _('Telefone') }}</label>
+                                                    <input type="text" class="form-control" name="phone"
+                                                        value="{{ company.phone or '' }}">
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small">{{ _('Website') }}</label>
+                                                    <input type="url" class="form-control" name="website"
+                                                        value="{{ company.website or '' }}"
+                                                        placeholder="https://exemplo.com">
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label small">{{ _('Identificação Legal
+                                                        (CNPJ/RUC)') }}</label>
+                                                    <input type="text" class="form-control" name="tax_id"
+                                                        value="{{ company.tax_id or '' }}">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small">{{ _('Endereço Completo') }}</label>
+                                                <textarea class="form-control" name="address"
+                                                    rows="2">{{ company.address or '' }}</textarea>
+                                            </div>
                                         </div>
-                                        <hr>
-                                        <button type="submit" class="btn btn-primary px-4">
+                                        <hr class="border-secondary opacity-25">
+                                        <button type="submit" class="btn btn-primary px-4 bg-gradient">
                                             <i class="bi bi-save me-1"></i> {{ _('Salvar Alterações de Branding') }}
                                         </button>
                                     </div>
@@ -170,7 +202,7 @@
                                             </div>
                                         </div>
 
-                                        <hr class="my-4">
+                                        <hr class="my-4 border-secondary opacity-25">
 
                                         <h5 class="fw-bold mb-3">{{ _('Identidade do Remetente') }}</h5>
                                         <div class="row">
@@ -188,14 +220,14 @@
                                         </div>
 
                                         <div class="mt-4">
-                                            <button type="submit" class="btn btn-primary px-4 shadow-sm">
+                                            <button type="submit" class="btn btn-primary px-4 bg-gradient shadow-sm">
                                                 <i class="bi bi-save me-1"></i> {{ _('Salvar Configurações SMTP') }}
                                             </button>
                                         </div>
                                     </form>
                                 </div>
                                 <div class="col-md-5">
-                                    <div class="card bg-light border-0">
+                                    <div class="card bg-hover-themed border-0 shadow-sm">
                                         <div class="card-body p-4">
                                             <h6 class="fw-bold mb-3"><i class="bi bi-send-check me-1"></i> {{ _('Testar
                                                 Configuração') }}</h6>
@@ -211,7 +243,7 @@
                                                 </div>
                                             </form>
 
-                                            <div class="mt-5">
+                                            <div class="mt-5 pt-4 border-top border-secondary border-opacity-10">
                                                 <h6 class="fw-bold mb-3"><i class="bi bi-file-earmark-code me-1"></i> {{
                                                     _('Templates de E-mail') }}</h6>
                                                 <p class="small text-muted mb-3">{{ _('Personalize as mensagens enviadas
@@ -244,16 +276,17 @@
                                         <div class="workflow-option-card {% if company.workflow_mode == 'solo' %}active{% endif %}"
                                             onclick="selectWorkflow('solo')">
                                             <div class="p-4 text-center">
-                                                <div class="workflow-icon mb-3 bg-light text-primary"><i
-                                                        class="bi bi-person"></i></div>
+                                                <div class="workflow-icon mb-3 bg-hover-themed text-primary shadow-sm">
+                                                    <i class="bi bi-person"></i></div>
                                                 <h5 class="fw-bold">{{ _('Solo') }}</h5>
                                                 <p class="text-muted small mb-0">{{ _('Para consultores independentes.
                                                     Foco total em prospecção e fechamento sem módulos extras.') }}</p>
                                                 <input type="radio" name="workflow_mode" id="wf_solo" value="solo" {% if
                                                     company.workflow_mode=='solo' %}checked{% endif %} class="d-none">
                                             </div>
-                                            <div class="card-footer bg-white border-0 text-center pb-4">
-                                                <span class="badge bg-light text-muted">{{ _('Owner/SDR/Sales')
+                                            <div class="card-footer border-0 text-center pb-4 pt-0">
+                                                <span class="badge bg-hover-themed text-muted fw-normal">{{
+                                                    _('Owner/SDR/Sales')
                                                     }}</span>
                                             </div>
                                         </div>
@@ -264,8 +297,8 @@
                                         <div class="workflow-option-card {% if company.workflow_mode == 'lean' %}active{% endif %}"
                                             onclick="selectWorkflow('lean')">
                                             <div class="p-4 text-center">
-                                                <div class="workflow-icon mb-3 bg-light text-success"><i
-                                                        class="bi bi-people"></i></div>
+                                                <div class="workflow-icon mb-3 bg-hover-themed text-success shadow-sm">
+                                                    <i class="bi bi-people"></i></div>
                                                 <h5 class="fw-bold">{{ _('Lean') }}</h5>
                                                 <p class="text-muted small mb-0">{{ _('Agência pequena. Fluxo entre SDR,
                                                     Vendedor e Gestor GMB. Módulos financeiros básicos inclusos.') }}
@@ -273,8 +306,9 @@
                                                 <input type="radio" name="workflow_mode" id="wf_lean" value="lean" {% if
                                                     company.workflow_mode=='lean' %}checked{% endif %} class="d-none">
                                             </div>
-                                            <div class="card-footer bg-white border-0 text-center pb-4">
-                                                <span class="badge bg-light text-muted">{{ _('Roles Essenciais')
+                                            <div class="card-footer border-0 text-center pb-4 pt-0">
+                                                <span class="badge bg-hover-themed text-muted fw-normal">{{ _('Roles
+                                                    Essenciais')
                                                     }}</span>
                                             </div>
                                         </div>
@@ -285,7 +319,7 @@
                                         <div class="workflow-option-card {% if company.workflow_mode == 'structured' %}active{% endif %}"
                                             onclick="selectWorkflow('structured')">
                                             <div class="p-4 text-center">
-                                                <div class="workflow-icon mb-3 bg-light text-danger"><i
+                                                <div class="workflow-icon mb-3 bg-hover-themed text-danger shadow-sm"><i
                                                         class="bi bi-building"></i></div>
                                                 <h5 class="fw-bold">{{ _('Structured') }}</h5>
                                                 <p class="text-muted small mb-0">{{ _('Agência completa. Todos os
@@ -295,15 +329,16 @@
                                                     value="structured" {% if company.workflow_mode=='structured'
                                                     %}checked{% endif %} class="d-none">
                                             </div>
-                                            <div class="card-footer bg-white border-0 text-center pb-4">
-                                                <span class="badge bg-light text-muted">{{ _('Toda a Plataforma')
+                                            <div class="card-footer border-0 text-center pb-4 pt-0">
+                                                <span class="badge bg-hover-themed text-muted fw-normal">{{ _('Toda a
+                                                    Plataforma')
                                                     }}</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="mt-5 border-top pt-4">
+                                <div class="mt-5 border-top border-secondary border-opacity-25 pt-4">
                                     <h6 class="fw-bold mb-3"><i class="bi bi-percent me-1"></i> {{ _('Taxas de
                                         Comissionamento') }}</h6>
                                     <div class="row">
@@ -326,7 +361,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary px-5 btn-lg shadow-sm mt-3">
+                                    <button type="submit"
+                                        class="btn btn-primary px-5 btn-lg bg-gradient shadow-sm mt-3">
                                         <i class="bi bi-check-circle me-1"></i> {{ _('Aplicar Configurações') }}
                                     </button>
                                     <p class="text-warning small mt-3">
@@ -344,22 +380,86 @@
 </div>
 
 <style>
+    .themed-card {
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+    }
+
+    .card-header {
+        background-color: transparent !important;
+        border-bottom-color: var(--border-color) !important;
+    }
+
+    .nav-tabs .nav-link {
+        color: var(--text-secondary);
+        border: none;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: var(--text-primary);
+        background-color: var(--bg-hover);
+        border-bottom-color: var(--border-color);
+    }
+
+    .nav-tabs .nav-link.active {
+        color: var(--primary);
+        background-color: transparent !important;
+        border-bottom-color: var(--primary) !important;
+    }
+
+    .border-end-themed {
+        border-right: 1px solid var(--border-color) !important;
+    }
+
+    @media (max-width: 767.98px) {
+        .border-end-themed {
+            border-right: none !important;
+            border-bottom: 1px solid var(--border-color) !important;
+            padding-bottom: 2rem;
+            margin-bottom: 2rem;
+        }
+    }
+
+    .logo-preview-container {
+        height: 150px;
+        width: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        /* Always white background for logos to ensure visibility */
+        padding: 15px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        margin: 0 auto;
+    }
+
+    .bg-hover-themed {
+        background-color: var(--bg-hover) !important;
+    }
+
     .theme-card {
-        border: 2px solid #f1f3f5;
+        border: 2px solid var(--border-color);
+        background-color: var(--bg-elevated);
         border-radius: 12px;
         cursor: pointer;
         transition: all 0.2s;
         overflow: hidden;
+        height: 100%;
+        color: var(--text-primary);
     }
 
     .theme-card:hover {
-        border-color: #dee2e6;
+        border-color: var(--text-secondary);
         transform: translateY(-2px);
     }
 
     .theme-card.active {
-        border-color: var(--bs-primary);
-        background-color: #f8f9fa;
+        border-color: var(--primary);
+        background-color: var(--bg-hover);
+        box-shadow: var(--shadow-glow);
     }
 
     .theme-color-preview {
@@ -368,21 +468,26 @@
     }
 
     .workflow-option-card {
-        border: 2px solid #f1f3f5;
+        border: 2px solid var(--border-color);
+        background-color: var(--bg-elevated);
         border-radius: 16px;
         cursor: pointer;
         transition: all 0.3s;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+        color: var(--text-primary);
     }
 
     .workflow-option-card:hover {
-        border-color: #dee2e6;
+        border-color: var(--text-secondary);
         transform: scale(1.02);
     }
 
     .workflow-option-card.active {
-        border-color: var(--bs-primary);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        border-color: var(--primary);
+        box-shadow: var(--shadow-glow);
+        background-color: var(--bg-hover);
     }
 
     .workflow-icon {
@@ -394,29 +499,37 @@
         margin: 0 auto;
     }
 
-    /* Theme color dots helper if needed */
+    .card-footer {
+        background-color: transparent !important;
+    }
+
+    /* Theme color previews */
     .bg-tech-teal {
-        background: #008080 !important;
+        background: #14b8a6 !important;
     }
 
     .bg-corporate-blue {
-        background: #0047AB !important;
+        background: #3b82f6 !important;
     }
 
     .bg-innovation-purple {
-        background: #6A0DAD !important;
+        background: #8b5cf6 !important;
     }
 
     .bg-energetic-orange {
-        background: #FF8C00 !important;
+        background: #f97316 !important;
     }
 
     .bg-premium-red {
-        background: #B22222 !important;
+        background: #ef4444 !important;
     }
 
     .bg-nature-green {
-        background: #2E8B57 !important;
+        background: #22c55e !important;
+    }
+
+    .bg-maps2go-official {
+        background: linear-gradient(135deg, #08202f, #14b8a6) !important;
     }
 </style>
 
@@ -452,5 +565,17 @@
             form.submit();
         }
     }
+
+    // Auto-select tab if hash in URL
+    document.addEventListener('DOMContentLoaded', function () {
+        const hash = window.location.hash;
+        if (hash) {
+            const tabBtn = document.querySelector(`button[data-bs-target="${hash}"]`);
+            if (tabBtn) {
+                const tab = new bootstrap.Tab(tabBtn);
+                tab.show();
+            }
+        }
+    });
 </script>
 {% endblock %}

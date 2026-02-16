@@ -73,10 +73,16 @@ def list_receivables():
             joinedload(Receivable.project)
         ), Receivable)
         
-        # Filtros básicos (status)
+        # Filtros básicos (status, search)
         status = request.args.get('status')
+        search = request.args.get('search')
+        
         if status:
             query = query.filter(Receivable.status == status)
+            
+        if search:
+            from app.models.client import Client
+            query = query.join(Receivable.client).filter(Client.name.ilike(f'%{search}%'))
             
         receivables = query.order_by(Receivable.due_date.asc()).all()
         
@@ -86,6 +92,18 @@ def list_receivables():
             'total_paid': filter_by_company(db.query(func.sum(Receivable.amount)), Receivable).filter(Receivable.status == 'paid').scalar() or 0,
             'overdue_count': filter_by_company(db.query(func.count(Receivable.id)), Receivable).filter(Receivable.status == 'open', Receivable.due_date < datetime.utcnow().date()).scalar() or 0
         }
+        
+        # 4. Comissões e Custos (Para cálculo de lucro)
+        from app.models import Commission, Payable
+        stats['commissions_pending'] = filter_by_company(db.query(func.sum(Commission.amount)), Commission).filter(Commission.status == 'pending').scalar() or 0
+        stats['payables_open'] = filter_by_company(db.query(func.sum(Payable.amount)), Payable).filter(Payable.status == 'open').scalar() or 0
+        
+        # 5. Folha de Pagamento (Payroll) - Somente ativos
+        from app.models.user import User
+        stats['payroll'] = filter_by_company(db.query(func.sum(User.base_salary)), User).filter(User.is_active == True).scalar() or 0
+        
+        # Cálculo de Lucro Líquido Estimado
+        stats['net_profit_estimate'] = float(stats['total_open']) - float(stats['commissions_pending']) - float(stats['payables_open']) - float(stats['payroll'])
         
         # Lista de clientes para o formulário de cadastro
         from app.models.client import Client

@@ -41,6 +41,8 @@ class Company(Base):
     slug = Column(String(100), unique=True, nullable=False, index=True)
     email = Column(String(255))
     phone = Column(String(50))
+    website = Column(String(255))
+    tax_id = Column(String(50)) # CNPJ, RUC, etc.
     address = Column(Text)
     logo_url = Column(String(500))
     theme_style = Column(String(50), default='tech-teal')  # Company's visual theme
@@ -128,6 +130,8 @@ class Company(Base):
             'slug': self.slug,
             'email': self.email,
             'phone': self.phone,
+            'website': self.website,
+            'tax_id': self.tax_id,
             'address': self.address,
             'logo_url': self.logo_url,
             'theme_style': self.theme_style or 'tech-teal',

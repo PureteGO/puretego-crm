@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="{{ language }}">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{ _('Commercial Proposal') }} - {{ proposal.client_name }}</title>
+    <style>
+        /* Base Print Styles for WeasyPrint & Browsers */
+        @page {
+            size: A4;
+            margin: 0;
+            /* Marginal control via body padding/containers for bleed */
+        }
+
+        :root {
+            --primary: {
+                    {
+                    theme.primary
+                }
+            }
+
+            ;
+
+            --primary-dark: {
+                    {
+                    theme.primary_dark
+                }
+            }
+
+            ;
+
+            --primary-light: {
+                    {
+                    theme.primary_light
+                }
+            }
+
+            ;
+
+            --accent: {
+                    {
+                    theme.accent
+                }
+            }
+
+            ;
+            --text-main: #1e293b;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --bg-base: #ffffff;
+            --bg-muted: #f8fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-main);
+            line-height: 1.5;
+            font-size: 11pt;
+            margin: 0;
+            padding: 0;
+            background: #f1f5f9;
+            /* Preview background */
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 10mm auto;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            page-break-after: always;
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+
+            .page {
+                margin: 0;
+                box-shadow: none;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        /* CAPA */
+        .cover {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 257mm;
+            /* Adjust for padding */
+        }
+
+        .cover-logo {
+            max-height: 80px;
+            margin-bottom: 2rem;
+        }
+
+        .cover-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 0.5rem 1.5rem;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .cover-client {
+            font-size: 34pt;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .cover-title {
+            font-size: 18pt;
+            color: var(--primary);
+            font-weight: 500;
+            margin-bottom: 3rem;
+        }
+
+        .cover-services {
+            font-size: 12pt;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            max-width: 80%;
+        }
+
+        .cover-footer {
+            position: absolute;
+            bottom: 20mm;
+            left: 20mm;
+            right: 20mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 9pt;
+            color: var(--text-secondary);
+        }
+
+        /* SECTION HEADERS */
+        .section-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            margin: 0 -20mm 2rem -20mm;
+            /* Bleed to page edges */
+            font-size: 18pt;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-header .num {
+            font-size: 24pt;
+            opacity: 0.5;
+            margin-right: 1rem;
+        }
+
+        .section-label {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 10pt;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        h2.section-title {
+            font-size: 24pt;
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        /* CONTENT BLOCKS */
+        .highlight-box {
+            background: var(--bg-muted);
+            border-left: 5px solid var(--primary);
+            padding: 1.5rem;
+            font-size: 13pt;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .benefit-card {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            border-radius: 12px;
+        }
+
+        .benefit-card i {
+            font-size: 24pt;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .benefit-card h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 12pt;
+            font-weight: 700;
+        }
+
+        .benefit-card p {
+            margin: 0;
+            font-size: 10pt;
+            color: var(--text-secondary);
+        }
+
+        /* DIAGNOSTIC */
+        .diag-container {
+            display: flex;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .score-card {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            min-width: 180px;
+        }
+
+        .score-value {
+            font-size: 42pt;
+            font-weight: 900;
+            display: block;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 9pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .diag-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .diag-table td {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .diag-icon {
+            width: 30px;
+            font-weight: bold;
+        }
+
+        .diag-pass {
+            color: #10b981;
+        }
+
+        .diag-fail {
+            color: #ef4444;
+        }
+
+        /* INVESTMENT */
+        .pricing-option {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .pricing-header {
+            background: var(--bg-muted);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .option-name {
+            font-weight: 700;
+            font-size: 14pt;
+        }
+
+        .option-badge {
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 8pt;
+            text-transform: uppercase;
+        }
+
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .pricing-table th {
+            text-align: left;
+            background: #fdfdfd;
+            padding: 0.75rem 1.5rem;
+            font-size: 9pt;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pricing-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .pricing-table .amount {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .total-box {
+            background: var(--primary-dark);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 14pt;
+            font-weight: 500;
+        }
+
+        .total-value {
+            font-size: 22pt;
+            font-weight: 800;
+        }
+
+        .payment-table {
+            width: 100%;
+            margin-top: 1.5rem;
+            border-collapse: collapse;
+        }
+
+        .payment-table th {
+            text-align: left;
+            padding: 0.5rem;
+            font-size: 9pt;
+            border-bottom: 2px solid var(--text-main);
+        }
+
+        .payment-table td {
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ICONS MOCK (since fontawesome might not work in local PDF) */
+        .bi {
+            font-style: normal;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- CAPA -->
+    <div class="page">
+        <div class="cover">
+            {% if company_info.get('logo_url') %}
+            <img src="{{ company_info.get('logo_url') }}" class="cover-logo">
+            {% endif %}
+
+            <div class="cover-badge">{{ _('Commercial Proposal') }}</div>
+            <h1 class="cover-client">{{ proposal.get('client_name', 'N/A') }}</h1>
+            <div class="cover-title">{{ proposal.get('title', '') }}</div>
+
+            <div class="cover-services">
+                {{ _('Web Presence · 360 Photos & Videos · GMB · Local SEO') }}
+            </div>
+        </div>
+
+        <div class="cover-footer">
+            <div>
+                <strong>{{ company_info.get('name', '') }}</strong><br>
+                {{ company_info.get('website', '') }}
+            </div>
+            <div>
+                {% set p_date = proposal.get('proposal_date') %}
+                {{ p_date.strftime('%B %Y')|capitalize if p_date and p_date.strftime else '' }}
+            </div>
+        </div>
+    </div>
+
+    <!-- SOBRE NÓS -->
+    <div class="page">
+        <div class="section-header">
+            <span class="num">01.</span> {{ _('About Us') }}
+        </div>
+
+        <span class="section-label">{{ _('Our Approach') }}</span>
+        <h2 class="section-title">{{ _('Connecting Businesses with Results') }}</h2>
+
+        <div class="highlight-box">
+            "{{ _('We have been following Google\'s evolution since its early days. Born to connect local businesses
+            with real customers through data and auditable results.') }}"
+        </div>
+
+        <p>{{ _('We are specialists in Elite Geomarketing. While others focus on vanity metrics, we obsess over ROI and
+            direct purchase intent where it matters most: Google Search and Maps.') }}</p>
+
+        <div class="benefit-grid" style="margin-top: 3rem;">
+            <div class="benefit-card">
+                <h4>{{ _('Radical Transparency') }}</h4>
+                <p>{{ _('100% auditable results through official Google tools.') }}</p>
+            </div>
+            <div class="benefit-card">
+                <h4>{{ _('Sales Focus') }}</h4>
+                <p>{{ _('We optimize for the exact moment when customers search for what you offer.') }}</p>
+            </div>
+            <div class="benefit-card">
+                <h4>{{ _('Real Data') }}</h4>
+                <p>{{ _('No fake metrics. Only data that directly impacts your revenue.') }}</p>
+            </div>
+            <div class="benefit-card">
+                <h4>{{ _('Ongoing Support') }}</h4>
+                <p>{{ _('Continuous monitoring with monthly reports and strategic adjustments.') }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIAGNÓSTICO -->
+    {% if proposal.get('health_check') %}
+    <div class="page">
+        <div class="section-header">
+            <span class="num">02.</span> {{ _('Diagnosis') }}
+        </div>
+
+        <span class="section-label">{{ _('Analysis') }}</span>
+        <h2 class="section-title">{{ _('Google Business Audit') }}</h2>
+
+        <div class="diag-container">
+            <div class="score-card">
+                <span class="score-value">{{ proposal.get('health_check', {}).get('score', 0) }}%</span>
+                <span class="score-label">{{ _('GMB Health Score') }}</span>
+            </div>
+
+            <div style="flex-grow: 1;">
+                <p style="margin-top: 0;">{{ _('Technical analysis of your local presence. We identified critical points
+                    that are preventing your business from appearing to more customers.') }}</p>
+
+                <table class="diag-table">
+                    {% set results = proposal.health_check.report_data.get('criteria_results') or
+                    proposal.health_check.report_data.get('criteria') or [] %}
+
+                    {% for item in results %}
+                    <tr>
+                        <td class="diag-icon">
+                            {% if item.get('passed') or item.get('status') == "Detectado" or item.get('score') == 100 %}
+                            <span class="diag-pass">✓</span>
+                            {% else %}
+                            <span class="diag-fail">✗</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.get('name_es') or item.get('name_pt') or item.get('name') or 'N/A' }}</td>
+                        <td align="right" style="font-size: 8pt; color: var(--text-secondary);">
+                            {% if item.get('passed') or item.get('status') == "Detectado" or item.get('score') == 100 %}
+                            {{ _('Detected') }}
+                            {% else %}
+                            {{ _('Not detected') }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- INVESTIMENTO -->
+    <div class="page">
+        <div class="section-header">
+            <span class="num">03.</span> {{ _('Investment') }}
+        </div>
+
+        <span class="section-label">{{ _('Custom Plan') }}</span>
+        <h2 class="section-title">{{ _('Investment Proposal') }}</h2>
+
+        {% for option in proposal['options'] %}
+        <div class="pricing-option">
+            <div class="pricing-header">
+                <span class="option-name">{{ option.get('name', '') }}</span>
+                {% if option.get('is_default') %}
+                <span class="option-badge">{{ _('Recommended') }}</span>
+                {% endif %}
+            </div>
+
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>{{ _('Service / Package') }}</th>
+                        <th style="text-align: center;">{{ _('Qty') }}</th>
+                        <th style="text-align: right;">{{ _('Total') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in option['items'] %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.get('display_name', '') }}</strong><br>
+                            <small>{{ item.get('description', '') }}</small>
+                        </td>
+                        <td align="center">{{ item.get('quantity', 1) }}</td>
+                        <td class="amount">{{ proposal.get('currency', 'Gs') }} {{ "{:,.0f}".format(item.get('total',
+                            0)|float) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+
+        <div class="total-box">
+            <span class="total-label">{{ _('Total Investment') }}</span>
+            <span class="total-value">{{ proposal.get('currency', 'Gs') }} {{
+                "{:,.0f}".format(proposal.get('total_amount', 0)|float) }}</span>
+        </div>
+
+        {% if proposal.get('payment_schedule') %}
+        <h3 style="margin-top: 2.5rem; font-size: 14pt;">{{ _('Payment Schedule') }}</h3>
+        <table class="payment-table">
+            <thead>
+                <tr>
+                    <th>{{ _('Installment') }}</th>
+                    <th>{{ _('Due Date') }}</th>
+                    <th style="text-align: right;">{{ _('Amount') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pmt in proposal.get('payment_schedule', []) %}
+                <tr>
+                    <td>{{ _('Installment') }} {{ pmt.get('installment', '') }} ({{ pmt.get('pct', 0)|int }}%)</td>
+                    <td>
+                        {% set d_date = pmt.get('due_date') %}
+                        {{ d_date if d_date is string else (d_date.strftime('%d/%m/%Y') if d_date and d_date.strftime
+                        else '') }}
+                    </td>
+                    <td align="right"><strong>{{ proposal.get('currency', 'Gs') }} {{ "{:,.0f}".format(pmt.get('amount',
+                            0)|float) }}</strong>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+</body>
+
+</html>

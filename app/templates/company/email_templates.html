@@ -13,46 +13,48 @@
     <div class="row">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0 text-gray-800"><i class="bi bi-file-earmark-code me-2"></i>{{ _('Modelos de E-mail')
+                <h1 class="h3 mb-0"><i class="bi bi-file-earmark-code me-2"></i>{{ _('Modelos de E-mail')
                     }}</h1>
             </div>
 
             <!-- COMERCIAL / SALES -->
-            <div class="card shadow-sm mb-4 border-0">
-                <div class="card-header bg-primary text-white py-3">
+            <div class="card shadow-sm mb-4 border-0 themed-card">
+                <div class="card-header bg-primary text-white py-3 border-0">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-cart3 me-2"></i>{{ _('Área Comercial (Vendas)') }}</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
+                            <thead class="bg-hover-themed">
                                 <tr>
-                                    <th class="ps-4">{{ _('Nome') }}</th>
-                                    <th>{{ _('Assunto') }}</th>
-                                    <th>{{ _('Status') }}</th>
-                                    <th class="text-end pe-4">{{ _('Ações') }}</th>
+                                    <th class="ps-4 border-bottom-themed">{{ _('Nome') }}</th>
+                                    <th class="border-bottom-themed">{{ _('Assunto') }}</th>
+                                    <th class="border-bottom-themed">{{ _('Status') }}</th>
+                                    <th class="text-end pe-4 border-bottom-themed">{{ _('Ações') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if templates.sales %}
                                 {% for t in templates.sales %}
-                                <tr>
-                                    <td class="ps-4">
+                                <tr class="border-bottom-themed">
+                                    <td class="ps-4 border-0">
                                         <div class="fw-bold">{{ t.name }}</div>
                                         <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Code: {{
                                             t.code }}</small>
                                     </td>
-                                    <td>{{ t.subject }}</td>
-                                    <td>
+                                    <td class="border-0">{{ t.subject }}</td>
+                                    <td class="border-0">
                                         {% if t.company_id %}
                                         <span class="badge bg-info text-dark">{{ _('Personalizado') }}</span>
                                         {% else %}
-                                        <span class="badge bg-light text-muted border">{{ _('Padrão Maps2GO') }}</span>
+                                        <span
+                                            class="badge bg-hover-themed text-muted border border-secondary border-opacity-25">{{
+                                            _('Padrão Maps2GO') }}</span>
                                         {% endif %}
                                     </td>
-                                    <td class="text-end pe-4">
+                                    <td class="text-end pe-4 border-0">
                                         <a href="{{ url_for('company.edit_email_template', code=t.code) }}"
-                                            class="btn btn-sm btn-outline-primary">
+                                            class="btn btn-sm btn-outline-primary px-3">
                                             <i class="bi bi-pencil"></i> {{ _('Editar') }}
                                         </a>
                                     </td>
@@ -60,7 +62,8 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="4" class="text-center py-4 text-muted small italic">{{ _('Nenhum
+                                    <td colspan="4" class="text-center py-4 text-muted small italic border-0">{{
+                                        _('Nenhum
                                         template comercial configurado.') }}</td>
                                 </tr>
                                 {% endif %}
@@ -71,41 +74,43 @@
             </div>
 
             <!-- FINANCEIRO / FINANCE -->
-            <div class="card shadow-sm mb-4 border-0">
-                <div class="card-header bg-danger text-white py-3">
+            <div class="card shadow-sm mb-4 border-0 themed-card">
+                <div class="card-header bg-danger text-white py-3 border-0">
                     <h5 class="mb-0 fw-bold"><i class="bi bi-cash-stack me-2"></i>{{ _('Área Financeira') }}</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
+                            <thead class="bg-hover-themed">
                                 <tr>
-                                    <th class="ps-4">{{ _('Nome') }}</th>
-                                    <th>{{ _('Assunto') }}</th>
-                                    <th>{{ _('Status') }}</th>
-                                    <th class="text-end pe-4">{{ _('Ações') }}</th>
+                                    <th class="ps-4 border-bottom-themed">{{ _('Nome') }}</th>
+                                    <th class="border-bottom-themed">{{ _('Assunto') }}</th>
+                                    <th class="border-bottom-themed">{{ _('Status') }}</th>
+                                    <th class="text-end pe-4 border-bottom-themed">{{ _('Ações') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% if templates.finance %}
                                 {% for t in templates.finance %}
-                                <tr>
-                                    <td class="ps-4">
+                                <tr class="border-bottom-themed">
+                                    <td class="ps-4 border-0">
                                         <div class="fw-bold">{{ t.name }}</div>
                                         <small class="text-muted text-uppercase" style="font-size: 0.7rem;">Code: {{
                                             t.code }}</small>
                                     </td>
-                                    <td>{{ t.subject }}</td>
-                                    <td>
+                                    <td class="border-0">{{ t.subject }}</td>
+                                    <td class="border-0">
                                         {% if t.company_id %}
                                         <span class="badge bg-info text-dark">{{ _('Personalizado') }}</span>
                                         {% else %}
-                                        <span class="badge bg-light text-muted border">{{ _('Padrão Maps2GO') }}</span>
+                                        <span
+                                            class="badge bg-hover-themed text-muted border border-secondary border-opacity-25">{{
+                                            _('Padrão Maps2GO') }}</span>
                                         {% endif %}
                                     </td>
-                                    <td class="text-end pe-4">
+                                    <td class="text-end pe-4 border-0">
                                         <a href="{{ url_for('company.edit_email_template', code=t.code) }}"
-                                            class="btn btn-sm btn-outline-primary">
+                                            class="btn btn-sm btn-outline-primary px-3">
                                             <i class="bi bi-pencil"></i> {{ _('Editar') }}
                                         </a>
                                     </td>
@@ -113,7 +118,8 @@
                                 {% endfor %}
                                 {% else %}
                                 <tr>
-                                    <td colspan="4" class="text-center py-4 text-muted small italic">{{ _('Nenhum
+                                    <td colspan="4" class="text-center py-4 text-muted small italic border-0">{{
+                                        _('Nenhum
                                         template financeiro configurado.') }}</td>
                                 </tr>
                                 {% endif %}
@@ -125,4 +131,28 @@
         </div>
     </div>
 </div>
+
+<style>
+    .themed-card {
+        background-color: var(--bg-card);
+        color: var(--text-primary);
+    }
+
+    .bg-hover-themed {
+        background-color: var(--bg-hover) !important;
+    }
+
+    .border-bottom-themed {
+        border-bottom-color: var(--border-color) !important;
+    }
+
+    table {
+        color: var(--text-primary) !important;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: var(--bg-hover) !important;
+        color: var(--text-primary) !important;
+    }
+</style>
 {% endblock %}

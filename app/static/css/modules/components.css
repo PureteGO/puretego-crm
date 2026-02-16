@@ -184,5 +184,6 @@
 }
 
 .themed-card label {
-    color: var(--text-secondary) !important;
+    color: var(--text-primary) !important;
+    font-weight: 500;
 }

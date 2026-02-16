@@ -47,6 +47,15 @@
                                     <td>{{ company.phone or '-' }}</td>
                                 </tr>
                                 <tr>
+                                    <th><i class="bi bi-globe me-2"></i>{{ _('Website') }}:</th>
+                                    <td>{% if company.website %}<a href="{{ company.website }}" target="_blank">{{
+                                            company.website }}</a>{% else %}-{% endif %}</td>
+                                </tr>
+                                <tr>
+                                    <th><i class="bi bi-card-text me-2"></i>{{ _('Legal ID (RUC/CNPJ)') }}:</th>
+                                    <td>{{ company.tax_id or '-' }}</td>
+                                </tr>
+                                <tr>
                                     <th><i class="bi bi-geo-alt me-2"></i>{{ _('Address') }}:</th>
                                     <td>{{ company.address or '-' }}</td>
                                 </tr>

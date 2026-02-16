@@ -168,7 +168,7 @@ def view(health_check_id):
             return render_template('health_checks/view.html', health_check=health_check)
     except Exception as e:
         logger.exception(f"Error loading health check report {health_check_id}")
-        flash('Erro ao carregar relatório.', 'error')
+        flash(f'Erro ao carregar relatório: {str(e)}', 'error')
         return redirect(url_for('health_checks.index'))
 
 @bp.route('/<int:health_check_id>/delete', methods=['POST'])
