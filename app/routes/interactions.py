@@ -203,7 +203,12 @@ def agenda():
                 Task.company_id == company_id
             )
             if user_role not in ['owner', 'admin', 'manager', 'superadmin']:
-                task_query = task_query.filter(Task.assigned_to_id == user_id)
+                task_query = task_query.filter(
+                    or_(
+                        Task.assigned_to_id == user_id,
+                        (Task.assigned_to_id.is_(None)) & (Task.assigned_by_id == user_id)
+                    )
+                )
                 
             tasks_today = task_query.filter(Task.due_date <= end_of_today).all()
             tasks_future = task_query.filter(Task.due_date > end_of_today, Task.due_date <= end_of_7_days).all()

@@ -49,7 +49,8 @@ def index():
             base_query = base_query.filter(
                 or_(
                     Task.assigned_to_id == user.id,
-                    (Task.assigned_to_id.is_(None)) & (Task.role_target == (user.role.name if user.role else 'sales'))
+                    (Task.assigned_to_id.is_(None)) & (Task.role_target == (user.role.name if user.role else 'sales')),
+                    (Task.assigned_to_id.is_(None)) & (Task.assigned_by_id == user.id)
                 )
             )
         elif tab == 'created':
@@ -138,7 +139,7 @@ def create():
     
     with get_db() as db:
 
-        assigned_to_id = int(request.form['assigned_to_id']) if request.form.get('assigned_to_id') else None
+        assigned_to_id = int(request.form['assigned_to_id']) if request.form.get('assigned_to_id') else user.id
         client_id = int(request.form['client_id']) if request.form.get('client_id') else None
         project_id = int(request.form['project_id']) if request.form.get('project_id') else None
         deal_id = int(request.form['deal_id']) if request.form.get('deal_id') else None
@@ -451,7 +452,8 @@ def get_task_summary():
         query = query.filter(
             or_(
                 Task.assigned_to_id == user.id,
-                (Task.assigned_to_id.is_(None)) & (Task.role_target == role_name)
+                (Task.assigned_to_id.is_(None)) & (Task.role_target == role_name),
+                (Task.assigned_to_id.is_(None)) & (Task.assigned_by_id == user.id)
             )
         )
         
@@ -486,7 +488,8 @@ def my_tasks():
             Task.status.in_(['open', 'in_progress']),
             or_(
                 Task.assigned_to_id == user.id,
-                (Task.assigned_to_id.is_(None)) & (Task.role_target == role_name)
+                (Task.assigned_to_id.is_(None)) & (Task.role_target == role_name),
+                (Task.assigned_to_id.is_(None)) & (Task.assigned_by_id == user.id)
             )
         ).order_by(Task.due_date.is_(None), Task.due_date.asc(), Task.priority.desc()).limit(10).all()
         
@@ -523,7 +526,7 @@ def api_quick_create():
         # Validation (Strict)
         company_id = session.get('company_id')
         
-        aid = int(data['assigned_to_id']) if data.get('assigned_to_id') else None
+        aid = int(data['assigned_to_id']) if data.get('assigned_to_id') else user.id
         if aid:
             q = db.query(User).filter(User.id == aid)
             if company_id:
