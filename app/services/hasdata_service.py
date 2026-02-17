@@ -17,7 +17,7 @@ class HasDataService:
             except Exception:
                 api_key = None
         
-        self.api_key = api_key or '5f596a1d-0ae2-4f9f-8eaf-2ca06c5cd0f6'
+        self.api_key = api_key or ''
         self.base_url = "https://api.hasdata.com/scrape/google-maps"
         self.headers = {
             "x-api-key": self.api_key,
