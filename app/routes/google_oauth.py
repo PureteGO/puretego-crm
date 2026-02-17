@@ -32,7 +32,7 @@ def get_client_config():
     """Get OAuth client configuration from environment"""
     return {
         "web": {
-            "client_id": os.environ.get('GOOGLE_CLIENT_ID', '722401847261-lfoe4j55kibqtt2e1r2ruv6qucens07b.apps.googleusercontent.com'),
+            "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
             "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET', ''),
             "auth_uri": "https://accounts.google.com/o/oauth2/v2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
