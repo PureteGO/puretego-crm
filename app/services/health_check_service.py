@@ -19,11 +19,36 @@ class HealthCheckService:
         Realiza uma auditoria baseada em dados públicos (Serper.dev + SerpApi Deep Dive).
         Mapeia os dados para os 17 Critérios oficiais (Config.HEALTH_CHECK_CRITERIA).
         
-        Agora utiliza verificação profunda (Reviews, Photos, Posts) para determinar status de verificação
-        e métricas reais de engajamento (Reply Rate, Freshness).
+        Agora inclui CACHE para evitar chamadas de API repetidas no mesmo dia para o mesmo cliente.
         """
         from config.settings import Config
         from app.services.serpapi_service import SerpApiService
+        from app.services.hasdata_service import HasDataService
+        from datetime import datetime
+        from sqlalchemy import func
+        
+        # --- 0. CHECK CACHE (Same Day) ---
+        if client_id:
+            try:
+                today = datetime.now().date()
+                with get_db() as db:
+                    existing = db.query(HealthCheck).filter(
+                        HealthCheck.client_id == client_id,
+                        HealthCheck.source == 'public',
+                        func.date(HealthCheck.created_at) == today
+                    ).order_by(HealthCheck.created_at.desc()).first()
+                    
+                    if existing and existing.report_data:
+                        logger.info(f"HealthCheck: Returning CACHED report for client {client_id}")
+                        return {
+                            'success': True, 
+                            'check_id': existing.id, 
+                            'score': existing.score,
+                            'report': existing.report_data,
+                            'cached': True
+                        }
+            except Exception as e:
+                logger.error(f"HealthCheck Cache check failed: {e}")
         
         # 1. Configurar contexto (País/GL)
         gl = 'py' # Default Paraguay
@@ -34,14 +59,17 @@ class HealthCheckService:
                     if 'brasil' in client.address.lower() or 'brazil' in client.address.lower(): gl = 'br'
                     elif 'marketing' in client.address.lower(): gl = 'us' # Exemplo
         
-        # 2. Buscar no Serper (Discovery)
+        # 2. Discovery via Serper (Rápido e Estável para Busca Inicial)
         serper = SerperService()
+        serpapi = SerpApiService()
+        hasdata = HasDataService()
+        
+        gl = location or 'py'
         search_res = serper.search_places(query, limit=1, country=gl)
         
-        # Retry logic (clean name, add city)
+        # Retry logic if no results
         if not search_res['success'] or not search_res.get('places'):
             clean_name = query.split("-")[0].split("(")[0].strip()
-            # Try with clean name + location hint if available
             location_hint = ""
             if client_id:
                 with get_db() as db:
@@ -51,256 +79,250 @@ class HealthCheckService:
             
             if location_hint:
                 search_res = serper.search_places(f"{clean_name} {location_hint}", limit=1, country=gl)
-            
-            if not search_res['success'] or not search_res.get('places'):
+            else:
                  search_res = serper.search_places(clean_name, limit=1, country=gl)
 
         if not search_res['success'] or not search_res.get('places'):
-            return {'success': False, 'error': 'Empresa não encontrada nos mapas. Tente um nome mais simples.'}
+            return {'success': False, 'error': 'Empresa não encontrada nos mapas.'}
             
         place_data = search_res['places'][0]
-        place_id = place_data.get('placeId') or place_data.get('cid')
+        place_id = place_data.get('placeId')
+        data_id = place_data.get('cid') or place_data.get('fid')
         
-        # --- NOVO: Verificação de Perfil Gerenciado (API Oficial) ---
-        # Se o perfil já é nosso cliente e está conectado, usamos a API Oficial com integridade 100%
-        official_service = None
-        current_location_link = None
+        # --- RECOVERY: Se place_id está faltando ou é numérico, tenta busca padrão do Serper ---
+        if not place_id or str(place_id).isdigit():
+            logger.info(f"HealthCheck: placeId missing or numeric ({place_id}) for {query}. Trying Serper Search (Local Pack) recovery...")
+            local_pack = serper.search_local_pack(query, country=gl)
+            if local_pack and 'places' in local_pack and local_pack['places']:
+                for p in local_pack['places']:
+                    # Match mais flexível ou posição 1
+                    if query.lower() in p.get('title', '').lower() or p.get('position') == 1:
+                        if p.get('placeId'):
+                            logger.info(f"HealthCheck: Recovered placeId {p.get('placeId')} via Serper Local Pack")
+                            place_id = p.get('placeId')
+                            if p.get('cid'): data_id = p.get('cid')
+                            place_data.update(p)
+                            break
+            
+            # --- FINAL FALLBACK: SerpApi Search (Se Serper falhou totalmente no placeId) ---
+            if not place_id or str(place_id).isdigit():
+                logger.info(f"HealthCheck: Serper failed. Trying SerpApi fallback for {query}...")
+                serp_search = serpapi.search_business(query, location=client.address if client_id else "Paraguay")
+                if serp_search.get('local_results'):
+                    p = serp_search['local_results'][0]
+                    place_id = p.get('place_id')
+                    place_data.update(p)
+                    logger.info(f"HealthCheck: Recovered placeId {place_id} via SerpApi Search")
+                elif serp_search.get('place_results'):
+                    p = serp_search.get('place_results')
+                    place_id = p.get('place_id')
+                    place_data.update(p)
+                    logger.info(f"HealthCheck: Recovered placeId {place_id} via SerpApi Place Results")
         
-        # 3. Fetch Details & Media (High-Integrity Public Search)
-        from app.services.serpapi_service import SerpApiService
-        serpapi = SerpApiService()
+        # Limpeza final de IDs
+        if place_id and str(place_id).isdigit() and not data_id:
+            data_id = place_id
+            place_id = None
+
+        # 3. Fetch Deep Insights
         
-        # Data containers
+        # Initial signals from Serper
+        is_claimed = place_data.get('verified') or place_data.get('claimed')
+        has_kp_video = place_data.get('has_video_indicator') or False
+        rich_extensions = place_data.get('extensions', [])
+        
+        # --- NOVO: Complemento via HasData PRIMEIRO (Cost Saving) ---
+        if place_id:
+            hd_res = hasdata.get_place_details(place_id)
+            if hd_res:
+                # Merge HasData into place_data
+                if 'workingHours' in hd_res and 'days' in hd_res['workingHours']:
+                    place_data['hours'] = hd_res['workingHours']['days']
+                if not place_data.get('description') and hd_res.get('description'):
+                    place_data['description'] = hd_res.get('description')
+                if not place_data.get('website') and hd_res.get('website'):
+                    place_data['website'] = hd_res.get('website')
+                if not place_data.get('logo') and hd_res.get('logo'):
+                    place_data['logo'] = hd_res.get('logo')
+                if 'images' in hd_res:
+                    place_data['photos'] = hd_res['images']
+                # Preservamos data_id se HasData retornar um novo, senão mantemos o do Serper
+                new_data_id = hd_res.get('dataId') or hd_res.get('data_id')
+                if new_data_id: data_id = new_data_id
+        elif query:
+            # Se não temos place_id, tentamos HasData Search para ver se recuperamos detalhe/ID
+            logger.info(f"HealthCheck: No placeId found for {query}. Trying HasData Search recovery...")
+            hd_search = hasdata.search_places(query, gl=gl)
+            if hd_search and len(hd_search) > 0:
+                hd_match = hd_search[0]
+                place_id = hd_match.get('placeId')
+                if not data_id: data_id = hd_match.get('dataId')
+                
+                # Se recuperamos place_id, pegamos os detalhes
+                if place_id:
+                    hd_res = hasdata.get_place_details(place_id)
+                    if hd_res:
+                        place_data.update(hd_res)
+
+        # Fallback details via SerpApi if we still lack basic info (or to get more data_id)
+        if place_id or data_id:
+            # Se ainda não temos data_id mas temos place_id, SerpApi Details pode nos dar o CID
+            if not data_id and place_id:
+                details_res = serpapi.get_business_details(place_id)
+                if details_res:
+                    if 'place_results' in details_res:
+                        # Soft merge: prioritize Serper/HasData basic fields if already present
+                        for k, v in details_res['place_results'].items():
+                            if k not in place_data or not place_data[k]:
+                                place_data[k] = v
+                    
+                    if 'search_parameters' in details_res:
+                        data_id = details_res['search_parameters'].get('data_id')
+    
+        # Deep Data Containers
         reviews_data = {}
         photos_data = {}
         posts_data = {}
-        data_id = place_id
-        deep_fetch_error = False
-        
-        # Use SerpApi for a deeper look at place details (Discovery of data_id)
-        details_res = {}
-        if place_id:
-            details_res = serpapi.get_business_details(place_id)
-            if 'search_parameters' in details_res:
-                data_id = details_res['search_parameters'].get('data_id')
-
-        # Fallback if no data_id found via place_id
-        if not data_id:
-            search_term = place_data.get('title')
-            if place_data.get('address'): search_term += f" {place_data.get('address')}"
-            fallback_res = serpapi.search_business(search_term)
-            
-            match = fallback_res.get('local_results', [None])[0] or fallback_res.get('place_results')
-            if match:
-                place_data.update(match)
-                data_id = match.get('data_id')
-                # Map photo structure
-                if 'images' in match: 
-                    place_data['photos'] = match['images']
-                    if any(i.get('title') == 'Videos' for i in match['images']): 
-                        place_data['has_video_indicator'] = True
-
-        # Parallel Deep Scraping (Photos, Reviews, Posts)
-        if data_id:
+    
+        if data_id or place_id:
             import concurrent.futures
             try:
                 with concurrent.futures.ThreadPoolExecutor() as executor:
-                    f_revs = executor.submit(serpapi.get_place_reviews, data_id, gl=gl)
-                    f_imgs = executor.submit(serpapi.get_place_photos, data_id, gl=gl)
-                    f_posts = executor.submit(serpapi.get_place_posts, data_id, gl=gl)
+                    # PRIORIDADE 1: HasData (Economia de Custo)
+                    # Passamos ambos place_id e data_id (CID) para maximizar chance de sucesso
+                    f_hd_revs = executor.submit(hasdata.get_reviews, place_id=place_id, data_id=data_id)
+                    f_hd_imgs = executor.submit(hasdata.get_photos, place_id=place_id, data_id=data_id)
+                    f_posts = executor.submit(serpapi.get_place_posts, data_id or place_id, gl=gl)
                     
-                    reviews_data = f_revs.result(timeout=6)
-                    photos_data = f_imgs.result(timeout=6)
-                    posts_data = f_posts.result(timeout=6)
+                    reviews_data = f_hd_revs.result(timeout=15) or {}
+                    photos_data = f_hd_imgs.result(timeout=15) or {}
+                    posts_data = f_posts.result(timeout=15) or {}
+                    
+                    # FALLBACK: Se HasData falhar em reviews/fotos, tenta SerpApi
+                    if not reviews_data and data_id:
+                        logger.info(f"HealthCheck: Falling back to SerpApi for reviews ({data_id})")
+                        reviews_data = serpapi.get_place_reviews(data_id, gl=gl) or {}
+                        
+                    if not photos_data and data_id:
+                        logger.info(f"HealthCheck: Falling back to SerpApi for photos ({data_id})")
+                        photos_data = serpapi.get_place_photos(data_id, gl=gl) or {}
+                        
             except Exception as e:
-                current_app.logger.error(f"HealthCheck: Scraping error for {data_id}: {e}")
-                deep_fetch_error = True
-        
-        # 4. Analysis & Logic (Intelligent Public Auditor)
-        
-        # A. Reviews Analysis
+                logger.error(f"HealthCheck: Deep fetch error {place_id}: {e}")
+    
+        # --- SIGNAL ANALYSIS ---
+        # 1. Review Signals
         reviews_list = reviews_data.get('reviews', [])
-        total_reviews_fetched = len(reviews_list)
-        reviews_with_response = [r for r in reviews_list if r.get('response')]
-        replied_count = len(reviews_with_response)
-        unreplied_count = total_reviews_fetched - replied_count
+        total_revs = len(reviews_list) or place_data.get('reviewsCount', 0)
+        owner_replied = any(r.get('response') for r in reviews_list)
         
-        has_owner_response = replied_count > 0 # Strong verification signal
-        
-        # B. Photos Analysis
+        # 2. Visual Signals
         photos_list = photos_data.get('photos', [])
-        # Also check local_results photos (mapped from 'images') if deep fetch failed
-        if not photos_list and place_data.get('photos'):
-            current_app.logger.info(f"HealthCheck: Using mapped 'images' -> 'photos' for {place_data.get('title')}")
-            photos_list = place_data.get('photos')
-
-        # Check for Owner Photos
-        # Standard Place Photos format: source = 'owner'
-        # Search API 'images' format: title = 'By owner'
-        has_owner_photos = any(
-            (p.get('source', '').lower() == 'owner') or 
-            ('owner' in str(p).lower()) or
-            (p.get('title') == 'By owner') 
-            for p in photos_list
-        )
-        
-        # Check categories directly if available (Standard Place Photos)
+        # HasData photos are in 'images'
         photo_cats = photos_data.get('categories', [])
-        has_owner_photos = has_owner_photos or any('owner' in c.get('title', '').lower() for c in photo_cats)
+        has_owner_photos = any('owner' in str(c.get('title', '')).lower() for c in photo_cats) or \
+                           any('owner' in str(p.get('source', '')).lower() for p in photos_list)
         
-        # Check for Videos
-        # Standard: video in categories OR video field in photo
-        # Search API: title = 'Videos' in images list
-        has_video = (
-            any('video' in c.get('title', '').lower() for c in photo_cats) or 
-            any(p.get('video') for p in photos_list) or
-            place_data.get('has_video_indicator') or
-            any(p.get('title') == 'Videos' for p in photos_list)
-        )
-        
-        # Photo Freshness check
-        last_photo_date = None
-        # TODO: Implement get_photo_meta for top photo if needed, strictly speaking we can infer from 'date' field in photos_list if present
-        
-        # C. Posts Analysis
+        has_video = has_kp_video or \
+                    any('video' in str(c.get('title', '')).lower() for c in photo_cats) or \
+                    any(p.get('video') for p in photos_list)
+
+        has_interior = any(x in str(c.get('title', '')).lower() for x in photo_cats for x in ['interior', 'inside', 'dentro'])
+        has_exterior = any(x in str(c.get('title', '')).lower() for x in photo_cats for x in ['exterior', 'street view', 'outside', 'fachada'])
+
+        # 3. Post/Update Signals
         posts_list = posts_data.get('posts', []) or posts_data.get('updates', [])
         has_posts = len(posts_list) > 0
-        last_post_date = posts_list[0].get('time') if has_posts else None # Check formatting later
         
-        # --- Verification Logic ---
-        # Se tem resposta do dono, fotos do dono ou posts, consideramos VERIFICADO/Gerenciado
-        is_managed = has_owner_response or has_owner_photos or has_posts or place_data.get('verified') or place_data.get('claimed')
-        
-        # --- Scoring ---
+        # --- VERIFICATION STATUS ---
+        is_claimed = place_data.get('verified') or place_data.get('claimed')
+        is_managed = owner_replied or has_owner_photos or has_posts or is_claimed
+
+        # --- CRITERIA EVALUATION (17 points) ---
         criteria = Config.HEALTH_CHECK_CRITERIA
         score = 0
         criteria_results = []
         details = []
+        
+        # Metrics for AI Summary
+        replied_count = sum(1 for r in reviews_list if r.get('response'))
+        unreplied_count = total_revs - replied_count
         positive_points = 0
         moderate_issues = 0
         critical_issues = 0
         
-        if deep_fetch_error:
-            details.append("Aviso: Falha temporária na API de busca profunda. Algumas métricas (Reviews, Fotos) podem estar incompletas.")
-            # moderate_issues += 1 # Optional
-            
         for c in criteria:
             cid = c['id']
             passed = False
             status = 'critical'
             res_score = 0
             
-            if cid == 1: # Horário
-                passed = bool(place_data.get('hours') or place_data.get('openingHours') or place_data.get('operating_hours'))
-            elif cid == 2: # Fotos Produtos
-                # Buscar especificamente por fotos enviadas pelo proprietário (Imagem 1)
-                passed = has_owner_photos or len(photos_list) > 10
-            elif cid == 3: # Vídeos
+            if cid == 1: # Hours
+                passed = bool(place_data.get('hours') or place_data.get('operating_hours'))
+            elif cid == 2: # Product Photos
+                passed = has_owner_photos or len(photos_list) > 10 or len(place_data.get('photos', [])) > 5
+            elif cid == 3: # Videos
                 passed = has_video
-            elif cid == 4: # Perfil Verificado
-                # Prova definitiva: Se tem 'Updates' ou Respostas (Imagens 3 e 4)
-                passed = has_posts or has_owner_response or is_managed
-                if passed: 
-                     details.append("Perfil Gerenciado (Updates/Posts ativos detectados)")
-                else:
-                     details.append("Sem indícios de gestão ativa (Faltam Posts/Updates)")
-            elif cid == 5: # Site
-                website = place_data.get('website', '').lower()
-                passed = bool(website)
-                if passed:
-                    social_domains = ['facebook.com', 'instagram.com', 'tiktok.com', 'linktr.ee', 'linkedin.com', 'twitter.com', 'x.com']
-                    if any(domain in website for domain in social_domains):
-                        passed = False
-                        details.append(f"Site detectado é rede social ({website})")
+            elif cid == 4: # Verified
+                passed = is_managed
+                if passed: details.append("Perfil Gerenciado (Sinais ativos detectados)")
+            elif cid == 5: # Website
+                ws = place_data.get('website', '').lower()
+                passed = bool(ws)
+                if passed and any(d in ws for d in ['facebook.com', 'instagram.com', 'linktr.ee']):
+                    passed = False; details.append(f"Site detectado é rede social ({ws})")
             elif cid == 6: # Q&A
                 passed = bool(place_data.get('questions_and_answers'))
+                if not passed and (is_managed and len(rich_extensions) > 0): passed = True
             elif cid == 7: # Posts
-                # Seção 'Updates from User' (Imagem 3)
                 passed = has_posts
-            elif cid == 8: # Descrição
-                # Seção 'From the business' (Imagem 3)
+            elif cid == 8: # Description
                 desc = place_data.get('description') or place_data.get('about', {}).get('summary')
-                passed = bool(desc and len(str(desc)) > 20)
-            elif cid == 9: # Redes Sociais
+                if not desc and has_posts: desc = posts_list[0].get('description')
+                passed = bool(desc and len(str(desc)) > 15)
+            elif cid == 9: # Social Presence
                 passed = bool(place_data.get('profiles')) or has_posts
-            elif cid == 10: # Presença Maps
+            elif cid == 10: # Maps Presence
                 passed = True
-            elif cid == 11: # Fotos Exterior
-                # Buscar a aba literal 'Street View' ou 'Exterior' no objeto da SerpApi (Imagem 1)
-                passed = any(x in str(c.get('title', '')).lower() for c in photo_cats for x in ['exterior', 'street view', 'outside', 'fachada'])
-                if not passed:
-                    # Fallback: se o dono postou fotos e o total é alto, é provável que incluiu a fachada
-                    passed = has_owner_photos and len(photos_list) > 15
-            elif cid == 12: # Fotos Interior
-                # Buscar a aba literal 'Interior' ou 'Inside' (Imagem 1)
-                passed = any(x in str(c.get('title', '')).lower() for c in photo_cats for x in ['interior', 'inside', 'dentro'])
-                if not passed:
-                    passed = has_owner_photos and len(photos_list) > 15
-            elif cid == 13: # Info Produtos
-                # Verificado via seção de Updates ou campos ricos
-                passed = bool(place_data.get('menu')) or bool(place_data.get('products')) or has_posts or place_data.get('extensions')
-            elif cid == 14: # Avaliações
-                rev_count = place_data.get('reviews') or 0
-                if rev_count >= 10: 
-                    passed = True; res_score = c['weight']
-                elif rev_count > 0:
-                    passed = True; res_score = c['weight'] // 2; status = 'moderate'
-                else: passed = False
-            elif cid == 15: # Endereço
+            elif cid == 11: # Exterior
+                passed = has_exterior or (has_owner_photos and len(photos_list) > 15)
+            elif cid == 12: # Interior
+                passed = has_interior or (has_owner_photos and len(photos_list) > 15)
+            elif cid == 13: # Rich Info
+                passed = bool(place_data.get('menu')) or bool(place_data.get('products')) or \
+                         len(rich_extensions) > 0 or has_posts
+            elif cid == 14: # Reviews Presence
+                rc = place_data.get('reviews') or 0
+                passed = rc >= 5
+            elif cid == 15: # Address
                 passed = bool(place_data.get('address'))
-            elif cid == 16: # Logotipo
-                passed = bool(place_data.get('thumbnail')) or bool(place_data.get('logo'))
-            elif cid == 17: # Resposta a Avaliações
-                passed = has_owner_response
-                if passed and unreplied_count > 5:
-                    status = 'moderate'
-                    res_score = c['weight'] // 2
-
-            if passed:
-                if res_score == 0: res_score = c['weight']
-                score += res_score
+            elif cid == 16: # Logo
+                passed = bool(place_data.get('thumbnail') or place_data.get('logo'))
+            elif cid == 17: # Review Response
+                passed = owner_replied
+            
+            if passed: 
+                status = 'positive'; res_score = c['weight']
                 positive_points += 1
             else:
                 if c['type'] == 'critical': critical_issues += 1
-                elif c['type'] == 'moderate': moderate_issues += 1
+                else: moderate_issues += 1
             
+            score += res_score
             criteria_results.append({
-                'id': cid,
-                'name_pt': c['name_pt'], 
-                'name_es': c['name_es'],
-                'passed': passed,
-                'weight': c['weight'],
-                'type': c.get('type','moderate')
+                'id': cid, 'name_pt': c['name_pt'], 'name_es': c['name_es'],
+                'passed': passed, 'weight': c['weight'], 'type': c['type']
             })
-            
-        # --- Score Adjustment Logic (Critical Issues) ---
-        # 1. Count missing criticals
-        # Note: critical_issues variable already counts missing criticals inside the loop
-        critical_missing_count = critical_issues
-        
-        # 2. Determine multiplier (Less aggressive penalty)
-        multiplier = 1.0
-        if critical_missing_count == 1:
-            multiplier = 0.95
-        elif critical_missing_count == 2:
-            multiplier = 0.85
-        elif critical_missing_count >= 3:
-            multiplier = 0.7
-            
-        # 3. Apply multiplier
-        score = round(score * multiplier)
-        
-        # Add explanation if penalized
-        if multiplier < 1.0:
-            details.append(f"Nota ajustada devido à ausência de {critical_missing_count} fatores críticos fundamentais.")
 
-        # Apply penalty for unverified profile (Cumulative)
-        if not is_managed:
-            score = round(score * 0.8)
+        # --- SCORE NORMALIZATION ---
+        if is_managed:
+            if score < 95 and score > 80: score = 95
+            elif score <= 80 and score > 60: score += 10
+        
+        score = min(max(score, 0), 100)
 
         # Relatório final
-        score = min(100, max(0, score))
-        
+        # recommendations calculation
         recommendations = []
         if not is_managed:
             recommendations.append("URGENTE: Reivindique e verifique seu perfil para proteger sua marca.")
@@ -318,7 +340,6 @@ class HealthCheckService:
             if not res['passed'] and res['type'] == 'critical':
                  recommendations.append(f"Corrija: {res['name_es']} ausente.")
         
-        # Top critical
         top_critical_issues = [{'name': r['name_es'], 'message': 'Ausente'} for r in criteria_results if not r['passed'] and r['type']=='critical']
 
         report_data = {
@@ -378,7 +399,7 @@ class HealthCheckService:
             
             # 2. If no metrics, trigger a scan (Sync for now, could be Async)
             if not radar_metrics and client_id:
-                current_app.logger.info(f"No existing metrics for client {client_id} today. Triggering scan.")
+                logger.info(f"No existing metrics for client {client_id} today. Triggering scan.")
                 scan_result = RankTrackerService.perform_scan(client_id)
                 if scan_result.get('success') and scan_result.get('metrics'):
                      agg = scan_result['metrics']
@@ -402,9 +423,9 @@ class HealthCheckService:
                 report_data['summary']['text'] += f" | Autoridade Local: {int(radar_metrics['authority'])}"
                 
         except Exception as e:
-            current_app.logger.error(f"Failed to integrate RankTracker metrics: {str(e)}")
+            logger.error(f"Failed to integrate RankTracker metrics: {str(e)}")
             import traceback
-            current_app.logger.error(traceback.format_exc())
+            logger.error(traceback.format_exc())
 
         # --- AI Quick Summary Generation ---
         try:
@@ -419,10 +440,6 @@ class HealthCheckService:
                  # 2. Prepare Input Data
                  input_data = {
                      'business_name': place_data.get('title'),
-                     'language': 'pt', # Default to PT for Quick Check or use gl/client preference? 
-                     # Quick Check is often for prospecting, so PT or ES might depend on target region.
-                     # The prompt handles languages. Let's pass 'pt' or 'es' based on `gl` context?
-                     # Method has `gl` variable. 'py' -> 'es', 'br' -> 'pt'.
                      'language': 'pt' if gl == 'br' else 'es',
                      'criteria_results': criteria_results,
                      'summary': {
@@ -442,7 +459,7 @@ class HealthCheckService:
                  report_data['ai_summary'] = ai_summary
                  
         except Exception as e: 
-             current_app.logger.error(f"AI Generation failed for Public Audit: {e}")
+             logger.error(f"AI Generation failed for Public Audit: {e}")
              # Non-blocking
 
         check_id = None
@@ -538,26 +555,21 @@ class HealthCheckService:
             # API Error - Do not penalize heavily, just warn
             details.append(f"Erro na verificação de status (API): {vcom_error}")
             moderate_issues += 1
-            # Assume verified for scoring to give benefit of doubt if it's an API config issue
-            # Or at least don't apply the 0.8 multiple later
             verification_status_unknown = True
         else:
             verification_status_unknown = False
 
         if is_verified:
-            score += 15 # Aumentado para 15
+            score += 15
             positive_points += 1
             details.append("Perfil Verificado e Gerenciado (Confirmado via Google)")
         elif not verification_status_unknown:
-            # Only go into details if we are sure it's NOT verified
-            # Analisar motivo da não-verificação
             msg = "Perfil não verificado ou requer ação manual no Google Business Profile."
             if 'resolveOwnershipConflict' in gain_vcom:
                 msg = "Conflito de Propriedade: Outra pessoa já verificou este local no Google."
             elif 'complyWithGuidelines' in gain_vcom:
                  msg = "Perfil Suspenso ou Fora das Diretrizes: Requer regularização imediata com o suporte do Google."
             elif 'verify' in gain_vcom:
-                 # Verificar se já existe algo em andamento
                  has_pending = any(v.get('state') != 'COMPLETED' for v in verifications)
                  if has_pending:
                      msg = "Verificação em Andamento: O processo foi iniciado mas ainda não foi concluído no Google."
@@ -566,13 +578,6 @@ class HealthCheckService:
             
             details.append(msg)
             critical_issues += 1
-        
-        # Categoria (Metadata ou Profile)
-        # A API v1 retorna categories dentro de 'profile' ou 'storefrontAddress'?? 
-        # Na verdade categories é uma chamada separada ou parte de 'categories' se usar readMask correto.
-        # O get_location_details usa readMask='name,title,storefrontAddress,phoneNumbers,websiteUri,regularHours,profile,metadata'
-        # 'profile' costuma conter categoria? Vamos checar. Se não, assumimos ok por ser verificado.
-        # Vamos focar no que temos certeza: Telefone, Site, Horário.
         
         if loc_details.get('phoneNumbers'):
             score += 5
@@ -592,16 +597,11 @@ class HealthCheckService:
              score += 5
              positive_points += 1
         else:
-             # Check if it's 24 hours or just missing?
-             # API returns regularHours as {periods: []} or None?
              details.append("Sem horário de funcionamento.")
              moderate_issues += 1
 
         # --- B. Imagem e Conteúdo (Max 30) ---
-        # Fotos (Verificadas via API Media)
         photo_count = len(media_items)
-        
-        # Check for potential API failure in Media
         if photo_count == 0:
             details.append("Não foi possível detectar fotos (Pode ser erro de Permissão da API ou Perfil vazio).")
         
@@ -618,7 +618,6 @@ class HealthCheckService:
             details.append(f"Poucas fotos ({photo_count}). Ideal > 10.")
         else:
             critical_issues += 1
-            # details.append("Sem fotos publicadas.") # Already added above
 
         if has_logo:
             score += 5
@@ -632,23 +631,20 @@ class HealthCheckService:
             positive_points += 1
             details.append("Fotos do interior identificadas.")
         else:
-            details.append("Sem fotos do interior/loja.") # Não penaliza tanto, mas não pontua.
+            details.append("Sem fotos do interior/loja.")
 
         # reviews usando dados globais (v4 summary)
         avg_rating = loc_details.get('averageRating', 0)
         review_count = loc_details.get('totalReviewCount', 0)
         
-        # Fallback: Se API v4 falhar ou retornar zero, tentar usar os reviews em cache
         if (avg_rating or 0) == 0:
             with get_db() as db:
                 from app.models import GMBReview
-                # Nota: link.id deve estar disponível do passo 1
                 cached_reviews = db.query(GMBReview).filter(GMBReview.location_link_id == link.id).all()
                 if cached_reviews:
                     review_count = len(cached_reviews)
                     avg_rating = sum([r.star_rating for r in cached_reviews]) / review_count
         
-        # Taxa de Resposta (estimada pelas últimas 50)
         recent_reviews_count = len(reviews)
         replied_count = sum([1 for r in reviews if r.get('hasReply')])
         reply_rate = (replied_count / recent_reviews_count) * 100 if recent_reviews_count > 0 else 0
@@ -666,7 +662,6 @@ class HealthCheckService:
                  details.append(f"Avaliação média baixa ({(avg_rating or 0):.1f} estrelas).")
                  critical_issues += 1
                  
-            # Reply Rate importa muito para gestão
             if reply_rate >= 90:
                 score += 15
                 positive_points += 1
@@ -679,7 +674,6 @@ class HealthCheckService:
                 critical_issues += 1
                 details.append(f"Baixa taxa de resposta recente ({reply_rate:.0f}%).")
                 
-            # Penalidade extra se review count for alto mas reply rate for 0
             if (review_count or 0) > 20 and (reply_rate or 0) < 10:
                  score -= 10
                  details.append("Alerta: Alto volume de avaliações sem resposta!")
@@ -699,20 +693,11 @@ class HealthCheckService:
             else:
                  recommendations.append(f"Ponto Positivo: {detail}")
 
-        # Apply penalty for unverified profile (Official)
-        # We need to re-verify the variable 'is_verified' scope or use 'critical_issues' analysis?
-        # 'is_verified' var corresponds to Voice of Merchant check from line 543.
-        # Apply penalty for unverified profile (Official)
         if not is_verified and not verification_status_unknown:
             score = score * 0.8
-            # Explicitly add critical issue if not already added?
-            # It was added in the block above
 
-        # Relatório final formatado
         score = min(100, max(0, score))
         
-        # Prepare report data
-        # Ensure ID is available at root for header
         if loc_details and loc_details.get('metadata'):
             loc_details['place_id'] = loc_details['metadata'].get('placeId')
             loc_details['placeId'] = loc_details['metadata'].get('placeId')
@@ -742,9 +727,7 @@ class HealthCheckService:
         try:
             from app.services.rank_tracker_service import RankTrackerService
             from app.models.local_search import LocalMetricsAggregated
-            from datetime import datetime
             
-            # 1. Try to get existing metrics for today
             today = datetime.now().date()
             radar_metrics = None
             
@@ -769,7 +752,6 @@ class HealthCheckService:
                             }
                         }
             
-            # 2. If no metrics, trigger a scan (Sync for now, could be Async)
             if not radar_metrics and client_id:
                 scan_result = RankTrackerService.perform_scan(client_id)
                 if scan_result.get('success') and scan_result.get('metrics'):
@@ -787,15 +769,12 @@ class HealthCheckService:
                         }
                      }
             
-            # 3. Add to report_data
             if radar_metrics:
                 report_data['radar_metrics'] = radar_metrics
-                # Update score description if authority is low?
                 report_data['summary']['text'] += f" | Autoridade Local: {int(radar_metrics['authority'])}"
                 
         except Exception as e:
             current_app.logger.error(f"Failed to integrate RankTracker metrics in Official Audit: {str(e)}")
-            # Fallback to mock/calculated structure if needed or just leave empty
             pass
         
         # --- AI Internal Analysis Generation ---
@@ -804,52 +783,13 @@ class HealthCheckService:
              gemini = GeminiService()
              
              if gemini.model:
-                 # 1. Detect site type
                  website_url = loc_details.get('websiteUri')
                  site_type = HealthCheckService._detect_site_type(website_url)
                  
-                 # 2. Prepare Input Data
                  input_data = {
                      'business_name': loc_details.get('title'),
-                     'language': 'es', # Default to Spanish for internal/official audit or make configurable
-                     'criteria_results': report_data['criteria'], # Note: report_data['criteria'] format is simplified (name, status, score). We need report_data['criteria_details']?
-                     # Wait, report_data assigned 'criteria' at line 675 with simplified format.
-                     # We need the rich 'criteria_results' which was NOT created in perform_official_audit (it uses 'details' list).
-                     # We must construct a compatible criteria_results list from 'details' or mapped IDs.
-                     # Since official audit logic is different, we'll map details to a "mock" criteria structure or pass 'details' directly.
-                     # The prompt uses 'criteria_results' with 'type' and 'passed'. Official audit logic didn't build this structured list.
-                     # We will pass 'details' and a constructed 'criteria_results' based on critical/moderate counts logic implicitly?
-                     # Let's verify prompt: "criteria_results (array of objects): id, name_pt, passed, type, weight".
-                     # perform_official_audit logic (lines 498-641) calculates `details` and counts directly.
-                     # We should reconstruct a minimal criteria list for the AI to understand the structure.
-                     
-                     # RE-PLAN: Adapt prompt input or data.
-                     # The prompt logic relies on 'criteria_results' to count critical misses.
-                     # In Official Audit, we already counted 'critical_issues'. We can pass that summary directly?
-                     # The prompt RE-CALCULATES critical_missing_count. So it needs the raw items.
-                     # Since Official Audit code is unstructured (just `details.append`), we can't easily rebuild the exact criteria list without refactoring.
-                     # HOWEVER, we can stick to passing the `details` text and letting the AI parse it?
-                     # No, prompt says "INPUT (JSON)... criteria_results".
-                     # Let's create a synthetic list from the `details` + hardcoded knowledge of official check criteria.
-                     
-                     # OR simpler: Use the `quick_check` logic (public audit) structure since prompt is shared?
-                     # But `perform_official_audit` is different.
-                     
-                     # Let's pass the 'details' text as 'criteria_results' for now? No, type mismatch.
-                     # Let's pass an empty criteria_results and rely on 'summary' counts? 
-                     # Prompt Logic Step 1: "count how many such items exist".
-                     # So if we pass empty, it counts 0.
-                     # We need to pass the actual failures.
-                     # Since we can't easily map back, let's skip AI generation for Official Audit OR refactor Official Audit to use structured criteria.
-                     # Refactoring Official Audit to use structured criteria like Public Audit is better but risky/large change.
-                     
-                     # ALTERNATIVE: Since User asked for "Health Check na ficha do cliente" (Client Sheet Health Check),
-                     # which usually refers to the internal view.
-                     # The prompt "HEALTH CHECK INTERNO" expects the same structure.
-                     # I will do my best to map the `details` to `criteria_results`.
-                     
-                     # Mapping based on text in details
-                     'criteria_results': [], # Populated below
+                     'language': 'es',
+                     'criteria_results': [],
                      'summary': {
                          'score_publico': score,
                          'critical_issues_count': critical_issues,
@@ -862,16 +802,6 @@ class HealthCheckService:
                      'site_url': website_url
                  }
                  
-                 # Reconstruct criteria_results from details (Best Effort)
-                 # We know which are critical in general logic.
-                 # Critical: Verification, Website (if missing), Phone?
-                 
-                 # Let's iterate details and try to assign to a generic criteria list
-                 # This is hacky. 
-                 # Maybe we just pass the `critical_issues` count and ask AI to trust it?
-                 # But Prompt Step 3 recalculates it.
-                 
-                 # Let's just create "Dummy" criteria entries for the detected failures.
                  for detail in details:
                      is_failure = any(x in detail.lower() for x in ["sem ", "não ", "poucas", "baixa", "pendente"])
                      severity = 'critical' if any(x in detail.lower() for x in ["verificado", "site", "telefone", "suspenso"]) else 'moderate'
@@ -887,15 +817,12 @@ class HealthCheckService:
                              'weight': 5
                          })
                  
-                 # Call AI
                  ai_summary = gemini.generate_internal_audit_summary(input_data)
                  report_data['ai_internal_analysis'] = ai_summary
                  
         except Exception as e:
              current_app.logger.error(f"AI Generation failed for Official Audit: {e}")
-             # Non-blocking
         
-        # Salvar auditoria
         with get_db() as db:
             health_check = HealthCheck(
                 client_id=client_id,
@@ -907,7 +834,6 @@ class HealthCheckService:
             
             db.add(health_check)
             db.commit()
-            
             check_id = health_check.id
             
         return {
@@ -927,13 +853,11 @@ class HealthCheckService:
             return 'none'
         
         url_lower = url.lower()
-        
         social_domains = ['facebook.com', 'instagram.com', 'twitter.com', 'linkedin.com', 'tiktok.com', 'pinterest.com', 'youtube.com']
         link_hubs = ['linktr.ee', 'bio.site', 'campsite.bio', 'beacons.ai', 'solo.to', 'hopp.co']
         
         if any(d in url_lower for d in social_domains):
             return 'social_profile'
-            
         if any(d in url_lower for d in link_hubs):
             return 'link_hub'
             
