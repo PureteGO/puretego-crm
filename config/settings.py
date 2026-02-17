@@ -41,8 +41,9 @@ class Config:
     DEFAULT_LANGUAGE = 'es'
     
     # API Keys
-    SERPAPI_KEY = os.environ.get('SERPAPI_KEY') or ''
+    SERPAPI_KEY = os.environ.get('SERPAPI_KEY') or '6f55d4306ee5ffe290816bf9a18908d1a74c7b8fccf49fa700aac6355859976a'
     SERPER_API_KEY = os.environ.get('SERPER_API_KEY') or ''
+    HASDATA_API_KEY = os.environ.get('HASDATA_API_KEY') or '5f596a1d-0ae2-4f9f-8eaf-2ca06c5cd0f6'
     
     # Configurações de email (para futuras implementações)
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'localhost'
