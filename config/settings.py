@@ -41,7 +41,7 @@ class Config:
     DEFAULT_LANGUAGE = 'es'
     
     # API Keys
-    SERPAPI_KEY = os.environ.get('SERPAPI_KEY') or '6f55d4306ee5ffe290816bf9a18908d1a74c7b8fccf49fa700aac6355859976a'
+    SERPAPI_KEY = os.environ.get('SERPAPI_KEY') or ''
     SERPER_API_KEY = os.environ.get('SERPER_API_KEY') or ''
     HASDATA_API_KEY = os.environ.get('HASDATA_API_KEY') or ''
     

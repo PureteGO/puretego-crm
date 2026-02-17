@@ -22,8 +22,8 @@ app = Flask(__name__)
 try:
     app.config.from_object(config['default'])
 except:
-    app.config['SERPAPI_KEY'] = '6f55d4306ee5ffe290816bf9a18908d1a74c7b8fccf49fa700aac6355859976a'
-    app.config['SERPER_KEY'] = '68d7974d0941d419e96e2bd887ab248a0d6d48ad'
+    app.config['SERPAPI_KEY'] = os.environ.get('SERPAPI_KEY') or ''
+    app.config['SERPER_API_KEY'] = os.environ.get('SERPER_API_KEY') or ''
 
 # Mock SerperService to return the same data we saw in debug_serpapi_tool if possible, 
 # OR let it run real requests if keys are present.
