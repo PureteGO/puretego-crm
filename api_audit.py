@@ -1,12 +1,11 @@
-import os
-import json
-import requests
-import time
-from datetime import datetime
+from dotenv import load_dotenv
+
+# Load .env file
+load_dotenv()
 
 # API Keys (Loading from environment or placeholder)
 SERPER_API_KEY = os.getenv("SERPER_API_KEY", "")
-SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY", "")
+SERPAPI_KEY = os.getenv("SERPAPI_KEY", "")
 HASDATA_API_KEY = os.getenv("HASDATA_API_KEY", "")
 
 LOG_FILE = f"api_audit_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
@@ -41,7 +40,7 @@ def test_serper():
 def test_serpapi():
     print("Testing SerpApi...")
     url = "https://serpapi.com/search"
-    params = {"q": "test query", "api_key": SERPAPI_API_KEY}
+    params = {"q": "test query", "api_key": SERPAPI_KEY}
     
     try:
         response = requests.get(url, params=params, timeout=10)
@@ -54,7 +53,7 @@ def test_serpapi():
 
 def test_hasdata():
     print("Testing HasData API...")
-    url = "https://api.hasdata.com/google/maps/search"
+    url = "https://api.hasdata.com/scrape/google-maps/search"
     params = {"q": "restaurant in San Lorenzo, Paraguay"}
     headers = {'x-api-key': HASDATA_API_KEY}
     
