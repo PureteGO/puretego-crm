@@ -17,7 +17,7 @@ class Config:
     """Configurações base da aplicação"""
     
     # Secret key para sessões
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-fallback-only-for-local')
+    SECRET_KEY = os.environ.get('SECRET_KEY') or ''
     
     # Configurações de sessão
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)

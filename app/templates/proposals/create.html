@@ -13,115 +13,139 @@
 
     <form method="POST" id="proposalForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <!-- Step 1: Client & Metadata -->
-        <div class="card shadow-sm mb-3">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-1-circle-fill text-primary"></i> {{ _('Basic Information') }}</h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">{{ _('Client') }} *</label>
-                        <select name="client_id" id="clientSelect" class="form-select" required>
-                            <option value="">{{ _('Select a client...') }}</option>
-                            {% for c in clients %}
-                            <option value="{{ c.id }}" {% if selected_client and selected_client.id==c.id %}selected{%
-                                endif %}>{{ c.name }}</option>
-                            {% endfor %}
-                        </select>
+
+        <div class="row">
+            <div class="col-lg-9">
+                <!-- Step 1: Client & Metadata -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-1-circle-fill text-primary"></i> {{ _('Basic Information') }}
+                        </h5>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">{{ _('Title') }}</label>
-                        <input type="text" name="title" class="form-control" placeholder="{{ _('Proposal title...') }}">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">{{ _('Client') }} *</label>
+                                <select name="client_id" id="clientSelect" class="form-select" required>
+                                    <option value="">{{ _('Select a client...') }}</option>
+                                    {% for c in clients %}
+                                    <option value="{{ c.id }}" {% if selected_client and selected_client.id==c.id
+                                        %}selected{% endif %}>{{ c.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">{{ _('Title') }}</label>
+                                <input type="text" name="title" class="form-control"
+                                    placeholder="{{ _('Proposal title...') }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">{{ _('Template') }}</label>
+                                <select name="template_id" class="form-select">
+                                    <option value="">{{ _('No template') }}</option>
+                                    {% for t in templates %}
+                                    <option value="{{ t.id }}">{{ t.name }} ({{ t.type }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">{{ _('Currency') }}</label>
+                                <select name="currency" class="form-select">
+                                    <option value="Gs" selected>Gs (Guaraníes)</option>
+                                    <option value="USD">USD (Dólar)</option>
+                                    <option value="BRL">BRL (Real)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">{{ _('Language') }}</label>
+                                <select name="language" class="form-select">
+                                    <option value="es" selected>Español</option>
+                                    <option value="pt">Português</option>
+                                    <option value="en">English</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">{{ _('Deal') }}</label>
+                                <select name="deal_id" id="dealSelect" class="form-select">
+                                    <option value="">{{ _('No deal linked') }}</option>
+                                    {% for d in deals %}
+                                    <option value="{{ d.id }}">{{ d.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">{{ _('Template') }}</label>
-                        <select name="template_id" class="form-select">
-                            <option value="">{{ _('No template') }}</option>
-                            {% for t in templates %}
-                            <option value="{{ t.id }}">{{ t.name }} ({{ t.type }})</option>
-                            {% endfor %}
-                        </select>
+                </div>
+
+                <!-- Step 2: Quote Options -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-2-circle-fill text-primary"></i> {{ _('Quote Options') }}</h5>
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="addOptionBtn">
+                            <i class="bi bi-plus-lg"></i> {{ _('Add Option') }}
+                        </button>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">{{ _('Currency') }}</label>
-                        <select name="currency" class="form-select">
-                            <option value="Gs" selected>Gs (Guaraníes)</option>
-                            <option value="USD">USD (Dólar)</option>
-                            <option value="BRL">BRL (Real)</option>
-                        </select>
+                    <div class="card-body" id="optionsContainer">
+                        <!-- Options will be dynamically added here -->
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">{{ _('Language') }}</label>
-                        <select name="language" class="form-select">
-                            <option value="es" selected>Español</option>
-                            <option value="pt">Português</option>
-                            <option value="en">English</option>
-                        </select>
+                </div>
+
+                <!-- Step 3: Notes & Terms -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-3-circle-fill text-primary"></i> {{ _('Notes & Terms') }}</h5>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label">{{ _('Deal') }}</label>
-                        <select name="deal_id" id="dealSelect" class="form-select">
-                            <option value="">{{ _('No deal linked') }}</option>
-                            {% for d in deals %}
-                            <option value="{{ d.id }}">{{ d.title }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">{{ _('Payment Terms') }}</label>
+                                <textarea name="payment_terms" class="form-control" rows="3"
+                                    placeholder="{{ _('Payment terms...') }}"></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">{{ _('Internal Notes') }}</label>
+                                <textarea name="notes" class="form-control" rows="3"
+                                    placeholder="{{ _('Internal notes (not shown in PDF)...') }}"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grand Total -->
+                <div class="card shadow-sm mb-3 border-primary">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0"><i class="bi bi-calculator"></i> {{ _('Grand Total (Default Option)') }}
+                            </h5>
+                        </div>
+                        <h3 class="mb-0 text-primary" id="grandTotal">Gs 0</h3>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mb-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> {{ _('Create Proposal') }}
+                    </button>
+                    <a href="{{ url_for('proposals.index') }}" class="btn btn-outline-secondary">{{ _('Cancel') }}</a>
+                </div>
+            </div> <!-- end col-lg-9 -->
+
+            <!-- Sidebar: Smart Recommendations -->
+            <div class="col-lg-3">
+                <div class="card shadow-sm border-warning sticky-top" style="top: 80px; z-index: 10;">
+                    <div class="card-header bg-warning bg-opacity-10">
+                        <h6 class="mb-0"><i class="bi bi-lightbulb-fill text-warning"></i> {{ _('Smart Recommendations')
+                            }}</h6>
+                    </div>
+                    <div class="card-body p-0" id="recommendationsList">
+                        <div class="p-4 text-center text-muted small">
+                            <i class="bi bi-person-check fs-2 d-block mb-2"></i>
+                            {{ _('Select a client to see recommendations based on their last Health Check.') }}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Step 2: Quote Options -->
-        <div class="card shadow-sm mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-2-circle-fill text-primary"></i> {{ _('Quote Options') }}</h5>
-                <button type="button" class="btn btn-sm btn-outline-primary" id="addOptionBtn">
-                    <i class="bi bi-plus-lg"></i> {{ _('Add Option') }}
-                </button>
-            </div>
-            <div class="card-body" id="optionsContainer">
-                <!-- Options will be dynamically added here -->
-            </div>
-        </div>
-
-        <!-- Step 3: Notes & Terms -->
-        <div class="card shadow-sm mb-3">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-3-circle-fill text-primary"></i> {{ _('Notes & Terms') }}</h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">{{ _('Payment Terms') }}</label>
-                        <textarea name="payment_terms" class="form-control" rows="3"
-                            placeholder="{{ _('Payment terms...') }}"></textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ _('Internal Notes') }}</label>
-                        <textarea name="notes" class="form-control" rows="3"
-                            placeholder="{{ _('Internal notes (not shown in PDF)...') }}"></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Grand Total -->
-        <div class="card shadow-sm mb-3 border-primary">
-            <div class="card-body d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0"><i class="bi bi-calculator"></i> {{ _('Grand Total (Default Option)') }}</h5>
-                </div>
-                <h3 class="mb-0 text-primary" id="grandTotal">Gs 0</h3>
-            </div>
-        </div>
-
-        <div class="d-flex gap-2 mb-4">
-            <button type="submit" class="btn btn-primary">
-                <i class="bi bi-check-lg"></i> {{ _('Create Proposal') }}
-            </button>
-            <a href="{{ url_for('proposals.index') }}" class="btn btn-outline-secondary">{{ _('Cancel') }}</a>
-        </div>
+        </div> <!-- end row -->
     </form>
 </div>
 
@@ -251,15 +275,24 @@
         // Add first option by default
         addOption();
 
+        // Trigger client info if already selected
+        if (document.getElementById('clientSelect').value) {
+            document.getElementById('clientSelect').dispatchEvent(new Event('change'));
+        }
+
         document.getElementById('addOptionBtn').addEventListener('click', addOption);
 
-        // Load deals when client changes
+        // Load deals & recommendations when client changes
         document.getElementById('clientSelect').addEventListener('change', function () {
             const clientId = this.value;
             const dealSelect = document.getElementById('dealSelect');
             dealSelect.innerHTML = '<option value="">{{ _("No deal linked") }}</option>';
 
+            const recList = document.getElementById('recommendationsList');
+            recList.innerHTML = '<div class="p-3 text-center"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+
             if (clientId) {
+                // Fetch Deals
                 fetch(`/proposals/api/client/${clientId}/deals`)
                     .then(r => r.json())
                     .then(deals => {
@@ -270,6 +303,45 @@
                             dealSelect.appendChild(opt);
                         });
                     });
+
+                // Fetch Recommendations
+                fetch(`/proposals/api/client/${clientId}/smart-recommendations`)
+                    .then(r => r.json())
+                    .then(recs => {
+                        if (recs.length === 0) {
+                            recList.innerHTML = '<div class="p-3 text-center text-muted small">No hay recomendaciones específicas para este cliente.</div>';
+                            return;
+                        }
+
+                        recList.innerHTML = '';
+                        recs.forEach(rec => {
+                            const div = document.createElement('div');
+                            div.className = 'p-3 border-bottom';
+                            div.innerHTML = `
+                                <div class="fw-bold small mb-1">${rec.name}</div>
+                                <div class="text-muted extra-small mb-2" style="font-size: 0.75rem;">${rec.reason}</div>
+                                <button type="button" class="btn btn-xs btn-outline-primary w-100 add-rec-btn" 
+                                    data-id="${rec.service_id}" data-name="${rec.name}" data-price="${rec.price}">
+                                    <i class="bi bi-plus"></i> Añadir
+                                </button>
+                            `;
+                            recList.appendChild(div);
+
+                            div.querySelector('.add-rec-btn').addEventListener('click', function () {
+                                // Add to the first option
+                                const firstOption = container.querySelector('.option-block');
+                                if (firstOption) {
+                                    const row = addItem(firstOption, 0);
+                                    row.querySelector('.item-type-select').value = 'service';
+                                    row.querySelector('.service-select').value = rec.service_id;
+                                    row.querySelector('.item-price').value = rec.price;
+                                    recalcItem(row, firstOption);
+                                }
+                            });
+                        });
+                    });
+            } else {
+                recList.innerHTML = '<div class="p-4 text-center text-muted small"><i class="bi bi-person-check fs-2 d-block mb-2"></i> Seleccione un cliente...</div>';
             }
         });
 
@@ -319,6 +391,11 @@
             const row = tr.querySelector('.item-row');
             tbody.appendChild(row);
 
+            setupItemListeners(row, optionBlock);
+            return row;
+        }
+
+        function setupItemListeners(row, optionBlock) {
             // Type toggle
             row.querySelector('.item-type-select').addEventListener('change', function () {
                 const serviceEl = row.querySelector('.service-select');

@@ -207,13 +207,13 @@
                                         <div class="btn-group">
                                             {% if p.status != 'paid' %}
                                             <button
-                                                onclick="openPaymentModal({{ p.id }}, '{{ p.description }}', {{ p.amount }}, {{ p.paid_amount or 0 }})"
+                                                onclick="openPaymentModal({{ p.id }}, {{ p.description | tojson | forceescape }}, {{ p.amount }}, {{ p.paid_amount or 0 }})"
                                                 class="btn btn-sm btn-success" title="{{ _('Pay') }}">
                                                 <i class="bi bi-check-circle"></i>
                                             </button>
                                             {% endif %}
                                             <button
-                                                onclick="openEditPayable({{ p.id }}, '{{ p.description }}', {{ p.amount }}, '{{ p.due_date }}', {{ p.category_id or 'null' }})"
+                                                onclick="openEditPayable({{ p.id }}, {{ p.description | tojson | forceescape }}, {{ p.amount }}, '{{ p.due_date }}', {{ p.category_id or 'null' }})"
                                                 class="btn btn-sm btn-outline-primary" title="{{ _('Edit') }}">
                                                 <i class="bi bi-pencil"></i>
                                             </button>

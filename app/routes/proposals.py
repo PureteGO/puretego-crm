@@ -700,6 +700,121 @@ def api_preset_schedule(preset_id):
         return jsonify(schedule)
 
 
+@bp.route('/api/client/<int:client_id>/smart-recommendations')
+@login_required
+def api_smart_recommendations(client_id):
+    """Retorna serviços recomendados baseados no último health check do cliente"""
+    with get_db() as db:
+        recommendations = ProposalService.get_smart_recommendations(db, client_id)
+        return jsonify(recommendations)
+
+
+# ============================
+# Public Routes (No Login)
+# ============================
+
+@bp.route('/p/<token>')
+def public_view(token):
+    """Visualização pública da proposta para o cliente"""
+    with get_db() as db:
+        proposal = db.query(Proposal).filter(Proposal.public_token == token).first()
+        if not proposal:
+            return render_template('errors/404.html'), 404
+        
+        # Build view data (similar to internal view but for public consumption)
+        proposal_data = proposal.to_dict(include_relations=True)
+        proposal_data['client_name'] = proposal.client.name if proposal.client else 'Cliente'
+        
+        options = []
+        for opt in proposal.options:
+            opt_data = opt.to_dict(include_items=True)
+            opt_data['payment_schedule'] = ProposalService.calculate_payment_schedule(opt)
+            options.append(opt_data)
+        
+        # Company Info
+        company = db.query(Company).get(proposal.company_id) if proposal.company_id else None
+        company_data = company.to_dict() if company else {}
+        
+        # Theme
+        from app.services.pdf_generator import THEME_COLORS
+        theme_style = company_data.get('theme_style', 'maps2go-official')
+        theme = THEME_COLORS.get(theme_style, THEME_COLORS['maps2go-official'])
+        
+        return render_template(
+            'proposals/public_view.html',
+            proposal=proposal_data,
+            options=options,
+            company=company_data,
+            theme=theme
+        )
+
+
+@bp.route('/p/<token>/approve', methods=['POST'])
+def public_approve(token):
+    """Aprovação pública via cliente"""
+    with get_db() as db:
+        proposal = db.query(Proposal).filter(Proposal.public_token == token).first()
+        if not proposal:
+            return jsonify({'success': False, 'message': 'Proposal not found'}), 404
+        
+        if proposal.status == 'approved':
+            return jsonify({'success': False, 'message': 'Proposal already approved'}), 400
+            
+        try:
+            # We use a system session or similar since it's a public action
+            session_mock = {'user_id': proposal.user_id, 'company_id': proposal.company_id}
+            ProposalService.approve_proposal(db, proposal.id, session_mock)
+            return jsonify({'success': True, 'message': 'Propuesta aprobada con éxito!'})
+        except Exception as e:
+            return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@bp.route('/p/<token>/reject', methods=['POST'])
+def public_reject(token):
+    """Rejeição pública via cliente"""
+    reason = request.json.get('reason', '')
+    with get_db() as db:
+        proposal = db.query(Proposal).filter(Proposal.public_token == token).first()
+        if not proposal:
+            return jsonify({'success': False, 'message': 'Proposal not found'}), 404
+            
+        proposal.status = 'rejected'
+        if reason:
+            proposal.set_note('rejection_reason', reason)
+        db.commit()
+        return jsonify({'success': True, 'message': 'Feedback enviado.'})
+
+
+@bp.route('/<int:proposal_id>/share/whatsapp')
+@login_required
+def share_whatsapp(proposal_id):
+    """Gera link para compartilhar proposta no WhatsApp"""
+    with get_db() as db:
+        proposal = db.query(Proposal).get(proposal_id)
+        if not proposal:
+            flash('Proposta não encontrada.', 'error')
+            return redirect(url_for('proposals.index'))
+            
+        if not proposal.public_token:
+            proposal.public_token = ProposalService.generate_public_token()
+            db.commit()
+            
+        public_url = url_for('proposals.public_view', token=proposal.public_token, _external=True)
+        
+        client_name = proposal.client.name if proposal.client else 'Cliente'
+        message = f"Hola *{client_name}*, adjunto la propuesta comercial: *{proposal.title or 'Propuesta'}*. \n\nPuedes revisarla y aprobarla directamente en este link: \n{public_url}"
+        
+        import urllib.parse
+        encoded_message = urllib.parse.quote(message)
+        
+        phone = proposal.client.phone or ''
+        # Clean phone (remove +, spaces, etc)
+        phone = "".join(filter(str.isdigit, phone))
+        
+        whatsapp_url = f"https://api.whatsapp.com/send?phone={phone}&text={encoded_message}"
+        return redirect(whatsapp_url)
+
+
 # ============================
 # Helper Functions
 # ============================

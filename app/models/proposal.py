@@ -47,6 +47,8 @@ class Proposal(Base):
     # Legacy field kept for backward compat during migration
     payment_terms = Column(Text, nullable=True)
     
+    public_token = Column(String(100), unique=True, index=True, nullable=True)
+    
     pdf_file_path = Column(String(255))
     
     created_at = Column(DateTime, server_default=func.now())
@@ -77,6 +79,7 @@ class Proposal(Base):
         self.deal_id = deal_id
         self.template_id = template_id
         self.payment_terms = payment_terms
+        self.public_token = None
     
     def calculate_total(self):
         """Calcula o total baseado na opção padrão ou primeira opção"""
@@ -125,6 +128,7 @@ class Proposal(Base):
             'status': self.status,
             'language': self.language,
             'payment_terms': self.payment_terms,
+            'public_token': self.public_token,
             'pdf_file_path': self.pdf_file_path,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None

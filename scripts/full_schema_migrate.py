@@ -51,7 +51,18 @@ def full_schema_check():
         ],
         'project_tickets': [
             ('phase', 'VARCHAR(50) NULL'),
-            ('is_onboarding', 'TINYINT(1) DEFAULT 0')
+            ('is_onboarding', 'TINYINT(1) DEFAULT 0'),
+            ('assigned_by_id', 'INTEGER NULL'),
+            ('verification_required', 'TINYINT(1) DEFAULT 0'),
+            ('approved_at', 'DATETIME NULL'),
+            ('approved_by_id', 'INTEGER NULL'),
+            ('rejection_comment', 'TEXT NULL'),
+            ('assigned_comment', 'TEXT NULL'),
+            ('completed_at', 'DATETIME NULL'),
+            ('completed_by', 'INTEGER NULL')
+        ],
+        'proposals': [
+            ('public_token', 'VARCHAR(100) UNIQUE')
         ]
     }
     

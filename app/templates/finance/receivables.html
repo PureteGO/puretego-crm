@@ -199,12 +199,12 @@
                             <td>
                                 {% if rec.status != 'paid' %}
                                 <button type="button" class="btn btn-sm btn-success"
-                                    onclick="openPaymentModal({{ rec.id }}, {{ rec.description | tojson | safe }}, {{ rec.amount }}, {{ rec.paid_amount or 0 }})"
+                                    onclick="openPaymentModal({{ rec.id }}, {{ rec.description | tojson | forceescape }}, {{ rec.amount }}, {{ rec.paid_amount or 0 }})"
                                     title="{{ _('Register Payment') }}">
                                     <i class="bi bi-check-circle"></i>
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-secondary ms-1"
-                                    onclick="openEditModal({{ rec.id }}, {{ rec.description | tojson | safe }}, {{ rec.amount }}, '{{ rec.due_date }}')"
+                                    onclick="openEditModal({{ rec.id }}, {{ rec.description | tojson | forceescape }}, {{ rec.amount }}, '{{ rec.due_date }}')"
                                     title="{{ _('Edit') }}">
                                     <i class="bi bi-pencil"></i>
                                 </button>

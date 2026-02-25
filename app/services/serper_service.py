@@ -38,7 +38,9 @@ class SerperService:
                 place_obj.update({
                     'phone': item.get('phoneNumber'),
                     'reviews': item.get('ratingCount'),
-                    'place_id': item.get('placeId') or item.get('cid') # Fallback
+                    'place_id': item.get('placeId'),
+                    'cid': item.get('cid'),
+                    'position': item.get('position', 0)
                 })
                 places.append(place_obj)
             return {'success': True, 'places': places}

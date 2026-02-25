@@ -26,6 +26,10 @@
             <a href="{{ url_for('proposals.generate_pdf', proposal_id=proposal.id) }}" class="btn btn-sm btn-danger">
                 <i class="bi bi-file-pdf"></i> PDF
             </a>
+            <a href="{{ url_for('proposals.share_whatsapp', proposal_id=proposal.id) }}" class="btn btn-sm btn-success"
+                target="_blank">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
             <div class="btn-group btn-group-sm">
                 <button type="button" class="btn btn-outline-info dropdown-toggle" data-bs-toggle="dropdown">
                     <i class="bi bi-three-dots"></i>
@@ -230,6 +234,20 @@
                     <button class="btn btn-outline-danger btn-sm" onclick="rejectProposal('{{ proposal.id }}')">
                         <i class="bi bi-x-circle"></i> {{ _('Reject') }}
                     </button>
+                    <hr class="my-2">
+                    <button class="btn btn-outline-success btn-sm"
+                        onclick="location.href='{{ url_for('proposals.share_whatsapp', proposal_id=proposal.id) }}'">
+                        <i class="bi bi-whatsapp"></i> {{ _('Share via WhatsApp') }}
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="copyPublicLink()">
+                        <i class="bi bi-link-45deg"></i> {{ _('Copy Public Link') }}
+                    </button>
+                    {% if proposal.public_token %}
+                    <a href="{{ url_for('proposals.public_view', token=proposal.public_token) }}"
+                        class="btn btn-link btn-xs text-center d-block" target="_blank">
+                        {{ _('Open Public View') }} <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
             {% endif %}
@@ -352,6 +370,22 @@
                 .then(r => r.json())
                 .then(data => { if (data.success) window.location.href = data.redirect; else alert(data.message); });
         }
+    }
+
+    function copyPublicLink() {
+        const token = '{{ proposal.public_token or "" }}';
+        if (!token) {
+            alert('Genere el link compartiendo por WhatsApp primeiro ou recarregue a página.');
+            return;
+        }
+        const url = window.location.origin + '/proposals/p/' + token;
+        const tempInput = document.createElement("input");
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        alert('Link copiado al portapapeles!');
     }
 </script>
 {% endblock %}

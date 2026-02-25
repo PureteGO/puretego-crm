@@ -10,6 +10,7 @@ from app.models import (
     HealthCheck, KanbanStage, Company
 )
 from flask_babel import gettext as _
+import secrets
 
 
 class ProposalService:
@@ -18,7 +19,7 @@ class ProposalService:
     @staticmethod
     def create_proposal(db, company_id, client_id, user_id, template_id=None, deal_id=None,
                         title=None, currency='Gs', language='es', options_data=None, 
-                        notes=None, payment_terms=None, valid_days=30):
+                        notes=None, payment_terms=None, valid_days=30, public_token=None):
         """
         Cria uma proposta completa com opções e itens.
         
@@ -42,7 +43,8 @@ class ProposalService:
             currency=currency,
             language=language,
             payment_terms=payment_terms,
-            status='draft'
+            status='draft',
+            public_token=public_token or ProposalService.generate_public_token()
         )
         proposal.issue_date = today
         proposal.valid_until = today + timedelta(days=valid_days)
@@ -391,3 +393,64 @@ class ProposalService:
         ).order_by(HealthCheck.created_at.desc()).first()
         
         return hc.to_dict() if hc else None
+
+    @staticmethod
+    def generate_public_token():
+        """Gera um token seguro para compartilhamento de link público"""
+        return secrets.token_urlsafe(32)
+
+    @staticmethod
+    def get_smart_recommendations(db, client_id):
+        """
+        Analisa o último health check e recomenda serviços baseados nas falhas.
+        
+        Regras de Negócio:
+        - Falha em Posts (ID 7) -> Recomenda 'Gestão de Conteúdo' / 'Google Business Posts'
+        - Falha em Fotos (ID 2) -> Recomenda 'Sessão de Fotos Profissionais'
+        - Perfil não gerenciado (ID 4) -> Recomenda 'Otimização GMB'
+        - Falha em Site (ID 5) -> Recomenda 'Criação de Site / Landing Page'
+        """
+        hc = db.query(HealthCheck).filter(
+            HealthCheck.client_id == client_id
+        ).order_by(HealthCheck.created_at.desc()).first()
+        
+        if not hc or not hc.report_data:
+            return []
+            
+        recommendations = []
+        criteria = hc.report_data.get('criteria_results', [])
+        
+        # Mapping criteria IDs to suggested service names or keywords
+        mapping = {
+            7: {"name": "Google Maps", "reason": "Su perfil no tiene publicaciones regulares."},
+            2: {"name": "Fotos", "reason": "Faltan fotos de alta calidad."},
+            3: {"name": "Video", "reason": "Su ficha no tiene vídeos optimizados."},
+            5: {"name": "Desarrollo Web", "reason": "Su sitio web necesita optimización."},
+            17: {"name": "Google Maps", "reason": "Muchas evaluaciones sin respuesta."},
+            4: {"name": "Google Maps", "reason": "Su perfil no está debidamente gestionado."},
+        }
+        
+        for res in criteria:
+            if not res.get('passed') and res.get('id') in mapping:
+                rec_info = mapping[res['id']]
+                # Find service in DB that matches the recommendation
+                service = db.query(Service).filter(Service.name.like(f"%{rec_info['name']}%")).first()
+                if service:
+                    recommendations.append({
+                        'service_id': service.id,
+                        'name': service.name,
+                        'price': float(service.base_price or 0),
+                        'reason': rec_info['reason'],
+                        'description': service.description
+                    })
+                else:
+                    # Fallback for generic recommendation if service not found
+                    recommendations.append({
+                        'service_id': None,
+                        'name': rec_info['name'],
+                        'price': 0,
+                        'reason': rec_info['reason'],
+                        'description': 'Serviço recomendado para otimização do perfil.'
+                    })
+        
+        return recommendations
