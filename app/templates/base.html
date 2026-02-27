@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="{{ current_language }}" data-theme="dark"
+<html lang="{{ current_language }}" data-theme="dark" data-bs-theme="dark"
     data-company-theme="{{ session.get('company_theme', 'tech-teal') }}">
 <script>
     // Apply saved theme and company theme immediately to prevent flash
     (function () {
         const savedTheme = localStorage.getItem('maps2go-theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
     })();
 </script>
 
@@ -340,6 +341,7 @@
                     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
                     html.setAttribute('data-theme', newTheme);
+                    html.setAttribute('data-bs-theme', newTheme);
                     localStorage.setItem('maps2go-theme', newTheme);
 
                     updateNavbar(newTheme);

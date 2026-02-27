@@ -96,7 +96,7 @@
 
             <!-- Detalles Adicionales -->
             <div class="card shadow-sm">
-                <div class="card-header bg-light">
+                <div class="card-header">
                     <h5 class="card-title mb-0">{{ _('Additional Details') }}</h5>
                 </div>
                 <div class="card-body">
@@ -527,7 +527,7 @@
                     <div class="row">
                         {% for project in client.projects %}
                         <div class="col-md-6 mb-3">
-                            <div class="card shadow-sm border-0 bg-light">
+                            <div class="card shadow-sm border-0">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="fw-bold mb-0">{{ project.name }}</h6>
@@ -549,7 +549,7 @@
                         {% endfor %}
                     </div>
                     {% else %}
-                    <div class="text-center py-5 bg-light rounded shadow-sm">
+                    <div class="text-center py-5 rounded shadow-sm border">
                         <i class="bi bi-briefcase text-muted display-4"></i>
                         <p class="mt-3 text-muted">
                             {{ _('This client does not have an active project yet.') }}<br>
