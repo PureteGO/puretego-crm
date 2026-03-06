@@ -1,0 +1,33 @@
+/* =====================================================
+   PURETEGO CRM - Dark Mode Overrides (Added specifically for production)
+   ===================================================== */
+
+[data-theme="dark"] .modal-content {
+    background-color: var(--bg-elevated) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="dark"] .bg-light,
+[data-theme="dark"] .card-header.bg-light,
+[data-theme="dark"] .card.bg-light {
+    background-color: var(--bg-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .card-header.bg-light {
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-muted) !important;
+}
