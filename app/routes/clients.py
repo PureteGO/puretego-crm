@@ -709,26 +709,35 @@ def create_deal_quick():
             flash(_('Deal title is required'), 'error')
             return redirect(url_for('clients.kanban'))
         
-        deal = Deal(
-            title=title,
-            company_id=session.get('company_id'),
-            client_id=int(client_id) if client_id else None,
-            kanban_stage_id=int(stage_id) if stage_id else None,
-            owner_id=session.get('user_id'),
-            value=float(value) if value else 0,
-            status=DealStatus.OPEN
-        )
+        if not client_id:
+            flash(_('Client is required'), 'error')
+            return redirect(url_for('clients.kanban'))
         
-        expected_close = request.form.get('expected_close_date')
-        if expected_close:
-            try:
-                deal.expected_close_date = datetime.strptime(expected_close, '%Y-%m-%d')
-            except ValueError:
-                pass
-        
-        db.add(deal)
-        db.commit()
-        flash(_('Deal created successfully'), 'success')
+        try:
+            deal = Deal(
+                title=title,
+                company_id=session.get('company_id'),
+                client_id=int(client_id),
+                kanban_stage_id=int(stage_id) if stage_id else None,
+                owner_id=session.get('user_id'),
+                value=float(value) if value else 0,
+            )
+            deal.status = DealStatus.OPEN
+            
+            expected_close = request.form.get('expected_close_date')
+            if expected_close:
+                try:
+                    deal.expected_close_date = datetime.strptime(expected_close, '%Y-%m-%d')
+                except ValueError:
+                    pass
+            
+            db.add(deal)
+            db.commit()
+            flash(_('Deal created successfully'), 'success')
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error creating deal: {str(e)}")
+            flash(f'Error creating deal: {str(e)}', 'error')
     
     return redirect(url_for('clients.kanban'))
 
