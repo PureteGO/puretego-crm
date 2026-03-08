@@ -52,7 +52,7 @@
                     </li>
                     <li>
                         <form method="POST" action="{{ url_for('proposals.delete', proposal_id=proposal.id) }}"
-                            onsubmit="return confirm(&quot;{{ _('Delete this proposal?') }}&quot;)">
+                            onsubmit="return confirm('{{ _('Delete this proposal?') }}')">
                             <button type="submit" class="dropdown-item text-danger"><i class="bi bi-trash"></i> {{
                                 _('Delete') }}</button>
                         </form>
@@ -375,7 +375,7 @@
     function copyPublicLink() {
         const token = '{{ proposal.public_token or "" }}';
         if (!token) {
-            alert('Genere el link compartiendo por WhatsApp primeiro ou recarregue a página.');
+            alert('{{ _("Generate the link by sharing via WhatsApp first or reload the page.") }}');
             return;
         }
         const url = window.location.origin + '/proposals/p/' + token;
@@ -385,7 +385,7 @@
         tempInput.select();
         document.execCommand("copy");
         document.body.removeChild(tempInput);
-        alert('Link copiado al portapapeles!');
+        alert('{{ _("Link copied to clipboard!") }}');
     }
 </script>
 {% endblock %}

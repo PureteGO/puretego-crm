@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 320px;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            padding: 0;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #00aa66, #008855);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header img {
+            height: 28px;
+            filter: brightness(0) invert(1);
+        }
+
+        .header h1 {
+            font-size: 16px;
+            color: white;
+            font-weight: 700;
+        }
+
+        .header .version {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .body {
+            padding: 16px 20px;
+        }
+
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background: #0d0d1a;
+            color: #e0e0e0;
+            font-size: 13px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .field input:focus {
+            outline: none;
+            border-color: #00aa66;
+            box-shadow: 0 0 0 2px rgba(0, 170, 102, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00aa66, #008855);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 170, 102, 0.3);
+        }
+
+        .btn-scan {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+            margin-top: 8px;
+        }
+
+        .btn-scan:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            text-align: center;
+            display: none;
+        }
+
+        .status.success {
+            display: block;
+            background: rgba(0, 170, 102, 0.15);
+            color: #00cc7a;
+            border: 1px solid rgba(0, 170, 102, 0.2);
+        }
+
+        .status.error {
+            display: block;
+            background: rgba(220, 53, 69, 0.15);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+
+        .status.info {
+            display: block;
+            background: rgba(0, 123, 255, 0.15);
+            color: #6db3f2;
+            border: 1px solid rgba(0, 123, 255, 0.2);
+        }
+
+        .connected {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #00cc7a;
+            margin-bottom: 14px;
+        }
+
+        .connected .dot {
+            width: 8px;
+            height: 8px;
+            background: #00cc7a;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .footer {
+            padding: 10px 20px;
+            border-top: 1px solid #222;
+            text-align: center;
+            font-size: 10px;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Maps2GO Scan</h1>
+        <span class="version">v1.0</span>
+    </div>
+
+    <div class="body">
+        <div id="loginSection">
+            <div class="field">
+                <label>Scan Token</label>
+                <input type="text" id="tokenInput" placeholder="Cole seu token aqui..." />
+            </div>
+            <div class="field">
+                <label>Server URL</label>
+                <input type="url" id="serverInput" placeholder="https://seu-dominio.com/" />
+            </div>
+            <button class="btn btn-primary" id="saveBtn">
+                <span>💾</span> Salvar Configuração
+            </button>
+        </div>
+
+        <div id="connectedSection" style="display:none;">
+            <div class="connected">
+                <div class="dot"></div>
+                <span>Conectado ao Maps2GO</span>
+            </div>
+            <button class="btn btn-scan" id="scanBtn">
+                <span>🔍</span> Analisar Esta Página
+            </button>
+            <button class="btn btn-primary" id="logoutBtn" style="margin-top:8px;background:#333;">
+                <span>🔑</span> Alterar Token
+            </button>
+        </div>
+
+        <div class="status" id="statusMsg"></div>
+    </div>
+
+    <div class="footer">
+        Maps2GO • Zero API Cost Scanner
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>

@@ -14,6 +14,7 @@ SQLAlchemy>=2.0.29
 # API Integration
 requests==2.31.0
 google-search-results==2.4.2
+beautifulsoup4>=4.12.0
 
 # PDF Generation
 weasyprint==60.1

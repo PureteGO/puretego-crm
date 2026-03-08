@@ -1,0 +1,46 @@
+{
+"manifest_version": 3,
+"name": "GBP Check - Local SEO and Optimization",
+"description": "Official GBP Check Chrome Extension that allows external locations Health Check.",
+"version": "1.9.2",
+"action": {
+"default_popup": "popup.html",
+"default_icon": "images/icon.png"
+},
+"permissions": [
+  "tabs",
+  "storage"
+  ],
+"content_scripts": [{
+"matches": [
+  "https://*.google.com.br/*",
+  "https://*.google.com/*",
+  "https://*.google.pt/*",
+  "https://*.google.cz/*",
+  "https://business.google.com/*",
+  "https://business.google.com.br/*"
+],
+"exclude_matches": ["https://ads.google.com/*", "https://lookerstudio.google.com/*", "https://www.ads.google.com/*", "https://www.lookerstudio.google.com/*"],
+"js": ["jquery.js", "html2canvas.js", "code.js"],
+"css": [ "main.css"]
+}],
+"background": {
+  "service_worker": "background.js"
+},
+"externally_connectable": {
+  "matches": ["https://*.gbpcheck.com/*"]
+},
+"icons": {
+    "16": "images/icons/gbpcheck-logo-chrome-16.png",
+    "32": "images/icons/gbpcheck-logo-chrome-32.png",
+    "48": "images/icons/gbpcheck-logo-chrome-48.png",
+    "128": "images/icons/gbpcheck-logo-chrome-128.png"
+   },
+
+   "web_accessible_resources": [{
+    "resources": ["/images/copy_paste.png", "/images/gmb-chec-v-transparent-white.png", "/images/back.png", "/images/gbp-check-v-green-250.png"],
+    "matches": ["<all_urls>"],
+    "extension_ids": []
+  }],
+"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl34PTYUBm+P5HbxLY6rhfmKR4rxvBEgoRi0b2V3DpvpPHbhu5/UrnmQaFjbrieq3YX8Rs0fkqoHXgCURPtViHjtQk+GbPCKQ+nqteS+6ez6YSwHtI8R73vBBnlt7re9TgE9ZZ60cH7v36SlBqBdwrYJJmnMJwSKguU4gVX5+WbjPwqBq/hfOXtkUonyl8S+ikuSw1NgChCGQRH2e5lbMhn1rRJ12VCilmQ0FmAb7kY/HhzR8vWnok1ms2p2UADPTxD8a6Guf0vr9zJQ5TCH2EOV+zGwV+A8Yu48TsTWumD2caHHdIQj8vIzhrR7z4tMHQoQWDEnDypZubESChzWhBwIDAQAB"
+}

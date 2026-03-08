@@ -1,249 +1,300 @@
 <!DOCTYPE html>
 <html lang="{{ language or 'es' }}">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ proposal.title or 'Propuesta Comercial' }}</title>
+    <title>{{ proposal.title or _('Commercial Proposal') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
         :root {
-            --primary: {{ theme.primary }};
-            --primary-dark: {{ theme.primary_dark }};
-            --primary-light: {{ theme.primary_light }};
-            --bg-dark: {{ theme.bg_dark }};
+            --primary: {
+                    {
+                    theme.primary
+                }
+            }
+
+            ;
+
+            --primary-dark: {
+                    {
+                    theme.primary_dark
+                }
+            }
+
+            ;
+
+            --primary-light: {
+                    {
+                    theme.primary_light
+                }
+            }
+
+            ;
+
+            --bg-dark: {
+                    {
+                    theme.bg_dark
+                }
+            }
+
+            ;
         }
+
         body {
             background-color: #f8fafc;
             color: #1e293b;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
+
         .navbar {
             background-color: white;
             border-bottom: 1px solid #e2e8f0;
         }
+
         .hero-section {
             background-color: var(--bg-dark);
             color: white;
             padding: 60px 0;
             margin-bottom: 40px;
         }
+
         .card {
             border: none;
             border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             margin-bottom: 24px;
         }
+
         .option-card {
             border: 2px solid transparent;
             transition: all 0.3s ease;
         }
+
         .option-card.active {
             border-color: var(--primary);
             background-color: var(--primary-light);
         }
+
         .btn-primary {
             background-color: var(--primary);
             border-color: var(--primary);
         }
+
         .btn-primary:hover {
             background-color: var(--primary-dark);
             border-color: var(--primary-dark);
         }
+
         .badge-primary {
             background-color: var(--primary-light);
             color: var(--primary-dark);
         }
+
         .sticky-summary {
             position: sticky;
             top: 20px;
         }
+
         @media print {
-            .no-print { display: none !important; }
-            .card { box-shadow: none; border: 1px solid #e2e8f0; }
+            .no-print {
+                display: none !important;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid #e2e8f0;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<nav class="navbar navbar-light bg-light py-3">
-    <div class="container d-flex justify-content-between align-items-center">
-        <a class="navbar-brand" href="#">
-            {% if company.logo_url %}
-            <img src="{{ company.logo_url }}" alt="Logo" height="40">
-            {% else %}
-            <span class="fw-bold text-primary">{{ company.name }}</span>
-            {% endif %}
-        </a>
-        <div class="no-print d-flex gap-2">
-            <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
-                <i class="bi bi-printer"></i> Imprimir/PDF
-            </button>
-        </div>
-    </div>
-</nav>
-
-<header class="hero-section">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-3">{{ proposal.title or 'Propuesta Comercial' }}</h1>
-        <p class="lead mb-0">Preparado para <strong>{{ proposal.client_name }}</strong></p>
-        <div class="mt-4">
-            <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
-                Válido hasta: {{ proposal.valid_until }}
-            </span>
-        </div>
-    </div>
-</header>
-
-<main class="container mb-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <!-- Details -->
-            <div class="card p-4">
-                <h4 class="mb-4">Resumen de Servicios</h4>
-                {% for opt in options %}
-                <div class="mb-5">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0 text-primary">{{ opt.name }}</h5>
-                        <h4 class="mb-0">{{ proposal.currency }} {{ "{:,.0f}".format(opt.total_amount) }}</h4>
-                    </div>
-                    
-                    <ul class="list-group list-group-flush">
-                        {% for item in opt.items %}
-                        <li class="list-group-item d-flex justify-content-between align-items-start py-3">
-                            <div class="ms-2 me-auto">
-                                <div class="fw-bold">{{ item.display_name or item.description }}</div>
-                                <small class="text-muted">{{ item.description }}</small>
-                            </div>
-                            <span class="badge badge-primary rounded-pill">
-                                {{ item.quantity }} x {{ proposal.currency }} {{ "{:,.0f}".format(item.unit_price) }}
-                            </span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endfor %}
+    <nav class="navbar navbar-light bg-light py-3">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a class="navbar-brand" href="#">
+                {% if company.logo_url %}
+                <img src="{{ company.logo_url }}" alt="Logo" height="40">
+                {% else %}
+                <span class="fw-bold text-primary">{{ company.name }}</span>
+                {% endif %}
+            </a>
+            <div class="no-print d-flex gap-2">
+                <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-printer"></i> {{ _('Print/PDF') }}
+                </button>
             </div>
-
-            {% if proposal.payment_terms %}
-            <div class="card p-4">
-                <h5 class="mb-3">Condiciones de Pago</h5>
-                <div class="text-muted" style="white-space: pre-line;">
-                    {{ proposal.payment_terms }}
-                </div>
-            </div>
-            {% endif %}
         </div>
+    </nav>
 
-        <div class="col-lg-4">
-            <div class="sticky-summary">
-                <div class="card p-4 text-center">
-                    <p class="text-muted mb-2">Total Propuesta</p>
-                    <h2 class="text-primary fw-bold mb-4">{{ proposal.currency }} {{ "{:,.0f}".format(proposal.total_amount) }}</h2>
-                    
-                    {% if proposal.status == 'draft' or proposal.status == 'sent' %}
-                    <div class="d-grid gap-3 no-print">
-                        <button id="btnApprove" class="btn btn-primary btn-lg">
-                            <i class="bi bi-check-circle"></i> Aprobar Propuesta
-                        </button>
-                        <button id="btnReject" class="btn btn-outline-danger">
-                            <i class="bi bi-x-circle"></i> Rechazar / Feedback
-                        </button>
-                    </div>
-                    {% elif proposal.status == 'approved' %}
-                    <div class="alert alert-success">
-                        <i class="bi bi-check-lg"></i> <strong>Aprobado</strong>
-                        <p class="small mb-0">Esta propuesta ha sido aprobada el {{ proposal.updated_at[:10] }}</p>
-                    </div>
-                    {% else %}
-                    <div class="alert alert-secondary">
-                        <strong>Status: {{ proposal.status|capitalize }}</strong>
-                    </div>
-                    {% endif %}
-                    
-                    <hr class="my-4">
-                    <div class="text-start small text-muted">
-                        <p class="mb-1"><i class="bi bi-info-circle"></i> Al aprobar esta propuesta, aceptas los términos mencionados.</p>
-                    </div>
-                </div>
+    <header class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-3">{{ proposal.title or _('Commercial Proposal') }}</h1>
+            <p class="lead mb-0">{{ _('Prepared for') }} <strong>{{ proposal.client_name }}</strong></p>
+            <div class="mt-4">
+                <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                    {{ _('Valid Until') }}: {{ proposal.valid_until }}
+                </span>
+            </div>
+        </div>
+    </header>
 
+    <main class="container mb-5">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Details -->
                 <div class="card p-4">
-                    <h6 class="fw-bold mb-3">Contacto Directo</h6>
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="flex-shrink-0">
-                            <i class="bi bi-envelope text-primary fs-4"></i>
+                    <h4 class="mb-4">{{ _('Services Summary') }}</h4>
+                    {% for opt in options %}
+                    <div class="mb-5">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0 text-primary">{{ opt.name }}</h5>
+                            <h4 class="mb-0">{{ proposal.currency }} {{ "{:,.0f}".format(opt.total_amount) }}</h4>
                         </div>
-                        <div class="ms-3">
-                            <p class="mb-0 small text-muted">Email</p>
-                            <p class="mb-0">{{ company.email }}</p>
+
+                        <ul class="list-group list-group-flush">
+                            {% for item in opt.items %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start py-3">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">{{ item.display_name or item.description }}</div>
+                                    <small class="text-muted">{{ item.description }}</small>
+                                </div>
+                                <span class="badge badge-primary rounded-pill">
+                                    {{ item.quantity }} x {{ proposal.currency }} {{ "{:,.0f}".format(item.unit_price)
+                                    }}
+                                </span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if proposal.payment_terms %}
+                <div class="card p-4">
+                    <h5 class="mb-3">{{ _('Payment Terms') }}</h5>
+                    <div class="text-muted" style="white-space: pre-line;">
+                        {{ proposal.payment_terms }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-summary">
+                    <div class="card p-4 text-center">
+                        <p class="text-muted mb-2">{{ _('Grand Total') }}</p>
+                        <h2 class="text-primary fw-bold mb-4">{{ proposal.currency }} {{
+                            "{:,.0f}".format(proposal.total_amount) }}</h2>
+
+                        {% if proposal.status == 'draft' or proposal.status == 'sent' %}
+                        <div class="d-grid gap-3 no-print">
+                            <button id="btnApprove" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> {{ _('Approve Proposal') }}
+                            </button>
+                            <button id="btnReject" class="btn btn-outline-danger">
+                                <i class="bi bi-x-circle"></i> {{ _('Reject / Feedback') }}
+                            </button>
+                        </div>
+                        {% elif proposal.status == 'approved' %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-lg"></i> <strong>{{ _('Approved') }}</strong>
+                            <p class="small mb-0">{{ _('This proposal was approved on') }} {{ proposal.updated_at[:10]
+                                }}</p>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary">
+                            <strong>Status: {{ proposal.status|capitalize }}</strong>
+                        </div>
+                        {% endif %}
+
+                        <hr class="my-4">
+                        <div class="text-start small text-muted">
+                            <p class="mb-1"><i class="bi bi-info-circle"></i> {{ _('By approving this proposal, you
+                                accept the terms mentioned.') }}</p>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="bi bi-telephone text-primary fs-4"></i>
+
+                    <div class="card p-4">
+                        <h6 class="fw-bold mb-3">{{ _('Direct Contact') }}</h6>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-envelope text-primary fs-4"></i>
+                            </div>
+                            <div class="ms-3">
+                                <p class="mb-0 small text-muted">{{ _('Email') }}</p>
+                                <p class="mb-0">{{ company.email }}</p>
+                            </div>
                         </div>
-                        <div class="ms-3">
-                            <p class="mb-0 small text-muted">Teléfono</p>
-                            <p class="mb-0">{{ company.phone }}</p>
+                        <div class="d-flex align-items-center">
+                            <div class="flex-shrink-0">
+                                <i class="bi bi-telephone text-primary fs-4"></i>
+                            </div>
+                            <div class="ms-3">
+                                <p class="mb-0 small text-muted">{{ _('Phone') }}</p>
+                                <p class="mb-0">{{ company.phone }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</main>
+    </main>
 
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.getElementById('btnApprove')?.addEventListener('click', function() {
-        Swal.fire({
-            title: '¿Confirmar aprobación?',
-            text: "Al aprobar, iniciaremos el proceso de formalización.",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '{{ theme.primary }}',
-            confirmButtonText: 'Sí, aprobar ahora',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(window.location.href + '/approve', { method: 'POST' })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire('¡Éxito!', data.message, 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('Error', data.message, 'error');
-                    }
-                });
-            }
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.getElementById('btnApprove')?.addEventListener('click', function () {
+            Swal.fire({
+                title: '{{ _("Confirm approval?") }}',
+                text: '{{ _("By approving, we will start the formalization process.") }}',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '{{ theme.primary }}',
+                confirmButtonText: '{{ _("Yes, approve now") }}',
+                cancelButtonText: '{{ _("Cancel") }}'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(window.location.href + '/approve', { method: 'POST' })
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('{{ _("Success!") }}', data.message, 'success').then(() => location.reload());
+                            } else {
+                                Swal.fire('{{ _("Error") }}', data.message, 'error');
+                            }
+                        });
+                }
+            });
         });
-    });
 
-    document.getElementById('btnReject')?.addEventListener('click', function() {
-        Swal.fire({
-            title: 'Contanos el motivo',
-            input: 'textarea',
-            inputLabel: 'Tu feedback nos ayuda a mejorar la propuesta.',
-            inputPlaceholder: 'Escribe tu motivo aquí...',
-            showCancelButton: true,
-            confirmButtonText: 'Enviar Feedback',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed && result.value) {
-                fetch(window.location.href + '/reject', { 
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ reason: result.value })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    Swal.fire('Enviado', 'Gracias por tu feedback.', 'info').then(() => location.reload());
-                });
-            }
+        document.getElementById('btnReject')?.addEventListener('click', function () {
+            Swal.fire({
+                title: '{{ _("Tell us the reason") }}',
+                input: 'textarea',
+                inputLabel: '{{ _("Your feedback helps us improve the proposal.") }}',
+                inputPlaceholder: '{{ _("Write your reason here...") }}',
+                showCancelButton: true,
+                confirmButtonText: '{{ _("Send Feedback") }}',
+                cancelButtonText: '{{ _("Cancel") }}'
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    fetch(window.location.href + '/reject', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ reason: result.value })
+                    })
+                        .then(r => r.json())
+                        .then(data => {
+                            Swal.fire('{{ _("Sent") }}', '{{ _("Thank you for your feedback.") }}', 'info').then(() => location.reload());
+                        });
+                }
+            });
         });
-    });
-</script>
+    </script>
 
 </body>
+
 </html>

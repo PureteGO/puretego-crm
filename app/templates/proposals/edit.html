@@ -133,7 +133,7 @@
         <div class="row g-2 mb-3">
             <div class="col-md-4">
                 <input type="text" name="options[__IDX__][name]" class="form-control form-control-sm option-name-input"
-                    value="Opción __LETTER__">
+                    value="{{ _('Option') }} __LETTER__">
             </div>
             <div class="col-md-4">
                 <select name="options[__IDX__][preset_id]" class="form-select form-select-sm preset-select">
@@ -248,7 +248,7 @@
         block.querySelector('.option-letter').textContent = letter;
 
         if (data) {
-            block.querySelector('.option-name-input').value = data.name || `Opción ${letter}`;
+            block.querySelector('.option-name-input').value = data.name || `{{ _('Option') }} ${letter}`;
             block.querySelector('.is-default-check').checked = !!data.is_default;
             if (data.preset_id) block.querySelector('.preset-select').value = data.preset_id;
         } else if (idx === 0) {
@@ -390,6 +390,6 @@
             });
         });
     });
-});
+    });
 </script>
 {% endblock %}
