@@ -325,6 +325,7 @@ def gbp_scan_submit():
         return resp, 500
 
 
+# Trigger redeploy to fix production routing error
 @bp.route('/gbp-scan/setup')
 @login_required
 def gbp_scan_setup():
