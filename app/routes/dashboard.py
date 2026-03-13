@@ -59,12 +59,15 @@ def index():
             'my_clients_count': 0,
             'critical_leads_count': 0,
             'leads_pending_followup': [],
-            'month_name': datetime.now().strftime('%B')
+            'month_name': datetime.now().strftime('%B'),
+            'onboarding_count': 0,
+            'execution_count': 0,
+            'pending_tickets': []
         }
 
         with get_db() as db:
-            # --- Common Calculations for Owners/Admins/Finance ---
-            if user_role in ['owner', 'admin', 'manager', 'superadmin', 'finance'] or is_superadmin:
+            # --- Common Calculations for Owners/Admins/Finance/Production ---
+            if user_role in ['owner', 'admin', 'manager', 'superadmin', 'finance', 'gmb_manager', 'production'] or is_superadmin:
                 # Timeframes
                 seven_days_ago = datetime.utcnow() - timedelta(days=7)
                 fifteen_days_ago = datetime.utcnow() - timedelta(days=15)
@@ -201,6 +204,11 @@ def index():
                 # Pending operational tickets
                 data['pending_tickets'] = filter_by_company(db.query(ProjectTicket).join(Project), Project)\
                     .filter(ProjectTicket.status != 'done').options(joinedload(ProjectTicket.project)).limit(10).all()
+                
+                # Production specific counts
+                if user_role in ['gmb_manager', 'production', 'owner', 'admin', 'superadmin']:
+                    data['onboarding_count'] = filter_by_company(db.query(func.count(Project.id)), Project).filter(Project.phase == 'onboarding', Project.status == 'active').scalar() or 0
+                    data['execution_count'] = filter_by_company(db.query(func.count(Project.id)), Project).filter(Project.phase == 'execucao', Project.status == 'active').scalar() or 0
             
             else:
                 # Sales (SDR/Seller) View
