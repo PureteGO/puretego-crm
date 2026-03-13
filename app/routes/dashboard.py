@@ -229,21 +229,14 @@ def index():
                 ]
 
             # Shared: Activity history
-            data['recent_leads'] = filter_by_company(
-                db.query(Client).order_by(Client.created_at.desc()).limit(10), Client
-            ).all()
+            data['recent_leads'] = filter_by_company(db.query(Client), Client).order_by(Client.created_at.desc()).limit(10).all()
 
-            data['recent_visits'] = filter_by_company(
-                db.query(Visit).join(Client).options(joinedload(Visit.client)), Client
-            ).order_by(Visit.visit_date.desc()).limit(5).all()
+            data['recent_visits'] = filter_by_company(db.query(Visit).join(Client).options(joinedload(Visit.client)), Client).order_by(Visit.visit_date.desc()).limit(5).all()
             
-            data['recent_health_checks'] = filter_by_company(
-                db.query(HealthCheck).join(Client).options(joinedload(HealthCheck.client)), Client
-            ).order_by(HealthCheck.created_at.desc()).limit(5).all()
+            data['recent_health_checks'] = filter_by_company(db.query(HealthCheck).join(Client).options(joinedload(HealthCheck.client)), Client).order_by(HealthCheck.created_at.desc()).limit(5).all()
             
-            data['recent_interactions'] = filter_by_company(
-                db.query(Interaction).join(Client).options(joinedload(Interaction.client), joinedload(Interaction.type)), Client
-            ).filter(Interaction.status == 'done', Interaction.date <= datetime.now()).order_by(Interaction.date.desc()).limit(5).all()
+            data['recent_interactions'] = filter_by_company(db.query(Interaction).join(Client).options(joinedload(Interaction.client), joinedload(Interaction.type)), Client)\
+                .filter(Interaction.status == 'done', Interaction.date <= datetime.now()).order_by(Interaction.date.desc()).limit(5).all()
 
             # --- Lead Follow-up Rule (v1.6) ---
             # "não permita leads que nao tenham seguimento no processo de vendas passar para o outro dia sem ter indicado o próximo passo"
