@@ -148,6 +148,17 @@
         border-radius: 2px;
         transition: width 0.3s;
     }
+
+    .card-inactive-warning {
+        border-left: 4px solid #ffb020 !important;
+        background-color: rgba(255, 176, 32, 0.02) !important;
+        box-shadow: 0 0 8px rgba(255, 176, 32, 0.1) !important;
+    }
+    .card-inactive-danger {
+        border-left: 4px solid #d14343 !important;
+        background-color: rgba(209, 67, 67, 0.02) !important;
+        box-shadow: 0 0 8px rgba(209, 67, 67, 0.1) !important;
+    }
 </style>
 {% endblock %}
 
@@ -172,6 +183,9 @@
             <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#createStageModal">
                 <i class="bi bi-columns-gap me-1"></i>{{ _('New Column') }}
             </button>
+            <a href="{{ url_for('clients.removed_repository') }}" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-archive me-1"></i>{{ _('Inativos / Removidos') }}
+            </a>
             <form action="{{ url_for('clients.reset_stages') }}" method="POST" class="d-inline"
                 data-confirm="{{ _('WARNING: This will remove all custom columns. Are you sure?') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -255,17 +269,27 @@
 
             <div class="kanban-cards-container" data-stage-id="{{ data.stage.id }}">
                 {% for card in data.cards %}
-                <div class="kanban-card" data-deal-id="{{ card.id }}" data-card-type="{{ card.card_type }}"
+                <div class="kanban-card{% if card.days_inactive >= 15 %} card-inactive-danger{% elif card.days_inactive >= 7 %} card-inactive-warning{% endif %}" data-deal-id="{{ card.id }}" data-card-type="{{ card.card_type }}"
                     data-client-id="{{ card.client_id or card.id }}" title="{{ _('Double-click to view details') }}">
-                    <!-- Lead temperature icon -->
-                    {% if card.lead_temperature %}
-                    <span class="me-1" title="{{ card.lead_temperature }}" style="font-size: 0.8rem;">
-                        {% if card.lead_temperature == 'hot' %}🔥
-                        {% elif card.lead_temperature == 'warm' %}☀️
-                        {% else %}❄️{% endif %}
-                    </span>
-                    {% endif %}
-                    <div class="deal-title text-truncate" title="{{ card.title }}">{{ card.title }}</div>
+                    <div class="d-flex justify-content-between align-items-start mb-1">
+                        <div class="deal-title text-truncate" style="max-width: 85%;" title="{{ card.title }}">
+                            <!-- Lead temperature icon -->
+                            {% if card.lead_temperature %}
+                            <span class="me-1" title="{{ card.lead_temperature }}" style="font-size: 0.8rem;">
+                                {% if card.lead_temperature == 'hot' %}🔥
+                                {% elif card.lead_temperature == 'warm' %}☀️
+                                {% else %}❄️{% endif %}
+                            </span>
+                            {% endif %}
+                            {{ card.title }}
+                        </div>
+                        <button class="btn btn-sm btn-link text-muted p-0 remove-card-btn" 
+                                onclick="removeCard(event, '{{ card.card_type }}', {{ card.id }})" 
+                                title="{{ _('Remove from Kanban') }}" 
+                                style="z-index: 10; line-height: 1;">
+                            <i class="bi bi-x-lg" style="font-size: 0.75rem;"></i>
+                        </button>
+                    </div>
 
                     {% if card.card_type == 'client' and card.contact_name %}
                     <div class="deal-client">
@@ -499,6 +523,44 @@
         document.getElementById('stageType').value = stageType || 'open';
         document.getElementById('stageColor').value = color || '#6c757d';
         new bootstrap.Modal(document.getElementById('editStageModal')).show();
+    }
+
+    function removeCard(event, cardType, cardId) {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        if (!confirm("{{ _('Are you sure you want to remove this item from the Kanban?') }}")) {
+            return;
+        }
+        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        let url = '';
+        if (cardType === 'client') {
+            url = `/clients/${cardId}/remove-from-kanban`;
+        } else {
+            url = `/clients/kanban/deals/${cardId}/remove`;
+        }
+        
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message || "{{ _('Error removing item') }}");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("{{ _('Connection error') }}");
+        });
     }
 
     // Global Confirmation Handler

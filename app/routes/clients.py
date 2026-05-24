@@ -6,7 +6,7 @@ Rotas de gestão de clientes e pipeline Kanban com suporte multi-tenant
 import logging
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app.routes.auth import login_required
-from app.models import Client, KanbanStage, Visit, HealthCheck, Proposal, Interaction, ServicePackage, Deal, DealStatus, User
+from app.models import Client, KanbanStage, Visit, HealthCheck, Proposal, Interaction, InteractionType, ServicePackage, Deal, DealStatus, User
 from app.utils.tenant import filter_by_company, set_tenant_context
 from app.utils.decorators import get_current_user
 from config.database import get_db
@@ -15,6 +15,88 @@ from datetime import datetime, timedelta
 logger = logging.getLogger(__name__)
 
 bp = Blueprint('clients', __name__, url_prefix='/clients')
+
+
+def log_system_interaction(db, client_id, deal_id, company_id, notes):
+    """Log an interaction automatically for archiving/removing from Kanban"""
+    try:
+        int_type = db.query(InteractionType).filter(InteractionType.name.ilike('%nota%')).first()
+        if not int_type:
+            int_type = db.query(InteractionType).first()
+        
+        if int_type:
+            user_id = session.get('user_id')
+            if not user_id:
+                client = db.query(Client).get(client_id)
+                user_id = client.owner_id if client else None
+                
+            if not user_id:
+                user = db.query(User).filter_by(company_id=company_id).first()
+                user_id = user.id if user else None
+                
+            if user_id:
+                interaction = Interaction(
+                    client_id=client_id,
+                    deal_id=deal_id,
+                    user_id=user_id,
+                    type_id=int_type.id,
+                    date=datetime.utcnow(),
+                    status='done',
+                    notes=notes
+                )
+                db.add(interaction)
+    except Exception as e:
+        logger.error(f"Error in log_system_interaction: {e}")
+
+
+def archive_inactive_cards(db, company_id):
+    """Arquivar automaticamente clientes e deals inativos por mais de 21 dias"""
+    try:
+        limit_date = datetime.utcnow() - timedelta(days=21)
+        
+        # 1. Clients
+        inactive_clients = db.query(Client).filter(
+            Client.company_id == company_id,
+            Client.is_active == True,
+            Client.status != 'inactive_kanban',
+            Client.kanban_stage_id.isnot(None),
+            Client.stage_updated_at < limit_date
+        ).all()
+        
+        for client in inactive_clients:
+            old_stage_name = client.kanban_stage.name if client.kanban_stage else "Sem Etapa"
+            client.status = 'inactive_kanban'
+            log_system_interaction(
+                db, 
+                client_id=client.id, 
+                deal_id=None, 
+                company_id=company_id, 
+                notes=f"Inativado automaticamente do Kanban após 21 dias sem movimentação (Etapa original: {old_stage_name})."
+            )
+            
+        # 2. Deals
+        inactive_deals = db.query(Deal).filter(
+            Deal.company_id == company_id,
+            Deal.status == DealStatus.OPEN,
+            Deal.kanban_stage_id.isnot(None),
+            Deal.stage_updated_at < limit_date
+        ).all()
+        
+        for deal in inactive_deals:
+            old_stage_name = deal.stage.name if deal.stage else "Sem Etapa"
+            deal.status = DealStatus.INACTIVE
+            log_system_interaction(
+                db, 
+                client_id=deal.client_id, 
+                deal_id=deal.id, 
+                company_id=company_id, 
+                notes=f"Negócio '{deal.title}' inativado automaticamente do Kanban após 21 dias sem movimentação (Etapa original: {old_stage_name})."
+            )
+            
+        if inactive_clients or inactive_deals:
+            db.commit()
+    except Exception as e:
+        logger.error(f"Error in archive_inactive_cards: {e}")
 
 
 @bp.route('/')
@@ -73,6 +155,10 @@ def kanban():
     owner_filter = request.args.get('owner_id', '')
     
     with get_db() as db:
+        # Run automatic archiving for inactive cards
+        company_id = session.get('company_id')
+        archive_inactive_cards(db, company_id)
+        
         from sqlalchemy.orm import joinedload
         from datetime import datetime
         
@@ -97,7 +183,8 @@ def kanban():
                     joinedload(Client.interested_package)
                 ).filter(
                     Client.kanban_stage_id == stage.id,
-                    Client.is_active == True
+                    Client.is_active == True,
+                    Client.status != 'inactive_kanban'
                 ), Client
             )
             if owner_filter and owner_filter.isdigit():
@@ -130,6 +217,8 @@ def kanban():
                     'probability': None,
                     'expected_close_date': None,
                     'created_at': c.created_at.strftime('%d/%m') if c.created_at else None,
+                    'stage_updated_at': c.stage_updated_at.strftime('%Y-%m-%d') if c.stage_updated_at else None,
+                    'days_inactive': (datetime.utcnow() - c.stage_updated_at).days if c.stage_updated_at else 0,
                 })
             
             # --- DEALS (new) ---
@@ -169,6 +258,8 @@ def kanban():
                     'probability': deal.probability,
                     'expected_close_date': deal.expected_close_date.strftime('%Y-%m-%d') if deal.expected_close_date else None,
                     'created_at': deal.created_at.strftime('%d/%m') if deal.created_at else None,
+                    'stage_updated_at': deal.stage_updated_at.strftime('%Y-%m-%d') if deal.stage_updated_at else None,
+                    'days_inactive': (datetime.utcnow() - deal.stage_updated_at).days if deal.stage_updated_at else 0,
                 })
             
             stage_dict = {
@@ -493,12 +584,14 @@ def move_stage(client_id):
             
             # Update stage
             client.kanban_stage_id = int(new_stage_id) if new_stage_id else None
+            client.stage_updated_at = datetime.utcnow()
             
             # Find associated Deal
             from app.models import Deal, KanbanStage
             deal = db.query(Deal).filter(Deal.client_id == client.id, Deal.status == 'open').first()
             if deal:
                 deal.kanban_stage_id = client.kanban_stage_id
+                deal.stage_updated_at = datetime.utcnow()
                 
             # --- SOP Automation: Trigger Workflow ---
             if new_stage_id:
@@ -774,6 +867,7 @@ def move_deal(deal_id):
             
             # Update stage
             deal.kanban_stage_id = int(new_stage_id) if new_stage_id else None
+            deal.stage_updated_at = datetime.utcnow()
             
             # Check if new stage is a won/lost type and update deal status
             if new_stage_id:
@@ -813,6 +907,155 @@ def move_deal(deal_id):
     except Exception as e:
         logger.exception("Error moving deal to new stage")
         return jsonify({'success': False, 'message': f'Erro ao mover: {str(e)}'}), 500
+
+
+@bp.route('/<int:client_id>/remove-from-kanban', methods=['POST'])
+@login_required
+def remove_client_from_kanban(client_id):
+    """Remover um cliente do Kanban (move para repositório)"""
+    with get_db() as db:
+        client = filter_by_company(db.query(Client), Client).filter(Client.id == client_id).first()
+        if not client:
+            return jsonify({'success': False, 'message': 'Cliente não encontrado'}), 404
+        
+        old_stage = client.kanban_stage.name if client.kanban_stage else "Sem Etapa"
+        client.status = 'inactive_kanban'
+        
+        # Log interaction
+        log_system_interaction(
+            db, 
+            client_id=client.id, 
+            deal_id=None, 
+            company_id=session.get('company_id'),
+            notes=f"Removido manualmente do Kanban (Etapa original: {old_stage})."
+        )
+        
+        db.commit()
+        return jsonify({'success': True, 'message': 'Cliente removido do Kanban com sucesso'})
+
+
+@bp.route('/kanban/deals/<int:deal_id>/remove', methods=['POST'])
+@login_required
+def remove_deal_from_kanban(deal_id):
+    """Remover um Deal do Kanban (move para repositório)"""
+    with get_db() as db:
+        deal = filter_by_company(db.query(Deal), Deal).filter(Deal.id == deal_id).first()
+        if not deal:
+            return jsonify({'success': False, 'message': 'Deal não encontrado'}), 404
+        
+        old_stage = deal.stage.name if deal.stage else "Sem Etapa"
+        deal.status = DealStatus.INACTIVE
+        
+        log_system_interaction(
+            db, 
+            client_id=deal.client_id, 
+            deal_id=deal.id, 
+            company_id=session.get('company_id'),
+            notes=f"Negócio '{deal.title}' removido manualmente do Kanban (Etapa original: {old_stage})."
+        )
+        
+        db.commit()
+        return jsonify({'success': True, 'message': 'Negócio removido do Kanban com sucesso'})
+
+
+@bp.route('/kanban/removed')
+@login_required
+def removed_repository():
+    """Repositório de clientes e negócios removidos do Kanban por inatividade"""
+    with get_db() as db:
+        # Get inactive clients
+        clients_query = filter_by_company(
+            db.query(Client).filter(
+                Client.is_active == True,
+                Client.status == 'inactive_kanban'
+            ), Client
+        ).all()
+        
+        # Get inactive deals
+        deals_query = filter_by_company(
+            db.query(Deal).filter(
+                Deal.status == DealStatus.INACTIVE
+            ), Deal
+        ).all()
+        
+        # Format cards for rendering
+        removed_items = []
+        for c in clients_query:
+            days_inactive = (datetime.utcnow() - c.stage_updated_at).days if c.stage_updated_at else 0
+            removed_items.append({
+                'type': 'client',
+                'id': c.id,
+                'title': c.name,
+                'subtitle': c.contact_name or '',
+                'stage_name': c.kanban_stage.name if c.kanban_stage else 'Sem Etapa',
+                'days_inactive': days_inactive,
+                'last_update': c.stage_updated_at.strftime('%d/%m/%Y %H:%M') if c.stage_updated_at else 'N/A'
+            })
+            
+        for d in deals_query:
+            days_inactive = (datetime.utcnow() - d.stage_updated_at).days if d.stage_updated_at else 0
+            removed_items.append({
+                'type': 'deal',
+                'id': d.id,
+                'title': d.title,
+                'subtitle': f"Cliente: {d.client.name}" if d.client else '',
+                'stage_name': d.stage.name if d.stage else 'Sem Etapa',
+                'days_inactive': days_inactive,
+                'last_update': d.stage_updated_at.strftime('%d/%m/%Y %H:%M') if d.stage_updated_at else 'N/A'
+            })
+            
+        # Sort items by days inactive (highest first)
+        removed_items.sort(key=lambda x: x['days_inactive'], reverse=True)
+        
+    return render_template('clients/removed.html', items=removed_items)
+
+
+@bp.route('/<int:client_id>/restore-to-kanban', methods=['POST'])
+@login_required
+def restore_client_to_kanban(client_id):
+    """Restaurar um cliente de volta ao Kanban"""
+    with get_db() as db:
+        client = filter_by_company(db.query(Client), Client).filter(Client.id == client_id).first()
+        if not client:
+            return jsonify({'success': False, 'message': 'Cliente não encontrado'}), 404
+        
+        client.status = 'lead' # Reset status to standard lead
+        client.stage_updated_at = datetime.utcnow()
+        
+        log_system_interaction(
+            db, 
+            client_id=client.id, 
+            deal_id=None, 
+            company_id=session.get('company_id'),
+            notes="Restaurado de volta ao Kanban."
+        )
+        
+        db.commit()
+        return jsonify({'success': True, 'message': 'Cliente restaurado com sucesso'})
+
+
+@bp.route('/kanban/deals/<int:deal_id>/restore', methods=['POST'])
+@login_required
+def restore_deal_to_kanban(deal_id):
+    """Restaurar um negócio de volta ao Kanban"""
+    with get_db() as db:
+        deal = filter_by_company(db.query(Deal), Deal).filter(Deal.id == deal_id).first()
+        if not deal:
+            return jsonify({'success': False, 'message': 'Negócio não encontrado'}), 404
+        
+        deal.status = DealStatus.OPEN # Reset status to OPEN
+        deal.stage_updated_at = datetime.utcnow()
+        
+        log_system_interaction(
+            db, 
+            client_id=deal.client_id, 
+            deal_id=deal.id, 
+            company_id=session.get('company_id'),
+            notes=f"Negócio '{deal.title}' restaurado de volta ao Kanban."
+        )
+        
+        db.commit()
+        return jsonify({'success': True, 'message': 'Negócio restaurado com sucesso'})
 
 
 # API Blueprint for client list endpoint

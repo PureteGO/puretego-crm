@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Removed from Kanban') }}{% endblock %}
+
+{% block head %}
+<style>
+    .removed-item-row {
+        transition: background-color 0.2s, transform 0.1s;
+    }
+    .removed-item-row:hover {
+        background-color: rgba(var(--primary-rgb, 13, 110, 253), 0.04) !important;
+    }
+    .status-badge-inactive {
+        background-color: rgba(209, 67, 67, 0.1);
+        color: #d14343;
+        border: 1px solid rgba(209, 67, 67, 0.2);
+    }
+    .badge-client {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        border: 1px solid rgba(13, 110, 253, 0.2);
+    }
+    .badge-deal {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.2);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2"><i class="bi bi-archive me-2"></i>{{ _('Inativos / Removidos do Kanban') }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('clients.kanban') }}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-kanban me-1"></i> {{ _('Voltar ao Kanban') }}
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert / Explanation -->
+    <div class="alert alert-warning border-warning-subtle shadow-sm mb-4" role="alert">
+        <div class="d-flex">
+            <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+            <div>
+                <h5 class="alert-heading mb-1">{{ _('Sobre a Inatividade no Kanban') }}</h5>
+                <p class="mb-0">
+                    {{ _('Os itens são movidos automaticamente para cá após 21 dias sem qualquer movimentação no Kanban, ou quando removidos manualmente. A restauração trará o item de volta para sua etapa original com a data de movimentação redefinida para hoje.') }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Card -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body py-3">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" id="removedSearch" class="form-control border-start-0"
+                    placeholder="{{ _('Pesquisar por nome, contato ou etapa original...') }}"
+                    onkeyup="filterRemovedItems()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Removed Items List Card -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0" id="removedTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">{{ _('Tipo') }}</th>
+                            <th>{{ _('Nome / Título') }}</th>
+                            <th>{{ _('Contato / Detalhe') }}</th>
+                            <th>{{ _('Etapa Original') }}</th>
+                            <th>{{ _('Tempo de Inatividade') }}</th>
+                            <th>{{ _('Última Ação') }}</th>
+                            <th class="pe-4 text-end">{{ _('Ações') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if items %}
+                            {% for item in items %}
+                            <tr class="removed-item-row" data-search="{{ item.title }} {{ item.subtitle }} {{ item.stage_name }}">
+                                <td class="ps-4">
+                                    {% if item.type == 'client' %}
+                                    <span class="badge badge-client rounded-pill">
+                                        <i class="bi bi-person-fill me-1"></i>{{ _('Cliente') }}
+                                    </span>
+                                    {% else %}
+                                    <span class="badge badge-deal rounded-pill">
+                                        <i class="bi bi-briefcase-fill me-1"></i>{{ _('Negócio') }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="fw-bold">{{ item.title }}</span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ item.subtitle or '-' }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ item.stage_name }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge status-badge-inactive rounded-pill">
+                                        <i class="bi bi-clock-history me-1"></i>{{ item.days_inactive }} {{ _('dias') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ item.last_update }}</small>
+                                </td>
+                                <td class="pe-4 text-end">
+                                    <button class="btn btn-sm btn-outline-success" onclick="restoreItem('{{ item.type }}', {{ item.id }})" title="{{ _('Restaurar para o Kanban') }}">
+                                        <i class="bi bi-arrow-counterclockwise me-1"></i>{{ _('Restaurar') }}
+                                    </button>
+                                    {% if item.type == 'client' %}
+                                    <a href="{{ url_for('clients.view', client_id=item.id) }}" class="btn btn-sm btn-outline-secondary ms-1" title="{{ _('Visualizar Ficha') }}">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="bi bi-archive fs-1 d-block mb-3 opacity-50"></i>
+                                    {{ _('Nenhum item removido ou inativo encontrado.') }}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function filterRemovedItems() {
+        const query = document.getElementById('removedSearch').value.toLowerCase();
+        const rows = document.querySelectorAll('.removed-item-row');
+        
+        rows.forEach(row => {
+            const searchData = row.dataset.search.toLowerCase();
+            if (searchData.includes(query)) {
+                row.style.setProperty('display', '', 'important');
+            } else {
+                row.style.setProperty('display', 'none', 'important');
+            }
+        });
+    }
+
+    function restoreItem(type, id) {
+        if (!confirm("{{ _('Tem certeza que deseja restaurar este item de volta ao Kanban?') }}")) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        let url = '';
+        if (type === 'client') {
+            url = `/clients/${id}/restore-to-kanban`;
+        } else {
+            url = `/clients/kanban/deals/${id}/restore`;
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                // Show a brief success message and reload
+                alert(data.message || "{{ _('Restaurado com sucesso!') }}");
+                location.reload();
+            } else {
+                alert(data.message || "{{ _('Erro ao restaurar item.') }}");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("{{ _('Erro de conexão ao restaurar.') }}");
+        });
+    }
+</script>
+{% endblock %}

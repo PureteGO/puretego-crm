@@ -8,11 +8,13 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from config.database import Base
 import enum
+from datetime import datetime
 
 class DealStatus(enum.Enum):
     OPEN = "open"
     WON = "won"
     LOST = "lost"
+    INACTIVE = "inactive"
 
 class Deal(Base):
     """Modelo de Negócio (Oportunidade) no CRM"""
@@ -25,10 +27,11 @@ class Deal(Base):
     currency = Column(String(3), default='Gs')
     probability = Column(Integer, default=50) # 0-100%
     expected_close_date = Column(DateTime, nullable=True)
-    status = Column(Enum(DealStatus), default=DealStatus.OPEN, index=True)
+    status = Column(Enum(DealStatus, values_callable=lambda x: [e.value for e in x]), default=DealStatus.OPEN, index=True)
     
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    stage_updated_at = Column(DateTime, server_default=func.now())
     closed_at = Column(DateTime, nullable=True)
     
     # Foreign Keys
@@ -52,6 +55,7 @@ class Deal(Base):
         self.owner_id = owner_id
         self.kanban_stage_id = kanban_stage_id
         self.value = value
+        self.stage_updated_at = datetime.utcnow()
     
     def to_dict(self):
         return {
@@ -66,6 +70,7 @@ class Deal(Base):
             'owner_id': self.owner_id,
             'kanban_stage_id': self.kanban_stage_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
+            'stage_updated_at': self.stage_updated_at.isoformat() if self.stage_updated_at else None,
             'expected_close_date': self.expected_close_date.isoformat() if self.expected_close_date else None
         }
 

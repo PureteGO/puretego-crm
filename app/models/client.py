@@ -7,6 +7,7 @@ from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Bool
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from config.database import Base
+from datetime import datetime
 
 
 class Client(Base):
@@ -25,6 +26,7 @@ class Client(Base):
     kanban_stage_id = Column(Integer, ForeignKey('kanban_stages.id', ondelete='SET NULL'), index=True)
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    stage_updated_at = Column(DateTime, server_default=func.now())
     is_active = Column(Boolean, default=True, index=True, nullable=False, server_default=text('1'))
     
     # New Fields for v1.5
@@ -78,6 +80,7 @@ class Client(Base):
         self.website = website
         self.address = address
         self.kanban_stage_id = kanban_stage_id
+        self.stage_updated_at = datetime.utcnow()
         
         # Detailed info fields
         self.receptionist_name = receptionist_name
@@ -104,6 +107,7 @@ class Client(Base):
             'kanban_stage_id': self.kanban_stage_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'stage_updated_at': self.stage_updated_at.isoformat() if self.stage_updated_at else None,
             # Detailed info fields
             'receptionist_name': self.receptionist_name,
             'decision_maker_name': self.decision_maker_name,
