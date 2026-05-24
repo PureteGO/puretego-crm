@@ -8,7 +8,7 @@ import os
 import json
 import secrets
 from datetime import datetime, timedelta
-from flask import Blueprint, request, redirect, url_for, flash, session, current_app, render_template
+from flask import Blueprint, request, redirect, url_for, flash, session, current_app, render_template, jsonify
 from flask_babel import _
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
@@ -840,3 +840,37 @@ def sync_insights(connection_id, link_id):
         client_id = link.client_id
             
     return redirect(url_for('clients.view', client_id=client_id, _anchor='insights'))
+
+@bp.route('/manage/review/generate-ai-reply', methods=['POST'])
+@login_required
+def generate_ai_reply():
+    """API endpoint to generate an AI-powered review reply suggestion"""
+    try:
+        data = request.get_json()
+        business_name = data.get('business_name')
+        reviewer_name = data.get('reviewer_name')
+        rating = data.get('rating')
+        comment = data.get('comment')
+        
+        if not all([business_name, reviewer_name, rating]):
+            return jsonify({'success': False, 'message': 'Dados incompletos'}), 400
+            
+        from app.services.gemini_service import GeminiService
+        gemini = GeminiService()
+        
+        # Get user language from session or default to pt
+        language = session.get('language', 'pt')
+        
+        reply = gemini.generate_review_reply(
+            business_name=business_name,
+            reviewer_name=reviewer_name,
+            rating=int(rating),
+            comment=comment or '',
+            language=language
+        )
+        
+        return jsonify({'success': True, 'reply': reply})
+        
+    except Exception as e:
+        current_app.logger.error(f"Error generating AI reply: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500

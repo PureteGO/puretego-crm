@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-16 10:56-0300\n"
+"POT-Creation-Date: 2026-02-25 12:04-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -599,7 +599,7 @@ msgstr ""
 msgid "Deal stage updated"
 msgstr ""
 
-#: app/services/proposal_service.py:276
+#: app/services/proposal_service.py:278
 msgid "Faturamento -"
 msgstr ""
 
@@ -763,9 +763,9 @@ msgstr ""
 #: app/templates/finance/receivables.html:252
 #: app/templates/health_checks/index.html:17
 #: app/templates/integrations/location_mapping.html:93
-#: app/templates/projects/view.html:81 app/templates/proposals/create.html:24
+#: app/templates/projects/view.html:81 app/templates/proposals/create.html:28
 #: app/templates/proposals/index.html:37 app/templates/proposals/index.html:66
-#: app/templates/proposals/view.html:85 app/templates/tasks/index.html:365
+#: app/templates/proposals/view.html:89 app/templates/tasks/index.html:365
 #: app/templates/tasks/index.html:459 app/templates/visits/create.html:19
 #: app/templates/visits/create.html:30 app/templates/visits/edit.html:17
 #: app/templates/visits/index.html:20
@@ -806,8 +806,11 @@ msgstr ""
 #: app/templates/interactions/manage_types_modal.html:42
 #: app/templates/projects/create.html:100 app/templates/projects/view.html:37
 #: app/templates/projects/view.html:686 app/templates/projects/view.html:731
-#: app/templates/projects/view.html:779 app/templates/proposals/create.html:123
-#: app/templates/proposals/edit.html:110 app/templates/saas/dashboard.html:122
+#: app/templates/projects/view.html:779 app/templates/proposals/create.html:129
+#: app/templates/proposals/edit.html:110
+#: app/templates/proposals/public_view.html:257
+#: app/templates/proposals/public_view.html:281
+#: app/templates/saas/dashboard.html:122
 #: app/templates/saas/packages/edit.html:75 app/templates/tasks/index.html:256
 #: app/templates/tasks/index.html:415 app/templates/tasks/index.html:514
 #: app/templates/users/create.html:66 app/templates/users/edit.html:78
@@ -958,6 +961,7 @@ msgstr ""
 #: app/templates/clients/create.html:47 app/templates/clients/edit.html:71
 #: app/templates/clients/view.html:56 app/templates/company/edit.html:58
 #: app/templates/company/profile.html:42
+#: app/templates/proposals/public_view.html:227
 #: app/templates/saas/edit_company.html:25 app/templates/users/create.html:21
 #: app/templates/users/edit.html:22 app/templates/users/index.html:20
 msgid "Email"
@@ -1030,7 +1034,7 @@ msgstr ""
 #: app/templates/finance/commissions.html:77
 #: app/templates/interactions/log_modal.html:19
 #: app/templates/interactions/manage_types_modal.html:57
-#: app/templates/proposals/create.html:168
+#: app/templates/proposals/create.html:192
 #: app/templates/proposals/edit.html:151
 msgid "Type"
 msgstr ""
@@ -1048,8 +1052,8 @@ msgid "Interaction Type"
 msgstr ""
 
 #: app/templates/calendar/index.html:71 app/templates/clients/edit.html:194
-#: app/templates/proposals/create.html:201
-#: app/templates/proposals/create.html:207
+#: app/templates/proposals/create.html:225
+#: app/templates/proposals/create.html:231
 #: app/templates/proposals/edit.html:181 app/templates/proposals/edit.html:187
 msgid "Select..."
 msgstr ""
@@ -1069,6 +1073,7 @@ msgstr ""
 #: app/templates/calendar/index.html:89 app/templates/clients/create.html:42
 #: app/templates/clients/edit.html:65 app/templates/clients/view.html:54
 #: app/templates/company/edit.html:64 app/templates/company/profile.html:46
+#: app/templates/proposals/public_view.html:236
 #: app/templates/saas/edit_company.html:29
 msgid "Phone"
 msgstr ""
@@ -1079,7 +1084,7 @@ msgstr ""
 
 #: app/templates/calendar/index.html:102 app/templates/clients/view.html:16
 #: app/templates/clients/view.html:412 app/templates/finance/payables.html:221
-#: app/templates/projects/view.html:428 app/templates/proposals/view.html:53
+#: app/templates/projects/view.html:428 app/templates/proposals/view.html:57
 #: app/templates/visits/view.html:58
 msgid "Delete"
 msgstr ""
@@ -1630,7 +1635,7 @@ msgstr ""
 msgid "Visits"
 msgstr ""
 
-#: app/templates/clients/view.html:142 app/templates/proposals/view.html:241
+#: app/templates/clients/view.html:142 app/templates/proposals/view.html:259
 msgid "Health Check"
 msgstr ""
 
@@ -1664,9 +1669,9 @@ msgstr ""
 msgid "Date"
 msgstr ""
 
-#: app/templates/clients/view.html:186 app/templates/proposals/create.html:175
+#: app/templates/clients/view.html:186 app/templates/proposals/create.html:199
 #: app/templates/proposals/edit.html:158 app/templates/proposals/print.html:534
-#: app/templates/proposals/view.html:123 app/templates/tasks/index.html:157
+#: app/templates/proposals/view.html:127 app/templates/tasks/index.html:157
 msgid "Total"
 msgstr ""
 
@@ -1678,13 +1683,13 @@ msgstr ""
 #: app/templates/finance/payables.html:166
 #: app/templates/finance/receivables.html:163
 #: app/templates/health_checks/index.html:19
-#: app/templates/health_checks/view.html:200
+#: app/templates/health_checks/view.html:193
 #: app/templates/integrations/google_dashboard.html:47
 #: app/templates/integrations/google_dashboard.html:155
 #: app/templates/integrations/location_mapping.html:49
 #: app/templates/projects/view.html:252 app/templates/projects/view.html:597
 #: app/templates/proposals/edit.html:55 app/templates/proposals/index.html:22
-#: app/templates/proposals/index.html:69 app/templates/proposals/view.html:69
+#: app/templates/proposals/index.html:69 app/templates/proposals/view.html:73
 #: app/templates/saas/dashboard.html:32 app/templates/users/index.html:25
 msgid "Status"
 msgstr ""
@@ -2353,7 +2358,7 @@ msgid "Agency Logo"
 msgstr ""
 
 #: app/templates/company/settings.html:57
-#: app/templates/proposals/create.html:142
+#: app/templates/proposals/create.html:166
 msgid "Remove"
 msgstr ""
 
@@ -2375,7 +2380,7 @@ msgid ""
 msgstr ""
 
 #: app/templates/company/settings.html:101
-#: app/templates/proposals/create.html:19
+#: app/templates/proposals/create.html:22
 msgid "Basic Information"
 msgstr ""
 
@@ -2807,7 +2812,7 @@ msgstr ""
 msgid "Loading tasks..."
 msgstr ""
 
-#: app/templates/dashboard/_sdr.html:69 app/templates/proposals/view.html:219
+#: app/templates/dashboard/_sdr.html:69 app/templates/proposals/view.html:223
 msgid "Quick Actions"
 msgstr ""
 
@@ -3076,7 +3081,7 @@ msgid "Close"
 msgstr ""
 
 #: app/templates/dashboard/index.html:653
-#: app/templates/proposals/create.html:34 app/templates/proposals/edit.html:25
+#: app/templates/proposals/create.html:38 app/templates/proposals/edit.html:25
 #: app/templates/proposals/index.html:65 app/templates/tasks/index.html:342
 #: app/templates/tasks/index.html:436
 msgid "Title"
@@ -3127,7 +3132,7 @@ msgid "Analysis Summary"
 msgstr ""
 
 #: app/templates/dashboard/index.html:742
-#: app/templates/health_checks/view.html:315
+#: app/templates/health_checks/view.html:303
 msgid "Critical Points"
 msgstr ""
 
@@ -3148,6 +3153,7 @@ msgid "Create Lead Based on This"
 msgstr ""
 
 #: app/templates/dashboard/index.html:747
+#: app/templates/proposals/public_view.html:266
 msgid "Error"
 msgstr ""
 
@@ -3207,7 +3213,7 @@ msgid "Collaborator"
 msgstr ""
 
 #: app/templates/finance/commissions.html:76
-#: app/templates/proposals/create.html:63 app/templates/proposals/view.html:311
+#: app/templates/proposals/create.html:68 app/templates/proposals/view.html:329
 msgid "Deal"
 msgstr ""
 
@@ -3440,7 +3446,8 @@ msgid "No entries found."
 msgstr ""
 
 #: app/templates/finance/receivables.html:254
-#: app/templates/proposals/create.html:26 app/templates/visits/create.html:21
+#: app/templates/proposals/create.html:30
+#: app/templates/proposals/create.html:344 app/templates/visits/create.html:21
 msgid "Select a client..."
 msgstr ""
 
@@ -3564,141 +3571,155 @@ msgstr ""
 msgid "%(client_name)s: Premium Profile"
 msgstr ""
 
-#: app/templates/health_checks/view.html:101
+#: app/templates/health_checks/view.html:100
 msgid "Google Business Profile Audit"
 msgstr ""
 
-#: app/templates/health_checks/view.html:124
+#: app/templates/health_checks/view.html:121
 msgid "View on Maps"
 msgstr ""
 
-#: app/templates/health_checks/view.html:133
+#: app/templates/health_checks/view.html:130
 msgid "Verified"
 msgstr ""
 
-#: app/templates/health_checks/view.html:134
+#: app/templates/health_checks/view.html:131
 msgid "Active Management"
 msgstr ""
 
-#: app/templates/health_checks/view.html:147
+#: app/templates/health_checks/view.html:142
 msgid "Quick AI Assessment"
 msgstr ""
 
-#: app/templates/health_checks/view.html:163
+#: app/templates/health_checks/view.html:157
 msgid "Internal Audit Analysis (Private)"
 msgstr ""
 
-#: app/templates/health_checks/view.html:177
+#: app/templates/health_checks/view.html:171
 msgid "Puntaje Real"
 msgstr ""
 
-#: app/templates/health_checks/view.html:180
+#: app/templates/health_checks/view.html:174
 #, python-format
 msgid "Top 1%%. Todas as ferramentas críticas estão configuradas."
 msgstr ""
 
-#: app/templates/health_checks/view.html:182
+#: app/templates/health_checks/view.html:176
 msgid "Poucos ajustes para chegar ao topo do mercado."
 msgstr ""
 
-#: app/templates/health_checks/view.html:184
+#: app/templates/health_checks/view.html:178
 msgid "Se pode melhorar. Melhorar é atrair novos e mais clientes."
 msgstr ""
 
-#: app/templates/health_checks/view.html:187
+#: app/templates/health_checks/view.html:180
 msgid ""
 "¡ALERTA CRÍTICA! Tu perfil de Google no está convirtiendo.\n"
 "                            Estás perdiendo clientes valiosos frente a tu"
 " competencia ahora mismo."
 msgstr ""
 
-#: app/templates/health_checks/view.html:209
+#: app/templates/health_checks/view.html:202
 msgid "Achieved Excellence Metrics"
 msgstr ""
 
-#: app/templates/health_checks/view.html:231
-msgid ""
-"Criterion details not available for this\n"
-"                            history."
+#: app/templates/health_checks/view.html:224
+msgid "Criterion details not available for this history."
 msgstr ""
 
-#: app/templates/health_checks/view.html:249
+#: app/templates/health_checks/view.html:241
 msgid "Maintain Leadership with AI"
 msgstr ""
 
-#: app/templates/health_checks/view.html:254
-msgid ""
-"Use AI to create high-conversion content and maintain\n"
-"                    relevance on Google."
+#: app/templates/health_checks/view.html:246
+msgid "Use AI to create high-conversion content and maintain relevance on Google."
 msgstr ""
 
-#: app/templates/health_checks/view.html:260
+#: app/templates/health_checks/view.html:250
 msgid "Generate Event/Offer Post"
 msgstr ""
 
-#: app/templates/health_checks/view.html:264
+#: app/templates/health_checks/view.html:254
 msgid "Create 5 FAQs (Q&A)"
 msgstr ""
 
-#: app/templates/health_checks/view.html:269
+#: app/templates/health_checks/view.html:259
 msgid "Analyzing industry trends..."
 msgstr ""
 
-#: app/templates/health_checks/view.html:277
+#: app/templates/health_checks/view.html:266
 msgid "Result"
 msgstr ""
 
-#: app/templates/health_checks/view.html:279
+#: app/templates/health_checks/view.html:267
 msgid "Copy"
 msgstr ""
 
-#: app/templates/health_checks/view.html:292
+#: app/templates/health_checks/view.html:280
 msgid "Market Analysis"
 msgstr ""
 
-#: app/templates/health_checks/view.html:296
-msgid ""
-"Your profile stands out in quality and\n"
-"                    engagement."
+#: app/templates/health_checks/view.html:284
+msgid "Your profile stands out in quality and engagement."
 msgstr ""
 
-#: app/templates/health_checks/view.html:305
+#: app/templates/health_checks/view.html:293
 msgid "Recommended Action Plan"
 msgstr ""
 
-#: app/templates/health_checks/view.html:308
+#: app/templates/health_checks/view.html:297
 msgid "Create Commercial Proposal"
 msgstr ""
 
-#: app/templates/health_checks/view.html:328
+#: app/templates/health_checks/view.html:316
 msgid "Expert Suggestions"
 msgstr ""
 
-#: app/templates/health_checks/view.html:344
+#: app/templates/health_checks/view.html:332
 msgid "Delete this report?"
 msgstr ""
 
-#: app/templates/health_checks/view.html:345
+#: app/templates/health_checks/view.html:333
 msgid "Remove Report"
 msgstr ""
 
-#: app/templates/health_checks/view.html:419
+#: app/templates/health_checks/view.html:406
 msgid "Optimization Level"
 msgstr ""
 
-#: app/templates/health_checks/view.html:494
+#: app/templates/health_checks/view.html:474
+#: app/templates/health_checks/view.html:486
+msgid "Visibility"
+msgstr ""
+
+#: app/templates/health_checks/view.html:474
+#: app/templates/health_checks/view.html:486
+msgid "Avg Position"
+msgstr ""
+
+#: app/templates/health_checks/view.html:474
+#: app/templates/health_checks/view.html:486
+msgid "Reviews"
+msgstr ""
+
+#: app/templates/health_checks/view.html:474
+#: app/templates/health_checks/view.html:486
+msgid "Local Authority"
+msgstr ""
+
+#: app/templates/health_checks/view.html:504
 msgid "Market Average"
 msgstr ""
 
-#: app/templates/health_checks/view.html:566
+#: app/templates/health_checks/view.html:579
 msgid "Post Suggestion"
 msgstr ""
 
-#: app/templates/health_checks/view.html:568
+#: app/templates/health_checks/view.html:581
 msgid "Suggested FAQs"
 msgstr ""
 
-#: app/templates/health_checks/view.html:586
+#: app/templates/health_checks/view.html:599
 msgid "Copied!"
 msgstr ""
 
@@ -3771,7 +3792,7 @@ msgid "Search profile..."
 msgstr ""
 
 #: app/templates/integrations/google_dashboard.html:152
-#: app/templates/proposals/view.html:254
+#: app/templates/proposals/view.html:272
 msgid "Business Name"
 msgstr ""
 
@@ -4195,7 +4216,9 @@ msgid "Awaiting Finance"
 msgstr ""
 
 #: app/templates/projects/view.html:74 app/templates/proposals/index.html:28
-#: app/templates/proposals/index.html:110 app/templates/proposals/view.html:76
+#: app/templates/proposals/index.html:110
+#: app/templates/proposals/public_view.html:203
+#: app/templates/proposals/view.html:80
 msgid "Approved"
 msgstr ""
 
@@ -4300,13 +4323,13 @@ msgid "Pending Approval"
 msgstr ""
 
 #: app/templates/projects/view.html:320 app/templates/projects/view.html:321
-#: app/templates/proposals/view.html:42 app/templates/tasks/index.html:243
+#: app/templates/proposals/view.html:46 app/templates/tasks/index.html:243
 #: app/templates/tasks/index.html:276
 msgid "Approve"
 msgstr ""
 
 #: app/templates/projects/view.html:326 app/templates/projects/view.html:328
-#: app/templates/proposals/view.html:44 app/templates/proposals/view.html:231
+#: app/templates/proposals/view.html:48 app/templates/proposals/view.html:235
 #: app/templates/tasks/index.html:245 app/templates/tasks/index.html:280
 msgid "Reject"
 msgstr ""
@@ -4446,169 +4469,188 @@ msgstr ""
 msgid "Monthly Amount"
 msgstr ""
 
-#: app/templates/proposals/create.html:35
+#: app/templates/proposals/create.html:40
 msgid "Proposal title..."
 msgstr ""
 
-#: app/templates/proposals/create.html:38 app/templates/proposals/edit.html:29
-#: app/templates/proposals/view.html:305
+#: app/templates/proposals/create.html:43 app/templates/proposals/edit.html:29
+#: app/templates/proposals/view.html:323
 msgid "Template"
 msgstr ""
 
-#: app/templates/proposals/create.html:40 app/templates/proposals/edit.html:31
+#: app/templates/proposals/create.html:45 app/templates/proposals/edit.html:31
 msgid "No template"
 msgstr ""
 
-#: app/templates/proposals/create.html:47 app/templates/proposals/edit.html:39
+#: app/templates/proposals/create.html:52 app/templates/proposals/edit.html:39
 msgid "Currency"
 msgstr ""
 
-#: app/templates/proposals/create.html:55 app/templates/proposals/edit.html:47
-#: app/templates/proposals/view.html:211
+#: app/templates/proposals/create.html:60 app/templates/proposals/edit.html:47
+#: app/templates/proposals/view.html:215
 msgid "Language"
 msgstr ""
 
-#: app/templates/proposals/create.html:65
-#: app/templates/proposals/create.html:260
+#: app/templates/proposals/create.html:70
+#: app/templates/proposals/create.html:289
 msgid "No deal linked"
 msgstr ""
 
-#: app/templates/proposals/create.html:78 app/templates/proposals/edit.html:70
+#: app/templates/proposals/create.html:83 app/templates/proposals/edit.html:70
 msgid "Quote Options"
 msgstr ""
 
-#: app/templates/proposals/create.html:80 app/templates/proposals/edit.html:72
+#: app/templates/proposals/create.html:85 app/templates/proposals/edit.html:72
 msgid "Add Option"
 msgstr ""
 
-#: app/templates/proposals/create.html:91
+#: app/templates/proposals/create.html:96
 msgid "Notes & Terms"
 msgstr ""
 
-#: app/templates/proposals/create.html:96 app/templates/proposals/edit.html:85
-#: app/templates/proposals/view.html:194
+#: app/templates/proposals/create.html:101 app/templates/proposals/edit.html:85
+#: app/templates/proposals/public_view.html:177
+#: app/templates/proposals/view.html:198
 msgid "Payment Terms"
 msgstr ""
 
-#: app/templates/proposals/create.html:98
+#: app/templates/proposals/create.html:103
 msgid "Payment terms..."
 msgstr ""
 
-#: app/templates/proposals/create.html:101
+#: app/templates/proposals/create.html:106
 msgid "Internal Notes"
 msgstr ""
 
-#: app/templates/proposals/create.html:103
+#: app/templates/proposals/create.html:108
 msgid "Internal notes (not shown in PDF)..."
 msgstr ""
 
-#: app/templates/proposals/create.html:113
+#: app/templates/proposals/create.html:118
 #: app/templates/proposals/edit.html:100
 msgid "Grand Total (Default Option)"
 msgstr ""
 
-#: app/templates/proposals/create.html:121
+#: app/templates/proposals/create.html:127
 msgid "Create Proposal"
 msgstr ""
 
-#: app/templates/proposals/create.html:133
-#: app/templates/proposals/edit.html:120
+#: app/templates/proposals/create.html:137
+msgid "Smart Recommendations"
+msgstr ""
+
+#: app/templates/proposals/create.html:143
+msgid "Select a client to see recommendations based on their last Health Check."
+msgstr ""
+
+#: app/templates/proposals/create.html:157
+#: app/templates/proposals/create.html:175
+#: app/templates/proposals/edit.html:120 app/templates/proposals/edit.html:136
+#: app/templates/proposals/edit.html:251
 msgid "Option"
 msgstr ""
 
-#: app/templates/proposals/create.html:137
+#: app/templates/proposals/create.html:161
 #: app/templates/proposals/edit.html:124
 msgid "Default"
 msgstr ""
 
-#: app/templates/proposals/create.html:151
+#: app/templates/proposals/create.html:175
 msgid "Option name..."
 msgstr ""
 
-#: app/templates/proposals/create.html:155
+#: app/templates/proposals/create.html:179
 #: app/templates/proposals/edit.html:140
 msgid "No payment plan"
 msgstr ""
 
-#: app/templates/proposals/create.html:169
+#: app/templates/proposals/create.html:193
 #: app/templates/proposals/edit.html:152 app/templates/proposals/print.html:532
-#: app/templates/proposals/view.html:117
+#: app/templates/proposals/view.html:121
 msgid "Service / Package"
 msgstr ""
 
-#: app/templates/proposals/create.html:170
+#: app/templates/proposals/create.html:194
 #: app/templates/proposals/edit.html:153 app/templates/proposals/print.html:533
-#: app/templates/proposals/view.html:118
+#: app/templates/proposals/view.html:122
 msgid "Qty"
 msgstr ""
 
-#: app/templates/proposals/create.html:171
-#: app/templates/proposals/edit.html:154 app/templates/proposals/view.html:119
+#: app/templates/proposals/create.html:195
+#: app/templates/proposals/edit.html:154 app/templates/proposals/view.html:123
 msgid "Unit Price"
 msgstr ""
 
-#: app/templates/proposals/create.html:172
-#: app/templates/proposals/edit.html:155 app/templates/proposals/view.html:120
+#: app/templates/proposals/create.html:196
+#: app/templates/proposals/edit.html:155 app/templates/proposals/view.html:124
 msgid "Disc."
 msgstr ""
 
-#: app/templates/proposals/create.html:173
-#: app/templates/proposals/edit.html:156 app/templates/proposals/view.html:121
+#: app/templates/proposals/create.html:197
+#: app/templates/proposals/edit.html:156 app/templates/proposals/view.html:125
 msgid "Billing"
 msgstr ""
 
-#: app/templates/proposals/create.html:174
-#: app/templates/proposals/edit.html:157 app/templates/proposals/view.html:122
+#: app/templates/proposals/create.html:198
+#: app/templates/proposals/edit.html:157 app/templates/proposals/view.html:126
 msgid "Tag"
 msgstr ""
 
-#: app/templates/proposals/create.html:184
+#: app/templates/proposals/create.html:208
 #: app/templates/proposals/edit.html:166
 msgid "Add Item"
 msgstr ""
 
-#: app/templates/proposals/create.html:194
+#: app/templates/proposals/create.html:218
 #: app/templates/proposals/edit.html:174 app/templates/services/index.html:30
 msgid "Service"
 msgstr ""
 
-#: app/templates/proposals/create.html:195
+#: app/templates/proposals/create.html:219
 #: app/templates/proposals/edit.html:175 app/templates/services/index.html:75
 msgid "Package"
 msgstr ""
 
-#: app/templates/proposals/create.html:196
+#: app/templates/proposals/create.html:220
 #: app/templates/proposals/edit.html:176
 msgid "Custom"
 msgstr ""
 
-#: app/templates/proposals/create.html:213
+#: app/templates/proposals/create.html:237
 msgid "Description..."
 msgstr ""
 
-#: app/templates/proposals/create.html:224
-#: app/templates/proposals/edit.html:200 app/templates/proposals/view.html:147
+#: app/templates/proposals/create.html:248
+#: app/templates/proposals/edit.html:200 app/templates/proposals/view.html:151
 msgid "One-time"
 msgstr ""
 
-#: app/templates/proposals/create.html:225
-#: app/templates/proposals/edit.html:201 app/templates/proposals/view.html:144
+#: app/templates/proposals/create.html:249
+#: app/templates/proposals/edit.html:201 app/templates/proposals/view.html:148
 msgid "Recurring"
 msgstr ""
 
-#: app/templates/proposals/create.html:230
+#: app/templates/proposals/create.html:254
 #: app/templates/proposals/edit.html:206
 msgid "Principal"
 msgstr ""
 
-#: app/templates/proposals/create.html:231
+#: app/templates/proposals/create.html:255
 #: app/templates/proposals/edit.html:207
 msgid "Optional"
 msgstr ""
 
-#: app/templates/proposals/create.html:232
+#: app/templates/proposals/create.html:256
 #: app/templates/proposals/edit.html:208
 msgid "Gift"
+msgstr ""
+
+#: app/templates/proposals/create.html:312
+msgid "No specific recommendations for this client."
+msgstr ""
+
+#: app/templates/proposals/create.html:325
+msgid "Add"
 msgstr ""
 
 #: app/templates/proposals/edit.html:3 app/templates/proposals/edit.html:8
@@ -4620,17 +4662,19 @@ msgid "Proposal Details"
 msgstr ""
 
 #: app/templates/proposals/edit.html:57 app/templates/proposals/index.html:25
-#: app/templates/proposals/index.html:105 app/templates/proposals/view.html:71
+#: app/templates/proposals/index.html:105 app/templates/proposals/view.html:75
 msgid "Draft"
 msgstr ""
 
 #: app/templates/proposals/edit.html:59 app/templates/proposals/index.html:27
-#: app/templates/proposals/index.html:108 app/templates/proposals/view.html:74
+#: app/templates/proposals/index.html:108
+#: app/templates/proposals/public_view.html:291
+#: app/templates/proposals/view.html:78
 msgid "Sent"
 msgstr ""
 
 #: app/templates/proposals/index.html:30 app/templates/proposals/index.html:113
-#: app/templates/proposals/view.html:79
+#: app/templates/proposals/view.html:83
 msgid "Rejected"
 msgstr ""
 
@@ -4642,7 +4686,7 @@ msgstr ""
 msgid "Clear"
 msgstr ""
 
-#: app/templates/proposals/index.html:68 app/templates/proposals/view.html:308
+#: app/templates/proposals/index.html:68 app/templates/proposals/view.html:326
 msgid "Options"
 msgstr ""
 
@@ -4658,7 +4702,7 @@ msgstr ""
 msgid "Valid until"
 msgstr ""
 
-#: app/templates/proposals/index.html:145 app/templates/proposals/view.html:35
+#: app/templates/proposals/index.html:145 app/templates/proposals/view.html:39
 msgid "Duplicate"
 msgstr ""
 
@@ -4666,11 +4710,13 @@ msgstr ""
 msgid "Create your first proposal"
 msgstr ""
 
-#: app/templates/proposals/index.html:173 app/templates/proposals/view.html:350
+#: app/templates/proposals/index.html:173 app/templates/proposals/view.html:368
 msgid "Duplicate this proposal?"
 msgstr ""
 
 #: app/templates/proposals/print.html:6 app/templates/proposals/print.html:404
+#: app/templates/proposals/public_view.html:7
+#: app/templates/proposals/public_view.html:134
 msgid "Commercial Proposal"
 msgstr ""
 
@@ -4789,8 +4835,88 @@ msgid "Payment Schedule"
 msgstr ""
 
 #: app/templates/proposals/print.html:565
-#: app/templates/proposals/print.html:573 app/templates/proposals/view.html:178
+#: app/templates/proposals/print.html:573 app/templates/proposals/view.html:182
 msgid "Installment"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:126
+msgid "Print/PDF"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:135
+msgid "Prepared for"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:138
+#: app/templates/proposals/view.html:98
+msgid "Valid Until"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:149
+msgid "Services Summary"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:188
+#: app/templates/proposals/view.html:212
+msgid "Grand Total"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:195
+msgid "Approve Proposal"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:198
+msgid "Reject / Feedback"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:204
+msgid "This proposal was approved on"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:215
+msgid ""
+"By approving this proposal, you\n"
+"                                accept the terms mentioned."
+msgstr ""
+
+#: app/templates/proposals/public_view.html:221
+msgid "Direct Contact"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:251
+msgid "Confirm approval?"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:252
+msgid "By approving, we will start the formalization process."
+msgstr ""
+
+#: app/templates/proposals/public_view.html:256
+msgid "Yes, approve now"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:264
+msgid "Success!"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:275
+msgid "Tell us the reason"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:277
+msgid "Your feedback helps us improve the proposal."
+msgstr ""
+
+#: app/templates/proposals/public_view.html:278
+msgid "Write your reason here..."
+msgstr ""
+
+#: app/templates/proposals/public_view.html:280
+msgid "Send Feedback"
+msgstr ""
+
+#: app/templates/proposals/public_view.html:291
+msgid "Thank you for your feedback."
 msgstr ""
 
 #: app/templates/proposals/view.html:3 app/templates/proposals/view.html:10
@@ -4801,58 +4927,70 @@ msgstr ""
 msgid "Preview"
 msgstr ""
 
-#: app/templates/proposals/view.html:38 app/templates/proposals/view.html:224
+#: app/templates/proposals/view.html:42 app/templates/proposals/view.html:228
 msgid "Mark as Sent"
 msgstr ""
 
-#: app/templates/proposals/view.html:51
+#: app/templates/proposals/view.html:55
 msgid "Delete this proposal?"
 msgstr ""
 
-#: app/templates/proposals/view.html:90
+#: app/templates/proposals/view.html:94
 msgid "Created"
 msgstr ""
 
-#: app/templates/proposals/view.html:94
-msgid "Valid Until"
-msgstr ""
-
-#: app/templates/proposals/view.html:171
+#: app/templates/proposals/view.html:175
 msgid ""
 "Payment\n"
 "                        Schedule"
 msgstr ""
 
-#: app/templates/proposals/view.html:208
-msgid "Grand Total"
-msgstr ""
-
-#: app/templates/proposals/view.html:228
+#: app/templates/proposals/view.html:232
 msgid "Approve & Create Deal"
 msgstr ""
 
-#: app/templates/proposals/view.html:249
+#: app/templates/proposals/view.html:240
+msgid "Share via WhatsApp"
+msgstr ""
+
+#: app/templates/proposals/view.html:243
+msgid "Copy Public Link"
+msgstr ""
+
+#: app/templates/proposals/view.html:248
+msgid "Open Public View"
+msgstr ""
+
+#: app/templates/proposals/view.html:267
 msgid "Overall Score"
 msgstr ""
 
-#: app/templates/proposals/view.html:298
+#: app/templates/proposals/view.html:316
 msgid "Details"
 msgstr ""
 
-#: app/templates/proposals/view.html:302
+#: app/templates/proposals/view.html:320
 msgid "Created by"
 msgstr ""
 
-#: app/templates/proposals/view.html:326
+#: app/templates/proposals/view.html:344
 msgid "Mark this proposal as sent?"
 msgstr ""
 
-#: app/templates/proposals/view.html:334
+#: app/templates/proposals/view.html:352
 msgid "Approve this proposal? This will create a deal, project, and receivables."
 msgstr ""
 
-#: app/templates/proposals/view.html:342
+#: app/templates/proposals/view.html:360
 msgid "Reject this proposal?"
+msgstr ""
+
+#: app/templates/proposals/view.html:378
+msgid "Generate the link by sharing via WhatsApp first or reload the page."
+msgstr ""
+
+#: app/templates/proposals/view.html:388
+msgid "Link copied to clipboard!"
 msgstr ""
 
 #: app/templates/saas/dashboard.html:3 app/templates/saas/dashboard.html:8

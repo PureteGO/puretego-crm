@@ -113,9 +113,10 @@ def agenda():
                 'client_id': getattr(item, 'client_id', None), 
                 'client_name': client_name,
                 'type_name': type_label,
+                'icon': getattr(item.type, 'icon', None) if hasattr(item, 'type') else None,
                 'is_call': is_call,
                 'date': date_val.isoformat() if date_val else datetime.now().isoformat(),
-                'status': getattr(item, 'status', 'scheduled'),
+                'status': str(getattr(item, 'status', 'scheduled')),
                 'notes': getattr(item, note_field, '') or getattr(item, 'title', ''), 
                 'url': url
             }

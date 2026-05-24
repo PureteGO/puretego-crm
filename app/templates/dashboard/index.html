@@ -528,7 +528,10 @@
                                                 interaction.client.name }}</small>
                                             <small class="text-muted">{{ interaction.date|format_date }}</small>
                                         </div>
-                                        <p class="mb-1 small">{{ interaction.type.name }}</p>
+                                        <p class="mb-1 small">
+                                            <i class="{{ interaction.type.icon if interaction.type else 'bi bi-info-circle' }}"></i>
+                                            {{ interaction.type.name }}
+                                        </p>
                                     </a>
                                     {% else %}
                                     <p class="text-muted small">{{ _('No recent interactions.') }}</p>
@@ -809,7 +812,8 @@
             item.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-transparent';
             item.style.color = 'var(--text-primary)';
 
-            const icon = task.is_call ? '<i class="bi bi-telephone"></i>' : '<i class="bi bi-geo-alt"></i>';
+            const iconClass = task.icon || (task.is_call ? 'bi bi-telephone' : 'bi bi-geo-alt');
+            const icon = `<i class="${iconClass}"></i>`;
             const d = new Date(task.date);
             const dateStr = d.toLocaleDateString('{{ current_language|replace("_", "-") }}', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 

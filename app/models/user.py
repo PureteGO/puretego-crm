@@ -38,6 +38,9 @@ class User(Base):
     reset_token = Column(String(100), nullable=True, index=True)
     reset_token_expires = Column(DateTime, nullable=True)
     
+    # GBP Scan token (for bookmarklet/extension auth)
+    scan_token = Column(String(64), unique=True, index=True, nullable=True)
+    
     # Relationships
     company = relationship('Company', back_populates='users')
     role = relationship('Role', back_populates='users')
@@ -82,6 +85,11 @@ class User(Base):
         """Limpa o token de reset após uso"""
         self.reset_token = None
         self.reset_token_expires = None
+    
+    def generate_scan_token(self):
+        """Gera um token único para autenticação do GBP Scan (bookmarklet/extensão)"""
+        self.scan_token = secrets.token_urlsafe(32)
+        return self.scan_token
     
     def has_permission(self, permission):
         """Verifica se o usuário tem determinada permissão"""

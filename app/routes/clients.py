@@ -74,16 +74,21 @@ def kanban():
     
     with get_db() as db:
         from sqlalchemy.orm import joinedload
+        from datetime import datetime
         
         stages = filter_by_company(
             db.query(KanbanStage).filter(KanbanStage.is_active == True), KanbanStage
         ).order_by(KanbanStage.order).all()
+        
+        # Determine the start of the current month
+        start_of_month = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         
         # Build kanban data with both Clients and Deals as cards
         kanban_data = []
         for stage in stages:
             cards = []
             stage_value = 0.0
+            is_closed_stage = stage.stage_type in ('won', 'lost')
             
             # --- CLIENTS (legacy) ---
             client_query = filter_by_company(
@@ -97,6 +102,10 @@ def kanban():
             )
             if owner_filter and owner_filter.isdigit():
                 client_query = client_query.filter(Client.owner_id == int(owner_filter))
+            
+            # Filter out old closed clients
+            if is_closed_stage:
+                client_query = client_query.filter(Client.updated_at >= start_of_month)
             
             clients_in_stage = client_query.order_by(Client.name).all()
             
@@ -134,6 +143,10 @@ def kanban():
             )
             if owner_filter and owner_filter.isdigit():
                 deal_query = deal_query.filter(Deal.owner_id == int(owner_filter))
+                
+            # Filter out old closed deals
+            if is_closed_stage:
+                deal_query = deal_query.filter(Deal.updated_at >= start_of_month)
             
             deals = deal_query.order_by(Deal.created_at.desc()).all()
             
@@ -709,26 +722,35 @@ def create_deal_quick():
             flash(_('Deal title is required'), 'error')
             return redirect(url_for('clients.kanban'))
         
-        deal = Deal(
-            title=title,
-            company_id=session.get('company_id'),
-            client_id=int(client_id) if client_id else None,
-            kanban_stage_id=int(stage_id) if stage_id else None,
-            owner_id=session.get('user_id'),
-            value=float(value) if value else 0,
-            status=DealStatus.OPEN
-        )
+        if not client_id:
+            flash(_('Client is required'), 'error')
+            return redirect(url_for('clients.kanban'))
         
-        expected_close = request.form.get('expected_close_date')
-        if expected_close:
-            try:
-                deal.expected_close_date = datetime.strptime(expected_close, '%Y-%m-%d')
-            except ValueError:
-                pass
-        
-        db.add(deal)
-        db.commit()
-        flash(_('Deal created successfully'), 'success')
+        try:
+            deal = Deal(
+                title=title,
+                company_id=session.get('company_id'),
+                client_id=int(client_id),
+                kanban_stage_id=int(stage_id) if stage_id else None,
+                owner_id=session.get('user_id'),
+                value=float(value) if value else 0,
+            )
+            deal.status = DealStatus.OPEN
+            
+            expected_close = request.form.get('expected_close_date')
+            if expected_close:
+                try:
+                    deal.expected_close_date = datetime.strptime(expected_close, '%Y-%m-%d')
+                except ValueError:
+                    pass
+            
+            db.add(deal)
+            db.commit()
+            flash(_('Deal created successfully'), 'success')
+        except Exception as e:
+            db.rollback()
+            logger.error(f"Error creating deal: {str(e)}")
+            flash(f'Error creating deal: {str(e)}', 'error')
     
     return redirect(url_for('clients.kanban'))
 

@@ -1,0 +1,418 @@
+{
+  "success": true,
+  "check_id": null,
+  "score": 90,
+  "report": {
+    "business_name": "San Sebastian Educational Center",
+    "source_data": {
+      "position": 1,
+      "title": "San Sebastian Educational Center",
+      "address": "Saturio Rios 2160, San Lorenzo 111452, Paraguay",
+      "latitude": -25.349535,
+      "longitude": -57.501873,
+      "rating": 4.4,
+      "ratingCount": 143,
+      "category": "Centro escolar",
+      "phoneNumber": "0986 519505",
+      "website": "http://www.sansebastian.edu.py/cess",
+      "cid": "6815707203100562312",
+      "phone": "+595 986 519505",
+      "reviews": 143,
+      "place_id": "ChIJqWcDtniuXZQRiFPhDZdBll4",
+      "data_id": "0x945dae78b60367a9:0x5e9641970de15388",
+      "data_cid": "6815707203100562312",
+      "reviews_link": "https://serpapi.com/search.json?data_id=0x945dae78b60367a9%3A0x5e9641970de15388&engine=google_maps_reviews&hl=en",
+      "photos_link": "https://serpapi.com/search.json?data_id=0x945dae78b60367a9%3A0x5e9641970de15388&engine=google_maps_photos&hl=en",
+      "gps_coordinates": {
+        "latitude": -25.349534499999997,
+        "longitude": -57.5018739
+      },
+      "place_id_search": "https://serpapi.com/search.json?engine=google_maps&google_domain=google.com&hl=en&place_id=ChIJqWcDtniuXZQRiFPhDZdBll4",
+      "provider_id": "/g/1tt8dc20",
+      "thumbnail": "https://lh3.googleusercontent.com/p/AF1QipNpeb60L97R_0RvoJSeyA9puokitg3ywu5i5JRi=w152-h86-k-no",
+      "serpapi_thumbnail": "https://serpapi.com/images/url/MwK183icuxmXUVJSUGylr5-TYayXnp-fnpNaWpxalJyfV5KaV6KXnJ-rX6Dv6GYYmFngV5CaZGbgY2keFG8QVJbvFZxa6WhZUJqfnVmSblxZXmqaaeoVlGlbbmhqpJthYaabrZuXDwCuKCGk",
+      "type": [
+        "School center",
+        "International school",
+        "Private educational institution",
+        "Technical school"
+      ],
+      "extensions": [
+        {
+          "accessibility": [
+            "Wheelchair accessible entrance",
+            "Wheelchair accessible parking lot",
+            "Wheelchair accessible restroom",
+            "Wheelchair accessible seating"
+          ]
+        }
+      ],
+      "open_state": "Open · Closes 6 PM",
+      "plus_code": "MF2X+57 San Lorenzo, Paraguay",
+      "hours": [
+        {
+          "tuesday": "7 AM–6 PM"
+        }
+      ],
+      "hours_last_updated": "Updated by this business 11 weeks ago",
+      "serpapi_posts_link": "https://serpapi.com/search.json?data_id=0x945dae78b60367a9%3A0x5e9641970de15388&engine=google_maps_posts",
+      "posts": [
+        {
+          "media": "https://lh3.googleusercontent.com/geougc/AF1QipOO4nlc_I0xZgjgebLLOP7DIpE1XGKdQcu8skUW=h400-no",
+          "post_link": "https://search.google.com/local/posts?q=San+Sebastian+Educational+Center&ludocid=6815707203100562312&lpsid=CIHM0ogKEPHKts7k_O7Jbw&source=sh/x/loc/post&lsig=AB86z5X0dvBnurUXaRu2Qm3wyCzg",
+          "description": "Seguimos compartiendo los primeros momentos de este nuevo año.\nMás sonrisas, más encuentros y muchas ganas de aprender.\n\nEn el CESS acompañamos cada paso con compromiso, vocación y amor por educar.\n¡Vamos por un gran año juntos! ✨📚\n\n#CESS2026 #SegundoDíaDeClases #FormandoParaCrear #EducamosConValores",
+          "date": "Feb 9, 2026"
+        },
+        {
+          "media": "https://lh3.googleusercontent.com/geougc/AF1QipMQWYqJhsk-jk6V5Oqfqh6usdGAGRFy91wXRFVX=h400-no",
+          "post_link": "https://search.google.com/local/posts?q=San+Sebastian+Educational+Center&ludocid=6815707203100562312&lpsid=CIHM0ogKELmx0aHw0JGkXA&source=sh/x/loc/post&lsig=AB86z5X0dvBnurUXaRu2Qm3wyCzg",
+          "description": "¡Robótica bilingüe en el C.E.S.S.!\n\nNuestro programa de Robótica en Inglés integra el aprendizaje tecnológico con el desarrollo de competencias lingüísticas, preparando a los estudiantes para un mundo global.\nCon proyectos prácticos, los alumnos:\n- Diseñan y programan robots mientras practican inglés técnico.\n- Desarrollan creatividad, pensamiento lógico y mentalidad analítica.\n- Aprenden a comunicarse y colaborar en dos idiomas: español e inglés.\nEn el Centro Educativo San Sebastián, la robótica se convierte en una experiencia bilingüe que potencia el futuro académico y profesional de nuestros estudiantes.",
+          "date": "Feb 5, 2026"
+        },
+        {
+          "media": "https://lh3.googleusercontent.com/geougc/AF1QipMLjyCYMfe4nbW2127d_lhFjz54IR09v-ORBVNo=h400-no",
+          "post_link": "https://search.google.com/local/posts?q=San+Sebastian+Educational+Center&ludocid=6815707203100562312&lpsid=CIHM0ogKEIOm2t7_gcaDwwE&source=sh/x/loc/post&lsig=AB86z5X0dvBnurUXaRu2Qm3wyCzg",
+          "description": "¡El ciclo escolar 2026 ya comenzó en el Centro Educativo San Sebastián!\nDesde el 2 de febrero nuestros estudiantes están de regreso en las aulas, iniciando un año lleno de aprendizajes, proyectos y experiencias enriquecedoras.\nEn el C.E.S.S. acompañamos a cada alumno en su desarrollo académico y personal, ofreciendo un ambiente seguro, inclusivo y motivador.\n¡Estamos felices de compartir este nuevo comienzo con nuestras familias y comunidad educativa!",
+          "date": "Feb 5, 2026"
+        }
+      ],
+      "at_this_place": {
+        "type": [
+          {
+            "title": "Food & Drink",
+            "places": 1
+          },
+          {
+            "title": "Services",
+            "places": 1
+          },
+          {
+            "title": "Other",
+            "places": 1
+          }
+        ],
+        "places": [
+          {
+            "position": 1,
+            "title": "Universidad Autonoma San Sebastián - UASS",
+            "data_id": "0x945dae78b6a3c147:0xab40bbe62315fb1",
+            "data_cid": "771254348506292145",
+            "reviews_link": "https://serpapi.com/search.json?data_id=0x945dae78b6a3c147%3A0xab40bbe62315fb1&engine=google_maps_reviews&hl=en",
+            "photos_link": "https://serpapi.com/search.json?data_id=0x945dae78b6a3c147%3A0xab40bbe62315fb1&engine=google_maps_photos&hl=en",
+            "gps_coordinates": {
+              "latitude": -25.3497985,
+              "longitude": -57.5019517
+            },
+            "place_id_search": "https://serpapi.com/search.json?data=%214m5%213m4%211s0x945dae78b6a3c147%3A0xab40bbe62315fb1%218m2%213d-25.3497985%214d-57.5019517&engine=google_maps&google_domain=google.com&hl=en&type=place",
+            "rating": 4.7,
+            "reviews": 170,
+            "type": "University",
+            "type_id": "university",
+            "address": "MF2X+485, &, San Lorenzo, Paraguay",
+            "open_state": "Open · Closes 9 PM",
+            "hours": [
+              {
+                "tuesday": "6:30 AM–9 PM"
+              }
+            ],
+            "thumbanil": "https://lh3.googleusercontent.com/p/AF1QipPTx_ACOby4ZCT3TV5CBQv-pjB_wa_dX9xFZHpj=w86-h86-n-k-no",
+            "thumbnail": "https://lh3.googleusercontent.com/p/AF1QipPTx_ACOby4ZCT3TV5CBQv-pjB_wa_dX9xFZHpj=w86-h86-n-k-no"
+          },
+          {
+            "position": 2,
+            "title": "Sol Cafe & Bar",
+            "data_id": "0x945dae78ce303dd1:0xde0b2bf00925d4c6",
+            "data_cid": "15999930411109438662",
+            "reviews_link": "https://serpapi.com/search.json?data_id=0x945dae78ce303dd1%3A0xde0b2bf00925d4c6&engine=google_maps_reviews&hl=en",
+            "photos_link": "https://serpapi.com/search.json?data_id=0x945dae78ce303dd1%3A0xde0b2bf00925d4c6&engine=google_maps_photos&hl=en",
+            "gps_coordinates": {
+              "latitude": -25.3493167,
+              "longitude": -57.5019079
+            },
+            "place_id_search": "https://serpapi.com/search.json?data=%214m5%213m4%211s0x945dae78ce303dd1%3A0xde0b2bf00925d4c6%218m2%213d-25.3493167%214d-57.5019079&engine=google_maps&google_domain=google.com&hl=en&type=place",
+            "rating": 4.2,
+            "reviews": 124,
+            "type": "Cafe",
+            "type_id": "cafe",
+            "address": "Nilo Meyer, San Lorenzo, Paraguay",
+            "open_state": "Open · Closes 8 PM",
+            "hours": [
+              {
+                "tuesday": "7 AM–8 PM"
+              }
+            ],
+            "thumbanil": "https://lh3.googleusercontent.com/p/AF1QipMdWyzS0LNaZ4jE0ufYGc0npYRbzdiapPi2BOpz=w86-h86-n-k-no",
+            "thumbnail": "https://lh3.googleusercontent.com/p/AF1QipMdWyzS0LNaZ4jE0ufYGc0npYRbzdiapPi2BOpz=w86-h86-n-k-no"
+          },
+          {
+            "position": 3,
+            "title": "En lo de Edgar san lorenzo",
+            "data_id": "0x945dad28fec3b307:0x1c8a96a528d40b97",
+            "data_cid": "2056621815946808215",
+            "reviews_link": "https://serpapi.com/search.json?data_id=0x945dad28fec3b307%3A0x1c8a96a528d40b97&engine=google_maps_reviews&hl=en",
+            "photos_link": "https://serpapi.com/search.json?data_id=0x945dad28fec3b307%3A0x1c8a96a528d40b97&engine=google_maps_photos&hl=en",
+            "gps_coordinates": {
+              "latitude": -25.3527702,
+              "longitude": -57.5007543
+            },
+            "place_id_search": "https://serpapi.com/search.json?data=%214m5%213m4%211s0x945dad28fec3b307%3A0x1c8a96a528d40b97%218m2%213d-25.3527702%214d-57.5007543&engine=google_maps&google_domain=google.com&hl=en&type=place",
+            "rating": 0.0,
+            "reviews": 0,
+            "type": "Apartment complex",
+            "type_id": "apartment_complex",
+            "address": "JFWX+VMX, Nilo Meyer, San Lorenzo, Paraguay"
+          }
+        ]
+      }
+    },
+    "details": [
+      "Perfil Gerenciado (Sinais ativos detectados)"
+    ],
+    "criteria_results": [
+      {
+        "id": 1,
+        "name_pt": "Horário de Funcionamento",
+        "name_es": "Horario de Funcionamiento",
+        "passed": true,
+        "weight": 6,
+        "type": "critical"
+      },
+      {
+        "id": 2,
+        "name_pt": "Fotos dos Produtos/Serviços",
+        "name_es": "Fotos de Productos/Servicios",
+        "passed": false,
+        "weight": 6,
+        "type": "critical"
+      },
+      {
+        "id": 3,
+        "name_pt": "Vídeos",
+        "name_es": "Videos",
+        "passed": false,
+        "weight": 6,
+        "type": "critical"
+      },
+      {
+        "id": 4,
+        "name_pt": "Perfil Verificado",
+        "name_es": "Perfil Verificado",
+        "passed": true,
+        "weight": 8,
+        "type": "critical"
+      },
+      {
+        "id": 5,
+        "name_pt": "Possui Site",
+        "name_es": "Posee Sitio Web",
+        "passed": true,
+        "weight": 7,
+        "type": "critical"
+      },
+      {
+        "id": 6,
+        "name_pt": "Perguntas e Respostas",
+        "name_es": "Preguntas y Respuestas",
+        "passed": true,
+        "weight": 5,
+        "type": "critical"
+      },
+      {
+        "id": 7,
+        "name_pt": "Posts/Publicações",
+        "name_es": "Posts/Publicaciones",
+        "passed": true,
+        "weight": 6,
+        "type": "critical"
+      },
+      {
+        "id": 8,
+        "name_pt": "Descrição do Negócio",
+        "name_es": "Descripción del Negocio",
+        "passed": true,
+        "weight": 7,
+        "type": "critical"
+      },
+      {
+        "id": 9,
+        "name_pt": "Presença nas Redes Sociais",
+        "name_es": "Presencia en Redes Sociales",
+        "passed": true,
+        "weight": 5,
+        "type": "moderate"
+      },
+      {
+        "id": 10,
+        "name_pt": "Presença no Google Maps",
+        "name_es": "Presencia en Google Maps",
+        "passed": true,
+        "weight": 8,
+        "type": "moderate"
+      },
+      {
+        "id": 11,
+        "name_pt": "Fotos do Exterior",
+        "name_es": "Fotos del Exterior",
+        "passed": false,
+        "weight": 4,
+        "type": "moderate"
+      },
+      {
+        "id": 12,
+        "name_pt": "Fotos do Interior",
+        "name_es": "Fotos del Interior",
+        "passed": false,
+        "weight": 4,
+        "type": "moderate"
+      },
+      {
+        "id": 13,
+        "name_pt": "Informações de Produtos e Serviços",
+        "name_es": "Información de Productos y Servicios",
+        "passed": true,
+        "weight": 6,
+        "type": "moderate"
+      },
+      {
+        "id": 14,
+        "name_pt": "Possui Avaliações",
+        "name_es": "Posee Evaluaciones",
+        "passed": true,
+        "weight": 7,
+        "type": "positive"
+      },
+      {
+        "id": 15,
+        "name_pt": "Endereço Configurado",
+        "name_es": "Dirección Configurada",
+        "passed": true,
+        "weight": 6,
+        "type": "positive"
+      },
+      {
+        "id": 16,
+        "name_pt": "Possui Logotipo",
+        "name_es": "Posee Logotipo",
+        "passed": true,
+        "weight": 5,
+        "type": "positive"
+      },
+      {
+        "id": 17,
+        "name_pt": "Resposta a Avaliações",
+        "name_es": "Respuesta a Evaluaciones",
+        "passed": true,
+        "weight": 4,
+        "type": "positive"
+      }
+    ],
+    "top_critical_issues": [
+      {
+        "name": "Fotos de Productos/Servicios",
+        "message": "Ausente"
+      },
+      {
+        "name": "Videos",
+        "message": "Ausente"
+      }
+    ],
+    "recommendations": [
+      "Adicione vídeos do local/produtos. O Google valoriza muito conteúdo em vídeo.",
+      "Corrija: Fotos de Productos/Servicios ausente.",
+      "Corrija: Videos ausente."
+    ],
+    "summary": {
+      "critical_issues_count": 2,
+      "moderate_issues_count": 2,
+      "positive_points_count": 13,
+      "text": "Score Público: 90/100"
+    },
+    "criteria": [
+      {
+        "name": "Horario de Funcionamiento",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Fotos de Productos/Servicios",
+        "status": "Não detectado",
+        "score": 0
+      },
+      {
+        "name": "Videos",
+        "status": "Não detectado",
+        "score": 0
+      },
+      {
+        "name": "Perfil Verificado",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Posee Sitio Web",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Preguntas y Respuestas",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Posts/Publicaciones",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Descripción del Negocio",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Presencia en Redes Sociales",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Presencia en Google Maps",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Fotos del Exterior",
+        "status": "Não detectado",
+        "score": 0
+      },
+      {
+        "name": "Fotos del Interior",
+        "status": "Não detectado",
+        "score": 0
+      },
+      {
+        "name": "Información de Productos y Servicios",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Posee Evaluaciones",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Dirección Configurada",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Posee Logotipo",
+        "status": "Detectado",
+        "score": 100
+      },
+      {
+        "name": "Respuesta a Evaluaciones",
+        "status": "Detectado",
+        "score": 100
+      }
+    ]
+  }
+}

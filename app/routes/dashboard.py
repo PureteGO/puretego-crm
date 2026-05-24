@@ -59,12 +59,15 @@ def index():
             'my_clients_count': 0,
             'critical_leads_count': 0,
             'leads_pending_followup': [],
-            'month_name': datetime.now().strftime('%B')
+            'month_name': datetime.now().strftime('%B'),
+            'onboarding_count': 0,
+            'execution_count': 0,
+            'pending_tickets': []
         }
 
         with get_db() as db:
-            # --- Common Calculations for Owners/Admins/Finance ---
-            if user_role in ['owner', 'admin', 'manager', 'superadmin', 'finance'] or is_superadmin:
+            # --- Common Calculations for Owners/Admins/Finance/Production ---
+            if user_role in ['owner', 'admin', 'manager', 'superadmin', 'finance', 'gmb_manager', 'production'] or is_superadmin:
                 # Timeframes
                 seven_days_ago = datetime.utcnow() - timedelta(days=7)
                 fifteen_days_ago = datetime.utcnow() - timedelta(days=15)
@@ -201,6 +204,11 @@ def index():
                 # Pending operational tickets
                 data['pending_tickets'] = filter_by_company(db.query(ProjectTicket).join(Project), Project)\
                     .filter(ProjectTicket.status != 'done').options(joinedload(ProjectTicket.project)).limit(10).all()
+                
+                # Production specific counts
+                if user_role in ['gmb_manager', 'production', 'owner', 'admin', 'superadmin']:
+                    data['onboarding_count'] = filter_by_company(db.query(func.count(Project.id)), Project).filter(Project.phase == 'onboarding', Project.status == 'active').scalar() or 0
+                    data['execution_count'] = filter_by_company(db.query(func.count(Project.id)), Project).filter(Project.phase == 'execucao', Project.status == 'active').scalar() or 0
             
             else:
                 # Sales (SDR/Seller) View
@@ -229,21 +237,14 @@ def index():
                 ]
 
             # Shared: Activity history
-            data['recent_leads'] = filter_by_company(
-                db.query(Client).order_by(Client.created_at.desc()).limit(10), Client
-            ).all()
+            data['recent_leads'] = filter_by_company(db.query(Client), Client).order_by(Client.created_at.desc()).limit(10).all()
 
-            data['recent_visits'] = filter_by_company(
-                db.query(Visit).join(Client).options(joinedload(Visit.client)), Client
-            ).order_by(Visit.visit_date.desc()).limit(5).all()
+            data['recent_visits'] = filter_by_company(db.query(Visit).join(Client).options(joinedload(Visit.client)), Client).order_by(Visit.visit_date.desc()).limit(5).all()
             
-            data['recent_health_checks'] = filter_by_company(
-                db.query(HealthCheck).join(Client).options(joinedload(HealthCheck.client)), Client
-            ).order_by(HealthCheck.created_at.desc()).limit(5).all()
+            data['recent_health_checks'] = filter_by_company(db.query(HealthCheck).join(Client).options(joinedload(HealthCheck.client)), Client).order_by(HealthCheck.created_at.desc()).limit(5).all()
             
-            data['recent_interactions'] = filter_by_company(
-                db.query(Interaction).join(Client).options(joinedload(Interaction.client), joinedload(Interaction.type)), Client
-            ).filter(Interaction.status == 'done', Interaction.date <= datetime.now()).order_by(Interaction.date.desc()).limit(5).all()
+            data['recent_interactions'] = filter_by_company(db.query(Interaction).join(Client).options(joinedload(Interaction.client), joinedload(Interaction.type)), Client)\
+                .filter(Interaction.status == 'done', Interaction.date <= datetime.now()).order_by(Interaction.date.desc()).limit(5).all()
 
             # --- Lead Follow-up Rule (v1.6) ---
             # "não permita leads que nao tenham seguimento no processo de vendas passar para o outro dia sem ter indicado o próximo passo"

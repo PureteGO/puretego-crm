@@ -254,6 +254,149 @@ def convert_to_lead():
             logger.error(f"Error in convert_to_lead: {str(e)}")
             return jsonify({'success': False, 'message': f"Erro ao criar lead: {str(e)}"}), 500
 
+# ============================================================
+# GBP SCAN — Zero API Cost (Bookmarklet / Extension)
+# ============================================================
+
+@bp.route('/api/gbp-scan/submit', methods=['POST', 'OPTIONS'])
+def gbp_scan_submit():
+    """
+    Recebe dados de scan do bookmarklet/extensão Chrome.
+    Autenticação via scan_token (header Authorization: Bearer <token>).
+    """
+    # CORS preflight
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS'
+        return response, 200
+
+    from app.models import User
+    from app.services.gbp_scan_service import GBPScanService
+
+    # 1. Authenticate via scan_token
+    auth_header = request.headers.get('Authorization', '')
+    token = None
+    if auth_header.startswith('Bearer '):
+        token = auth_header[7:]
+    if not token:
+        token = request.get_json(silent=True, force=True).get('scan_token') if request.data else None
+
+    if not token:
+        resp = jsonify({'success': False, 'error': 'Token de autenticação ausente.'})
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp, 401
+
+    with get_db() as db:
+        user = db.query(User).filter(User.scan_token == token, User.is_active == True).first()
+        if not user:
+            resp = jsonify({'success': False, 'error': 'Token inválido ou usuário inativo.'})
+            resp.headers['Access-Control-Allow-Origin'] = '*'
+            return resp, 401
+
+        user_id = user.id
+
+    # 2. Parse request body
+    try:
+        scan_data = request.get_json(force=True)
+    except Exception:
+        resp = jsonify({'success': False, 'error': 'Dados inválidos.'})
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp, 400
+
+    if not scan_data or not scan_data.get('business_name'):
+        resp = jsonify({'success': False, 'error': 'Nome do negócio não informado.'})
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp, 400
+
+    # 3. Process scan
+    try:
+        result = GBPScanService.perform_scan_audit(scan_data, user_id)
+
+        resp = jsonify(result)
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp, 200 if result['success'] else 400
+
+    except Exception as e:
+        logger.exception(f"GBP Scan submit error: {e}")
+        resp = jsonify({'success': False, 'error': 'Erro interno ao processar scan.'})
+        resp.headers['Access-Control-Allow-Origin'] = '*'
+        return resp, 500
+
+
+# Trigger redeploy to fix production routing error
+@bp.route('/gbp-scan/setup')
+@login_required
+def gbp_scan_setup():
+    """Página de setup do GBP Scan (instruções, token, bookmarklet)."""
+    from app.models import User
+
+    user_id = session.get('user_id')
+    scan_token = None
+
+    with get_db() as db:
+        user = db.query(User).get(user_id)
+        if user:
+            scan_token = user.scan_token
+        # Buscar histórico de scans do usuário
+        scan_history = db.query(HealthCheck).filter(
+            HealthCheck.source == 'gbp_scan'
+        ).order_by(HealthCheck.created_at.desc()).limit(10).all()
+
+        return render_template(
+            'health_checks/gbp_scan_setup.html',
+            scan_token=scan_token,
+            scan_history=scan_history
+        )
+
+
+@bp.route('/gbp-scan/generate-token', methods=['POST'])
+@login_required
+def gbp_scan_generate_token():
+    """Gera ou regenera o scan_token do usuário."""
+    from app.models import User
+
+    user_id = session.get('user_id')
+    with get_db() as db:
+        user = db.query(User).get(user_id)
+        if not user:
+            flash('Usuário não encontrado.', 'error')
+            return redirect(url_for('health_checks.gbp_scan_setup'))
+
+        token = user.generate_scan_token()
+        db.commit()
+        flash('Token gerado com sucesso!', 'success')
+
+    return redirect(url_for('health_checks.gbp_scan_setup'))
+
+
+@bp.route('/gbp-scan/direct', methods=['POST'])
+@login_required
+def gbp_scan_direct():
+    """Scan direto: busca o negócio no Google server-side e retorna resultado."""
+    from app.services.gbp_scan_service import GBPScanService
+
+    business_name = request.form.get('business_name', '').strip()
+    location = request.form.get('location', '').strip()
+
+    if not business_name:
+        return jsonify({'success': False, 'error': 'Informe o nome do negócio.'}), 400
+
+    user_id = session.get('user_id')
+
+    # 1. Fetch and parse from Google
+    scan_data = GBPScanService.perform_direct_scan(business_name, location)
+
+    if scan_data.get('error'):
+        return jsonify({'success': False, 'error': scan_data['error']}), 400
+
+    # 2. Evaluate criteria
+    result = GBPScanService.perform_scan_audit(scan_data, user_id)
+
+    return jsonify(result)
+
+
 @bp.route('/<int:health_check_id>/ai-generate', methods=['POST'])
 @login_required
 def generate_ai_content(health_check_id):

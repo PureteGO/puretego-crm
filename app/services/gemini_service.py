@@ -278,3 +278,36 @@ Generate an internal note for consultants/CSM.
 Your final response for this prompt is ONLY the four sections in Markdown, in the selected language.
 """
         return self.generate_content(prompt)
+    def generate_review_reply(self, business_name, reviewer_name, rating, comment, language='pt'):
+        """
+        Gera uma sugestão de resposta para uma avaliação do Google Business Profile.
+        """
+        language_map = {
+            'pt': 'Português',
+            'es': 'Espanhol',
+            'en': 'Inglês'
+        }
+        lang_full = language_map.get(language, 'Português')
+
+        prompt = f"""
+        Você é um gerente de relacionamento com o cliente especializado em SEO Local e Google Business Profile.
+        Sua tarefa é escrever uma resposta profissional, amigável e personalizada para uma avaliação de cliente.
+
+        DADOS DA AVALIAÇÃO:
+        - Empresa: {business_name}
+        - Cliente: {reviewer_name}
+        - Nota: {rating} estrelas
+        - Comentário do cliente: "{comment}"
+
+        DIRETRIZES:
+        1. Responda em {lang_full}.
+        2. Seja cordial e agradeça se a avaliação for positiva.
+        3. Se a nota for baixa, seja empático, peça desculpas de forma profissional e convide para resolver o problema de forma privada (sem prometer reembolsos publicamente).
+        4. Tente incluir o nome do cliente na saudação.
+        5. Mantenha a resposta concisa (máximo 300 caracteres).
+        6. Use uma linguagem natural, evite parecer um robô.
+        7. Não use placeholders como [Nome da Empresa], use os dados fornecidos.
+
+        Resposta sugerida:
+        """
+        return self.generate_content(prompt)
