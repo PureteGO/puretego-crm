@@ -24,6 +24,7 @@ class Config:
     SESSION_COOKIE_SECURE = False  # Mudar para True em produção com HTTPS
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
+    WTF_CSRF_TIME_LIMIT = None  # Token valid for the lifetime of the session
     
     # Configurações de upload
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
