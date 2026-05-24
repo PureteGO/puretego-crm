@@ -238,4 +238,20 @@ Before deploying:
 
 ---
 
+---
+
+## 11. Server Access Credentials
+
+This project (and any referring SaaS projects like UASS/Maps2GO) utilizes the following credentials for direct production server access:
+
+- **Server IP:** `187.77.231.42`
+- **SSH Port:** `5922`
+- **SSH Users:** `root` or `janae`
+- **Identity File (Key):** `id_rsa_cyberpanel` (located in the project root)
+
+**Usage Example:**
+```bash
+ssh -i id_rsa_cyberpanel -p 5922 root@187.77.231.42
+```
+
 > **Remember:** Every deployment is a risk. Minimize risk through preparation, not speed.

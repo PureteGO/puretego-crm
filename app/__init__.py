@@ -3,6 +3,7 @@ MAPS2GO CRM - Flask Application Factory
 """
 
 from flask import Flask, session, g, request, redirect, url_for
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_babel import Babel, gettext as _, lazy_gettext as _l
 from flask_wtf.csrf import CSRFProtect
 from config import config, init_db, close_db
@@ -36,6 +37,10 @@ def create_app(config_object=None):
         app.config.from_object(config)
     else:
         app.config.from_object(config_object)
+    
+    # Configure ProxyFix for production (correct proto/host behind proxy)
+    if app.config.get('FLASK_ENV') == 'production':
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
     
     # Babel configuration
     app.config['BABEL_DEFAULT_LOCALE'] = 'es'

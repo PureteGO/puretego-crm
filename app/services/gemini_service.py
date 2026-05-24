@@ -278,9 +278,9 @@ Generate an internal note for consultants/CSM.
 Your final response for this prompt is ONLY the four sections in Markdown, in the selected language.
 """
         return self.generate_content(prompt)
-    def generate_review_reply(self, business_name, reviewer_name, rating, comment, language='pt'):
+    def generate_review_reply(self, business_name, reviewer_name, rating, comment, business_category=None, language='pt'):
         """
-        Gera uma sugestão de resposta para uma avaliação do Google Business Profile.
+        Gera uma sugestão de resposta otimizada para SEO/AEO/GEO para uma avaliação do Google.
         """
         language_map = {
             'pt': 'Português',
@@ -288,26 +288,27 @@ Your final response for this prompt is ONLY the four sections in Markdown, in th
             'en': 'Inglês'
         }
         lang_full = language_map.get(language, 'Português')
+        category_text = f" no segmento de {business_category}" if business_category else ""
 
         prompt = f"""
-        Você é um gerente de relacionamento com o cliente especializado em SEO Local e Google Business Profile.
-        Sua tarefa é escrever uma resposta profissional, amigável e personalizada para uma avaliação de cliente.
+        Você é um Diretor de Reputação Digital e Especialista em SEO Local (SEO, AEO, GEO).
+        Sua tarefa é escrever uma resposta estratégica para uma avaliação no Google Business Profile da empresa {business_name}{category_text}.
 
         DADOS DA AVALIAÇÃO:
-        - Empresa: {business_name}
         - Cliente: {reviewer_name}
         - Nota: {rating} estrelas
-        - Comentário do cliente: "{comment}"
+        - Comentário: "{comment}"
 
-        DIRETRIZES:
-        1. Responda em {lang_full}.
-        2. Seja cordial e agradeça se a avaliação for positiva.
-        3. Se a nota for baixa, seja empático, peça desculpas de forma profissional e convide para resolver o problema de forma privada (sem prometer reembolsos publicamente).
-        4. Tente incluir o nome do cliente na saudação.
-        5. Mantenha a resposta concisa (máximo 300 caracteres).
-        6. Use uma linguagem natural, evite parecer um robô.
-        7. Não use placeholders como [Nome da Empresa], use os dados fornecidos.
+        DIRETRIZES ESTRATÉGICAS (SEO/AEO/GEO):
+        1. IDIOMA: Responda obrigatoriamente em {lang_full}.
+        2. PERSONALIZAÇÃO: Use o nome {reviewer_name} na saudação.
+        3. GEO/AEO: Inclua naturalmente palavras-chave relacionadas a {business_category or 'negócio local'} e, se possível, mencione a importância da satisfação local.
+        4. TOM: Profissional, caloroso e humano. Evite clichês robóticos.
+        5. POSITIVA (4-5 estrelas): Agradeça especificamente por pontos mencionados no comentário e reforce um diferencial da marca.
+        6. NEGATIVA (1-3 estrelas): Seja empático, peça desculpas profissionalmente e ofereça um canal direto (sem expor dados sensíveis) para resolver. Nunca seja defensivo.
+        7. TAMANHO: Máximo 350 caracteres.
+        8. ENTIDADE: Reforce a autoridade da {business_name} em seu setor.
 
-        Resposta sugerida:
+        Não use placeholders como [Nome]. Gere apenas o texto final da resposta.
         """
         return self.generate_content(prompt)

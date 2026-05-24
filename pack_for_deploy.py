@@ -22,7 +22,7 @@ def create_deploy_zip():
                 # Archive name should be relative to project root
                 arcname = os.path.relpath(file_path, '.')
                 
-                print(f"Adding {arcname}")
+                # print(f"Adding {arcname}")
                 zipf.write(file_path, arcname)
                 
     print(f"\nSuccessfully created {zip_filename}!")

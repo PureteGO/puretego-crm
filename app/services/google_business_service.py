@@ -526,96 +526,97 @@ class GoogleBusinessService:
     def fetch_insights(self, location_name: str, days: int = 30) -> List[Dict]:
         """
         Fetch performance insights for a location using the GMB Performance API.
-        
-        Args:
-            location_name: Full location name (accounts/X/locations/Y)
-            days: Number of days of history to fetch (max 90)
+        Uses the GET dailyMetricsTimeSeries endpoint for maximum compatibility.
         """
-        if '/locations/' in location_name:
-             try:
-                real_name = 'locations/' + location_name.split('/locations/')[1]
-             except:
-                real_name = location_name
+        # Performance API requires EXACTLY 'locations/{location_id}'
+        # Full resource names with 'accounts/' prefix cause 404 errors.
+        if 'locations/' in location_name:
+            location_id = location_name.split('locations/')[-1]
         else:
-             real_name = location_name
-
-        # The Performance API uses a specific endpoint for daily metrics
-        # GET https://businessprofileperformance.googleapis.com/v1/{name}/fetchMultiDailyMetricsTimeSeries
-        url = f"https://businessprofileperformance.googleapis.com/v1/{real_name}:fetchMultiDailyMetricsTimeSeries"
+            location_id = location_name
+            
+        base_url = f"https://businessprofileperformance.googleapis.com/v1/locations/{location_id}/dailyMetricsTimeSeries"
         
-        # Calculate time range
-        end_date = datetime.utcnow().date()
+        # Calculate time range - Google usually has a 2-3 day lag for performance data
+        # So we fetch up to 3 days ago to avoid empty recent dates
+        today = datetime.utcnow().date()
+        end_date = today - timedelta(days=3)
         start_date = end_date - timedelta(days=days)
         
-        payload = {
-            'dailyMetrics': [
-                'BUSINESS_IMPRESSIONS_DESKTOP_MAPS',
-                'BUSINESS_IMPRESSIONS_DESKTOP_SEARCH',
-                'BUSINESS_IMPRESSIONS_MOBILE_MAPS',
-                'BUSINESS_IMPRESSIONS_MOBILE_SEARCH',
-                'CALL_CLICKS',
-                'WEBSITE_CLICKS',
-                'BUSINESS_DIRECTION_REQUESTS'
-            ],
-            'dailyRange.startDate.year': start_date.year,
-            'dailyRange.startDate.month': start_date.month,
-            'dailyRange.startDate.day': start_date.day,
-            'dailyRange.endDate.year': end_date.year,
-            'dailyRange.endDate.month': end_date.month,
-            'dailyRange.endDate.day': end_date.day
-        }
+        # Ensure we don't go beyond the 180-day limit of the API (approx 6 months)
+        max_history = today - timedelta(days=179)
+        if start_date < max_history:
+            start_date = max_history
         
-        try:
-            response = requests.post(url, headers=self._get_headers(), json=payload, timeout=30)
+        # List of metrics to fetch one by one (since we're using the single GET endpoint)
+        metrics = [
+            'BUSINESS_IMPRESSIONS_DESKTOP_MAPS',
+            'BUSINESS_IMPRESSIONS_DESKTOP_SEARCH',
+            'BUSINESS_IMPRESSIONS_MOBILE_MAPS',
+            'BUSINESS_IMPRESSIONS_MOBILE_SEARCH',
+            'CALL_CLICKS',
+            'WEBSITE_CLICKS',
+            'BUSINESS_DIRECTION_REQUESTS'
+        ]
+        
+        results = []
+        headers = self._get_headers()
+        
+        for metric in metrics:
+            params = {
+                'dailyMetric': metric,
+                'dailyRange.startDate.year': start_date.year,
+                'dailyRange.startDate.month': start_date.month,
+                'dailyRange.startDate.day': start_date.day,
+                'dailyRange.endDate.year': end_date.year,
+                'dailyRange.endDate.month': end_date.month,
+                'dailyRange.endDate.day': end_date.day
+            }
             
-            # DEBUG: Print status and response for troubleshooting
-            logger.debug(f"Status Code: {response.status_code}, URL: {url}")
-            
-            if response.status_code == 403:
-                 body = response.json() if response.text else {}
-                 error_msg = body.get('error', {}).get('message', '')
-                 logger.error(f"403 detected: {error_msg}")
-                 
-                 if "Business Profile Performance API" in error_msg:
-                     raise Exception("API Desabilitada: Por favor, habilite a 'Business Profile Performance API' no seu Google Cloud Console para ver estes dados.")
-                 
-                 # Try with location_name (accounts/X/locations/Y)
-                 url_fallback = f"https://businessprofileperformance.googleapis.com/v1/{location_name}:fetchMultiDailyMetricsTimeSeries"
-                 logger.debug(f"Fallback URL: {url_fallback}")
-                 response = requests.post(url_fallback, headers=self._get_headers(), json=payload, timeout=30)
-                 logger.debug(f"Fallback Status: {response.status_code}")
-
-            response.raise_for_status()
-            
-            data = response.json()
-            logger.debug(f"Response Data: {data}")
-            
-            time_series_list = data.get('multiDailyMetricTimeSeries', [])
-            
-            # Reformat data for easier storage
-            # The API returns a list of TimeSeries, one per metric
-            results = []
-            for ts in time_series_list:
-                metric_name = ts.get('dailyMetric', '')
-                time_series = ts.get('dailyMetricTimeSeries', {}).get('timeSeries', [])
+            try:
+                response = requests.get(base_url, headers=headers, params=params, timeout=20)
                 
-                for point in time_series:
-                    date_data = point.get('date', {})
-                    val = int(point.get('value', 0))
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"GMB API Response for {metric}: {data}")
+                    time_series = data.get('timeSeries', {}).get('datedValues', [])
                     
-                    results.append({
-                        'metric': metric_name,
-                        'date': f"{date_data.get('year')}-{date_data.get('month'):02d}-{date_data.get('day'):02d}",
-                        'value': val
-                    })
-            
-            return results
-            
-        except Exception as e:
-            logger.error(f"Error fetching GMB performance data: {str(e)}")
-            return []
+                    for point in time_series:
+                        date_data = point.get('date', {})
+                        val = int(point.get('value', 0))
+                        
+                        results.append({
+                            'metric': metric,
+                            'date': f"{date_data.get('year')}-{date_data.get('month'):02d}-{date_data.get('day'):02d}",
+                            'value': val
+                        })
+                elif response.status_code == 404:
+                    # Log but continue if one metric is missing
+                    logger.warning(f"Metric {metric} not found (404) for location {location_id}")
+                else:
+                    logger.warning(f"Error fetching metric {metric}: {response.status_code} - {response.text}")
+                    
+            except Exception as e:
+                logger.error(f"Failed to fetch metric {metric}: {e}")
+                
+        return results
 
-    def sync_insights_to_cache(self, location_link_id: int, days: int = 30) -> int:
+
+    def test_performance_api(self, location_name: str) -> Dict:
+        """Diagnostic tool to test if Performance API is working for this connection"""
+        try:
+            # Try to fetch 180 days of data (maximum) to be absolutely sure
+            results = self.fetch_insights(location_name, days=180)
+            count = len(results)
+            return {
+                'success': True, 
+                'message': f'API de Performance funcionando! Encontrados {count} pontos de dados nos últimos 180 dias.'
+            }
+        except Exception as e:
+            return {'success': False, 'message': str(e)}
+
+
+    def sync_insights_to_cache(self, location_link_id: int, days: int = 90) -> int:
         """
         Fetch insights from Google and sync to GMBInsight table.
         """
@@ -664,15 +665,17 @@ class GoogleBusinessService:
                     else:
                         insight = GMBInsight(
                             location_link_id=location_link_id,
-                        date=item_date,
-                        metric=item['metric'],
-                        value=item['value']
-                    )
-                    db.add(insight)
+                            date=item_date,
+                            metric=item['metric'],
+                            value=item['value']
+                        )
+                        db.add(insight)
+                    
                     synced_count += 1
-            
-            db.commit()
-            return synced_count
+                
+                db.commit()
+                logger.info(f"Successfully synced {synced_count} insights for link {location_link_id}")
+                return synced_count
             
         except Exception as e:
             logger.exception(f"Sync insights failed: {str(e)}")

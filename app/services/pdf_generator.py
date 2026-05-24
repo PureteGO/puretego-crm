@@ -108,6 +108,32 @@ class PDFGenerator:
             
             return filepath
 
+    def generate_performance_report_pdf(self, report_data, language='pt', company=None):
+        """Gera PDF de performance do GMB"""
+        with force_locale(language):
+            context = self._get_context(report_data, language, company)
+            # Add specific report dates for template
+            context['start_date'] = report_data.get('start_date') or (datetime.now() - timedelta(days=30))
+            context['end_date'] = report_data.get('end_date') or datetime.now()
+            context['location'] = report_data.get('location')
+            context['stats'] = report_data.get('stats', {})
+            
+            html_content = render_template('reports/performance_report.html', **context)
+            
+            # File naming
+            date_str = datetime.now().strftime('%Y%m%d')
+            safe_name = "".join(
+                x for x in report_data.get('location', {}).get('title', 'relatorio')
+                if x.isalnum() or x in (' ', '_', '-')
+            ).replace(' ', '_')
+            filename = f"reporte_gmb_{safe_name}_{date_str}.pdf"
+            filepath = os.path.join(self.output_folder, filename)
+            
+            from weasyprint import HTML
+            HTML(string=html_content).write_pdf(filepath)
+            
+            return filepath
+
     def _get_context(self, proposal_data, language, company=None):
         """Builds the context for the template"""
         # Resolve theme

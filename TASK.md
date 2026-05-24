@@ -22,6 +22,18 @@
 - [x] Display business name prominently on Kanban cards.
 - [x] Add double-click shortcut to Kanban cards to open client view.
 
+## 7. Infrastructure & Stability (DONE - 2026-05-11)
+- [x] Resolved production 500 errors by fixing `DetachedInstanceError` in `services.py` using request-scoped `db_session`.
+- [x] Cleaned up `run.py` to remove generic 503 error masking, allowing for transparent debugging.
+- [x] Reconfigured LiteSpeed VirtualHost aliases to support `app2.maps2go.online` correctly.
+- [x] Issued and installed a valid Let's Encrypt SSL certificate for `app2.maps2go.online`.
+- [x] Migrated backend runner to a managed Gunicorn systemd service on port 5005 for improved reliability.
+
+## 8. Next Steps: SaaS Commercial Launch (PENDING)
+- [ ] Field testing with new prospects (Tomorrow).
+- [ ] Final UI/UX adaptations based on field feedback.
+- [ ] Prepare for official SaaS sales launch.
+
 ## 5. Brainstorming & Design (IN PROGRESS)
 - [ ] **Step 3: Design Proposals** <!-- id: 4 -->
     - [x] Create `docs/design_interaction_flow.md`.
@@ -30,3 +42,10 @@
 
 ## 6. Implementation: Visits & Calls Flow (PENDING)
 - [ ] Enhance interaction logging based on brainstorming. <!-- id: 6 -->
+
+## 9. GMB Insights & Reporting (DONE)
+- [x] Implement GMB Performance API connectivity check.
+- [x] Create Insights Dashboard (Chart.js) in `manage_location.html`.
+- [x] Implement Insight synchronization and local caching.
+- [x] Design and implement PDF Performance Reports for clients.
+

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="{{ language }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ _('Informe de Rendimiento') }} - {{ location.title }}</title>
+    <style>
+        @page {
+            margin: 2cm;
+            @bottom-right {
+                content: "Página " counter(page) " de " counter(pages);
+                font-size: 9pt;
+                color: #666;
+            }
+        }
+        body {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            color: #333;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            border-bottom: 2px solid {{ theme.primary }};
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            max-height: 60px;
+        }
+        .title-section h1 {
+            color: {{ theme.primary }};
+            margin: 0;
+            font-size: 24pt;
+            text-transform: uppercase;
+        }
+        .title-section p {
+            margin: 5px 0 0;
+            color: #666;
+            font-size: 11pt;
+        }
+        .client-info {
+            background-color: {{ theme.primary_light }};
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .client-info h2 {
+            margin-top: 0;
+            font-size: 14pt;
+            color: {{ theme.accent }};
+        }
+        .stats-grid {
+            display: block;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            width: 22%;
+            display: inline-block;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-right: 2%;
+        }
+        .stat-card:last-child {
+            margin-right: 0;
+        }
+        .stat-value {
+            font-size: 18pt;
+            font-weight: bold;
+            color: {{ theme.primary }};
+            display: block;
+        }
+        .stat-label {
+            font-size: 9pt;
+            color: #666;
+            text-transform: uppercase;
+        }
+        .section-title {
+            border-left: 4px solid {{ theme.primary }};
+            padding-left: 15px;
+            margin: 40px 0 20px;
+            font-size: 16pt;
+            color: {{ theme.bg_dark }};
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .data-table th {
+            background-color: {{ theme.primary }};
+            color: white;
+            text-align: left;
+            padding: 10px;
+            font-size: 10pt;
+        }
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 10pt;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 9pt;
+            color: #999;
+            text-align: center;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .accent-text {
+            color: {{ theme.primary }};
+            font-weight: bold;
+        }
+        .chart-placeholder {
+            width: 100%;
+            height: 200px;
+            background-color: #f9f9f9;
+            border: 1px dashed #ccc;
+            text-align: center;
+            line-height: 200px;
+            color: #999;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title-section">
+            <h1>{{ _('Reporte de Performance') }}</h1>
+            <p>{{ _('Google Business Profile') }} | {{ now.strftime('%B %Y') }}</p>
+        </div>
+        {% if company_info.logo_url %}
+        <img src="{{ company_info.logo_url }}" class="logo" alt="Logo">
+        {% endif %}
+    </div>
+
+    <div class="client-info">
+        <h2>{{ location.title }}</h2>
+        <p><strong>{{ _('Dirección') }}:</strong> {{ location.address }}</p>
+        <p><strong>{{ _('Período') }}:</strong> {{ start_date.strftime('%d/%m/%Y') }} - {{ end_date.strftime('%d/%m/%Y') }}</p>
+    </div>
+
+    <div class="section-title">{{ _('Resumen de Actividad') }}</div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.get('impressions', 0) }}</span>
+            <span class="stat-label">{{ _('Impresiones') }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.get('CALL_CLICKS', 0) }}</span>
+            <span class="stat-label">{{ _('Llamadas') }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.get('WEBSITE_CLICKS', 0) }}</span>
+            <span class="stat-label">{{ _('Web Clicks') }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-value">{{ stats.get('BUSINESS_DIRECTION_REQUESTS', 0) }}</span>
+            <span class="stat-label">{{ _('Rutas') }}</span>
+        </div>
+    </div>
+
+    <div class="section-title">{{ _('Detalle de Interacciones') }}</div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>{{ _('Métrica') }}</th>
+                <th>{{ _('Total del Período') }}</th>
+                <th>{{ _('Promedio Diario') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ _('Impresiones en Búsqueda (Desktop)') }}</td>
+                <td>{{ stats.get('BUSINESS_IMPRESSIONS_DESKTOP_SEARCH', 0) }}</td>
+                <td>{{ (stats.get('BUSINESS_IMPRESSIONS_DESKTOP_SEARCH', 0) / 30)|round(1) }}</td>
+            </tr>
+            <tr>
+                <td>{{ _('Impresiones en Búsqueda (Móvil)') }}</td>
+                <td>{{ stats.get('BUSINESS_IMPRESSIONS_MOBILE_SEARCH', 0) }}</td>
+                <td>{{ (stats.get('BUSINESS_IMPRESSIONS_MOBILE_SEARCH', 0) / 30)|round(1) }}</td>
+            </tr>
+            <tr>
+                <td>{{ _('Impresiones en Maps (Desktop)') }}</td>
+                <td>{{ stats.get('BUSINESS_IMPRESSIONS_DESKTOP_MAPS', 0) }}</td>
+                <td>{{ (stats.get('BUSINESS_IMPRESSIONS_DESKTOP_MAPS', 0) / 30)|round(1) }}</td>
+            </tr>
+            <tr>
+                <td>{{ _('Impresiones en Maps (Móvil)') }}</td>
+                <td>{{ stats.get('BUSINESS_IMPRESSIONS_MOBILE_MAPS', 0) }}</td>
+                <td>{{ (stats.get('BUSINESS_IMPRESSIONS_MOBILE_MAPS', 0) / 30)|round(1) }}</td>
+            </tr>
+            <tr>
+                <td><strong>{{ _('Total de Llamadas Telefónicas') }}</strong></td>
+                <td><strong class="accent-text">{{ stats.get('CALL_CLICKS', 0) }}</strong></td>
+                <td>{{ (stats.get('CALL_CLICKS', 0) / 30)|round(1) }}</td>
+            </tr>
+            <tr>
+                <td><strong>{{ _('Visitas al Sitio Web') }}</strong></td>
+                <td><strong class="accent-text">{{ stats.get('WEBSITE_CLICKS', 0) }}</strong></td>
+                <td>{{ (stats.get('WEBSITE_CLICKS', 0) / 30)|round(1) }}</td>
+            </tr>
+            <tr>
+                <td><strong>{{ _('Solicitudes de Direcciones') }}</strong></td>
+                <td><strong class="accent-text">{{ stats.get('BUSINESS_DIRECTION_REQUESTS', 0) }}</strong></td>
+                <td>{{ (stats.get('BUSINESS_DIRECTION_REQUESTS', 0) / 30)|round(1) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>{{ _('Este informe fue generado automáticamente por PureteGO CRM.') }}</p>
+        <p>{{ company_info.name }} - {{ company_info.email }} - {{ company_info.phone }}</p>
+    </div>
+</body>
+</html>

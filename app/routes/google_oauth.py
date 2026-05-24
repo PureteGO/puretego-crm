@@ -8,7 +8,7 @@ import os
 import json
 import secrets
 from datetime import datetime, timedelta
-from flask import Blueprint, request, redirect, url_for, flash, session, current_app, render_template, jsonify
+from flask import Blueprint, request, redirect, url_for, flash, session, current_app, render_template, jsonify, send_file
 from flask_babel import _
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
@@ -41,25 +41,22 @@ def get_client_config():
     }
 
 def get_redirect_uri():
-    """Get the redirect URI - auto-detect local vs production environment"""
-    # Check if explicitly set in environment
+    """Get the redirect URI - auto-detect based on current request host"""
+    # Check if explicitly set in environment (for emergency override)
     explicit_uri = os.environ.get('GOOGLE_REDIRECT_URI')
     if explicit_uri:
         return explicit_uri
-    
-    # Auto-detect based on FLASK_ENV or ENVIRONMENT variable
-    env = os.environ.get('FLASK_ENV', os.environ.get('ENVIRONMENT', 'development'))
-    
-    if env == 'production':
-        return 'https://app2.maps2go.online/integrations/google/callback'
-    else:
-        # Local development - use dynamic URL if in request context
-        try:
-            # This ensures the redirect URI matches the host used by the user (localhost vs 127.0.0.1 vs LAN IP)
-            return url_for('google_oauth.callback', _external=True)
-        except RuntimeError:
-            # Fallback if called outside request context
-            return 'http://localhost:5000/integrations/google/callback'
+        
+    try:
+        # This ensures the redirect URI matches the host used by the user (app.maps2go vs app2.maps2go)
+        # Required ProxyFix in app/__init__.py to work correctly behind LiteSpeed
+        return url_for('google_oauth.callback', _external=True)
+    except RuntimeError:
+        # Fallback if called outside request context
+        env = os.environ.get('FLASK_ENV', 'development')
+        if env == 'production':
+            return 'https://app2.maps2go.online/integrations/google/callback'
+        return 'http://localhost:5000/integrations/google/callback'
 
 
 @bp.route('/')
@@ -340,6 +337,10 @@ def connect():
         state=state
     )
     
+    # Store code_verifier for PKCE in callback
+    if hasattr(flow, 'code_verifier'):
+        session['oauth_code_verifier'] = flow.code_verifier
+    
     return redirect(authorization_url)
 
 
@@ -374,14 +375,18 @@ def callback():
         # Clear CSRF token
         session.pop('oauth_csrf', None)
         
-        # Exchange code for tokens
+        # Exchange code for tokens using stored code_verifier
         flow = Flow.from_client_config(
             get_client_config(),
             scopes=SCOPES,
             redirect_uri=get_redirect_uri()
         )
         
-        flow.fetch_token(code=code)
+        # Exchange code for tokens using stored code_verifier
+        flow.fetch_token(code=code, code_verifier=session.get('oauth_code_verifier'))
+        
+        # Clear code_verifier
+        session.pop('oauth_code_verifier', None)
         credentials = flow.credentials
         
         # Get user info to identify the account
@@ -751,12 +756,28 @@ def manage_location(connection_id, location_name):
                 if not location_details['totalReviewCount']:
                     location_details['totalReviewCount'] = len(reviews)
             
+            # 3. Get cached insights for basic stats
+            from app.models.ranking import GMBInsight
+            from sqlalchemy import func
+            
+            # Aggregate last 30 days
+            stats = db.query(
+                GMBInsight.metric, 
+                func.sum(GMBInsight.value).label('total')
+            ).filter(
+                GMBInsight.location_link_id == (link.id if link else 0),
+                GMBInsight.date >= (datetime.utcnow() - timedelta(days=30))
+            ).group_by(GMBInsight.metric).all()
+            
+            stats_dict = {s.metric: int(s.total) for s in stats}
+            
             return render_template('integrations/manage_location.html',
                                    connection=connection,
                                    location=location_details,
                                    link=link,
                                    reviews=reviews,
                                    review_error=review_error,
+                                   stats=stats_dict,
                                    debug_location=location_name)
                                    
         except Exception as e:
@@ -830,9 +851,8 @@ def sync_insights(connection_id, link_id):
             from app.services.google_business_service import GoogleBusinessService
             service = GoogleBusinessService(connection)
             
-            # Sync last 30 days
-            # actually sync_insights_to_cache takes link_id, so it re-queries.
-            count = service.sync_insights_to_cache(link_id, days=30)
+            # Sync last 90 days (Google max) for initial import
+            count = service.sync_insights_to_cache(link_id, days=90)
             flash(_('Métricas sincronizadas com sucesso: %(count)s registros.', count=count), 'success')
         except Exception as e:
             flash(_('Erro ao sincronizar métricas: %(error)s', error=str(e)), 'error')
@@ -852,6 +872,8 @@ def generate_ai_reply():
         rating = data.get('rating')
         comment = data.get('comment')
         
+        business_category = data.get('business_category')
+        
         if not all([business_name, reviewer_name, rating]):
             return jsonify({'success': False, 'message': 'Dados incompletos'}), 400
             
@@ -863,6 +885,7 @@ def generate_ai_reply():
         
         reply = gemini.generate_review_reply(
             business_name=business_name,
+            business_category=business_category,
             reviewer_name=reviewer_name,
             rating=int(rating),
             comment=comment or '',
@@ -874,3 +897,179 @@ def generate_ai_reply():
     except Exception as e:
         current_app.logger.error(f"Error generating AI reply: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
+
+@bp.route('/manage/<int:connection_id>/insights/data')
+@login_required
+def api_get_insights(connection_id):
+    """API: Get cached insights for a location as JSON for Chart.js"""
+    company_id = session.get('company_id')
+    location_name = request.args.get('location_name')
+    days = int(request.args.get('days', 30))
+    
+    with get_db() as db:
+        from app.models import GMBLocationLink
+        from app.models.ranking import GMBInsight
+        
+        link = db.query(GMBLocationLink).filter(
+            GMBLocationLink.gmb_location_name == location_name,
+            GMBLocationLink.company_id == company_id
+        ).first()
+        
+        if not link:
+            return jsonify({'success': False, 'message': 'Perfil não vinculado'}), 404
+            
+        # Fetch insights from DB
+        start_date = datetime.utcnow() - timedelta(days=days)
+        insights = db.query(GMBInsight).filter(
+            GMBInsight.location_link_id == link.id,
+            GMBInsight.date >= start_date
+        ).order_by(GMBInsight.date.asc()).all()
+        
+        # Format for Chart.js
+        # We need labels (dates) and datasets (one per metric)
+        labels = sorted(list(set([i.date.strftime('%Y-%m-%d') for i in insights])))
+        
+        metrics = {
+            'BUSINESS_IMPRESSIONS_DESKTOP_MAPS': 'Impressões (Desktop Maps)',
+            'BUSINESS_IMPRESSIONS_DESKTOP_SEARCH': 'Impressões (Desktop Search)',
+            'BUSINESS_IMPRESSIONS_MOBILE_MAPS': 'Impressões (Mobile Maps)',
+            'BUSINESS_IMPRESSIONS_MOBILE_SEARCH': 'Impressões (Mobile Search)',
+            'CALL_CLICKS': 'Chamadas',
+            'WEBSITE_CLICKS': 'Cliques no Site',
+            'BUSINESS_DIRECTION_REQUESTS': 'Solicitações de Rota'
+        }
+        
+        datasets = []
+        for metric_key, metric_label in metrics.items():
+            data_points = []
+            for label in labels:
+                val = next((i.value for i in insights if i.date.strftime('%Y-%m-%d') == label and i.metric == metric_key), 0)
+                data_points.append(val)
+            
+            if any(data_points): # Only include metrics that have data
+                datasets.append({
+                    'label': metric_label,
+                    'data': data_points,
+                    'borderWidth': 2,
+                    'tension': 0.3
+                })
+        
+        return jsonify({
+            'success': True,
+            'labels': labels,
+            'datasets': datasets
+        })
+
+@bp.route('/manage/<int:connection_id>/test-api')
+@login_required
+def test_api_connection(connection_id):
+    """Diagnostic: Test connection to GMB Performance API"""
+    company_id = session.get('company_id')
+    location_name = request.args.get('location_name')
+    
+    if not location_name:
+        return jsonify({'success': False, 'message': 'Nome do local ausente'}), 400
+        
+    try:
+        with get_db() as db:
+            connection = db.query(GoogleConnection).filter(
+                GoogleConnection.id == connection_id,
+                GoogleConnection.company_id == company_id
+            ).first()
+            
+            if not connection:
+                return jsonify({'success': False, 'message': 'Conexão não encontrada'}), 404
+                
+            from app.services.google_business_service import GoogleBusinessService
+            service = GoogleBusinessService(connection)
+            result = service.test_performance_api(location_name)
+            
+            return jsonify(result)
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@bp.route('/manage/<int:connection_id>/<path:location_name>/report')
+@login_required
+def download_report(connection_id, location_name):
+    """Generate and download a PDF performance report for a location"""
+    company_id = session.get('company_id')
+    
+    with get_db() as db:
+        connection = db.query(GoogleConnection).filter(
+            GoogleConnection.id == connection_id,
+            GoogleConnection.company_id == company_id
+        ).first()
+        
+        if not connection:
+            flash(_('Conexão não encontrada.'), 'error')
+            return redirect(url_for('google_oauth.dashboard'))
+            
+        from app.models import GMBLocationLink
+        from app.models.ranking import GMBInsight
+        from sqlalchemy import func
+        
+        link = db.query(GMBLocationLink).filter(
+            GMBLocationLink.gmb_location_name == location_name,
+            GMBLocationLink.company_id == company_id
+        ).first()
+        
+        if not link:
+            flash(_('Perfil não vinculado. Sincronize os dados primeiro.'), 'warning')
+            return redirect(url_for('google_oauth.manage_location', connection_id=connection_id, location_name=location_name))
+            
+        # Get stats for last 30 days
+        end_date = datetime.utcnow()
+        start_date = end_date - timedelta(days=30)
+        
+        stats = db.query(
+            GMBInsight.metric, 
+            func.sum(GMBInsight.value).label('total')
+        ).filter(
+            GMBInsight.location_link_id == link.id,
+            GMBInsight.date >= start_date
+        ).group_by(GMBInsight.metric).all()
+        
+        stats_dict = {s.metric: int(s.total) for s in stats}
+        # Add a calculated 'impressions' for easier template use
+        stats_dict['impressions'] = sum([v for k, v in stats_dict.items() if 'IMPRESSIONS' in k])
+        
+        # Prepare report data
+        from app.services.google_business_service import GoogleBusinessService
+        service = GoogleBusinessService(connection)
+        location_details = service.get_location_details(location_name)
+        
+        report_data = {
+            'location': location_details,
+            'stats': stats_dict,
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        
+        # Generate PDF
+        from app.services.pdf_generator import PDFGenerator
+        from app.models import Company
+        company = db.query(Company).get(company_id)
+        
+        # Convert company object to dict for PDF generator
+        company_dict = {
+            'name': company.name,
+            'email': company.email,
+            'phone': company.phone,
+            'address': company.address,
+            'logo_url': company.logo_url,
+            'theme_style': company.theme_style or 'maps2go-official'
+        }
+        
+        try:
+            pdf_gen = PDFGenerator()
+            filepath = pdf_gen.generate_performance_report_pdf(
+                report_data, 
+                language=session.get('language', 'pt'),
+                company=company_dict
+            )
+            
+            return send_file(filepath, as_attachment=True)
+        except Exception as e:
+            current_app.logger.error(f"Error generating PDF report: {e}")
+            flash(_('Erro ao gerar PDF: %(error)s', error=str(e)), 'error')
+            return redirect(url_for('google_oauth.manage_location', connection_id=connection_id, location_name=location_name))
