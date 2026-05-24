@@ -1,7 +1,7 @@
 # 📊 PureteGO CRM - Status & Roadmap
 
-**Data:** 06/02/2026 (Refactoring & RBAC Day)
-**Versão:** MVP - Produção Estabilizada + RBAC
+**Data:** 24/05/2026 (Kanban Inactivity & PDF Stability Day)
+**Versão:** MVP - Produção Estabilizada + Kanban Inactivity + PDF Fix
 **Status do Sistema:** 🟢 Operacional (Produção & Local)
 
 ---
@@ -10,7 +10,17 @@
 
 O sistema passou por uma fase crítica de estabilização em produção e agora está funcional e robusto.
 
-### ✅ Concluído Hoje (Maratona de 16h)
+### ✅ Concluído Hoje (24/05/2026 - Kanban & PDF Fix)
+*   **Controle de Inatividade no Kanban**:
+    *   Implementado destaque colorido sutil por inatividade nos cartões (amarelo para $\ge$ 7 dias, vermelho para $\ge$ 15 dias).
+    *   Implementada rotina de auto-arquivamento após 21 dias sem movimentação.
+    *   Adicionado botão de fechar (`x`) para remoção manual rápida nos cartões do Kanban.
+    *   Criada a visualização **Repositório de Removidos** (`/clients/kanban/removed`) com barra de buscas JS dinâmica e ação de restauração instantânea.
+*   **Estabilidade de PDF de Propostas**:
+    *   Corrigido o erro crítico de dependência no servidor: `TypeError: PDF.__init__() takes 1 positional argument but 3 were given` travando `pydyf==0.10.0` no `requirements.txt`.
+    *   Deploy completo realizado e serviço Gunicorn daemon (`maps2gosaas.service`) reiniciado com sucesso no VPS.
+
+### ✅ Concluído Anteriormente
 *   **Estabilidade de Produção**:
     *   Resolvidos erros de `DetachedInstanceError` em todas as rotas principais (Dashboard, Clientes, Relatórios).
     *   Implementado `joinedload` exaustivo para garantir que dados de relacionamentos subam sem falhas.
@@ -40,6 +50,9 @@ O sistema passou por uma fase crítica de estabilização em produção e agora 
 *   **Dashboard Executivo**: Implementadas métricas de Conversão, Ticket Médio, Valor em Pipeline e Gráfico de Desempenho Mensal.
 
 ### 🚧 Em Andamento / Próximos Desafios
+*   **Melhoria do Fluxo de Orçamentos e Propostas (Foco Imediato)**:
+    *   Aprimorar o assistente e interface de criação de orçamentos/propostas.
+    *   Otimizar a diagramação dos templates de PDF e visualização pública.
 *   **Arquitetura Assíncrona**: Preparar ambiente para Celery/Redis para tarefas pesadas.
 *   **SaaS Multi-tenant**: Refinar o fluxo de assinatura e limites de usuários por plano.
 
@@ -48,7 +61,7 @@ O sistema passou por uma fase crítica de estabilização em produção e agora 
 ## 🗺️ 2. Para Onde Vamos (Próximos Passos)
 
 ### 🎯 Curto Prazo
-1.  **Módulo de Orçamentos**: Vincular os itens de serviço aos preços salvos no banco.
+1.  **Fluxo de Propostas & Orçamentos**: Refinar a experiência de criação e o visual dos PDFs.
 2.  **Notificações**: Alertas simples para tarefas atrasadas na agenda.
 
 ### 🚀 Médio Prazo (Rumo aos 5k usuários)
