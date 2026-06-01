@@ -22,6 +22,6 @@ try:
     
 except Exception as e:
     import traceback
-    with open(os.path.expanduser('~/maps2go_crm/startup_error.txt'), 'w') as f:
+    with open(os.path.expanduser('~/gbpcheck.puretego.online/startup_error.txt'), 'w') as f:
         f.write(traceback.format_exc())
     raise
