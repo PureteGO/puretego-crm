@@ -35,6 +35,8 @@ from .payable_category import PayableCategory
 from .notification import Notification
 from .local_search import LocalSearchKeyword, LocalScanResult, LocalMetricsAggregated
 from .project_note import ProjectNote
+from .lead import Lead
+from .lead_activity import LeadActivity
 
 __all__ = [
     'Company',
@@ -79,5 +81,7 @@ __all__ = [
     'Notification',
     'LocalSearchKeyword',
     'LocalScanResult',
-    'LocalMetricsAggregated'
+    'LocalMetricsAggregated',
+    'Lead',
+    'LeadActivity'
 ]

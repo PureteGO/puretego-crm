@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Leads para Prospecção') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ _('Leads para Prospecção') }}</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a href="{{ url_for('prospecting.search') }}" class="btn btn-sm btn-outline-primary me-2">
+                <i class="bi bi-search-location"></i> {{ _('Buscar no Google Maps') }}
+            </a>
+            <a href="{{ url_for('prospecting.leads_create') }}" class="btn btn-sm btn-success">
+                <i class="bi bi-plus-lg"></i> {{ _('Adicionar Lead Manual') }}
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros de Busca -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form action="{{ url_for('prospecting.leads') }}" method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">{{ _('Nome da Empresa') }}</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" name="q" class="form-control" placeholder="{{ _('Buscar por nome...') }}" value="{{ q }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">{{ _('Cidade') }}</label>
+                    <select name="city" class="form-select form-select-sm">
+                        <option value="">{{ _('Todas') }}</option>
+                        {% for city in cities %}
+                        <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">{{ _('Bairro/Região') }}</label>
+                    <select name="neighborhood" class="form-select form-select-sm">
+                        <option value="">{{ _('Todos') }}</option>
+                        {% for nh in neighborhoods %}
+                        <option value="{{ nh }}" {% if selected_neighborhood == nh %}selected{% endif %}>{{ nh }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-1.5">
+                    <label class="form-label small fw-bold">{{ _('Origem') }}</label>
+                    <select name="source" class="form-select form-select-sm">
+                        <option value="">{{ _('Todas') }}</option>
+                        <option value="field_visit" {% if selected_source == 'field_visit' %}selected{% endif %}>{{ _('Visita em Campo') }}</option>
+                        <option value="social_media" {% if selected_source == 'social_media' %}selected{% endif %}>{{ _('Redes Sociais') }}</option>
+                        <option value="google_maps" {% if selected_source == 'google_maps' %}selected{% endif %}>{{ _('Google Maps') }}</option>
+                        <option value="referral" {% if selected_source == 'referral' %}selected{% endif %}>{{ _('Indicação') }}</option>
+                        <option value="other" {% if selected_source == 'other' %}selected{% endif %}>{{ _('Outro') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-1.5">
+                    <label class="form-label small fw-bold">{{ _('Abordagem') }}</label>
+                    <select name="prospecting_method" class="form-select form-select-sm">
+                        <option value="">{{ _('Todas') }}</option>
+                        <option value="opening_visit" {% if selected_method == 'opening_visit' %}selected{% endif %}>{{ _('Visita de Abertura') }}</option>
+                        <option value="phone_call" {% if selected_method == 'phone_call' %}selected{% endif %}>{{ _('Chamada Telefônica') }}</option>
+                        <option value="whatsapp" {% if selected_method == 'whatsapp' %}selected{% endif %}>{{ _('WhatsApp') }}</option>
+                        <option value="email" {% if selected_method == 'email' %}selected{% endif %}>{{ _('E-mail') }}</option>
+                        <option value="other" {% if selected_method == 'other' %}selected{% endif %}>{{ _('Outro') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-1.5">
+                    <label class="form-label small fw-bold">{{ _('Status') }}</label>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="">{{ _('Todos') }}</option>
+                        <option value="new" {% if selected_status == 'new' %}selected{% endif %}>{{ _('Novo') }}</option>
+                        <option value="analyzing" {% if selected_status == 'analyzing' %}selected{% endif %}>{{ _('Em análise') }}</option>
+                        <option value="qualified" {% if selected_status == 'qualified' %}selected{% endif %}>{{ _('Qualificado') }}</option>
+                        <option value="contacting" {% if selected_status == 'contacting' %}selected{% endif %}>{{ _('Em contato') }}</option>
+                        <option value="converted" {% if selected_status == 'converted' %}selected{% endif %}>{{ _('Convertido') }}</option>
+                        <option value="lost" {% if selected_status == 'lost' %}selected{% endif %}>{{ _('Perdido') }}</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-sm btn-primary flex-grow-1"><i class="bi bi-funnel"></i></button>
+                    <a href="{{ url_for('prospecting.leads') }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabela de Leads -->
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>{{ _('Empresa') }}</th>
+                            <th>{{ _('Cidade / Bairro') }}</th>
+                            <th>{{ _('Qualificação') }}</th>
+                            <th>{{ _('Origem / Abordagem') }}</th>
+                            <th>{{ _('Status') }}</th>
+                            <th>{{ _('Data Cadastro') }}</th>
+                            <th class="text-end pe-3">{{ _('Ações') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lead in leads %}
+                        <tr style="cursor: pointer;" onclick="window.location='{{ url_for('prospecting.leads_view', lead_id=lead.id) }}'">
+                            <td>
+                                <div class="fw-bold">{{ lead.company_name }}</div>
+                                {% if lead.maps_link %}
+                                <small class="text-muted"><i class="bi bi-geo-alt"></i> {{ _('Google Maps cadastrado') }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ lead.city or '-' }}</div>
+                                <small class="text-muted">{{ lead.neighborhood or '-' }}</small>
+                            </td>
+                            <td>
+                                {% if lead.qualification == 'hot' %}
+                                <span class="badge bg-danger rounded-pill"><i class="bi bi-fire"></i> {{ _('Quente') }}</span>
+                                {% elif lead.qualification == 'warm' %}
+                                <span class="badge bg-warning text-dark rounded-pill"><i class="bi bi-thermometer-half"></i> {{ _('Morno') }}</span>
+                                {% else %}
+                                <span class="badge bg-info text-dark rounded-pill"><i class="bi bi-snow"></i> {{ _('Frio') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="small fw-semibold">
+                                    {% if lead.source == 'google_maps' %}
+                                    <i class="bi bi-google text-primary"></i> {{ _('Google Maps') }}
+                                    {% elif lead.source == 'field_visit' %}
+                                    <i class="bi bi-geo text-success"></i> {{ _('Visita em Campo') }}
+                                    {% elif lead.source == 'social_media' %}
+                                    <i class="bi bi-instagram text-danger"></i> {{ _('Redes Sociais') }}
+                                    {% elif lead.source == 'referral' %}
+                                    <i class="bi bi-chat-quote text-warning"></i> {{ _('Indicação') }}
+                                    {% else %}
+                                    <i class="bi bi-question-circle"></i> {{ _('Outro') }}
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">
+                                    {% if lead.prospecting_method == 'opening_visit' %}
+                                    <i class="bi bi-geo-alt"></i> {{ _('Visita de Abertura') }}
+                                    {% elif lead.prospecting_method == 'phone_call' %}
+                                    <i class="bi bi-telephone"></i> {{ _('Chamada Telefônica') }}
+                                    {% elif lead.prospecting_method == 'whatsapp' %}
+                                    <i class="bi bi-whatsapp"></i> {{ _('WhatsApp') }}
+                                    {% elif lead.prospecting_method == 'email' %}
+                                    <i class="bi bi-envelope"></i> {{ _('E-mail') }}
+                                    {% else %}
+                                    <i class="bi bi-link-45deg"></i> {{ _('Outro') }}
+                                    {% endif %}
+                                </small>
+                            </td>
+                            <td>
+                                {% if lead.status == 'new' %}
+                                <span class="badge bg-info text-dark">{{ _('Novo') }}</span>
+                                {% elif lead.status == 'analyzing' %}
+                                <span class="badge bg-secondary">{{ _('Em análise') }}</span>
+                                {% elif lead.status == 'qualified' %}
+                                <span class="badge bg-primary">{{ _('Qualificado') }}</span>
+                                {% elif lead.status == 'contacting' %}
+                                <span class="badge bg-warning text-dark">{{ _('Em contato') }}</span>
+                                {% elif lead.status == 'converted' %}
+                                <span class="badge bg-success"><i class="bi bi-check-circle"></i> {{ _('Convertido') }}</span>
+                                {% else %}
+                                <span class="badge bg-danger">{{ _('Perdido') }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="small text-muted">{{ lead.created_at|format_date }}</td>
+                            <td class="text-end pe-3" onclick="event.stopPropagation();">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('prospecting.leads_view', lead_id=lead.id) }}" class="btn btn-outline-primary" title="{{ _('Visualizar') }}">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('prospecting.leads_edit', lead_id=lead.id) }}" class="btn btn-outline-secondary" title="{{ _('Editar') }}">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{{ url_for('prospecting.leads_delete', lead_id=lead.id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ _('Excluir este lead de prospecção permanentemente?') }}');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-danger" title="{{ _('Remover') }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-funnel fs-1 mb-3 d-block text-secondary"></i>
+                                {{ _('Nenhum lead de prospecção cadastrado ou encontrado com estes filtros.') }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

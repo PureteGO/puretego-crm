@@ -14,7 +14,8 @@ class HasDataService:
         if not api_key:
             try:
                 api_key = current_app.config.get('HASDATA_API_KEY')
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Could not retrieve HASDATA_API_KEY from current_app config: {e}")
                 api_key = None
         
         self.api_key = api_key or ''

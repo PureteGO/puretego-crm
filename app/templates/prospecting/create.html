@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Novo Lead de Prospecção') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">{{ _('Novo Lead de Prospecção') }}</h1>
+        <a href="{{ url_for('prospecting.leads') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> {{ _('Voltar') }}
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form action="{{ url_for('prospecting.leads_create') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="row">
+                    <!-- Informações Básicas -->
+                    <div class="col-md-6">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-info-circle me-2"></i>{{ _('Informações Básicas') }}</h5>
+                        
+                        <div class="mb-3">
+                            <label for="company_name" class="form-label fw-bold">{{ _('Nome da Empresa') }} <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="company_name" name="company_name" required placeholder="{{ _('Ex: Restaurante Central') }}">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="source" class="form-label fw-bold">{{ _('Origem do Lead') }}</label>
+                                <select class="form-select" id="source" name="source">
+                                    <option value="field_visit">{{ _('Visita em Campo') }}</option>
+                                    <option value="social_media">{{ _('Redes Sociais') }}</option>
+                                    <option value="google_maps">{{ _('Google Maps') }}</option>
+                                    <option value="referral">{{ _('Indicação') }}</option>
+                                    <option value="other">{{ _('Outro') }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="prospecting_method" class="form-label fw-bold">{{ _('Forma de Abordagem') }}</label>
+                                <select class="form-select" id="prospecting_method" name="prospecting_method">
+                                    <option value="opening_visit">{{ _('Visita de Abertura') }}</option>
+                                    <option value="phone_call" selected>{{ _('Chamada Telefônica') }}</option>
+                                    <option value="whatsapp">{{ _('WhatsApp') }}</option>
+                                    <option value="email">{{ _('E-mail') }}</option>
+                                    <option value="other">{{ _('Outro') }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="qualification" class="form-label fw-bold">{{ _('Qualificação do Lead') }}</label>
+                                <select class="form-select" id="qualification" name="qualification">
+                                    <option value="cold" selected>{{ _('Frio') }}</option>
+                                    <option value="warm">{{ _('Morno') }}</option>
+                                    <option value="hot">{{ _('Quente') }}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="status" class="form-label fw-bold">{{ _('Status Inicial') }}</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option value="new" selected>{{ _('Novo') }}</option>
+                                    <option value="analyzing">{{ _('Em análise') }}</option>
+                                    <option value="qualified">{{ _('Qualificado') }}</option>
+                                    <option value="contacting">{{ _('Em contato') }}</option>
+                                    <option value="converted">{{ _('Convertido') }}</option>
+                                    <option value="lost">{{ _('Perdido') }}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="maps_link" class="form-label fw-bold">{{ _('Link Google Maps') }}</label>
+                            <input type="url" class="form-control" id="maps_link" name="maps_link" placeholder="https://maps.google.com/...">
+                        </div>
+                    </div>
+
+                    <!-- Localização e Diagnóstico -->
+                    <div class="col-md-6">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-geo-alt me-2"></i>{{ _('Localização e Diagnóstico') }}</h5>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="city" class="form-label fw-bold">{{ _('Cidade') }}</label>
+                                <input type="text" class="form-control" id="city" name="city" placeholder="{{ _('Ex: Asunción') }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="neighborhood" class="form-label fw-bold">{{ _('Bairro/Região') }}</label>
+                                <input type="text" class="form-control" id="neighborhood" name="neighborhood" placeholder="{{ _('Ex: Villa Morra') }}">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="address" class="form-label fw-bold">{{ _('Localização / Endereço Completo') }}</label>
+                            <textarea class="form-control" id="address" name="address" rows="2" placeholder="{{ _('Endereço ou pontos de referência...') }}"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="business_health" class="form-label fw-bold">{{ _('Saúde do Cliente (Diagnóstico Inicial)') }}</label>
+                            <textarea class="form-control" id="business_health" name="business_health" rows="3" placeholder="{{ _('Ex: Sem ficha reivindicada no maps, poucas fotos, site lento...') }}"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-chat-text me-2"></i>{{ _('Observações Gerais') }}</h5>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="observations" name="observations" rows="3" placeholder="{{ _('Anotações sobre a abordagem, decisores identificados ou próximos passos...') }}"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                    <a href="{{ url_for('prospecting.leads') }}" class="btn btn-secondary">{{ _('Cancelar') }}</a>
+                    <button type="submit" class="btn btn-success"><i class="bi bi-check-lg"></i> {{ _('Cadastrar Lead') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

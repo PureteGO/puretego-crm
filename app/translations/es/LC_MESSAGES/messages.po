@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PURETEGO CRM 1.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-25 12:04-0300\n"
+"POT-Creation-Date: 2026-06-01 09:03-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -60,15 +60,20 @@ msgstr ""
 msgid "Password updated successfully! You can now log in."
 msgstr ""
 
-#: app/routes/clients.py:709
+#: app/routes/clients.py:815
 msgid "Deal title is required"
 msgstr "El título del negocio es obligatorio"
 
-#: app/routes/clients.py:731
+#: app/routes/clients.py:819
+#, fuzzy
+msgid "Client is required"
+msgstr "El título del negocio es obligatorio"
+
+#: app/routes/clients.py:842
 msgid "Deal created successfully"
 msgstr "Negocio creado con éxito"
 
-#: app/routes/dashboard.py:105 app/routes/dashboard.py:227
+#: app/routes/dashboard.py:108 app/routes/dashboard.py:235
 #: app/templates/projects/view.html:416
 msgid "Unknown"
 msgstr "Desconocido"
@@ -93,160 +98,170 @@ msgstr ""
 msgid "Contas(s) a pagar registrada(s)!"
 msgstr ""
 
-#: app/routes/google_oauth.py:86
+#: app/routes/google_oauth.py:83
 msgid "Cuenta desconocida"
 msgstr ""
 
-#: app/routes/google_oauth.py:125
+#: app/routes/google_oauth.py:122
 msgid "Cliente eliminado"
 msgstr "Cliente eliminado correctamente"
 
-#: app/routes/google_oauth.py:176
+#: app/routes/google_oauth.py:173
 msgid "Você não tem permissão para gerenciar integrações Google."
 msgstr ""
 
-#: app/routes/google_oauth.py:187 app/routes/google_oauth.py:789
+#: app/routes/google_oauth.py:184 app/routes/google_oauth.py:810
+#: app/routes/google_oauth.py:1004
 msgid "Conexão não encontrada."
 msgstr "Empresa no encontrada"
 
-#: app/routes/google_oauth.py:264
+#: app/routes/google_oauth.py:261
 #, python-format
 msgid "Erro ao carregar locais: %(error)s"
 msgstr "Error al procesar la solicitud"
 
-#: app/routes/google_oauth.py:297
+#: app/routes/google_oauth.py:294
 msgid ""
 "Permissões de GMB restauradas para Proprietários e Gerentes. Sua sessão "
 "foi atualizada."
 msgstr ""
 
-#: app/routes/google_oauth.py:308
+#: app/routes/google_oauth.py:305
 msgid "La integración con Google Business Profile está deshabilitada."
 msgstr ""
 
-#: app/routes/google_oauth.py:313
+#: app/routes/google_oauth.py:310
 msgid "Error de configuración: Falta el Client Secret de Google."
 msgstr ""
 
-#: app/routes/google_oauth.py:356
+#: app/routes/google_oauth.py:357
 #, python-format
 msgid "Error de autorización de Google: %(error)s"
 msgstr ""
 
-#: app/routes/google_oauth.py:360
+#: app/routes/google_oauth.py:361
 msgid "Respuesta OAuth inválida."
 msgstr ""
 
-#: app/routes/google_oauth.py:371
+#: app/routes/google_oauth.py:372
 msgid "Token de seguridad inválido. Intente nuevamente."
 msgstr ""
 
-#: app/routes/google_oauth.py:412
+#: app/routes/google_oauth.py:417
 #, python-format
 msgid "Cuenta Google %(email)s reconectada exitosamente."
 msgstr ""
 
-#: app/routes/google_oauth.py:427
+#: app/routes/google_oauth.py:432
 #, python-format
 msgid "Cuenta Google %(email)s conectada exitosamente."
 msgstr ""
 
-#: app/routes/google_oauth.py:435
+#: app/routes/google_oauth.py:440
 #, python-format
 msgid "Error al procesar la autorización: %(error)s"
 msgstr "Error al procesar la solicitud"
 
-#: app/routes/google_oauth.py:455
+#: app/routes/google_oauth.py:460
 #, python-format
 msgid "Cuenta %(email)s desconectada."
 msgstr ""
 
-#: app/routes/google_oauth.py:457 app/routes/google_oauth.py:586
+#: app/routes/google_oauth.py:462 app/routes/google_oauth.py:591
 msgid "Conexión no encontrada."
 msgstr "Empresa no encontrada"
 
-#: app/routes/google_oauth.py:558
+#: app/routes/google_oauth.py:563
 msgid ""
 "Quota excedida ou API não ativada no Google Cloud. Por favor, verifique "
 "as configurações no Console do Google Cloud."
 msgstr ""
 
-#: app/routes/google_oauth.py:560
+#: app/routes/google_oauth.py:565
 msgid ""
 "Permissão negada. Verifique se a conta tem acesso aos perfis e se as APIs"
 " estão ativadas."
 msgstr ""
 
-#: app/routes/google_oauth.py:575
+#: app/routes/google_oauth.py:580
 msgid "Datos incompletos."
 msgstr ""
 
-#: app/routes/google_oauth.py:595
+#: app/routes/google_oauth.py:600
 msgid "Você não tem permissão para vincular este cliente."
 msgstr ""
 
-#: app/routes/google_oauth.py:609
+#: app/routes/google_oauth.py:614
 msgid "Vínculo actualizado."
 msgstr "Actualizar"
 
-#: app/routes/google_oauth.py:628
+#: app/routes/google_oauth.py:633
 msgid "Perfil vinculado exitosamente."
 msgstr ""
 
-#: app/routes/google_oauth.py:654
+#: app/routes/google_oauth.py:659
 msgid "Você não tem permissão para alterar este vínculo."
 msgstr ""
 
-#: app/routes/google_oauth.py:658
+#: app/routes/google_oauth.py:663
 msgid "Perfil definido como principal."
 msgstr ""
 
-#: app/routes/google_oauth.py:660 app/routes/google_oauth.py:691
+#: app/routes/google_oauth.py:665 app/routes/google_oauth.py:696
 msgid "Vínculo no encontrado."
 msgstr "Empresa no encontrada"
 
-#: app/routes/google_oauth.py:684
+#: app/routes/google_oauth.py:689
 msgid "Você não tem permissão para remover este vínculo."
 msgstr ""
 
-#: app/routes/google_oauth.py:689
+#: app/routes/google_oauth.py:694
 msgid "Vínculo eliminado."
 msgstr ""
 
-#: app/routes/google_oauth.py:711
+#: app/routes/google_oauth.py:716
 msgid "Conexión no encontrada o inactiva."
 msgstr ""
 
-#: app/routes/google_oauth.py:764
+#: app/routes/google_oauth.py:785
 #, python-format
 msgid "Error al obtener datos de Google: %(error)s"
 msgstr ""
 
-#: app/routes/google_oauth.py:776
+#: app/routes/google_oauth.py:797
 msgid "Dados incompletos para a resposta."
 msgstr ""
 
-#: app/routes/google_oauth.py:796
+#: app/routes/google_oauth.py:817
 msgid "Resposta enviada com sucesso!"
 msgstr ""
 
-#: app/routes/google_oauth.py:800
+#: app/routes/google_oauth.py:821
 msgid "Erro ao enviar resposta: "
 msgstr ""
 
-#: app/routes/google_oauth.py:824
+#: app/routes/google_oauth.py:845
 msgid "Conexão ou Perfil não encontrado."
 msgstr ""
 
-#: app/routes/google_oauth.py:836
+#: app/routes/google_oauth.py:856
 #, python-format
 msgid "Métricas sincronizadas com sucesso: %(count)s registros."
 msgstr ""
 
-#: app/routes/google_oauth.py:838
+#: app/routes/google_oauth.py:858
 #, python-format
 msgid "Erro ao sincronizar métricas: %(error)s"
 msgstr ""
+
+#: app/routes/google_oauth.py:1017
+msgid "Perfil não vinculado. Sincronize os dados primeiro."
+msgstr ""
+
+#: app/routes/google_oauth.py:1074
+#, fuzzy, python-format
+msgid "Erro ao gerar PDF: %(error)s"
+msgstr "Error al procesar la solicitud"
 
 #: app/routes/health_checks.py:55
 msgid "Auditoria Oficial realizada com sucesso!"
@@ -261,16 +276,16 @@ msgstr ""
 msgid "Erro interno ao processar auditoria oficial."
 msgstr "Error al procesar la solicitud"
 
-#: app/routes/interactions.py:105 app/routes/interactions.py:217
-#: app/routes/interactions.py:219 app/templates/projects/view.html:251
+#: app/routes/interactions.py:105 app/routes/interactions.py:218
+#: app/routes/interactions.py:220 app/templates/projects/view.html:251
 msgid "Task"
 msgstr "Tarea"
 
-#: app/routes/interactions.py:187 app/routes/interactions.py:195
+#: app/routes/interactions.py:188 app/routes/interactions.py:196
 msgid "Visit"
 msgstr "Visita"
 
-#: app/routes/interactions.py:244 app/routes/interactions.py:252
+#: app/routes/interactions.py:245 app/routes/interactions.py:253
 msgid "Project Task"
 msgstr "Tarea de Proyecto"
 
@@ -440,6 +455,94 @@ msgstr "Eliminar"
 msgid "Note not found."
 msgstr "Empresa no encontrada"
 
+#: app/routes/prospecting.py:33
+msgid "API Key do Serper não configurada. Contate o admin."
+msgstr "Clave API de Serper no configurada. Contacte al admin."
+
+#: app/routes/prospecting.py:40
+msgid "Erro na busca:"
+msgstr "Error en la búsqueda:"
+
+#: app/routes/prospecting.py:62
+msgid "Nome é obrigatório."
+msgstr "El nombre es obligatorio."
+
+#: app/routes/prospecting.py:73 app/routes/prospecting.py:107
+#: app/routes/prospecting.py:222 app/routes/prospecting.py:312
+#: app/routes/prospecting.py:335 app/routes/prospecting.py:463
+msgid "Lead"
+msgstr "Lead"
+
+#: app/routes/prospecting.py:73
+msgid "já existe na base de prospecção."
+msgstr "ya existe en la base de prospección."
+
+#: app/routes/prospecting.py:102
+msgid "Lead prospectado e adicionado via busca do Google Maps."
+msgstr "Lead prospectado y agregado a través de la búsqueda de Google Maps."
+
+#: app/routes/prospecting.py:107
+msgid "capturado com sucesso para prospecção!"
+msgstr "¡capturado con éxito para prospección!"
+
+#: app/routes/prospecting.py:190 app/routes/prospecting.py:275
+msgid "Nome da empresa é obrigatório."
+msgstr "El nombre de la empresa es obligatorio."
+
+#: app/routes/prospecting.py:217
+msgid "Lead cadastrado manualmente."
+msgstr "Lead registrado manualmente."
+
+#: app/routes/prospecting.py:222
+msgid "cadastrado com sucesso!"
+msgstr "¡registrado con éxito!"
+
+#: app/routes/prospecting.py:238 app/routes/prospecting.py:258
+#: app/routes/prospecting.py:328 app/routes/prospecting.py:358
+#: app/routes/prospecting.py:386
+msgid "Lead não encontrado."
+msgstr "Lead no encontrado."
+
+#: app/routes/prospecting.py:298
+msgid "Status atualizado de"
+msgstr "Estado actualizado de"
+
+#: app/routes/prospecting.py:298
+msgid "para"
+msgstr "para"
+
+#: app/routes/prospecting.py:306
+msgid "Informações da ficha atualizadas."
+msgstr "Información de la ficha actualizada."
+
+#: app/routes/prospecting.py:312
+msgid "atualizado com sucesso!"
+msgstr "¡actualizado con éxito!"
+
+#: app/routes/prospecting.py:335
+msgid "removido com sucesso!"
+msgstr "¡eliminado con éxito!"
+
+#: app/routes/prospecting.py:352
+msgid "Descrição da atividade é obrigatória."
+msgstr "La descripción de la actividad es obligatoria."
+
+#: app/routes/prospecting.py:370
+msgid "Atividade registrada com sucesso!"
+msgstr "¡Actividad registrada con éxito!"
+
+#: app/routes/prospecting.py:390
+msgid "Este lead já foi convertido anteriormente."
+msgstr "Este lead ya fue convertido anteriormente."
+
+#: app/routes/prospecting.py:458
+msgid "Lead convertido com sucesso em Cliente Ativo."
+msgstr "Lead convertido con éxito en Cliente Activo."
+
+#: app/routes/prospecting.py:463
+msgid "convertido com sucesso em Cliente e inserido no Kanban!"
+msgstr "¡convertido con éxito en Cliente e insertado en el Kanban!"
+
 #: app/routes/saas.py:18
 msgid "Acceso denegado. Área restringida para Super Administradores."
 msgstr "Acceso denegado. Área restringida para Super Administradores."
@@ -478,27 +581,27 @@ msgstr "Paquete creado con éxito!"
 msgid "Paquete actualizado con éxito!"
 msgstr "Paquete actualizado con éxito!"
 
-#: app/routes/services.py:42
+#: app/routes/services.py:45
 msgid "Service created successfully!"
 msgstr "¡Servicio creado con éxito!"
 
-#: app/routes/services.py:54
+#: app/routes/services.py:58
 msgid "Service not found or permission denied."
 msgstr "Servicio no encontrado o permiso denegado."
 
-#: app/routes/services.py:63
+#: app/routes/services.py:67
 msgid "Service updated successfully!"
 msgstr "¡Servicio actualizado con éxito!"
 
-#: app/routes/services.py:83
+#: app/routes/services.py:88
 msgid "Package created successfully!"
 msgstr "¡Paquete creado con éxito!"
 
-#: app/routes/services.py:95
+#: app/routes/services.py:101
 msgid "Package not found or permission denied."
 msgstr "Paquete no encontrado o permiso denegado."
 
-#: app/routes/services.py:105
+#: app/routes/services.py:111
 msgid "Package updated successfully!"
 msgstr "¡Paquete actualizado con éxito!"
 
@@ -570,7 +673,7 @@ msgstr "El título del negocio es obligatorio"
 msgid "Company context not found"
 msgstr "Empresa no encontrada"
 
-#: app/routes/tasks.py:610 app/templates/dashboard/index.html:1290
+#: app/routes/tasks.py:610 app/templates/dashboard/index.html:1338
 #, fuzzy
 msgid "Task created!"
 msgstr "Tarea completada"
@@ -662,29 +765,29 @@ msgstr ""
 msgid "Faturamento Inicial -"
 msgstr ""
 
-#: app/templates/base.html:94
+#: app/templates/base.html:95
 msgid "Upload your logo in Company Settings"
 msgstr ""
 
-#: app/templates/base.html:107 app/templates/dashboard/index.html:3
+#: app/templates/base.html:108 app/templates/dashboard/index.html:3
 #: app/templates/dashboard/index.html:9
 msgid "Dashboard"
 msgstr "Tablero"
 
-#: app/templates/base.html:113
+#: app/templates/base.html:114
 msgid "Projects"
 msgstr "Proyectos"
 
-#: app/templates/base.html:128 app/templates/calendar/index.html:9
-#: app/templates/calendar/index.html:131 app/templates/dashboard/index.html:240
+#: app/templates/base.html:129 app/templates/calendar/index.html:9
+#: app/templates/calendar/index.html:186 app/templates/dashboard/index.html:240
 msgid "Agenda"
 msgstr "Agenda"
 
-#: app/templates/base.html:139
+#: app/templates/base.html:140
 msgid "Kanban"
 msgstr "Kanban"
 
-#: app/templates/base.html:144 app/templates/clients/index.html:3
+#: app/templates/base.html:145 app/templates/clients/index.html:3
 #: app/templates/clients/index.html:9 app/templates/company/profile.html:84
 #: app/templates/health_checks/create.html:9
 #: app/templates/saas/dashboard.html:69
@@ -692,99 +795,103 @@ msgstr "Kanban"
 msgid "Clients"
 msgstr "Clientes"
 
-#: app/templates/base.html:149 app/templates/clients/view.html:133
+#: app/templates/base.html:150
+msgid "Prospecting Leads"
+msgstr "Leads de Prospección"
+
+#: app/templates/base.html:155 app/templates/clients/view.html:133
 #: app/templates/proposals/index.html:3 app/templates/proposals/index.html:9
 msgid "Proposals"
 msgstr "Propuestas"
 
 # ===== TASKS =====
-#: app/templates/base.html:157 app/templates/tasks/index.html:3
+#: app/templates/base.html:163 app/templates/tasks/index.html:3
 #: app/templates/tasks/index.html:146
 msgid "Tasks"
 msgstr "Tareas"
 
-#: app/templates/base.html:167 app/templates/services/index.html:3
+#: app/templates/base.html:183 app/templates/services/index.html:3
 #: app/templates/services/index.html:8
 msgid "Services & Packages"
 msgstr "Servicios y Paquetes"
 
-#: app/templates/base.html:176 app/templates/finance/commissions.html:8
+#: app/templates/base.html:192 app/templates/finance/commissions.html:8
 #: app/templates/finance/payables.html:8
 #: app/templates/finance/receivables.html:8
 #: app/templates/projects/view.html:226
 msgid "Finance"
 msgstr "Finanzas"
 
-#: app/templates/base.html:180 app/templates/dashboard/_finance.html:78
+#: app/templates/base.html:196 app/templates/dashboard/_finance.html:78
 #: app/templates/finance/receivables.html:3
 msgid "Accounts Receivable"
 msgstr "Cuentas por Cobrar"
 
-#: app/templates/base.html:182 app/templates/finance/commissions.html:17
+#: app/templates/base.html:198 app/templates/finance/commissions.html:17
 #: app/templates/finance/payables.html:3 app/templates/finance/payables.html:17
 #: app/templates/finance/receivables.html:51
 #: app/templates/finance/receivables.html:66
 msgid "Accounts Payable"
 msgstr "Cuentas por Pagar"
 
-#: app/templates/base.html:184 app/templates/finance/commissions.html:3
+#: app/templates/base.html:200 app/templates/finance/commissions.html:3
 #: app/templates/finance/commissions.html:20
 #: app/templates/finance/payables.html:20
 #: app/templates/finance/receivables.html:69
 msgid "Commissions"
 msgstr "Comisiones"
 
-#: app/templates/base.html:196 app/templates/company/profile.html:80
+#: app/templates/base.html:212 app/templates/company/profile.html:80
 #: app/templates/saas/packages/index.html:41
 msgid "Users"
 msgstr "Usuarios"
 
-#: app/templates/base.html:202 app/templates/base.html:558
+#: app/templates/base.html:218 app/templates/base.html:581
 #, fuzzy
 msgid "Quick Task"
 msgstr "Acciones"
 
 # ===== NOTIFICATIONS =====
-#: app/templates/base.html:220
+#: app/templates/base.html:236
 msgid "Notifications"
 msgstr "Notificaciones"
 
-#: app/templates/base.html:222
+#: app/templates/base.html:238
 msgid "Mark all read"
 msgstr "Marcar todas como leídas"
 
-#: app/templates/base.html:228 app/templates/base.html:499
+#: app/templates/base.html:244 app/templates/base.html:522
 msgid "No notifications"
 msgstr "Sin notificaciones"
 
-#: app/templates/base.html:236
+#: app/templates/base.html:252
 msgid "Toggle theme"
 msgstr "Cambiar Tema"
 
-#: app/templates/base.html:271
+#: app/templates/base.html:287
 msgid "SaaS Admin"
 msgstr "Admin SaaS"
 
-#: app/templates/base.html:278 app/templates/saas/dashboard.html:84
+#: app/templates/base.html:294 app/templates/saas/dashboard.html:84
 msgid "Settings"
 msgstr "Configuraciones"
 
-#: app/templates/base.html:280
+#: app/templates/base.html:296
 msgid "Integrations"
 msgstr "Integraciones"
 
-#: app/templates/base.html:287
+#: app/templates/base.html:303
 msgid "Logout"
 msgstr "Cerrar Sesión"
 
-#: app/templates/base.html:356
+#: app/templates/base.html:373
 msgid "New Action"
 msgstr "Nueva Acción"
 
-#: app/templates/base.html:365 app/templates/base.html:590
-#: app/templates/calendar/index.html:69 app/templates/clients/kanban.html:339
+#: app/templates/base.html:382 app/templates/base.html:613
+#: app/templates/calendar/index.html:124 app/templates/clients/kanban.html:363
 #: app/templates/dashboard/index.html:412
-#: app/templates/dashboard/index.html:677
+#: app/templates/dashboard/index.html:724
 #: app/templates/finance/receivables.html:159
 #: app/templates/finance/receivables.html:252
 #: app/templates/health_checks/index.html:17
@@ -798,30 +905,30 @@ msgstr "Nueva Acción"
 msgid "Client"
 msgstr "Cliente"
 
-#: app/templates/base.html:367 app/templates/base.html:427
-#: app/templates/clients/kanban.html:341
+#: app/templates/base.html:384 app/templates/base.html:450
+#: app/templates/clients/kanban.html:365
 #: app/templates/integrations/location_mapping.html:108
 msgid "Select client..."
 msgstr "Seleccionar cliente..."
 
-#: app/templates/base.html:371
+#: app/templates/base.html:388
 msgid "Register new client"
 msgstr "Registrar nuevo cliente"
 
-#: app/templates/base.html:378 app/templates/calendar/index.html:63
+#: app/templates/base.html:395 app/templates/calendar/index.html:118
 msgid "Date and Time"
 msgstr "Fecha y Hora"
 
-#: app/templates/base.html:384
+#: app/templates/base.html:402
 msgid "Notes (optional)"
 msgstr "Notas (opcional)"
 
-#: app/templates/base.html:389 app/templates/base.html:619
-#: app/templates/calendar/index.html:104 app/templates/clients/index.html:171
-#: app/templates/clients/kanban.html:370 app/templates/clients/kanban.html:413
+#: app/templates/base.html:407 app/templates/base.html:642
+#: app/templates/calendar/index.html:159 app/templates/clients/index.html:171
+#: app/templates/clients/kanban.html:394 app/templates/clients/kanban.html:437
 #: app/templates/clients/view.html:606 app/templates/clients/view.html:640
 #: app/templates/clients/view.html:662 app/templates/company/edit.html:131
-#: app/templates/dashboard/index.html:714
+#: app/templates/dashboard/index.html:761
 #: app/templates/finance/payables.html:283
 #: app/templates/finance/payables.html:375
 #: app/templates/finance/receivables.html:287
@@ -844,34 +951,34 @@ msgstr "Notas (opcional)"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: app/templates/base.html:392 app/templates/interactions/log_modal.html:73
+#: app/templates/base.html:410 app/templates/interactions/log_modal.html:73
 msgid "Schedule"
 msgstr "Agendar"
 
-#: app/templates/base.html:408 app/templates/clients/index.html:13
+#: app/templates/base.html:426 app/templates/clients/index.html:13
 #: app/templates/dashboard/index.html:21
 msgid "New Visit"
 msgstr "Nueva Visita"
 
-#: app/templates/base.html:411 app/templates/clients/index.html:17
+#: app/templates/base.html:429 app/templates/clients/index.html:17
 #: app/templates/dashboard/index.html:25
 msgid "New Call"
 msgstr "Nueva Llamada"
 
-#: app/templates/base.html:464 app/templates/base.html:718
-#: app/templates/calendar/index.html:126 app/templates/clients/index.html:241
+#: app/templates/base.html:487 app/templates/base.html:741
+#: app/templates/calendar/index.html:181 app/templates/clients/index.html:241
 msgid "Connection Error"
 msgstr "Error de Conexión"
 
-#: app/templates/base.html:564 app/templates/projects/view.html:647
+#: app/templates/base.html:587 app/templates/projects/view.html:647
 msgid "Task Title"
 msgstr "Título de la Tarea"
 
-#: app/templates/base.html:566
+#: app/templates/base.html:589
 msgid "What needs to be done?"
 msgstr "¿Qué hay que hacer?"
 
-#: app/templates/base.html:569 app/templates/dashboard/index.html:658
+#: app/templates/base.html:592 app/templates/dashboard/index.html:705
 #: app/templates/finance/payables.html:79
 #: app/templates/finance/payables.html:152
 #: app/templates/finance/payables.html:261
@@ -886,92 +993,93 @@ msgstr "¿Qué hay que hacer?"
 msgid "Description"
 msgstr "Descripción"
 
-#: app/templates/base.html:571
+#: app/templates/base.html:594
 msgid "Optional details..."
 msgstr "Detalles opcionales..."
 
-#: app/templates/base.html:575 app/templates/dashboard/index.html:667
+#: app/templates/base.html:598 app/templates/dashboard/index.html:714
 #: app/templates/projects/view.html:253 app/templates/projects/view.html:657
 #: app/templates/tasks/index.html:351 app/templates/tasks/index.html:445
 msgid "Priority"
 msgstr "Prioridad"
 
-#: app/templates/base.html:577 app/templates/dashboard/index.html:669
+#: app/templates/base.html:600 app/templates/dashboard/index.html:716
 #: app/templates/projects/view.html:659 app/templates/tasks/index.html:202
 #: app/templates/tasks/index.html:353 app/templates/tasks/index.html:447
 msgid "Low"
 msgstr "Baja"
 
-#: app/templates/base.html:578 app/templates/dashboard/index.html:670
+#: app/templates/base.html:601 app/templates/dashboard/index.html:717
 #: app/templates/projects/view.html:660 app/templates/tasks/index.html:201
 #: app/templates/tasks/index.html:354 app/templates/tasks/index.html:448
 msgid "Medium"
 msgstr "Media"
 
-#: app/templates/base.html:579 app/templates/dashboard/index.html:671
+#: app/templates/base.html:602 app/templates/dashboard/index.html:718
 #: app/templates/projects/view.html:661 app/templates/tasks/index.html:200
 #: app/templates/tasks/index.html:355 app/templates/tasks/index.html:449
 msgid "High"
 msgstr "Alta"
 
-#: app/templates/base.html:580 app/templates/projects/view.html:662
+#: app/templates/base.html:603 app/templates/projects/view.html:662
 msgid "Urgent"
 msgstr "Urgente"
 
-#: app/templates/base.html:584 app/templates/projects/view.html:255
+#: app/templates/base.html:607 app/templates/projects/view.html:255
 #: app/templates/projects/view.html:666
 msgid "Deadline"
 msgstr "Fecha Límite"
 
-#: app/templates/base.html:592 app/templates/base.html:598
-#: app/templates/base.html:658 app/templates/base.html:671
-#: app/templates/dashboard/index.html:679
-#: app/templates/dashboard/index.html:688 app/templates/tasks/index.html:367
+#: app/templates/base.html:615 app/templates/base.html:621
+#: app/templates/base.html:681 app/templates/base.html:694
+#: app/templates/dashboard/index.html:726
+#: app/templates/dashboard/index.html:735 app/templates/tasks/index.html:367
 #: app/templates/tasks/index.html:376 app/templates/tasks/index.html:461
 #: app/templates/tasks/index.html:470
 msgid "None"
 msgstr "Ninguno"
 
-#: app/templates/base.html:596 app/templates/dashboard/index.html:411
-#: app/templates/dashboard/index.html:686 app/templates/tasks/index.html:374
+#: app/templates/base.html:619 app/templates/dashboard/index.html:411
+#: app/templates/dashboard/index.html:733 app/templates/tasks/index.html:374
 #: app/templates/tasks/index.html:468
 msgid "Project"
 msgstr "Proyecto"
 
-#: app/templates/base.html:603 app/templates/dashboard/index.html:698
+#: app/templates/base.html:626 app/templates/dashboard/index.html:745
 msgid "Assign To"
 msgstr "Asignar a"
 
-#: app/templates/base.html:605 app/templates/dashboard/index.html:216
+#: app/templates/base.html:628 app/templates/calendar/index.html:398
+#: app/templates/dashboard/index.html:216
 #: app/templates/dashboard/index.html:245
 #: app/templates/dashboard/index.html:260
-#: app/templates/dashboard/index.html:700
+#: app/templates/dashboard/index.html:747
 #: app/templates/interactions/manage_types_modal.html:80
 msgid "Loading..."
 msgstr "Cargando..."
 
-#: app/templates/base.html:613 app/templates/dashboard/index.html:707
+#: app/templates/base.html:636 app/templates/dashboard/index.html:754
 #: app/templates/projects/view.html:676 app/templates/tasks/index.html:405
 #: app/templates/tasks/index.html:505
 msgid "Require Verification"
 msgstr "Requerir Verificación"
 
-#: app/templates/base.html:622 app/templates/base.html:722
-#: app/templates/dashboard/index.html:715 app/templates/tasks/index.html:416
+#: app/templates/base.html:645 app/templates/base.html:745
+#: app/templates/dashboard/index.html:762 app/templates/tasks/index.html:416
 msgid "Create Task"
 msgstr "Crear Tarea"
 
-#: app/templates/base.html:644 app/templates/dashboard/index.html:779
+#: app/templates/base.html:667 app/templates/dashboard/index.html:826
 #: app/templates/tasks/index.html:392 app/templates/tasks/index.html:486
 msgid "Unassigned"
 msgstr "Sin asignar"
 
-#: app/templates/base.html:646 app/templates/dashboard/index.html:781
+#: app/templates/base.html:669 app/templates/dashboard/index.html:828
 #, fuzzy
 msgid "me"
 msgstr "(yo)"
 
-#: app/templates/base.html:685 app/templates/dashboard/index.html:751
+#: app/templates/base.html:708 app/templates/dashboard/index.html:798
 msgid "Creating..."
 msgstr "Creando..."
 
@@ -1051,13 +1159,67 @@ msgstr "Guardar Contraseña"
 msgid "Agenda / Calendar"
 msgstr "Calendario"
 
-#: app/templates/calendar/index.html:12 app/templates/calendar/index.html:30
-#: app/templates/calendar/index.html:119
+#: app/templates/calendar/index.html:12 app/templates/calendar/index.html:85
+#: app/templates/calendar/index.html:174
 msgid "New Appointment"
 msgstr "Nueva Cita"
 
-#: app/templates/calendar/index.html:37 app/templates/clients/kanban.html:399
-#: app/templates/clients/kanban.html:442
+#: app/templates/calendar/index.html:21
+msgid "Calendário"
+msgstr ""
+
+#: app/templates/calendar/index.html:26
+msgid "Agendamentos Perdidos"
+msgstr ""
+
+#: app/templates/calendar/index.html:47
+msgid "Agendamentos e Seguimentos Perdidos"
+msgstr ""
+
+#: app/templates/calendar/index.html:49
+msgid "Atualizar"
+msgstr ""
+
+#: app/templates/calendar/index.html:54
+msgid ""
+"Aqui você encontra os agendamentos antigos que foram classificados como "
+"perdidos ou descartados durante longos períodos de inatividade. Você pode"
+" revisá-los, reagendá-los ou excluí-los permanentemente."
+msgstr ""
+
+#: app/templates/calendar/index.html:60 app/templates/clients/removed.html:75
+#, fuzzy
+msgid "Tipo"
+msgstr "Opcional"
+
+#: app/templates/calendar/index.html:61 app/templates/clients/removed.html:91
+#, fuzzy
+msgid "Cliente"
+msgstr "Cliente"
+
+#: app/templates/calendar/index.html:62
+msgid "Data Original"
+msgstr ""
+
+#: app/templates/calendar/index.html:63
+#, fuzzy
+msgid "Observações"
+msgstr "Observaciones"
+
+#: app/templates/calendar/index.html:64 app/templates/clients/removed.html:81
+#: app/templates/company/email_templates.html:33
+#: app/templates/company/email_templates.html:89
+#: app/templates/prospecting/index.html:103
+msgid "Ações"
+msgstr "Acciones"
+
+#: app/templates/calendar/index.html:69 app/templates/calendar/index.html:405
+#, fuzzy
+msgid "Nenhum agendamento perdido encontrado."
+msgstr "Ningún proyecto encontrado."
+
+#: app/templates/calendar/index.html:92 app/templates/clients/kanban.html:423
+#: app/templates/clients/kanban.html:466
 #: app/templates/finance/commissions.html:77
 #: app/templates/interactions/log_modal.html:19
 #: app/templates/interactions/manage_types_modal.html:57
@@ -1066,38 +1228,38 @@ msgstr "Nueva Cita"
 msgid "Type"
 msgstr "Tipo"
 
-#: app/templates/calendar/index.html:42
+#: app/templates/calendar/index.html:97
 msgid "On-site Visit"
 msgstr "Nueva Visita"
 
-#: app/templates/calendar/index.html:47
+#: app/templates/calendar/index.html:102
 msgid "Call / Other"
 msgstr ""
 
-#: app/templates/calendar/index.html:53
+#: app/templates/calendar/index.html:108
 msgid "Interaction Type"
 msgstr "Interacciones"
 
-#: app/templates/calendar/index.html:71 app/templates/clients/edit.html:194
+#: app/templates/calendar/index.html:126 app/templates/clients/edit.html:194
 #: app/templates/proposals/create.html:225
 #: app/templates/proposals/create.html:231
 #: app/templates/proposals/edit.html:181 app/templates/proposals/edit.html:187
 msgid "Select..."
 msgstr "Seleccionar..."
 
-#: app/templates/calendar/index.html:75
+#: app/templates/calendar/index.html:130
 msgid "Quick New Client"
 msgstr "Sin clientes"
 
-#: app/templates/calendar/index.html:82
+#: app/templates/calendar/index.html:137
 msgid "Quick Client Registration"
 msgstr "Máximo de clientes registrados."
 
-#: app/templates/calendar/index.html:85
+#: app/templates/calendar/index.html:140
 msgid "Client/Company Name"
 msgstr ""
 
-#: app/templates/calendar/index.html:89 app/templates/clients/create.html:42
+#: app/templates/calendar/index.html:144 app/templates/clients/create.html:42
 #: app/templates/clients/edit.html:65 app/templates/clients/view.html:54
 #: app/templates/company/edit.html:64 app/templates/company/profile.html:46
 #: app/templates/proposals/public_view.html:236
@@ -1105,62 +1267,120 @@ msgstr ""
 msgid "Phone"
 msgstr "Teléfono"
 
-#: app/templates/calendar/index.html:95 app/templates/clients/view.html:116
+#: app/templates/calendar/index.html:150 app/templates/clients/view.html:116
 msgid "Observations"
 msgstr "Observaciones"
 
-#: app/templates/calendar/index.html:102 app/templates/clients/view.html:16
-#: app/templates/clients/view.html:412 app/templates/finance/payables.html:221
-#: app/templates/projects/view.html:428 app/templates/proposals/view.html:57
-#: app/templates/visits/view.html:58
+#: app/templates/calendar/index.html:157 app/templates/calendar/index.html:440
+#: app/templates/clients/view.html:16 app/templates/clients/view.html:412
+#: app/templates/finance/payables.html:221 app/templates/projects/view.html:428
+#: app/templates/proposals/view.html:57 app/templates/visits/view.html:58
 msgid "Delete"
 msgstr "Eliminar"
 
-#: app/templates/calendar/index.html:105
+#: app/templates/calendar/index.html:160
 msgid ""
 "Save\n"
 "                        Appointment"
 msgstr ""
 
-#: app/templates/calendar/index.html:120
+#: app/templates/calendar/index.html:175
 msgid "Edit Appointment"
 msgstr "Editar Cliente"
 
-#: app/templates/calendar/index.html:121
+#: app/templates/calendar/index.html:176
 msgid "Save Appointment"
 msgstr ""
 
-#: app/templates/calendar/index.html:122
+#: app/templates/calendar/index.html:177
 msgid "Update Appointment"
 msgstr ""
 
-#: app/templates/calendar/index.html:123
+#: app/templates/calendar/index.html:178
 msgid "Please fill Date and Client!"
 msgstr ""
 
-#: app/templates/calendar/index.html:124
+#: app/templates/calendar/index.html:179
 msgid "Please fill the New Client Name!"
 msgstr ""
 
-#: app/templates/calendar/index.html:125
+#: app/templates/calendar/index.html:180
 msgid "Are you sure you want to delete this appointment?"
 msgstr ""
 
-#: app/templates/calendar/index.html:127 app/templates/dashboard/index.html:240
+#: app/templates/calendar/index.html:182 app/templates/dashboard/index.html:240
 msgid "Today"
 msgstr "Hoy"
 
-#: app/templates/calendar/index.html:128
+#: app/templates/calendar/index.html:183
 msgid "Month"
 msgstr "Mes"
 
-#: app/templates/calendar/index.html:129
+#: app/templates/calendar/index.html:184
 msgid "Week"
 msgstr "Semana"
 
-#: app/templates/calendar/index.html:130
+#: app/templates/calendar/index.html:185
 msgid "Day"
 msgstr "Día"
+
+#: app/templates/calendar/index.html:416
+msgid "Missed"
+msgstr ""
+
+#: app/templates/calendar/index.html:418
+msgid "Dismissed"
+msgstr ""
+
+#: app/templates/calendar/index.html:420 app/templates/tasks/index.html:196
+msgid "Canceled"
+msgstr "Cancelada"
+
+#: app/templates/calendar/index.html:437 app/templates/dashboard/index.html:628
+#, fuzzy
+msgid "Reschedule"
+msgstr "Agendar"
+
+#: app/templates/calendar/index.html:445 app/templates/dashboard/index.html:644
+#, fuzzy
+msgid "Select date..."
+msgstr "Seleccione una opción"
+
+#: app/templates/calendar/index.html:446 app/templates/dashboard/index.html:646
+#, fuzzy
+msgid "Confirm"
+msgstr "Configurado"
+
+#: app/templates/calendar/index.html:467
+#, fuzzy
+msgid "Error loading lost items."
+msgstr "Error al crear lead"
+
+#: app/templates/calendar/index.html:483
+#: app/templates/dashboard/index.html:1443
+#, fuzzy
+msgid "Please select a date."
+msgstr "Seleccionar un pack..."
+
+#: app/templates/calendar/index.html:504
+#, fuzzy
+msgid "Item rescheduled successfully!"
+msgstr "Tarea creada con éxito"
+
+#: app/templates/calendar/index.html:513 app/templates/calendar/index.html:542
+#, fuzzy
+msgid "Connection error."
+msgstr "Error de conexión."
+
+#: app/templates/calendar/index.html:518
+#, fuzzy
+msgid "Are you sure you want to delete this item permanently?"
+msgstr "¿Está seguro de que desea eliminar al cliente"
+
+#: app/templates/calendar/index.html:534
+#, fuzzy
+msgid "Item deleted successfully!"
+msgstr "Negocio creado con éxito"
 
 #: app/templates/clients/create.html:3 app/templates/clients/create.html:9
 #: app/templates/clients/index.html:20
@@ -1201,7 +1421,7 @@ msgstr "Nombre de Contacto"
 #: app/templates/clients/create.html:51 app/templates/clients/edit.html:76
 #: app/templates/clients/view.html:57 app/templates/company/profile.html:50
 #: app/templates/company/settings.html:128
-#: app/templates/integrations/manage_location.html:68
+#: app/templates/integrations/manage_location.html:191
 msgid "Website"
 msgstr ""
 
@@ -1397,7 +1617,7 @@ msgstr "Nombre / Empresa"
 msgid "Contact"
 msgstr "Contacto"
 
-#: app/templates/clients/index.html:61 app/templates/clients/kanban.html:361
+#: app/templates/clients/index.html:61 app/templates/clients/kanban.html:385
 #: app/templates/clients/view.html:30
 msgid "Stage"
 msgstr "Etapa"
@@ -1433,6 +1653,7 @@ msgid "No stage"
 msgstr "Notas"
 
 #: app/templates/clients/index.html:115 app/templates/dashboard/index.html:426
+#: app/templates/dashboard/index.html:670
 #: app/templates/proposals/index.html:131
 msgid "View"
 msgstr "Ver"
@@ -1476,71 +1697,80 @@ msgid "Error moving client"
 msgstr "Error al mover cliente"
 
 # ===== KANBAN / SALES PIPELINE =====
-#: app/templates/clients/kanban.html:3 app/templates/clients/kanban.html:158
+#: app/templates/clients/kanban.html:3 app/templates/clients/kanban.html:169
 msgid "Sales Pipeline"
 msgstr "Pipeline de Ventas"
 
-#: app/templates/clients/kanban.html:162
+#: app/templates/clients/kanban.html:173
 msgid "All Owners"
 msgstr "Todos los Dueños"
 
-#: app/templates/clients/kanban.html:170 app/templates/clients/kanban.html:325
+#: app/templates/clients/kanban.html:181 app/templates/clients/kanban.html:349
 msgid "New Deal"
 msgstr "Nuevo Negocio"
 
-#: app/templates/clients/kanban.html:173 app/templates/clients/kanban.html:383
+#: app/templates/clients/kanban.html:184 app/templates/clients/kanban.html:407
 msgid "New Column"
 msgstr "Nueva Columna"
 
-#: app/templates/clients/kanban.html:176
+#: app/templates/clients/kanban.html:187
+msgid "Inativos / Removidos"
+msgstr ""
+
+#: app/templates/clients/kanban.html:190
 msgid "WARNING: This will remove all custom columns. Are you sure?"
 msgstr ""
 "ADVERTENCIA: Esto eliminará todas las columnas personalizadas. ¿Estás "
 "seguro?"
 
-#: app/templates/clients/kanban.html:197
+#: app/templates/clients/kanban.html:211
 msgid "Active Deals"
 msgstr "Negocios Activos"
 
-#: app/templates/clients/kanban.html:201
+#: app/templates/clients/kanban.html:215
 msgid "Pipeline Value"
 msgstr "Valor del Pipeline"
 
-#: app/templates/clients/kanban.html:205
+#: app/templates/clients/kanban.html:219
 msgid "Stages"
 msgstr "Etapas"
 
-#: app/templates/clients/kanban.html:221
+#: app/templates/clients/kanban.html:235
 msgid "Add Deal"
 msgstr "Agregar Negocio"
 
-#: app/templates/clients/kanban.html:237 app/templates/clients/kanban.html:239
+#: app/templates/clients/kanban.html:251 app/templates/clients/kanban.html:253
 msgid "Add to Pipeline Value"
 msgstr "Sumar al Valor del Pipeline"
 
-#: app/templates/clients/kanban.html:251 app/templates/clients/kanban.html:402
-#: app/templates/clients/kanban.html:445
+#: app/templates/clients/kanban.html:265 app/templates/clients/kanban.html:426
+#: app/templates/clients/kanban.html:469
 msgid "Won"
 msgstr "Ganado"
 
-#: app/templates/clients/kanban.html:251 app/templates/clients/kanban.html:403
-#: app/templates/clients/kanban.html:446
+#: app/templates/clients/kanban.html:265 app/templates/clients/kanban.html:427
+#: app/templates/clients/kanban.html:470 app/templates/dashboard/index.html:631
 msgid "Lost"
 msgstr "Perdido"
 
-#: app/templates/clients/kanban.html:259
+#: app/templates/clients/kanban.html:273
 msgid "Double-click to view details"
 msgstr ""
 
-#: app/templates/clients/kanban.html:334
+#: app/templates/clients/kanban.html:288
+#, fuzzy
+msgid "Remove from Kanban"
+msgstr "Ver Kanban"
+
+#: app/templates/clients/kanban.html:358
 msgid "Deal Title"
 msgstr "Título del Negocio"
 
-#: app/templates/clients/kanban.html:336
+#: app/templates/clients/kanban.html:360
 msgid "e.g. Website Redesign"
 msgstr "ej. Rediseño del Sitio Web"
 
-#: app/templates/clients/kanban.html:349 app/templates/dashboard/index.html:414
+#: app/templates/clients/kanban.html:373 app/templates/dashboard/index.html:414
 #: app/templates/finance/commissions.html:78
 #: app/templates/finance/payables.html:84
 #: app/templates/finance/payables.html:162
@@ -1551,44 +1781,45 @@ msgstr "ej. Rediseño del Sitio Web"
 msgid "Value"
 msgstr "Valor"
 
-#: app/templates/clients/kanban.html:356
+#: app/templates/clients/kanban.html:380
 msgid "Expected Close"
 msgstr "Cierre Esperado"
 
-#: app/templates/clients/kanban.html:371
+#: app/templates/clients/kanban.html:395
 msgid "Create Deal"
 msgstr "Crear Negocio"
 
-#: app/templates/clients/kanban.html:390 app/templates/clients/kanban.html:433
+#: app/templates/clients/kanban.html:414 app/templates/clients/kanban.html:457
 msgid "Stage Name"
 msgstr "Agenda"
 
-#: app/templates/clients/kanban.html:395 app/templates/clients/kanban.html:438
+#: app/templates/clients/kanban.html:419 app/templates/clients/kanban.html:462
 msgid "Order"
 msgstr "Ver"
 
-#: app/templates/clients/kanban.html:401 app/templates/clients/kanban.html:444
+#: app/templates/clients/kanban.html:425 app/templates/clients/kanban.html:468
 #: app/templates/finance/payables.html:136
 #: app/templates/finance/payables.html:203
 #: app/templates/finance/receivables.html:17
+#: app/templates/health_checks/gbp_scan_setup.html:178
 msgid "Open"
 msgstr "Abierto"
 
-#: app/templates/clients/kanban.html:407 app/templates/clients/kanban.html:450
+#: app/templates/clients/kanban.html:431 app/templates/clients/kanban.html:474
 #: app/templates/finance/payables.html:308
 #, fuzzy
 msgid "Color"
 msgstr "Crear"
 
-#: app/templates/clients/kanban.html:414
+#: app/templates/clients/kanban.html:438
 msgid "Create"
 msgstr "Crear"
 
-#: app/templates/clients/kanban.html:426
+#: app/templates/clients/kanban.html:450
 msgid "Edit Stage"
 msgstr "Editar Etapa"
 
-#: app/templates/clients/kanban.html:455 app/templates/company/edit.html:128
+#: app/templates/clients/kanban.html:479 app/templates/company/edit.html:128
 #: app/templates/finance/receivables.html:383
 #: app/templates/proposals/edit.html:107
 #: app/templates/saas/edit_company.html:71 app/templates/tasks/index.html:515
@@ -1596,31 +1827,134 @@ msgstr "Editar Etapa"
 msgid "Save Changes"
 msgstr "Guardar Cambios"
 
-#: app/templates/clients/kanban.html:459
+#: app/templates/clients/kanban.html:483
 msgid "Are you sure you want to delete this stage?"
 msgstr ""
 
-#: app/templates/clients/kanban.html:462
+#: app/templates/clients/kanban.html:486
 msgid "Delete Stage"
 msgstr "Eliminar Etapa"
 
-#: app/templates/clients/kanban.html:474
+#: app/templates/clients/kanban.html:498
 msgid "Error moving deal"
 msgstr "Error al mover negocio"
 
-#: app/templates/clients/kanban.html:475 app/templates/clients/kanban.html:553
-#: app/templates/clients/view.html:842 app/templates/clients/view.html:879
+#: app/templates/clients/kanban.html:499 app/templates/clients/kanban.html:562
+#: app/templates/clients/kanban.html:615 app/templates/clients/view.html:842
+#: app/templates/clients/view.html:879
 #, fuzzy
 msgid "Connection error"
 msgstr "Error de Conexión"
 
-#: app/templates/clients/kanban.html:546
+#: app/templates/clients/kanban.html:533
+#, fuzzy
+msgid "Are you sure you want to remove this item from the Kanban?"
+msgstr "¿Está seguro de que desea eliminar al cliente"
+
+#: app/templates/clients/kanban.html:557
+#, fuzzy
+msgid "Error removing item"
+msgstr "Error al mover cliente"
+
+#: app/templates/clients/kanban.html:608
 msgid "Error updating configuration"
 msgstr "Error al actualizar configuración"
 
-#: app/templates/clients/kanban.html:623
+#: app/templates/clients/kanban.html:685
 msgid "Error reordering columns"
 msgstr "Error al reordenar columnas"
+
+#: app/templates/clients/removed.html:3
+#, fuzzy
+msgid "Removed from Kanban"
+msgstr "Ver Kanban"
+
+#: app/templates/clients/removed.html:35
+msgid "Inativos / Removidos do Kanban"
+msgstr ""
+
+#: app/templates/clients/removed.html:38
+msgid "Voltar ao Kanban"
+msgstr ""
+
+#: app/templates/clients/removed.html:48
+msgid "Sobre a Inatividade no Kanban"
+msgstr ""
+
+#: app/templates/clients/removed.html:50
+msgid ""
+"Os itens são movidos automaticamente para cá após 21 dias sem qualquer "
+"movimentação no Kanban, ou quando removidos manualmente. A restauração "
+"trará o item de volta para sua etapa original com a data de movimentação "
+"redefinida para hoje."
+msgstr ""
+
+#: app/templates/clients/removed.html:62
+msgid "Pesquisar por nome, contato ou etapa original..."
+msgstr ""
+
+#: app/templates/clients/removed.html:76
+msgid "Nome / Título"
+msgstr ""
+
+#: app/templates/clients/removed.html:77
+#, fuzzy
+msgid "Contato / Detalhe"
+msgstr "Contacto"
+
+#: app/templates/clients/removed.html:78
+msgid "Etapa Original"
+msgstr ""
+
+#: app/templates/clients/removed.html:79
+msgid "Tempo de Inatividade"
+msgstr ""
+
+#: app/templates/clients/removed.html:80
+msgid "Última Ação"
+msgstr ""
+
+#: app/templates/clients/removed.html:95
+msgid "Negócio"
+msgstr ""
+
+#: app/templates/clients/removed.html:110
+#, fuzzy
+msgid "dias"
+msgstr "Editar Etapa"
+
+#: app/templates/clients/removed.html:117
+msgid "Restaurar para o Kanban"
+msgstr ""
+
+#: app/templates/clients/removed.html:118
+msgid "Restaurar"
+msgstr ""
+
+#: app/templates/clients/removed.html:121
+msgid "Visualizar Ficha"
+msgstr ""
+
+#: app/templates/clients/removed.html:132
+#, fuzzy
+msgid "Nenhum item removido ou inativo encontrado."
+msgstr "Ningún proyecto encontrado."
+
+#: app/templates/clients/removed.html:161
+msgid "Tem certeza que deseja restaurar este item de volta ao Kanban?"
+msgstr ""
+
+#: app/templates/clients/removed.html:184
+msgid "Restaurado com sucesso!"
+msgstr ""
+
+#: app/templates/clients/removed.html:187
+msgid "Erro ao restaurar item."
+msgstr ""
+
+#: app/templates/clients/removed.html:192
+msgid "Erro de conexão ao restaurar."
+msgstr ""
 
 #: app/templates/clients/view.html:3
 msgid "Client Details"
@@ -1696,6 +2030,7 @@ msgstr "Nueva Propuesta"
 
 #: app/templates/clients/view.html:185 app/templates/clients/view.html:226
 #: app/templates/clients/view.html:236 app/templates/clients/view.html:311
+#: app/templates/health_checks/gbp_scan_setup.html:250
 #: app/templates/health_checks/index.html:16
 #: app/templates/proposals/index.html:70 app/templates/visits/index.html:19
 msgid "Date"
@@ -1722,7 +2057,11 @@ msgstr "Total"
 #: app/templates/projects/view.html:252 app/templates/projects/view.html:597
 #: app/templates/proposals/edit.html:55 app/templates/proposals/index.html:22
 #: app/templates/proposals/index.html:69 app/templates/proposals/view.html:73
-#: app/templates/saas/dashboard.html:32 app/templates/users/index.html:25
+#: app/templates/prospecting/edit.html:62
+#: app/templates/prospecting/index.html:71
+#: app/templates/prospecting/index.html:101
+#: app/templates/prospecting/view.html:201 app/templates/saas/dashboard.html:32
+#: app/templates/users/index.html:25
 msgid "Status"
 msgstr "Estado"
 
@@ -1771,6 +2110,7 @@ msgid "New Health Check (Public)"
 msgstr "Health Check"
 
 #: app/templates/clients/view.html:312
+#: app/templates/health_checks/gbp_scan_setup.html:248
 #: app/templates/health_checks/index.html:18
 msgid "Score"
 msgstr "Crear"
@@ -1906,6 +2246,7 @@ msgid "Ex: Pizzeria in Asuncion"
 msgstr "Ej: Pizzería en Asunción"
 
 #: app/templates/clients/view.html:633
+#: app/templates/health_checks/gbp_scan_setup.html:32
 msgid "Location"
 msgstr "Opcional"
 
@@ -2059,7 +2400,9 @@ msgid "Salvar Template"
 msgstr ""
 
 #: app/templates/company/edit_email_template.html:49
-#: app/templates/integrations/manage_location.html:152
+#: app/templates/integrations/manage_location.html:279
+#: app/templates/prospecting/create.html:117
+#: app/templates/prospecting/edit.html:117
 msgid "Cancelar"
 msgstr "Cancelar"
 
@@ -2086,8 +2429,9 @@ msgid "Nome Completo"
 msgstr "Nombre del Paquete"
 
 #: app/templates/company/edit_email_template.html:85
+#: app/templates/prospecting/index.html:97
 msgid "Empresa"
-msgstr "Editar Empresa"
+msgstr "Empresa"
 
 #: app/templates/company/edit_email_template.html:90
 msgid "Dados da Proposta"
@@ -2269,11 +2613,6 @@ msgstr "Nombre"
 msgid "Assunto"
 msgstr ""
 
-#: app/templates/company/email_templates.html:33
-#: app/templates/company/email_templates.html:89
-msgid "Ações"
-msgstr ""
-
 #: app/templates/company/email_templates.html:48
 #: app/templates/company/email_templates.html:104
 msgid "Personalizado"
@@ -2286,6 +2625,7 @@ msgstr ""
 
 #: app/templates/company/email_templates.html:58
 #: app/templates/company/email_templates.html:114
+#: app/templates/prospecting/index.html:177
 msgid "Editar"
 msgstr "Editar"
 
@@ -2742,6 +3082,7 @@ msgstr "Proyectos"
 
 #: app/templates/dashboard/_production.html:65
 #: app/templates/integrations/google_dashboard.html:11
+#: app/templates/reports/performance_report.html:136
 msgid "Google Business Profile"
 msgstr "Google Business Profile"
 
@@ -2838,7 +3179,7 @@ msgstr "Health Check"
 
 #: app/templates/dashboard/_sdr.html:29
 msgid "Recent analysis for prospecting"
-msgstr ""
+msgstr "Auditoría reciente para prospección"
 
 #: app/templates/dashboard/_sdr.html:38
 msgid "Critical Leads"
@@ -2882,7 +3223,7 @@ msgstr ""
 msgid "Welcome"
 msgstr "Bienvenido"
 
-#: app/templates/dashboard/index.html:17 app/templates/dashboard/index.html:647
+#: app/templates/dashboard/index.html:17 app/templates/dashboard/index.html:694
 #: app/templates/projects/view.html:242 app/templates/tasks/index.html:148
 #: app/templates/tasks/index.html:333
 msgid "New Task"
@@ -2968,7 +3309,7 @@ msgid "Verify Now"
 msgstr "Verificar Ahora"
 
 #: app/templates/dashboard/index.html:218
-#: app/templates/dashboard/index.html:736
+#: app/templates/dashboard/index.html:783
 #: app/templates/health_checks/create.html:42
 msgid "Analyzing..."
 msgstr "Analizando..."
@@ -3083,63 +3424,82 @@ msgstr "No hay visitas recientes."
 msgid "Latest Interactions"
 msgstr "Editar Interacción"
 
-#: app/templates/dashboard/index.html:534
+#: app/templates/dashboard/index.html:537
 msgid "No recent interactions."
 msgstr "No hay interacciones recientes."
 
-#: app/templates/dashboard/index.html:541
+#: app/templates/dashboard/index.html:544
 msgid ""
 "Latest\n"
 "                                    Visits"
 msgstr ""
 
-#: app/templates/dashboard/index.html:555
+#: app/templates/dashboard/index.html:558
 msgid ""
 "No\n"
 "                                            observations"
 msgstr ""
 
-#: app/templates/dashboard/index.html:559
+#: app/templates/dashboard/index.html:562
 msgid "No recent visits."
 msgstr "No hay visitas recientes."
 
-#: app/templates/dashboard/index.html:566
+#: app/templates/dashboard/index.html:569
 msgid ""
 "Latest\n"
 "                                    Health Checks"
 msgstr ""
 
-#: app/templates/dashboard/index.html:587
+#: app/templates/dashboard/index.html:590
 msgid "No recent health checks."
 msgstr "Sin health checks recientes"
 
-#: app/templates/dashboard/index.html:603
+#: app/templates/dashboard/index.html:606
 msgid "Overdue Items"
 msgstr "Ítems Atrasados"
 
-#: app/templates/dashboard/index.html:622
+#: app/templates/dashboard/index.html:617
+#, fuzzy
+msgid "Select All"
+msgstr "Seleccione una opción"
+
+#: app/templates/dashboard/index.html:624
+msgid "Mover todos para Perdidos"
+msgstr ""
+
+#: app/templates/dashboard/index.html:634
+#, fuzzy
+msgid "Dismiss"
+msgstr "Visitas"
+
+#: app/templates/dashboard/index.html:643
+#, fuzzy
+msgid "New Date and Time"
+msgstr "Fecha y Hora"
+
+#: app/templates/dashboard/index.html:666
 #: app/templates/finance/payables.html:201
 #: app/templates/finance/receivables.html:194
 #: app/templates/projects/view.html:610
 msgid "Overdue"
 msgstr "Atrasado"
 
-#: app/templates/dashboard/index.html:630
+#: app/templates/dashboard/index.html:677
 msgid "No overdue items found."
 msgstr "No se encontraron ítems atrasados."
 
-#: app/templates/dashboard/index.html:636
+#: app/templates/dashboard/index.html:683
 msgid "Close"
 msgstr "Cerrar"
 
-#: app/templates/dashboard/index.html:653
+#: app/templates/dashboard/index.html:700
 #: app/templates/proposals/create.html:38 app/templates/proposals/edit.html:25
 #: app/templates/proposals/index.html:65 app/templates/tasks/index.html:342
 #: app/templates/tasks/index.html:436
 msgid "Title"
 msgstr "Título"
 
-#: app/templates/dashboard/index.html:663
+#: app/templates/dashboard/index.html:710
 #: app/templates/finance/payables.html:88
 #: app/templates/finance/payables.html:156
 #: app/templates/finance/payables.html:269
@@ -3151,93 +3511,114 @@ msgstr "Título"
 msgid "Due Date"
 msgstr "Vencimiento"
 
-#: app/templates/dashboard/index.html:709 app/templates/tasks/index.html:409
+#: app/templates/dashboard/index.html:756 app/templates/tasks/index.html:409
 msgid "Completion must be approved by the creator."
 msgstr ""
 
-#: app/templates/dashboard/index.html:734
+#: app/templates/dashboard/index.html:781
 msgid "No tasks for today."
 msgstr "No hay tareas para hoy."
 
-#: app/templates/dashboard/index.html:735
+#: app/templates/dashboard/index.html:782
 msgid "No upcoming tasks."
 msgstr "No hay tareas próximas."
 
-#: app/templates/dashboard/index.html:737
+#: app/templates/dashboard/index.html:784
 msgid "Please wait while we query Google."
 msgstr "Espere mientras consultamos a Google."
 
-#: app/templates/dashboard/index.html:738
+#: app/templates/dashboard/index.html:785
 msgid "Analysis Complete!"
 msgstr "¡Análisis Completado!"
 
-#: app/templates/dashboard/index.html:739
+#: app/templates/dashboard/index.html:786
 msgid "Business found"
 msgstr "Empresa encontrada"
 
-#: app/templates/dashboard/index.html:740
+#: app/templates/dashboard/index.html:787
 msgid "Points"
 msgstr "Puntos"
 
-#: app/templates/dashboard/index.html:741
+#: app/templates/dashboard/index.html:788
 msgid "Analysis Summary"
 msgstr "Resumen del Análisis"
 
-#: app/templates/dashboard/index.html:742
+#: app/templates/dashboard/index.html:789
 #: app/templates/health_checks/view.html:303
 msgid "Critical Points"
 msgstr "Pontos Críticos"
 
-#: app/templates/dashboard/index.html:743
+#: app/templates/dashboard/index.html:790
 msgid "Moderate Points"
 msgstr "Puntos Moderados"
 
-#: app/templates/dashboard/index.html:744
+#: app/templates/dashboard/index.html:791
 msgid "Positive Points"
 msgstr "Puntos Positivos"
 
-#: app/templates/dashboard/index.html:745
+#: app/templates/dashboard/index.html:792
 msgid "View Full Report"
 msgstr "Ver Reporte Completo"
 
-#: app/templates/dashboard/index.html:746
+#: app/templates/dashboard/index.html:793
 msgid "Create Lead Based on This"
 msgstr "Crear Lead basado en esto"
 
-#: app/templates/dashboard/index.html:747
+#: app/templates/dashboard/index.html:794
 #: app/templates/proposals/public_view.html:266
 msgid "Error"
 msgstr "Error"
 
-#: app/templates/dashboard/index.html:748
+#: app/templates/dashboard/index.html:795
 msgid "Try to be more specific (e.g., Company X, City Y)"
 msgstr ""
 
-#: app/templates/dashboard/index.html:749
+#: app/templates/dashboard/index.html:796
 msgid "Connection Error."
 msgstr "Error de conexión."
 
-#: app/templates/dashboard/index.html:750
+#: app/templates/dashboard/index.html:797
 msgid "Try Again"
 msgstr ""
 
-#: app/templates/dashboard/index.html:752
+#: app/templates/dashboard/index.html:799
 msgid "Error creating lead"
 msgstr "Error al crear lead"
 
-#: app/templates/dashboard/index.html:888
-#: app/templates/dashboard/index.html:930
+#: app/templates/dashboard/index.html:936
+#: app/templates/dashboard/index.html:978
 msgid "No. of Clients"
 msgstr "# de Clientes"
 
-#: app/templates/dashboard/index.html:977
+#: app/templates/dashboard/index.html:1025
 msgid "Sales Closed"
 msgstr ""
 
-#: app/templates/dashboard/index.html:1300
+#: app/templates/dashboard/index.html:1348
 #, fuzzy
 msgid "Error creating task"
 msgstr "Error al crear lead"
+
+#: app/templates/dashboard/index.html:1372
+#: app/templates/dashboard/index.html:1415
+#, fuzzy
+msgid "selected"
+msgstr "Rechazada"
+
+#: app/templates/dashboard/index.html:1449
+msgid ""
+"Do you want to mark the selected items as lost/missed? They will be moved"
+" to the revision area in the Agenda."
+msgstr ""
+
+#: app/templates/dashboard/index.html:1450
+msgid "Do you want to dismiss/cancel the selected items?"
+msgstr ""
+
+#: app/templates/dashboard/index.html:1476
+#, fuzzy
+msgid "Connection error when updating items."
+msgstr "Error de conexión."
 
 #: app/templates/finance/commissions.html:14
 #: app/templates/finance/payables.html:14
@@ -3624,6 +4005,212 @@ msgstr "Ver Propuesta"
 msgid "Reviews and Replies"
 msgstr ""
 
+#: app/templates/health_checks/gbp_scan_setup.html:3
+msgid "GBP Scan Setup"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:9
+#, fuzzy
+msgid "Health Checks"
+msgstr "Auditoría de Salud"
+
+#: app/templates/health_checks/gbp_scan_setup.html:17
+#, fuzzy
+msgid "Direct Scan"
+msgstr "Contacto Directo"
+
+#: app/templates/health_checks/gbp_scan_setup.html:21
+msgid ""
+"Type a business name and get an instant GBP health check — uses only\n"
+"                1 API credit (vs 3-6 for Quick Health Check)."
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:26
+#: app/templates/integrations/google_dashboard.html:152
+#: app/templates/proposals/view.html:272
+msgid "Business Name"
+msgstr "Nombre del Negocio"
+
+#: app/templates/health_checks/gbp_scan_setup.html:33
+#, fuzzy
+msgid "optional"
+msgstr "Opcional"
+
+#: app/templates/health_checks/gbp_scan_setup.html:48
+msgid "Fetching data from Google..."
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:64
+#, fuzzy
+msgid "View on Google Maps"
+msgstr "Ver en Maps"
+
+#: app/templates/health_checks/gbp_scan_setup.html:70
+msgid "Criteria"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:85
+msgid "Your Scan Token"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:89
+msgid "Use this token to authenticate the bookmarklet and extension."
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:102
+msgid "This will invalidate the current token. Continue?"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:103
+#, fuzzy
+msgid "Regenerate Token"
+msgstr "Fecha Generada"
+
+#: app/templates/health_checks/gbp_scan_setup.html:107
+msgid "You need to generate a token to use GBP Scan."
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:111
+msgid "Generate Token"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:122
+msgid "Bookmarklet (Mobile + Desktop)"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:127
+msgid ""
+"Drag the button below to your browser bookmarks bar. On mobile, add it as"
+" a bookmark\n"
+"                        manually."
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:134
+msgid "Drag this button to your bookmarks bar!"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:135
+msgid "Drag to bookmarks bar"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:142
+#, fuzzy
+msgid "How to use"
+msgstr "Cómo funciona"
+
+#: app/templates/health_checks/gbp_scan_setup.html:144
+msgid "Search for a business on Google"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:145
+msgid "When you see the business panel, click the bookmark"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:146
+msgid "The scan will run and the report will appear here in Maps2GO"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:159
+msgid "Chrome Extension (Desktop)"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:163
+msgid ""
+"For deeper analysis at the office. The extension can scroll through "
+"reviews, count photos,\n"
+"                        and extract more data."
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:170
+msgid "Download Extension (.zip)"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:175
+#, fuzzy
+msgid "Installation"
+msgstr "Interacciones"
+
+#: app/templates/health_checks/gbp_scan_setup.html:177
+msgid "Extract the .zip file"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:179
+msgid "Enable \"Developer mode\""
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:180
+msgid "Click \"Load unpacked\" and select the folder"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:181
+msgid "Paste your token in the extension popup"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:191
+#, fuzzy
+msgid "How GBP Scan Works"
+msgstr "Cómo funciona"
+
+#: app/templates/health_checks/gbp_scan_setup.html:197
+msgid "You browse Google"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:198
+msgid "Search for a business or open it on Google Maps"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:205
+#, fuzzy
+msgid "Activate the scan"
+msgstr "Activar"
+
+#: app/templates/health_checks/gbp_scan_setup.html:206
+msgid "Click the bookmarklet or extension button"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:212
+msgid "Data extracted from the page"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:213
+msgid ""
+"Name, address, reviews, photos, posts — all extracted\n"
+"                                from what Google shows"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:220
+#, fuzzy
+msgid "Report generated"
+msgstr "Fecha Generada"
+
+#: app/templates/health_checks/gbp_scan_setup.html:221
+msgid "Same 17-criteria score, zero API cost!"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:228
+msgid "API Credits Saved"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:228
+msgid ""
+"Each scan saves 3-6 API calls compared\n"
+"                            to Quick Health Check."
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:241
+msgid "Recent GBP Scans"
+msgstr ""
+
+#: app/templates/health_checks/gbp_scan_setup.html:247
+#, fuzzy
+msgid "Business"
+msgstr "Nombre del Negocio"
+
+#: app/templates/health_checks/gbp_scan_setup.html:249
+#, fuzzy
+msgid "Source"
+msgstr "Servicio"
+
 #: app/templates/health_checks/index.html:3
 #: app/templates/health_checks/index.html:8
 msgid "Health Check Audits"
@@ -3869,11 +4456,6 @@ msgstr "Perfiles Administrados"
 msgid "Search profile..."
 msgstr "Buscar perfil..."
 
-#: app/templates/integrations/google_dashboard.html:152
-#: app/templates/proposals/view.html:272
-msgid "Business Name"
-msgstr "Nombre del Negocio"
-
 #: app/templates/integrations/google_dashboard.html:154
 msgid "Managed by"
 msgstr "Administrado por"
@@ -3999,69 +4581,119 @@ msgid ""
 "                        profile directly in the client record."
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:11
+#: app/templates/integrations/manage_location.html:46
+#, fuzzy
+msgid "Error al generar respuesta:"
+msgstr "Enviar Prueba"
+
+#: app/templates/integrations/manage_location.html:50
+msgid "Error de conexión al generar la respuesta."
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:131
 msgid ""
 "Google\n"
 "                            Dashboard"
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:24
+#: app/templates/integrations/manage_location.html:143
+msgid "Verificar Conexão"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:147
 msgid "Ver en Maps"
 msgstr "Ver Clientes"
 
-#: app/templates/integrations/manage_location.html:34
+#: app/templates/integrations/manage_location.html:157
 msgid "Estado"
 msgstr "Estado"
 
-#: app/templates/integrations/manage_location.html:37
+#: app/templates/integrations/manage_location.html:160
 msgid "Publicado"
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:39
+#: app/templates/integrations/manage_location.html:162
 msgid "No Publicado"
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:48
+#: app/templates/integrations/manage_location.html:171
 msgid "Categoría"
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:57
+#: app/templates/integrations/manage_location.html:180
 msgid "Rating"
 msgstr "Creando..."
 
-#: app/templates/integrations/manage_location.html:61
+#: app/templates/integrations/manage_location.html:184
 msgid "reseñas"
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:86
+#: app/templates/integrations/manage_location.html:209
 msgid "Reseñas"
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:123
+#: app/templates/integrations/manage_location.html:213
+msgid "Insights de Performance"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:250
 msgid ""
 "Sua\n"
 "                                    resposta:"
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:133
+#: app/templates/integrations/manage_location.html:260
 msgid "Responder"
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:144
+#: app/templates/integrations/manage_location.html:271
 msgid "Nueva Respuesta"
 msgstr "Nuevo Presupuesto"
 
-#: app/templates/integrations/manage_location.html:146
+#: app/templates/integrations/manage_location.html:273
 msgid "Escriba su respuesta aquí..."
 msgstr ""
 
-#: app/templates/integrations/manage_location.html:154
+#: app/templates/integrations/manage_location.html:285
+msgid "Sugerir con IA"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:289
 msgid "Enviar Respuesta"
 msgstr "Enviar Prueba"
 
-#: app/templates/integrations/manage_location.html:167
+#: app/templates/integrations/manage_location.html:302
 msgid "No hay reseñas disponibles."
 msgstr "No hay tareas próximas."
+
+#: app/templates/integrations/manage_location.html:308
+msgid "Performance (Últimos 30 días)"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:314
+msgid "Sincronizar Dados"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:319
+msgid "Baixar Relatório"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:328
+#, fuzzy
+msgid "Impressões Totais"
+msgstr "Impuestos"
+
+#: app/templates/integrations/manage_location.html:336
+msgid "Chamadas"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:344
+msgid "Cliques no Site"
+msgstr ""
+
+#: app/templates/integrations/manage_location.html:352
+msgid "Solicitações de Rota"
+msgstr ""
 
 #: app/templates/interactions/log_modal.html:9
 #: app/templates/interactions/log_modal.html:83
@@ -4224,7 +4856,8 @@ msgstr "Activos"
 msgid "Concluídos"
 msgstr "Completados"
 
-#: app/templates/projects/index.html:20
+#: app/templates/projects/index.html:20 app/templates/prospecting/index.html:42
+#: app/templates/prospecting/index.html:73
 msgid "Todos"
 msgstr "Todos"
 
@@ -5179,6 +5812,618 @@ msgstr "Genera el enlace compartiendo vía WhatsApp primero o recarga la página
 msgid "Link copied to clipboard!"
 msgstr "¡Enlace copiado al portapapeles!"
 
+#: app/templates/prospecting/create.html:3
+#: app/templates/prospecting/create.html:8
+msgid "Novo Lead de Prospecção"
+msgstr "Nuevo Lead de Prospección"
+
+#: app/templates/prospecting/create.html:10
+#: app/templates/prospecting/edit.html:10
+#: app/templates/prospecting/view.html:23
+msgid "Voltar"
+msgstr "Volver"
+
+#: app/templates/prospecting/create.html:22
+#: app/templates/prospecting/edit.html:22
+msgid "Informações Básicas"
+msgstr "Información Básica"
+
+#: app/templates/prospecting/create.html:25
+#: app/templates/prospecting/edit.html:25
+#: app/templates/prospecting/index.html:24
+msgid "Nome da Empresa"
+msgstr "Nombre de la Empresa"
+
+#: app/templates/prospecting/create.html:26
+msgid "Ex: Restaurante Central"
+msgstr "Ej: Restaurante Central"
+
+#: app/templates/prospecting/create.html:31
+#: app/templates/prospecting/edit.html:31
+#: app/templates/prospecting/view.html:231
+msgid "Origem do Lead"
+msgstr "Origen del Lead"
+
+#: app/templates/prospecting/create.html:33
+#: app/templates/prospecting/edit.html:33
+#: app/templates/prospecting/index.html:52
+#: app/templates/prospecting/index.html:133
+#: app/templates/prospecting/view.html:236
+msgid "Visita em Campo"
+msgstr "Visita de Campo"
+
+#: app/templates/prospecting/create.html:34
+#: app/templates/prospecting/edit.html:34
+#: app/templates/prospecting/index.html:53
+#: app/templates/prospecting/index.html:135
+#: app/templates/prospecting/view.html:238
+msgid "Redes Sociais"
+msgstr "Redes Sociales"
+
+#: app/templates/prospecting/create.html:35
+#: app/templates/prospecting/edit.html:35
+#: app/templates/prospecting/index.html:54
+#: app/templates/prospecting/index.html:131
+#: app/templates/prospecting/view.html:234
+msgid "Google Maps"
+msgstr "Google Maps"
+
+#: app/templates/prospecting/create.html:36
+#: app/templates/prospecting/edit.html:36
+#: app/templates/prospecting/index.html:55
+#: app/templates/prospecting/index.html:137
+#: app/templates/prospecting/view.html:240
+msgid "Indicação"
+msgstr "Recomendación"
+
+#: app/templates/prospecting/create.html:37
+#: app/templates/prospecting/create.html:47
+#: app/templates/prospecting/edit.html:37
+#: app/templates/prospecting/edit.html:47
+#: app/templates/prospecting/index.html:56
+#: app/templates/prospecting/index.html:67
+#: app/templates/prospecting/index.html:139
+#: app/templates/prospecting/index.html:152
+#: app/templates/prospecting/view.html:242
+#: app/templates/prospecting/view.html:258
+msgid "Outro"
+msgstr "Otro"
+
+#: app/templates/prospecting/create.html:41
+#: app/templates/prospecting/edit.html:41
+#: app/templates/prospecting/view.html:247
+msgid "Forma de Abordagem"
+msgstr "Forma de Abordaje"
+
+#: app/templates/prospecting/create.html:43
+#: app/templates/prospecting/edit.html:43
+#: app/templates/prospecting/index.html:63
+#: app/templates/prospecting/index.html:144
+#: app/templates/prospecting/view.html:250
+msgid "Visita de Abertura"
+msgstr "Visita de Apertura"
+
+#: app/templates/prospecting/create.html:44
+#: app/templates/prospecting/edit.html:44
+#: app/templates/prospecting/index.html:64
+#: app/templates/prospecting/index.html:146
+#: app/templates/prospecting/view.html:252
+msgid "Chamada Telefônica"
+msgstr "Llamada Telefónica"
+
+#: app/templates/prospecting/create.html:45
+#: app/templates/prospecting/edit.html:45
+#: app/templates/prospecting/index.html:65
+#: app/templates/prospecting/index.html:148
+#: app/templates/prospecting/view.html:254
+msgid "WhatsApp"
+msgstr "WhatsApp"
+
+#: app/templates/prospecting/create.html:46
+#: app/templates/prospecting/edit.html:46
+#: app/templates/prospecting/index.html:66
+#: app/templates/prospecting/index.html:150
+#: app/templates/prospecting/view.html:256
+msgid "E-mail"
+msgstr "Correo electrónico"
+
+#: app/templates/prospecting/create.html:54
+#: app/templates/prospecting/edit.html:54
+msgid "Qualificação do Lead"
+msgstr "Calificación del Lead"
+
+#: app/templates/prospecting/create.html:56
+#: app/templates/prospecting/edit.html:56
+#: app/templates/prospecting/index.html:125
+#: app/templates/prospecting/view.html:226
+msgid "Frio"
+msgstr "Frío"
+
+#: app/templates/prospecting/create.html:57
+#: app/templates/prospecting/edit.html:57
+#: app/templates/prospecting/index.html:123
+#: app/templates/prospecting/view.html:224
+msgid "Morno"
+msgstr "Tibio"
+
+#: app/templates/prospecting/create.html:58
+#: app/templates/prospecting/edit.html:58
+#: app/templates/prospecting/index.html:121
+#: app/templates/prospecting/view.html:222
+msgid "Quente"
+msgstr "Caliente"
+
+#: app/templates/prospecting/create.html:62
+msgid "Status Inicial"
+msgstr "Estado Inicial"
+
+#: app/templates/prospecting/create.html:64
+#: app/templates/prospecting/edit.html:64
+#: app/templates/prospecting/index.html:74
+#: app/templates/prospecting/index.html:158
+#: app/templates/prospecting/view.html:204
+msgid "Novo"
+msgstr "Nuevo"
+
+#: app/templates/prospecting/create.html:65
+#: app/templates/prospecting/edit.html:65
+#: app/templates/prospecting/index.html:75
+#: app/templates/prospecting/index.html:160
+#: app/templates/prospecting/view.html:206
+msgid "Em análise"
+msgstr "En análisis"
+
+#: app/templates/prospecting/create.html:66
+#: app/templates/prospecting/edit.html:66
+#: app/templates/prospecting/index.html:76
+#: app/templates/prospecting/index.html:162
+#: app/templates/prospecting/view.html:208
+msgid "Qualificado"
+msgstr "Calificado"
+
+#: app/templates/prospecting/create.html:67
+#: app/templates/prospecting/edit.html:67
+#: app/templates/prospecting/index.html:77
+#: app/templates/prospecting/index.html:164
+#: app/templates/prospecting/view.html:210
+msgid "Em contato"
+msgstr "En contacto"
+
+#: app/templates/prospecting/create.html:68
+#: app/templates/prospecting/edit.html:68
+#: app/templates/prospecting/index.html:78
+#: app/templates/prospecting/index.html:166
+#: app/templates/prospecting/view.html:212
+msgid "Convertido"
+msgstr "Convertido"
+
+#: app/templates/prospecting/create.html:69
+#: app/templates/prospecting/edit.html:69
+#: app/templates/prospecting/index.html:79
+#: app/templates/prospecting/index.html:168
+#: app/templates/prospecting/view.html:214
+msgid "Perdido"
+msgstr "Perdido"
+
+#: app/templates/prospecting/create.html:75
+#: app/templates/prospecting/edit.html:75
+#: app/templates/prospecting/view.html:54
+msgid "Link Google Maps"
+msgstr "Enlace de Google Maps"
+
+#: app/templates/prospecting/create.html:82
+#: app/templates/prospecting/edit.html:82
+msgid "Localização e Diagnóstico"
+msgstr "Ubicación y Diagnóstico"
+
+#: app/templates/prospecting/create.html:86
+#: app/templates/prospecting/edit.html:86
+#: app/templates/prospecting/index.html:31
+msgid "Cidade"
+msgstr "Ciudad"
+
+#: app/templates/prospecting/create.html:87
+msgid "Ex: Asunción"
+msgstr "Ej: Asunción"
+
+#: app/templates/prospecting/create.html:90
+#: app/templates/prospecting/edit.html:90
+#: app/templates/prospecting/index.html:40
+msgid "Bairro/Região"
+msgstr "Barrio/Región"
+
+#: app/templates/prospecting/create.html:91
+msgid "Ex: Villa Morra"
+msgstr "Ej: Villa Morra"
+
+#: app/templates/prospecting/create.html:96
+#: app/templates/prospecting/edit.html:96
+msgid "Localização / Endereço Completo"
+msgstr "Ubicación / Dirección Completa"
+
+#: app/templates/prospecting/create.html:97
+msgid "Endereço ou pontos de referência..."
+msgstr "Dirección o puntos de referencia..."
+
+#: app/templates/prospecting/create.html:101
+#: app/templates/prospecting/edit.html:101
+msgid "Saúde do Cliente (Diagnóstico Inicial)"
+msgstr "Auditoría de Salud del Cliente (Diagnóstico Inicial)"
+
+#: app/templates/prospecting/create.html:102
+msgid "Ex: Sem ficha reivindicada no maps, poucas fotos, site lento..."
+msgstr "Ej: Sin ficha reclamada en maps, pocas fotos, sitio web lento..."
+
+#: app/templates/prospecting/create.html:109
+#: app/templates/prospecting/edit.html:109
+#: app/templates/prospecting/view.html:75
+msgid "Observações Gerais"
+msgstr "Observaciones Generales"
+
+#: app/templates/prospecting/create.html:111
+msgid "Anotações sobre a abordagem, decisores identificados ou próximos passos..."
+msgstr "Notas sobre el abordaje, tomadores de decisiones identificados o próximos pasos..."
+
+#: app/templates/prospecting/create.html:118
+msgid "Cadastrar Lead"
+msgstr "Registrar Lead"
+
+#: app/templates/prospecting/edit.html:3 app/templates/prospecting/edit.html:8
+msgid "Editar Lead de Prospecção"
+msgstr "Editar Lead de Prospección"
+
+#: app/templates/prospecting/edit.html:118
+msgid "Salvar Alterações"
+msgstr "Guardar Cambios"
+
+#: app/templates/prospecting/index.html:3
+#: app/templates/prospecting/index.html:8
+#: app/templates/prospecting/view.html:12
+msgid "Leads para Prospecção"
+msgstr "Leads de Prospección"
+
+#: app/templates/prospecting/index.html:11
+msgid "Buscar no Google Maps"
+msgstr "Buscar en Google Maps"
+
+#: app/templates/prospecting/index.html:14
+msgid "Adicionar Lead Manual"
+msgstr "Agregar Lead Manual"
+
+#: app/templates/prospecting/index.html:27
+msgid "Buscar por nome..."
+msgstr "Buscar por nombre..."
+
+#: app/templates/prospecting/index.html:33
+#: app/templates/prospecting/index.html:51
+#: app/templates/prospecting/index.html:62
+msgid "Todas"
+msgstr "Todas"
+
+#: app/templates/prospecting/index.html:49
+msgid "Origem"
+msgstr "Origen"
+
+#: app/templates/prospecting/index.html:60
+msgid "Abordagem"
+msgstr "Abordaje"
+
+#: app/templates/prospecting/index.html:98
+msgid "Cidade / Bairro"
+msgstr "Ciudad / Barrio"
+
+#: app/templates/prospecting/index.html:99
+#: app/templates/prospecting/view.html:219
+msgid "Qualificação"
+msgstr "Calificación"
+
+#: app/templates/prospecting/index.html:100
+msgid "Origem / Abordagem"
+msgstr "Origen / Abordaje"
+
+#: app/templates/prospecting/index.html:102
+msgid "Data Cadastro"
+msgstr "Fecha de Registro"
+
+#: app/templates/prospecting/index.html:112
+msgid "Google Maps cadastrado"
+msgstr "Google Maps registrado"
+
+#: app/templates/prospecting/index.html:174
+msgid "Visualizar"
+msgstr "Ver"
+
+#: app/templates/prospecting/index.html:180
+msgid "Excluir este lead de prospecção permanentemente?"
+msgstr "¿Eliminar este lead de prospección permanentemente?"
+
+#: app/templates/prospecting/index.html:182
+msgid "Remover"
+msgstr "Eliminar"
+
+#: app/templates/prospecting/index.html:193
+msgid "Nenhum lead de prospecção cadastrado ou encontrado com estes filtros."
+msgstr "Ningún lead de prospección registrado o encontrado con estos filtros."
+
+#: app/templates/prospecting/search.html:3
+msgid "Prospecção de Leads"
+msgstr "Prospección de Leads"
+
+#: app/templates/prospecting/search.html:8
+msgid "Buscar Leads no Google Maps"
+msgstr "Buscar Leads en Google Maps"
+
+#: app/templates/prospecting/search.html:10
+msgid "Lista de Prospecção"
+msgstr "Lista de Prospección"
+
+#: app/templates/prospecting/search.html:19
+msgid "Buscar Novos Leads"
+msgstr "Buscar Nuevos Leads"
+
+#: app/templates/prospecting/search.html:24
+msgid "Termo de Busca (ex: Dentistas, Restaurantes)"
+msgstr "Término de Búsqueda (ej: Dentistas, Restaurantes)"
+
+#: app/templates/prospecting/search.html:25
+msgid "Ex: Dentistas"
+msgstr "Ej: Dentistas"
+
+#: app/templates/prospecting/search.html:28
+msgid "Localização (Cidade, Bairro)"
+msgstr "Ubicación (Ciudad, Barrio)"
+
+#: app/templates/prospecting/search.html:29
+msgid "Ex: Villa Morra, Asunción"
+msgstr "Ej: Villa Morra, Asunción"
+
+#: app/templates/prospecting/search.html:33
+msgid "Buscar"
+msgstr "Buscar"
+
+#: app/templates/prospecting/search.html:46
+msgid "Resultados da Busca"
+msgstr "Resultados de Búsqueda"
+
+#: app/templates/prospecting/search.html:90
+msgid "Capturar como Lead"
+msgstr "Capturar como Lead"
+
+#: app/templates/prospecting/search.html:102
+msgid "Nenhum resultado encontrado para"
+msgstr "Ningún resultado encontrado para"
+
+#: app/templates/prospecting/search.html:102
+msgid "em"
+msgstr "en"
+
+#: app/templates/prospecting/view.html:3
+msgid "Ficha do Lead"
+msgstr "Ficha del Lead"
+
+#: app/templates/prospecting/view.html:20
+msgid "Editar Ficha"
+msgstr "Editar Ficha"
+
+#: app/templates/prospecting/view.html:36
+msgid "Dados do Lead"
+msgstr "Datos del Lead"
+
+#: app/templates/prospecting/view.html:40
+msgid "Localização / Endereço"
+msgstr "Ubicación / Dirección"
+
+#: app/templates/prospecting/view.html:57
+msgid "Visualizar no Google Maps"
+msgstr "Ver en Google Maps"
+
+#: app/templates/prospecting/view.html:64
+msgid "Saúde do Cliente / Negócio"
+msgstr "Salud del Cliente / Negocio"
+
+#: app/templates/prospecting/view.html:69
+msgid "Nenhuma análise de saúde registrada."
+msgstr "Ninguna auditoría de salud registrada."
+
+#: app/templates/prospecting/view.html:91
+msgid "Histórico de Prospecção"
+msgstr "Historial de Prospección"
+
+#: app/templates/prospecting/view.html:99
+msgid "Registrar Nova Atividade / Anotação de Contato"
+msgstr "Registrar Nueva Actividad / Nota de Contacto"
+
+#: app/templates/prospecting/view.html:100
+msgid ""
+"Ex: Realizado contato via WhatsApp, demonstrou interesse no plano "
+"Agency..."
+msgstr ""
+
+#: app/templates/prospecting/view.html:104
+msgid "Ação"
+msgstr "Acción"
+
+#: app/templates/prospecting/view.html:106
+msgid "Anotação"
+msgstr "Anotación"
+
+#: app/templates/prospecting/view.html:107
+msgid "Abordagem / Contato"
+msgstr "Abordaje / Contacto"
+
+#: app/templates/prospecting/view.html:108
+msgid "Ajuste de Ficha"
+msgstr "Ajuste de Ficha"
+
+#: app/templates/prospecting/view.html:112
+msgid "Registrar"
+msgstr "Registrar"
+
+#: app/templates/prospecting/view.html:145
+msgid "Lead Criado"
+msgstr "Lead Creado"
+
+#: app/templates/prospecting/view.html:147
+msgid "Convertido em Cliente"
+msgstr "Convertido en Cliente"
+
+#: app/templates/prospecting/view.html:149
+msgid "Status Alterado"
+msgstr "Estado Modificado"
+
+#: app/templates/prospecting/view.html:151
+msgid "Anotação de Prospecção"
+msgstr "Anotación de Prospección"
+
+#: app/templates/prospecting/view.html:163
+msgid "Nenhuma atividade registrada ainda."
+msgstr "Ninguna actividad registrada aún."
+
+#: app/templates/prospecting/view.html:176
+msgid "Avançar Negócio"
+msgstr "Avanzar Negocio"
+
+#: app/templates/prospecting/view.html:177
+msgid ""
+"Quando este lead demonstrar interesse e for qualificado, converta-o em um"
+" Cliente Ativo no Kanban."
+msgstr ""
+
+#: app/templates/prospecting/view.html:178
+msgid "Confirmar conversão do lead em cliente e oportunidade no Kanban?"
+msgstr "¿Confirmar conversión del lead en cliente y oportunidad en el Kanban?"
+
+#: app/templates/prospecting/view.html:181
+msgid "Converter em Cliente"
+msgstr "Convertir en Cliente"
+
+#: app/templates/prospecting/view.html:189
+msgid "Lead Convertido!"
+msgstr "¡Lead Convertido!"
+
+#: app/templates/prospecting/view.html:190
+msgid "Esta empresa já foi qualificada e movida para a base de clientes ativos."
+msgstr "Esta empresa ya fue calificada y movida a la base de clientes activos."
+
+#: app/templates/prospecting/view.html:263
+msgid "Cadastrado em"
+msgstr "Registrado el"
+
+#: app/templates/prospecting/view.html:267
+msgid "Responsável"
+msgstr "Responsable"
+
+#: app/templates/prospecting/view.html:279
+msgid "Zona de Risco"
+msgstr "Zona de Riesgo"
+
+#: app/templates/prospecting/view.html:280
+msgid ""
+"Excluir este lead de prospecção removerá todos os seus dados e o "
+"histórico associado permanentemente."
+msgstr ""
+
+#: app/templates/prospecting/view.html:281
+msgid "Excluir este lead permanentemente? Esta ação não pode ser desfeita."
+msgstr "¿Eliminar este lead permanentemente? Esta acción no se puede deshacer."
+
+#: app/templates/prospecting/view.html:284
+msgid "Excluir Lead de Prospecção"
+msgstr "Eliminar Lead de Prospección"
+
+#: app/templates/reports/performance_report.html:5
+msgid "Informe de Rendimiento"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:135
+msgid "Reporte de Performance"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:145
+#, fuzzy
+msgid "Dirección"
+msgstr "Contacto Directo"
+
+#: app/templates/reports/performance_report.html:146
+#, fuzzy
+msgid "Período"
+msgstr "Puerto"
+
+#: app/templates/reports/performance_report.html:149
+#, fuzzy
+msgid "Resumen de Actividad"
+msgstr "Actividade Reciente"
+
+#: app/templates/reports/performance_report.html:154
+#, fuzzy
+msgid "Impresiones"
+msgstr "Impuestos"
+
+#: app/templates/reports/performance_report.html:158
+msgid "Llamadas"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:162
+#, fuzzy
+msgid "Web Clicks"
+msgstr "Clics en Sitio Web"
+
+#: app/templates/reports/performance_report.html:166
+#, fuzzy
+msgid "Rutas"
+msgstr "Tarea"
+
+#: app/templates/reports/performance_report.html:170
+#, fuzzy
+msgid "Detalle de Interacciones"
+msgstr "Editar Interacción"
+
+#: app/templates/reports/performance_report.html:174
+msgid "Métrica"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:175
+#, fuzzy
+msgid "Total del Período"
+msgstr "Total Propuestas"
+
+#: app/templates/reports/performance_report.html:176
+msgid "Promedio Diario"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:181
+msgid "Impresiones en Búsqueda (Desktop)"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:186
+msgid "Impresiones en Búsqueda (Móvil)"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:191
+msgid "Impresiones en Maps (Desktop)"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:196
+msgid "Impresiones en Maps (Móvil)"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:201
+msgid "Total de Llamadas Telefónicas"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:206
+#, fuzzy
+msgid "Visitas al Sitio Web"
+msgstr "Visitas"
+
+#: app/templates/reports/performance_report.html:211
+msgid "Solicitudes de Direcciones"
+msgstr ""
+
+#: app/templates/reports/performance_report.html:219
+msgid "Este informe fue generado automáticamente por PureteGO CRM."
+msgstr ""
+
 #: app/templates/saas/dashboard.html:3 app/templates/saas/dashboard.html:8
 msgid "SaaS Administration"
 msgstr "Administración SaaS"
@@ -5439,10 +6684,6 @@ msgid ""
 "Pending\n"
 "                Approval"
 msgstr ""
-
-#: app/templates/tasks/index.html:196
-msgid "Canceled"
-msgstr "Cancelada"
 
 #: app/templates/tasks/index.html:199
 msgid "All Priorities"

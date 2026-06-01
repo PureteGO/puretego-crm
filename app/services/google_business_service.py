@@ -182,7 +182,8 @@ class GoogleBusinessService:
         if '/locations/' in location_name:
              try:
                 real_name = 'locations/' + location_name.split('/locations/')[1]
-             except:
+             except Exception as e:
+                logger.warning(f"Error parsing location_name: {e}", extra={"location_name": location_name})
                 real_name = location_name
         else:
              real_name = location_name
@@ -269,7 +270,8 @@ class GoogleBusinessService:
         if '/locations/' in location_name:
             try:
                 real_name = 'locations/' + location_name.split('/locations/')[1]
-            except:
+            except Exception as e:
+                logger.warning(f"Error parsing location_name: {e}", extra={"location_name": location_name})
                 real_name = location_name
         else:
             real_name = location_name
@@ -291,7 +293,8 @@ class GoogleBusinessService:
         if '/locations/' in location_name:
             try:
                 real_name = 'locations/' + location_name.split('/locations/')[1]
-            except:
+            except Exception as e:
+                logger.warning(f"Error parsing location_name: {e}", extra={"location_name": location_name})
                 real_name = location_name
         else:
             real_name = location_name
@@ -302,7 +305,8 @@ class GoogleBusinessService:
             response = requests.get(url, headers=self._get_headers(), timeout=30)
             response.raise_for_status()
             return response.json().get('verifications', [])
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error listing verifications: {e}", extra={"location_name": location_name})
             return []
     
     def list_reviews(self, location_name: str, page_size: int = 50) -> List[Dict]:
@@ -400,7 +404,8 @@ class GoogleBusinessService:
             response = requests.delete(url, headers=self._get_headers(), timeout=30)
             response.raise_for_status()
             return True
-        except Exception:
+        except Exception as e:
+            logger.error(f"Error deleting review reply: {e}", extra={"review_name": review_name})
             return False
     
     def list_media(self, location_name: str) -> List[Dict]:
@@ -437,6 +442,7 @@ class GoogleBusinessService:
             
         except Exception as e:
             # Media API might fail or be empty, don't crash
+            logger.warning(f"Failed to list media items: {e}", extra={"location_name": location_name})
             return []
     
     def _parse_star_rating(self, rating_str: str) -> int:
@@ -458,6 +464,14 @@ class GoogleBusinessService:
         """
         with get_db() as db:
             try:
+                link = db.query(GMBLocationLink).get(location_link_id)
+                if not link:
+                    logger.error(f"Link {location_link_id} not found when syncing reviews.")
+                    return 0
+                location_name = link.gmb_location_name
+                next_page_token = None
+                all_reviews = []
+                
                 # Fetch up to 10 pages (total 500 reviews)
                 for _ in range(10):
                     try:

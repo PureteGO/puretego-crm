@@ -67,8 +67,19 @@ class AuditService:
             return True
             
         except SQLAlchemyError as e:
-            # Don't let audit logging failures break the application
-            logger.error(f"Failed to log audit action: {e}")
+            # Don't let audit logging failures break the application, but write structured log with payload
+            logger.error("Failed to commit audit log to database. Outputting to error stream.", 
+                         extra={
+                             "audit_action": action,
+                             "entity_type": entity_type,
+                             "entity_id": entity_id,
+                             "user_id": user_id,
+                             "company_id": company_id,
+                             "old_values": old_values,
+                             "new_values": new_values,
+                             "description": description,
+                             "db_error": str(e)
+                         })
             return False
     
     @staticmethod

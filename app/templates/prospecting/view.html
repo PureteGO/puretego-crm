@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lead.company_name }} - {{ _('Ficha do Lead') }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{{ url_for('prospecting.leads') }}">{{ _('Leads para Prospecção') }}</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ lead.company_name }}</li>
+                </ol>
+            </nav>
+            <h1 class="h2">{{ lead.company_name }}</h1>
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0 gap-2">
+            <a href="{{ url_for('prospecting.leads_edit', lead_id=lead.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-pencil"></i> {{ _('Editar Ficha') }}
+            </a>
+            <a href="{{ url_for('prospecting.leads') }}" class="btn btn-sm btn-secondary">
+                <i class="bi bi-arrow-left"></i> {{ _('Voltar') }}
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="row">
+        <!-- Main Column (Details & History) -->
+        <div class="col-lg-8">
+            <!-- Details Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2 mb-3">
+                        <i class="bi bi-file-earmark-text me-2 text-primary"></i>{{ _('Dados do Lead') }}
+                    </h5>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold text-muted">{{ _('Localização / Endereço') }}:</div>
+                        <div class="col-sm-9">
+                            {{ lead.address or '-' }}
+                            {% if lead.neighborhood or lead.city %}
+                            <div class="text-muted small mt-1">
+                                {% if lead.neighborhood %}{{ lead.neighborhood }}{% endif %}
+                                {% if lead.city %}, {{ lead.city }}{% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if lead.maps_link %}
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold text-muted">{{ _('Link Google Maps') }}:</div>
+                        <div class="col-sm-9">
+                            <a href="{{ lead.maps_link }}" target="_blank" class="btn btn-xs btn-outline-info text-decoration-none">
+                                <i class="bi bi-google me-1"></i> {{ _('Visualizar no Google Maps') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold text-muted">{{ _('Saúde do Cliente / Negócio') }}:</div>
+                        <div class="col-sm-9">
+                            {% if lead.business_health %}
+                            <div class="p-3 bg-light border rounded text-dark text-pre-wrap small">{{ lead.business_health }}</div>
+                            {% else %}
+                            <span class="text-muted italic">{{ _('Nenhuma análise de saúde registrada.') }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3 fw-bold text-muted">{{ _('Observações Gerais') }}:</div>
+                        <div class="col-sm-9">
+                            {% if lead.observations %}
+                            <div class="text-pre-wrap">{{ lead.observations }}</div>
+                            {% else %}
+                            <span class="text-muted italic">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Interaction Form & History -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title border-bottom pb-2 mb-3">
+                        <i class="bi bi-chat-left-text me-2 text-primary"></i>{{ _('Histórico de Prospecção') }}
+                    </h5>
+
+                    {% if lead.status != 'converted' %}
+                    <!-- Form to add new note -->
+                    <form action="{{ url_for('prospecting.leads_activity', lead_id=lead.id) }}" method="POST" class="mb-4 bg-light p-3 border rounded">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="notes" class="form-label fw-bold small">{{ _('Registrar Nova Atividade / Anotação de Contato') }}</label>
+                            <textarea class="form-control form-control-sm" id="notes" name="notes" rows="2" required placeholder="{{ _('Ex: Realizado contato via WhatsApp, demonstrou interesse no plano Agency...') }}"></textarea>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="form-label mb-0 small fw-bold me-1">{{ _('Ação') }}:</label>
+                                <select name="action" class="form-select form-select-sm" style="width: auto;">
+                                    <option value="note_added">{{ _('Anotação') }}</option>
+                                    <option value="contact" selected>{{ _('Abordagem / Contato') }}</option>
+                                    <option value="status_change">{{ _('Ajuste de Ficha') }}</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg"></i> {{ _('Registrar') }}
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+
+                    <!-- Timeline -->
+                    <div class="timeline">
+                        {% for act in activities %}
+                        <div class="d-flex mb-3 border-bottom pb-3">
+                            <div class="me-3">
+                                {% if act.action == 'created' %}
+                                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-plus-lg"></i>
+                                </div>
+                                {% elif act.action == 'converted' %}
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person-check-fill"></i>
+                                </div>
+                                {% elif act.action == 'status_change' %}
+                                <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                </div>
+                                {% else %}
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-chat-text"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold small">
+                                        {% if act.action == 'created' %}
+                                        {{ _('Lead Criado') }}
+                                        {% elif act.action == 'converted' %}
+                                        {{ _('Convertido em Cliente') }}
+                                        {% elif act.action == 'status_change' %}
+                                        {{ _('Status Alterado') }}
+                                        {% else %}
+                                        {{ _('Anotação de Prospecção') }}
+                                        {% endif %}
+                                        {% if act.user %}
+                                        <span class="text-muted font-normal">({{ act.user.name }})</span>
+                                        {% endif %}
+                                    </span>
+                                    <small class="text-muted">{{ act.created_at|format_date('%d/%m/%Y %H:%M') }}</small>
+                                </div>
+                                <div class="small text-dark mt-1 text-pre-wrap">{{ act.notes }}</div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p class="text-muted italic text-center py-3">{{ _('Nenhuma atividade registrada ainda.') }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Column (Status & Conversão) -->
+        <div class="col-lg-4">
+            <!-- Quick Actions / Conversion -->
+            {% if lead.status != 'converted' %}
+            <div class="card shadow-sm border-success mb-4 bg-success bg-opacity-10">
+                <div class="card-body text-center py-4">
+                    <h5 class="card-title text-success fw-bold"><i class="bi bi-person-plus-fill me-2"></i>{{ _('Avançar Negócio') }}</h5>
+                    <p class="small text-muted mb-4">{{ _('Quando este lead demonstrar interesse e for qualificado, converta-o em um Cliente Ativo no Kanban.') }}</p>
+                    <form action="{{ url_for('prospecting.leads_convert', lead_id=lead.id) }}" method="POST" onsubmit="return confirm('{{ _('Confirmar conversão do lead em cliente e oportunidade no Kanban?') }}');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-bold shadow-sm">
+                            <i class="bi bi-check-circle-fill me-2"></i> {{ _('Converter em Cliente') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% else %}
+            <div class="card shadow-sm border-primary mb-4 bg-primary bg-opacity-10 text-center py-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary fw-bold"><i class="bi bi-check-circle-fill me-2"></i>{{ _('Lead Convertido!') }}</h5>
+                    <p class="small text-muted mb-0">{{ _('Esta empresa já foi qualificada e movida para a base de clientes ativos.') }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Properties Card -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-0">
+                    <table class="table table-striped table-hover align-middle mb-0 small">
+                        <tbody>
+                            <tr>
+                                <th class="ps-3 text-muted" style="width: 45%;">{{ _('Status') }}</th>
+                                <td class="pe-3">
+                                    {% if lead.status == 'new' %}
+                                    <span class="badge bg-info text-dark">{{ _('Novo') }}</span>
+                                    {% elif lead.status == 'analyzing' %}
+                                    <span class="badge bg-secondary">{{ _('Em análise') }}</span>
+                                    {% elif lead.status == 'qualified' %}
+                                    <span class="badge bg-primary">{{ _('Qualificado') }}</span>
+                                    {% elif lead.status == 'contacting' %}
+                                    <span class="badge bg-warning text-dark">{{ _('Em contato') }}</span>
+                                    {% elif lead.status == 'converted' %}
+                                    <span class="badge bg-success">{{ _('Convertido') }}</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">{{ _('Perdido') }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3 text-muted">{{ _('Qualificação') }}</th>
+                                <td class="pe-3">
+                                    {% if lead.qualification == 'hot' %}
+                                    <span class="badge bg-danger"><i class="bi bi-fire"></i> {{ _('Quente') }}</span>
+                                    {% elif lead.qualification == 'warm' %}
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-thermometer-half"></i> {{ _('Morno') }}</span>
+                                    {% else %}
+                                    <span class="badge bg-info text-dark"><i class="bi bi-snow"></i> {{ _('Frio') }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3 text-muted">{{ _('Origem do Lead') }}</th>
+                                <td class="pe-3 fw-semibold">
+                                    {% if lead.source == 'google_maps' %}
+                                    <i class="bi bi-google text-primary me-1"></i> {{ _('Google Maps') }}
+                                    {% elif lead.source == 'field_visit' %}
+                                    <i class="bi bi-geo text-success me-1"></i> {{ _('Visita em Campo') }}
+                                    {% elif lead.source == 'social_media' %}
+                                    <i class="bi bi-instagram text-danger me-1"></i> {{ _('Redes Sociais') }}
+                                    {% elif lead.source == 'referral' %}
+                                    <i class="bi bi-chat-quote text-warning me-1"></i> {{ _('Indicação') }}
+                                    {% else %}
+                                    <i class="bi bi-question-circle me-1"></i> {{ _('Outro') }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3 text-muted">{{ _('Forma de Abordagem') }}</th>
+                                <td class="pe-3">
+                                    {% if lead.prospecting_method == 'opening_visit' %}
+                                    <i class="bi bi-geo-alt me-1"></i> {{ _('Visita de Abertura') }}
+                                    {% elif lead.prospecting_method == 'phone_call' %}
+                                    <i class="bi bi-telephone me-1"></i> {{ _('Chamada Telefônica') }}
+                                    {% elif lead.prospecting_method == 'whatsapp' %}
+                                    <i class="bi bi-whatsapp me-1 text-success"></i> {{ _('WhatsApp') }}
+                                    {% elif lead.prospecting_method == 'email' %}
+                                    <i class="bi bi-envelope me-1"></i> {{ _('E-mail') }}
+                                    {% else %}
+                                    <i class="bi bi-link-45deg me-1"></i> {{ _('Outro') }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3 text-muted">{{ _('Cadastrado em') }}</th>
+                                <td class="pe-3 text-muted">{{ lead.created_at|format_date('%d/%m/%Y %H:%M') }}</td>
+                            </tr>
+                            <tr>
+                                <th class="ps-3 text-muted">{{ _('Responsável') }}</th>
+                                <td class="pe-3 font-semibold">{{ lead.owner.name if lead.owner else '-' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Danger Zone -->
+            {% if lead.status != 'converted' %}
+            <div class="card shadow-sm border-danger">
+                <div class="card-body">
+                    <h6 class="card-title text-danger fw-bold"><i class="bi bi-exclamation-octagon me-2"></i>{{ _('Zona de Risco') }}</h6>
+                    <p class="small text-muted">{{ _('Excluir este lead de prospecção removerá todos os seus dados e o histórico associado permanentemente.') }}</p>
+                    <form action="{{ url_for('prospecting.leads_delete', lead_id=lead.id) }}" method="POST" onsubmit="return confirm('{{ _('Excluir este lead permanentemente? Esta ação não pode ser desfeita.') }}');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">
+                            <i class="bi bi-trash"></i> {{ _('Excluir Lead de Prospecção') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
