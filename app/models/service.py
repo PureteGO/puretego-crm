@@ -25,10 +25,6 @@ class Service(Base):
     # Relationships
     company = relationship("Company")
     
-    def __init__(self, name, description=None, base_price=0.00):
-        self.name = name
-        self.description = description
-        self.base_price = base_price
     
     def to_dict(self):
         """Converte o objeto para dicionário"""
