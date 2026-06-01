@@ -25,8 +25,7 @@ def run_endpoint_tests():
             user = db.query(User).first()
             if not user:
                 print("No user found in DB. Creating dummy User...")
-                user = User(name="Test User", email="test_endpoint@example.com", company_id=1)
-                user.set_password("password123")
+                user = User(name="Test User", email="test_endpoint@example.com", password="password123", company_id=1)
                 db.add(user)
                 db.flush()
             

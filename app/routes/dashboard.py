@@ -317,7 +317,7 @@ def index():
                     'id': i.id,
                     'title': f"{i.type.name} - {i.client.name}",
                     'date': i.date,
-                    'url': f"/clients/{i.client_id}"  # Direct link to client
+                    'url': f"/clients/{i.client_id}?interaction_id={i.id}"  # Direct link to client with interaction ID
                 })
                 
             # 2. Overdue Tasks (Simpler filter to avoid 500)

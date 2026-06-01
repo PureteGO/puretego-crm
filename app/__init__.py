@@ -2,6 +2,7 @@
 MAPS2GO CRM - Flask Application Factory
 """
 
+from app.utils.logging_config import setup_observability
 from flask import Flask, session, g, request, redirect, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_babel import Babel, gettext as _, lazy_gettext as _l
@@ -31,6 +32,9 @@ def create_app(config_object=None):
                 template_folder='templates',
                 static_folder='static',
                 static_url_path='/static')
+    
+    # Initialize structured logging
+    setup_observability(app)
     
     # Carregar configurações
     if config_object is None:

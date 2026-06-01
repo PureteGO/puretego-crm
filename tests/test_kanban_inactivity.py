@@ -27,8 +27,7 @@ def run_tests():
             user = db.query(User).first()
             if not user:
                 print("Creating dummy User...")
-                user = User(name="Test User", email="test@example.com", company_id=1)
-                user.set_password("password123")
+                user = User(name="Test User", email="test@example.com", password="password123", company_id=1)
                 db.add(user)
                 db.flush()
             

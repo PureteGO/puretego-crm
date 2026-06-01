@@ -880,6 +880,24 @@
                 statusSpan.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i>';
             });
     }
+
+    // Auto-open interaction edit modal if interaction_id query param is present
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const interactionId = urlParams.get('interaction_id');
+        if (interactionId) {
+            window.addEventListener('load', function() {
+                const timelineCard = document.querySelector(`.timeline [data-id="${interactionId}"]`);
+                if (timelineCard) {
+                    timelineCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    timelineCard.classList.add('border-warning', 'shadow');
+                    setTimeout(function() {
+                        openEditModalFromData(timelineCard);
+                    }, 500);
+                }
+            });
+        }
+    })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}

@@ -608,25 +608,65 @@
                     aria-label="Close"></button>
             </div>
             <div class="modal-body p-0">
+                {% if overdue_items %}
+                <!-- Bulk Actions Toolbar -->
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom bg-light text-dark gap-2 flex-wrap">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="selectAllOverdue">
+                        <label class="form-check-label fw-bold small" for="selectAllOverdue">
+                            {{ _('Select All') }}
+                        </label>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="small text-muted me-2 d-none" id="selectedOverdueCount">0 selecionados</span>
+                        
+                        <button type="button" class="btn btn-xs btn-outline-warning" id="btnBulkReschedule" disabled data-bs-toggle="collapse" data-bs-target="#bulkRescheduleCollapse">
+                            <i class="bi bi-calendar-event"></i> {{ _('Reschedule') }}
+                        </button>
+                        <button type="button" class="btn btn-xs btn-outline-danger" id="btnBulkMissed" disabled onclick="submitBulkAction('missed')">
+                            <i class="bi bi-calendar-x"></i> {{ _('Lost') }}
+                        </button>
+                        <button type="button" class="btn btn-xs btn-outline-secondary" id="btnBulkSkipped" disabled onclick="submitBulkAction('skipped')">
+                            <i class="bi bi-x-circle"></i> {{ _('Dismiss') }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reschedule Form Collapse -->
+                <div class="collapse p-3 border-bottom bg-light text-dark" id="bulkRescheduleCollapse">
+                    <div class="d-flex align-items-end gap-2" style="max-width: 400px;">
+                        <div class="flex-grow-1">
+                            <label class="form-label small fw-bold mb-1">{{ _('New Date and Time') }}</label>
+                            <input type="text" class="form-control form-control-sm flatpickr-datetime" id="bulkNewDate" placeholder="{{ _('Select date...') }}">
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="submitBulkAction('reschedule')">{{ _('Confirm') }}</button>
+                    </div>
+                </div>
+                {% endif %}
+
                 <div class="list-group list-group-flush">
                     {% for item in overdue_items %}
-                    <a href="{{ item.url }}"
-                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="fw-bold">
-                                {% if item.type == 'interaction' %}
-                                <i class="bi bi-calendar-event me-2 text-muted"></i>
-                                {% else %}
-                                <i class="bi bi-check2-square me-2 text-muted"></i>
-                                {% endif %}
-                                {{ item.title }}
+                    <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent">
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <input type="checkbox" class="form-check-input me-3 overdue-item-checkbox" value="{{ item.type }}_{{ item.id }}">
+                            <div>
+                                <div class="fw-bold">
+                                    {% if item.type == 'interaction' %}
+                                    <i class="bi bi-calendar-event me-2 text-muted"></i>
+                                    {% else %}
+                                    <i class="bi bi-check2-square me-2 text-muted"></i>
+                                    {% endif %}
+                                    {{ item.title }}
+                                </div>
+                                <small class="text-danger">
+                                    <i class="bi bi-clock"></i> {{ item.date|format_date }} - {{ _('Overdue') }}
+                                </small>
                             </div>
-                            <small class="text-danger">
-                                <i class="bi bi-clock"></i> {{ item.date|format_date }} - {{ _('Overdue') }}
-                            </small>
                         </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
+                        <a href="{{ item.url }}" class="btn btn-sm btn-outline-primary" title="{{ _('View') }}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </div>
                     {% else %}
                     <div class="p-4 text-center">
                         <i class="bi bi-check-circle fs-1 text-success mb-3"></i>
@@ -1303,6 +1343,109 @@
                 console.error(err);
                 alert("{{ _('Error creating task') }}");
             });
+    }
+
+    // Bulk Overdue Items Action Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectAllCheckbox = document.getElementById('selectAllOverdue');
+        const itemCheckboxes = document.querySelectorAll('.overdue-item-checkbox');
+        const btnReschedule = document.getElementById('btnBulkReschedule');
+        const btnMissed = document.getElementById('btnBulkMissed');
+        const btnSkipped = document.getElementById('btnBulkSkipped');
+        const selectedCountLabel = document.getElementById('selectedOverdueCount');
+
+        function updateActionButtons() {
+            const checkedBoxes = document.querySelectorAll('.overdue-item-checkbox:checked');
+            const checkedCount = checkedBoxes.length;
+            const anyChecked = checkedCount > 0;
+            
+            if (btnReschedule) btnReschedule.disabled = !anyChecked;
+            if (btnMissed) btnMissed.disabled = !anyChecked;
+            if (btnSkipped) btnSkipped.disabled = !anyChecked;
+            
+            if (anyChecked) {
+                if (selectedCountLabel) {
+                    selectedCountLabel.textContent = `${checkedCount} {{ _('selected') }}`;
+                    selectedCountLabel.classList.remove('d-none');
+                }
+            } else {
+                if (selectedCountLabel) selectedCountLabel.classList.add('d-none');
+                // Hide collapse if open
+                const collapseEl = document.getElementById('bulkRescheduleCollapse');
+                if (collapseEl && collapseEl.classList.contains('show')) {
+                    bootstrap.Collapse.getInstance(collapseEl).hide();
+                }
+            }
+        }
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                const isChecked = this.checked;
+                itemCheckboxes.forEach(cb => {
+                    cb.checked = isChecked;
+                });
+                updateActionButtons();
+            });
+        }
+
+        itemCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                const allChecked = Array.from(itemCheckboxes).every(c => c.checked);
+                if (selectAllCheckbox) selectAllCheckbox.checked = allChecked;
+                updateActionButtons();
+            });
+        });
+    });
+
+    function submitBulkAction(action) {
+        const selectedCheckboxes = document.querySelectorAll('.overdue-item-checkbox:checked');
+        const ids = Array.from(selectedCheckboxes).map(cb => cb.value);
+        
+        if (ids.length === 0) return;
+        
+        let payload = {
+            ids: ids,
+            action: action
+        };
+        
+        if (action === 'reschedule') {
+            const newDate = document.getElementById('bulkNewDate').value;
+            if (!newDate) {
+                alert("{{ _('Please select a date.') }}");
+                return;
+            }
+            payload.new_date = newDate;
+        } else {
+            const confirmMsg = action === 'missed' 
+                ? "{{ _('Do you want to mark the selected items as lost/missed? They will be moved to the revision area in the Agenda.') }}"
+                : "{{ _('Do you want to dismiss/cancel the selected items?') }}";
+                
+            if (!confirm(confirmMsg)) return;
+        }
+        
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        fetch('/calendar/bulk-update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("{{ _('Connection error when updating items.') }}");
+        });
     }
 </script>
 {% endblock %}
