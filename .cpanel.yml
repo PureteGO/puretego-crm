@@ -2,5 +2,8 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home2/puretego/gbpcheck.puretego.online/
-    - /usr/bin/rsync -a --delete --exclude='venv/' --exclude='__pycache__/' --exclude='.env' --exclude='*.pem' --exclude='*.log' --exclude='*.db' --exclude='*.zip' --exclude='.git/' --exclude='.gitignore' --exclude='debug_*' --exclude='seed_*' --exclude='test_*' --exclude='*.sql' --exclude='client_secret*' --exclude='generated_pdfs/' --exclude='uploads/' --exclude='recovery_my.ini' --exclude='export_*.json' --exclude='relatoriodossonhos.pdf' --exclude='htaccess_*.txt' --exclude='cpanel_*' --exclude='server_*.log' --exclude='emergency_error.log' --exclude='error_log.txt' --exclude='verification_log.txt' . $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/app $DEPLOYPATH/config
+    - /bin/cp -rf app/* $DEPLOYPATH/app/
+    - /bin/cp -rf config/* $DEPLOYPATH/config/
+    - /bin/cp -f passenger_wsgi.py run.py requirements.txt $DEPLOYPATH/
     - /bin/touch $DEPLOYPATH/passenger_wsgi.py
