@@ -620,6 +620,10 @@
                     <div class="d-flex align-items-center gap-2">
                         <span class="small text-muted me-2 d-none" id="selectedOverdueCount">0 selecionados</span>
                         
+                        <button type="button" class="btn btn-xs btn-danger" id="btnMoveAllToLost" onclick="moveAllToLost()">
+                            <i class="bi bi-arrow-right-circle"></i> {{ _('Mover todos para Perdidos') }}
+                        </button>
+                        
                         <button type="button" class="btn btn-xs btn-outline-warning" id="btnBulkReschedule" disabled data-bs-toggle="collapse" data-bs-target="#bulkRescheduleCollapse">
                             <i class="bi bi-calendar-event"></i> {{ _('Reschedule') }}
                         </button>
@@ -1396,6 +1400,31 @@
             });
         });
     });
+
+    function moveAllToLost() {
+        const itemCheckboxes = document.querySelectorAll('.overdue-item-checkbox');
+        if (itemCheckboxes.length === 0) return;
+        
+        itemCheckboxes.forEach(cb => cb.checked = true);
+        
+        const selectAllCheckbox = document.getElementById('selectAllOverdue');
+        if (selectAllCheckbox) selectAllCheckbox.checked = true;
+        
+        const selectedCountLabel = document.getElementById('selectedOverdueCount');
+        if (selectedCountLabel) {
+            selectedCountLabel.textContent = `${itemCheckboxes.length} {{ _('selected') }}`;
+            selectedCountLabel.classList.remove('d-none');
+        }
+        
+        const btnReschedule = document.getElementById('btnBulkReschedule');
+        const btnMissed = document.getElementById('btnBulkMissed');
+        const btnSkipped = document.getElementById('btnBulkSkipped');
+        if (btnReschedule) btnReschedule.disabled = false;
+        if (btnMissed) btnMissed.disabled = false;
+        if (btnSkipped) btnSkipped.disabled = false;
+        
+        submitBulkAction('missed');
+    }
 
     function submitBulkAction(action) {
         const selectedCheckboxes = document.querySelectorAll('.overdue-item-checkbox:checked');
